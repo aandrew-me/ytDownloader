@@ -1,0 +1,68 @@
+{
+	"dependencies": {
+		"body-parser": "^1.20.0",
+		"express": "^4.18.1",
+		"ffmpeg-static": "^5.0.2",
+		"ytdl-core": "^4.11.0"
+	},
+	"name": "ytdownloader",
+	"version": "1.0.0",
+	"main": "main.js",
+	"scripts": {
+		"start": "electron .",
+		"windows": "electron-builder -w",
+		"linux": "electron-builder -l",
+		"mac": "electron-builder -m"
+	},
+	"keywords": [],
+	"author": "Andrew",
+	"license": "MIT",
+	"description": "Download videos and audios from YouTube",
+	"devDependencies": {
+		"electron": "^19.0.9",
+		"electron-builder": "^23.1.0"
+	},
+	"build": {
+		"productName": "YTDownloader",
+		"appId": "com.andrew.ytdownloader",
+		"mac": {
+			"category": "Utility",
+			"target": [
+				"dmg"
+			]
+		},
+		"dmg": {
+			"contents": [
+				{
+					"x": 130,
+					"y": 220
+				},
+				{
+					"x": 410,
+					"y": 220,
+					"type": "link",
+					"path": "/Applications"
+				}
+			],
+			"sign": false
+		},
+		"asar": true,
+		"directories": {
+			"buildResources": "resources",
+			"output": "release"
+		},
+		"linux": {
+			"target": [
+				"AppImage"
+			],
+			"category": "Utility"
+		},
+		"win": {
+			"target": "nsis"
+		},
+		"nsis": {
+			"allowToChangeInstallationDirectory": true,
+			"oneClick": false
+		}
+	}
+}

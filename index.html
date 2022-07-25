@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Youtube Video Downloader</title>
+    <link rel="stylesheet" href="index.css">
+    <script src="index.js" defer></script>
+</head>
+
+<body>
+    <!-- Theme toggle -->
+    <div id="themeToggle" onclick="toggle()">
+        <div id="themeToggleInside"></div>
+    </div>
+
+    <h1>YouTube Downloader</h1>
+    <input type="text" name="url" placeholder="Paste Video URL or ID here" id="url" autofocus>
+    <!-- Get info button -->
+    <button id="getInfo" onclick="clickAnimation('getInfo')">Get info</button>
+
+    <p id="incorrectMsg"></p>
+
+    <div id="loadingWrapper">
+        <span>Loading</span>
+        <svg version="1.1" id="L4" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
+            y="0px" viewBox="0 0 100 100" enable-background="new 0 0 0 0" xml:space="preserve">
+            <circle fill="rgb(84, 171, 222)" stroke="none" cx="6" cy="50" r="6">
+                <animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite" begin="0.1" />
+            </circle>
+            <circle fill="rgb(84, 171, 222)" stroke="none" cx="26" cy="50" r="6">
+                <animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite" begin="0.2" />
+            </circle>
+            <circle fill="rgb(84, 171, 222)" stroke="none" cx="46" cy="50" r="6">
+                <animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite" begin="0.3" />
+            </circle>
+        </svg>
+    </div>
+
+
+    <div id="hidden">
+        <div id="btnContainer">
+            <button class="toggleBtn" id="videoToggle">Video</button>
+            <button class="toggleBtn" id="audioToggle">Audio</button>
+        </div>
+        <p id="title">Title: </p>
+
+        <div id="videoList">
+            <form action="/download" method="post">
+                <label>Select Format - </label>
+                <select name="videoTag" id="videoFormatSelect">
+                </select>
+                <br>
+                <input type="hidden" name="url" class="url">
+                <button type="submit" class="submitBtn">Download</button>
+            </form>
+        </div>
+
+        <div id="audioList">
+            <form action="/download" method="post">
+                <label>Select Format - </label>
+                <select name="audioTag" id="audioFormatSelect">
+                </select>
+                <br>
+                <input type="hidden" name="url" class="url">
+                <button type="submit" class="submitBtn" id="submitBtn" onclick="clickAnimation('submitBtn')">Download</button>
+            </form>
+        </div>
+
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,149 @@
+body {
+	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+		Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
+		sans-serif;
+	text-align: center;
+	font-size: xx-large;
+	padding: 10px;
+	background-color: whitesmoke;
+}
+
+#title {
+	font-size: x-large;
+	font-family: sans-serif;
+}
+
+h1 {
+	font-size: 50px;
+}
+
+input[type="text"] {
+	padding: 10px;
+	border-radius: 10px;
+	border: 1px solid gray;
+	outline: none;
+	font-size: large;
+	width: 70%;
+}
+
+#getInfo {
+	padding: 10px;
+	background-color: rgb(64, 227, 64);
+	border: none;
+	border-radius: 8px;
+	color: white;
+	font-size: large;
+	cursor: pointer;
+
+	/* animation-name: clickAnimation; */
+	animation-duration: .5s;
+	animation-timing-function: linear;
+}
+
+@keyframes clickAnimation {
+	0% {background-color: rgb(64, 227, 64);}
+	50% {background-color: rgb(40, 126, 40);}
+	100% {background-color: rgb(64, 227, 64);}
+}
+
+#hidden {
+	display: none;
+	/* display: inline-block; */
+	background-color: rgb(143, 239, 207);
+	border-radius: 10px;
+	width: 80%;
+	padding: 10px;
+	color:black;
+}
+
+#btnContainer {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+}
+
+.toggleBtn {
+	width: 50%;
+	font-size: x-large;
+	border: none;
+	background-color: rgb(108, 231, 190);
+	border-radius: 10px;
+	cursor: pointer;
+	padding: 8px;
+}
+
+select {
+	padding: 15px;
+	background-color: lightgreen;
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+	font-size: large;
+	margin: 8px;
+	outline:none;
+}
+
+label {
+	position: relative;
+	top: 3px;
+}
+
+#videoList,
+#audioList {
+	display: none;
+}
+
+.submitBtn {
+	padding: 15px;
+	margin: 15px;
+	border-radius: 8px;
+	background-color: rgb(64, 227, 64);
+	color: white;
+	border: none;
+	font-size: large;
+	cursor: pointer;
+	
+	animation-duration: .5s;
+	animation-timing-function: linear;
+}
+
+#incorrectMsg {
+	color: rgb(250, 59, 59);
+}
+
+#loadingWrapper{
+	display:none;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+}
+
+svg {
+	width: 100px;
+	height: 100px;
+	display: inline-block;
+	margin-left:20px
+  }
+
+#themeToggle {
+	width: 55px;
+	height: 30px;
+	background-color: rgb(147, 174, 185);
+	border-radius: 40px;
+	display: flex;
+	cursor: pointer;
+	transition: linear;
+	transition-duration: 0.4s;
+}
+
+#themeToggleInside {
+	background-color: rgb(255, 255, 255);
+	border-radius: 30px;
+	width: 22px;
+	height: 22px;
+	margin: 4px;
+	position: relative;
+	transition: linear;
+	transition-duration: 0.4s;
+	left:0px;
+}
