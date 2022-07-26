@@ -36,10 +36,7 @@ function getInfo() {
 				videoToggle.style.backgroundColor = "rgb(67, 212, 164)";
 
 				for (let format of data.formats) {
-					let sizeSplitted = (Number(format.contentLength) / 1000000)
-						.toString().split(".")
-					let size = sizeSplitted[0] + sizeSplitted[1].slice(0,1)
-
+					let size = (Number(format.contentLength) / 1000000).toFixed(2)
 					size = size + " MB";
 
 					// For videos
@@ -63,7 +60,8 @@ function getInfo() {
 					}
 
 					// For audios
-					else {
+					else if(format.hasAudio && !format.hasVideo && format.audioBitrate)
+					 {
 						const pattern = /^mp*4a[0-9.]+$/g;
 						let audioCodec;
 						const itag = format.itag;
