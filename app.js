@@ -1,7 +1,6 @@
 //! Todo
 //! Filename needs to be filtered
 //! Total progress
-//! Colours
 
 
 const express = require('express');

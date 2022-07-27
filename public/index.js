@@ -166,11 +166,13 @@ function download(type) {
 }
 
 document.getElementById("videoDownload").addEventListener("click", (event) => {
+	document.getElementById("preparingBox").style.display = "flex";
 	clickAnimation("videoDownload");
 	download("video");
 });
 
 document.getElementById("audioDownload").addEventListener("click", (event) => {
+	document.getElementById("preparingBox").style.display = "flex";
 	clickAnimation("audioDownload");
 	download("audio");
 });
@@ -186,41 +188,46 @@ document.getElementById("url").addEventListener("keypress", (event) => {
 });
 
 videoToggle.addEventListener("click", (event) => {
-	videoToggle.style.backgroundColor = "rgb(67, 212, 164)";
-	audioToggle.style.backgroundColor = "rgb(108, 231, 190)";
+	videoToggle.style.backgroundColor = "var(--box-toggleOn)";
+	audioToggle.style.backgroundColor = "var(--box-toggle)";
 	document.getElementById("audioList").style.display = "none";
 	document.getElementById("videoList").style.display = "block";
 });
 
 audioToggle.addEventListener("click", (event) => {
-	audioToggle.style.backgroundColor = "rgb(67, 212, 164)";
-	videoToggle.style.backgroundColor = "rgb(108, 231, 190)";
+	audioToggle.style.backgroundColor = "var(--box-toggleOn)";
+	videoToggle.style.backgroundColor = "var(--box-toggle)";
 	document.getElementById("videoList").style.display = "none";
 	document.getElementById("audioList").style.display = "block";
 });
 
 // Toggle theme
 let darkTheme = false;
-let button = document.getElementById("themeToggle");
 let circle = document.getElementById("themeToggleInside");
+const root = document.querySelector(":root");
+
 function toggle() {
 	if (darkTheme == false) {
 		circle.style.left = "25px";
-		button.style.backgroundColor = "rgb(80, 193, 238)";
+
+		root.style.setProperty("--background", "rgb(40,40,40)");
+		root.style.setProperty("--text", "white");
+		root.style.setProperty("--box-main", "rgb(80,80,80)");
+		root.style.setProperty("--box-toggle", "rgb(70,70,70)");
+		root.style.setProperty("--theme-toggle", "rgb(80, 193, 238)");
+
 		darkTheme = true;
-		document.body.style.backgroundColor = "rgb(50,50,50)";
-		document.getElementById("hidden").style.backgroundColor =
-			"rgb(143, 239, 207)";
-		document.body.style.color = "whitesmoke";
 		localStorage.setItem("theme", "dark");
 	} else {
 		circle.style.left = "0px";
+
+		root.style.setProperty("--background", "whitesmoke");
+		root.style.setProperty("--text", "rgb(20, 20, 20)");
+		root.style.setProperty("--box-main", "rgb(143, 239, 207)");
+		root.style.setProperty("--box-toggle", "rgb(108, 231, 190)");
+		root.style.setProperty("--theme-toggle", "rgb(147, 174, 185)");
+
 		darkTheme = false;
-		button.style.backgroundColor = "rgb(147, 174, 185)";
-		document.body.style.backgroundColor = "whitesmoke";
-		document.getElementById("hidden").style.backgroundColor =
-			"rgb(203, 253, 236)";
-		document.body.style.color = "black";
 		localStorage.setItem("theme", "light");
 	}
 }

@@ -1,3 +1,12 @@
+:root{
+	--background: whitesmoke;
+	--text:rgb(20, 20, 20);
+	--box-main:rgb(143, 239, 207);
+	--box-toggle:rgb(108, 231, 190);
+	--box-toggleOn: rgb(67, 212, 164);
+	--theme-toggle:rgb(147, 174, 185);
+}
+
 body {
 	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
 		Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
@@ -5,7 +14,8 @@ body {
 	text-align: center;
 	font-size: xx-large;
 	padding: 10px;
-	background-color: whitesmoke;
+	background-color: var(--background);
+	color:var(--text)
 }
 
 #title {
@@ -49,11 +59,14 @@ input[type="text"] {
 #hidden {
 	display: none;
 	/* display: inline-block; */
-	background-color: rgb(143, 239, 207);
+	background-color: var(--box-main);
 	border-radius: 10px;
 	width: 80%;
-	padding: 10px;
-	color:black;
+	padding: 10px 10px 20px 10px;
+	color:var(--text);
+}
+#progressBox{
+	display:none;
 }
 
 #btnContainer {
@@ -66,15 +79,16 @@ input[type="text"] {
 	width: 50%;
 	font-size: x-large;
 	border: none;
-	background-color: rgb(108, 231, 190);
+	background-color: var(--box-toggle);
 	border-radius: 10px;
 	cursor: pointer;
 	padding: 8px;
+	color:var(--text)
 }
 
 select {
 	padding: 15px;
-	background-color: lightgreen;
+	background-color: rgb(127, 253, 127);
 	border: none;
 	border-radius: 8px;
 	cursor: pointer;
@@ -102,6 +116,7 @@ label {
 	border: none;
 	font-size: large;
 	cursor: pointer;
+	display:inline-block;
 	
 	animation-duration: .5s;
 	animation-timing-function: linear;
@@ -118,6 +133,13 @@ label {
 	align-items: center;
 }
 
+#preparingBox{
+	display:none;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+}
+
 svg {
 	width: 100px;
 	height: 100px;
@@ -128,7 +150,7 @@ svg {
 #themeToggle {
 	width: 55px;
 	height: 30px;
-	background-color: rgb(147, 174, 185);
+	background-color: var(--theme-toggle);
 	border-radius: 40px;
 	display: flex;
 	cursor: pointer;
