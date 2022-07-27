@@ -1,11 +1,13 @@
 const videoToggle = document.getElementById("videoToggle");
 const audioToggle = document.getElementById("audioToggle");
 const incorrectMsg = document.getElementById("incorrectMsg");
-const loadingMsg = document.getElementById("loadingWrapper")
+const loadingMsg = document.getElementById("loadingWrapper");
 
 function getInfo() {
 	incorrectMsg.textContent = "";
 	loadingMsg.style.display = "flex";
+	document.getElementById("videoFormatSelect").innerHTML = "";
+	document.getElementById("audioFormatSelect").innerHTML = "";
 	const url = document.getElementById("url").value;
 	const options = {
 		method: "POST",
@@ -35,33 +37,56 @@ function getInfo() {
 				document.getElementById("videoList").style.display = "block";
 				videoToggle.style.backgroundColor = "rgb(67, 212, 164)";
 
+				let highestQualityLength = 0;
+
 				for (let format of data.formats) {
-					let size = (Number(format.contentLength) / 1000000).toFixed(2)
+					let size = (Number(format.contentLength) / 1000000).toFixed(
+						2
+					);
 					size = size + " MB";
 
 					// For videos
-					if (format.hasVideo && format.contentLength && format.container == "mp4") {
+					if (
+						format.hasVideo &&
+						format.contentLength &&
+						!format.hasAudio
+					) {
+						const itag = format.itag;
+						const avcPattern = /^avc1[0-9a-zA-Z.]+$/g;
+						const av1Pattern = /^av01[0-9a-zA-Z.]+$/g;
 
-							const itag = format.itag;
-							const element =
-								"<option value='" +
-								itag +
-								"'>" +
-								format.qualityLabel +
-								" | " +
-								format.container +
-								" | " +
-								size +
-								"</option>";
-							document.getElementById(
-								"videoFormatSelect"
-							).innerHTML += element;
-						
+						let codec;
+						if (av1Pattern.test(format.codecs)) {
+							codec = "AV1 Codec";
+						} else if (avcPattern.test(format.codecs)) {
+							codec = "AVC Codec";
+						} else {
+							codec = format.codecs.toUpperCase() + " Codec";
+						}
+
+						const element =
+							"<option value='" +
+							itag +
+							"'>" +
+							format.qualityLabel +
+							"  |  " +
+							format.container +
+							"  |  " +
+							size +
+							"  |  " +
+							codec;
+						("</option>");
+						document.getElementById(
+							"videoFormatSelect"
+						).innerHTML += element;
 					}
 
 					// For audios
-					else if(format.hasAudio && !format.hasVideo && format.audioBitrate)
-					 {
+					else if (
+						format.hasAudio &&
+						!format.hasVideo &&
+						format.audioBitrate
+					) {
 						const pattern = /^mp*4a[0-9.]+$/g;
 						let audioCodec;
 						const itag = format.itag;
@@ -89,7 +114,8 @@ function getInfo() {
 				}
 			} else {
 				loadingMsg.style.display = "none";
-				incorrectMsg.textContent = "Some error has occured";
+				incorrectMsg.textContent =
+					"Some error has occured. Check your connection or the URL";
 			}
 		})
 		.catch((error) => {
@@ -99,6 +125,55 @@ function getInfo() {
 			}
 		});
 }
+
+function download(type) {
+	const url = document.getElementById("url").value;
+	let itag;
+	let options;
+	if (type === "video") {
+		itag = document.getElementById("videoFormatSelect").value;
+		options = {
+			method: "POST",
+			body: new URLSearchParams({
+				url: url,
+				videoTag: itag,
+			}),
+			headers: {
+				"Content-Type": "Application/x-www-form-urlencoded",
+			},
+		};
+	} else {
+		itag = document.getElementById("audioFormatSelect").value;
+		options = {
+			method: "POST",
+			body: new URLSearchParams({
+				url: url,
+				audioTag: itag,
+			}),
+			headers: {
+				"Content-Type": "Application/x-www-form-urlencoded",
+			},
+		};
+	}
+	fetch("/download", options)
+		.then((response) => response.json)
+		.then((data) => {
+			console.log(data);
+		})
+		.catch((error) => {
+			console.log(error);
+		});
+}
+
+document.getElementById("videoDownload").addEventListener("click", (event) => {
+	clickAnimation("videoDownload");
+	download("video");
+});
+
+document.getElementById("audioDownload").addEventListener("click", (event) => {
+	clickAnimation("audioDownload");
+	download("audio");
+});
 
 document.getElementById("getInfo").addEventListener("click", (event) => {
 	getInfo();
@@ -134,7 +209,8 @@ function toggle() {
 		button.style.backgroundColor = "rgb(80, 193, 238)";
 		darkTheme = true;
 		document.body.style.backgroundColor = "rgb(50,50,50)";
-		document.getElementById("hidden").style.backgroundColor = "rgb(143, 239, 207)"
+		document.getElementById("hidden").style.backgroundColor =
+			"rgb(143, 239, 207)";
 		document.body.style.color = "whitesmoke";
 		localStorage.setItem("theme", "dark");
 	} else {
@@ -142,7 +218,8 @@ function toggle() {
 		darkTheme = false;
 		button.style.backgroundColor = "rgb(147, 174, 185)";
 		document.body.style.backgroundColor = "whitesmoke";
-		document.getElementById("hidden").style.backgroundColor = "rgb(203, 253, 236)"
+		document.getElementById("hidden").style.backgroundColor =
+			"rgb(203, 253, 236)";
 		document.body.style.color = "black";
 		localStorage.setItem("theme", "light");
 	}
@@ -163,6 +240,6 @@ function clickAnimation(id) {
 	document.getElementById(id).style.animationName = "clickAnimation";
 
 	setTimeout(() => {
-		document.getElementById("getInfo").style.animationName = "";
+		document.getElementById(id).style.animationName = "";
 	}, 500);
 }

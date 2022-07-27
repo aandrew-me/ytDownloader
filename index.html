@@ -8,6 +8,7 @@
     <title>Youtube Video Downloader</title>
     <link rel="stylesheet" href="index.css">
     <script src="index.js" defer></script>
+
 </head>
 
 <body>
@@ -48,28 +49,49 @@
         <p id="title">Title: </p>
 
         <div id="videoList">
-            <form action="/download" method="post">
                 <label>Select Format - </label>
-                <select name="videoTag" id="videoFormatSelect">
+                <select id="videoFormatSelect">
                 </select>
                 <br>
-                <input type="hidden" name="url" class="url">
-                <button type="submit" class="submitBtn">Download</button>
-            </form>
+                <input type="hidden" name="url" class="url" id="url">
+                <button class="submitBtn" id="videoDownload">Download</button>
         </div>
 
         <div id="audioList">
-            <form action="/download" method="post">
                 <label>Select Format - </label>
-                <select name="audioTag" id="audioFormatSelect">
+                <select id="audioFormatSelect">
                 </select>
                 <br>
                 <input type="hidden" name="url" class="url">
-                <button type="submit" class="submitBtn" id="submitBtn" onclick="clickAnimation('submitBtn')">Download</button>
-            </form>
+                <button class="submitBtn" id="audioDownload">Download</button>
         </div>
 
+        <label>Video Progress: <progress max="100" value="0" id="videoProgress"></progress></label>
+<br>
+        <label>Audio Progress: <progress max="100" value="0" id="audioProgress"></progress></label>
+<br>
+
     </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        let totalProgress = 0
+        const socket = io();
+
+        socket.on("id", (id) => {
+            document.cookie = "id=" + id + "; SameSite=Strict"
+        })
+
+        socket.on("videoProgress", (progress) => {
+            document.getElementById("videoProgress").value = progress
+        })
+
+        socket.on("audioProgress", (progress) => {
+            document.getElementById("audioProgress").value = progress
+        })
+
+        socket.on("message", (message) => console.log(message))
+    </script>
 </body>
 
 </html>
