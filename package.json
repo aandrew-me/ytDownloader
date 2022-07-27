@@ -12,11 +12,10 @@
 	"main": "main.js",
 	"scripts": {
 		"start": "electron .",
-		"windows": "electron-builder -w",
-		"linux": "electron-builder -l",
-		"mac": "electron-builder -m"
+		"windows": "rm -rf ./node_modules/ffmpeg-static && electron-builder -w",
+		"linux": "rm -rf ./node_modules/ffmpeg-static && electron-builder -l",
+		"mac": "rm -rf ./node_modules/ffmpeg-static && electron-builder -m"
 	},
-	"keywords": [],
 	"author": "Andrew",
 	"license": "MIT",
 	"description": "Download videos and audios from YouTube",
