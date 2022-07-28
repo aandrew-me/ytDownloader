@@ -12,15 +12,15 @@
 	"main": "main.js",
 	"scripts": {
 		"start": "electron .",
-		"windows": "rm -rf ./node_modules/ffmpeg-static && electron-builder -w",
-		"linux": "rm -rf ./node_modules/ffmpeg-static && electron-builder -l",
-		"mac": "rm -rf ./node_modules/ffmpeg-static && electron-builder -m"
+		"windows": "rm -rf ./node_modules && electron-builder -w",
+		"linux": "rm -rf ./node_modules && electron-builder -l",
+		"mac": "rm -rf ./node_modules && electron-builder -m"
 	},
 	"author": "Andrew",
 	"license": "MIT",
 	"description": "Download videos and audios from YouTube",
 	"devDependencies": {
-		"electron": "^19.0.9",
+		"electron": "19.0.9",
 		"electron-builder": "^23.1.0"
 	},
 	"build": {
@@ -47,7 +47,7 @@
 			],
 			"sign": false
 		},
-		"asar": true,
+		"asar": false,
 		"directories": {
 			"buildResources": "resources",
 			"output": "release"
