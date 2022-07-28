@@ -8,7 +8,7 @@
 		"ytdl-core": "^4.11.0"
 	},
 	"name": "ytdownloader",
-	"version": "1.3.2",
+	"version": "1.3.3",
 	"main": "main.js",
 	"scripts": {
 		"start": "electron .",

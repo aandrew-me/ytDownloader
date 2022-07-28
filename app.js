@@ -1,6 +1,7 @@
 //! Todo
 //! Filename needs to be filtered
-//! Total progress
+//! File size needs to be modified
+//! Scrollbar needs to be customized
 
 const express = require("express");
 const app = express();
@@ -161,7 +162,9 @@ app.post("/download", async (req, res) => {
 								"audioProgress",
 								audioProgress
 							);
-							resolve("audio downloaded");
+							if (audioProgress == 100) {
+								resolve("audio downloaded");
+							}
 						})
 						.pipe(fs.createWriteStream(tempDir + audioName));
 				}),
@@ -176,7 +179,7 @@ app.post("/download", async (req, res) => {
 						(error, stdout, stderr) => {
 							if (error) {
 								console.log(error);
-							} else if (stderr){
+							} else if (stderr) {
 								console.log("video saved");
 								// Clear temp dir
 								fs.readdirSync(tempDir).forEach((f) =>
@@ -184,8 +187,8 @@ app.post("/download", async (req, res) => {
 								);
 								io.to(socketId).emit("saved", `${downloadDir}`);
 							}
-							if (stdout){
-								console.log("stdout this time")
+							if (stdout) {
+								console.log("stdout this time");
 							}
 						}
 					);

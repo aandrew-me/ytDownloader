@@ -104,7 +104,7 @@
 
         socket.on("videoProgress", (progress) => {
             document.getElementById("progressBox").style.display = "inline-block"
-
+            document.getElementById("preparingBox").style.display = "none"
             document.getElementById("videoProgress").value = progress
             if (progress != 100) {
                 document.querySelector(".submitBtn").style.display = "none"
@@ -127,6 +127,7 @@
                 icon: 'icon.png'
             });
             document.getElementById("savedMsg").innerHTML = `Video saved to <a href='file://${savedLocation}'>${savedLocation}</a>`
+            document.getElementById("progressBox").style.display = "none"
         })
     </script>
 </body>
