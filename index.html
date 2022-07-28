@@ -68,8 +68,8 @@
 
         <div id="preparingBox">
             <span>Preparing</span>
-            <svg version="1.1" id="L4" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
-                y="0px" viewBox="0 0 100 100" enable-background="new 0 0 0 0" xml:space="preserve">
+            <svg version="1.1" id="L4" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                x="0px" y="0px" viewBox="0 0 100 100" enable-background="new 0 0 0 0" xml:space="preserve">
                 <circle fill="rgb(84, 171, 222)" stroke="none" cx="6" cy="50" r="6">
                     <animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite" begin="0.1" />
                 </circle>
@@ -81,7 +81,8 @@
                 </circle>
             </svg>
         </div>
-        
+
+        <p id="savedMsg"></p>
 
         <div id="progressBox">
             <label>Video Progress: <progress max="100" value="0" id="videoProgress"></progress></label>
@@ -105,22 +106,28 @@
             document.getElementById("progressBox").style.display = "inline-block"
 
             document.getElementById("videoProgress").value = progress
-            if (progress != 100){
+            if (progress != 100) {
                 document.querySelector(".submitBtn").style.display = "none"
             }
-            else{
+            else {
                 document.querySelector(".submitBtn").style.display = "inline-block"
             }
         })
 
         socket.on("audioProgress", (progress) => {
-            document.getElementById("progressBox").style.display = "block"
+            document.getElementById("progressBox").style.display = "inline-block"
             document.getElementById("preparingBox").style.display = "none"
 
             document.getElementById("audioProgress").value = progress
         })
 
-        socket.on("message", (message) => console.log(message))
+        socket.on("saved", (savedLocation) => {
+            const notify = new Notification('ytDownloaded', {
+                body: "Video saved successfully.",
+                icon: 'icon.png'
+            });
+            document.getElementById("savedMsg").innerHTML = `Video saved to <a href='file:/${savedLocation}'>${savedLocation}</a>`
+        })
     </script>
 </body>
 

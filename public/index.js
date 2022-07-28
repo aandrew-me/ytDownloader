@@ -127,6 +127,8 @@ function getInfo() {
 }
 
 function download(type) {
+	document.getElementById("progressBox").style.display = "none"
+	document.getElementById("savedMsg").innerHTML = ""
 	const url = document.getElementById("url").value;
 	let itag;
 	let options;
