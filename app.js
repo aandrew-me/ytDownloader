@@ -176,13 +176,16 @@ app.post("/download", async (req, res) => {
 						(error, stdout, stderr) => {
 							if (error) {
 								console.log(error);
-							} else{
+							} else if (stderr){
 								console.log("video saved");
 								// Clear temp dir
 								fs.readdirSync(tempDir).forEach((f) =>
 									fs.rmSync(`${tempDir}/${f}`)
 								);
 								io.to(socketId).emit("saved", `${downloadDir}`);
+							}
+							if (stdout){
+								console.log("stdout this time")
 							}
 						}
 					);

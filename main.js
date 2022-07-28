@@ -4,11 +4,12 @@ require("./app.js")
 
 function createWindow () {
   const win = new BrowserWindow({
-    width: 800,
-    height: 600
+    show:false
   })
 
   win.loadURL("http://localhost:3000")
+  win.maximize()
+  win.show()
 }
 
 app.whenReady().then(() => {
