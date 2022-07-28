@@ -169,3 +169,10 @@ svg {
 	transition-duration: 0.4s;
 	left:0px;
 }
+
+a{
+	color:rgb(131, 222, 253);
+}
+a:active, a:link{
+	color:rgb(131, 222, 253)
+}

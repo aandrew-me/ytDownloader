@@ -170,7 +170,7 @@ app.post("/download", async (req, res) => {
 			Promise.all([arr[0], arr[1]])
 				.then((response) => {
 					cp.exec(
-						`'${ffmpeg}' -i '${tempDir + videoName}' -i '${
+						`"${ffmpeg}" -i '${tempDir + videoName}' -i '${
 							tempDir + audioName
 						}' -c copy '${downloadDir + filename}'`,
 						(error, stdout, stderr) => {
