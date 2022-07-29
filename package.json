@@ -15,8 +15,8 @@
 		"windows": "rm -rf ./node_modules && electron-builder -w",
 		"linux": "rm -rf ./node_modules && electron-builder -l",
 		"mac": "rm -rf ./node_modules && electron-builder -m",
-		"publish-linux":"rm -rf ./node_modules && electron-builder -w --publish=always",
-		"publish-windows":"rm -rf ./node_modules && electron-builder -l --publish=always"
+		"publish-linux":"rm -rf ./node_modules && electron-builder -l --publish=always",
+		"publish-windows":"rm -rf ./node_modules && electron-builder -w --publish=always"
 	},
 	"author": "Andrew",
 	"license": "MIT",
