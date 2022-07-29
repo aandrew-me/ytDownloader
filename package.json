@@ -8,13 +8,15 @@
 		"ytdl-core": "^4.11.0"
 	},
 	"name": "ytdownloader",
-	"version": "1.3.3",
+	"version": "1.4.4",
 	"main": "main.js",
 	"scripts": {
 		"start": "electron .",
 		"windows": "rm -rf ./node_modules && electron-builder -w",
 		"linux": "rm -rf ./node_modules && electron-builder -l",
-		"mac": "rm -rf ./node_modules && electron-builder -m"
+		"mac": "rm -rf ./node_modules && electron-builder -m",
+		"publish-linux":"rm -rf ./node_modules && electron-builder -w --publish=always",
+		"publish-windows":"rm -rf ./node_modules && electron-builder -l --publish=always"
 	},
 	"author": "Andrew",
 	"license": "MIT",

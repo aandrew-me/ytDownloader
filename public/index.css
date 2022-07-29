@@ -176,3 +176,16 @@ a{
 a:active, a:link{
 	color:rgb(131, 222, 253)
 }
+body::-webkit-scrollbar {
+	width: 5px;
+	
+  }
+   
+  body::-webkit-scrollbar-track {
+	box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  }
+   
+  body::-webkit-scrollbar-thumb {
+	background-color: rgb(79, 78, 78);
+	border-radius: 5px;
+  }
