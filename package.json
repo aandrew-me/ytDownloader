@@ -18,7 +18,10 @@
 		"publish-linux":"rm -rf ./node_modules && electron-builder -l --publish=always",
 		"publish-windows":"rm -rf ./node_modules && electron-builder -w --publish=always"
 	},
-	"author": "Andrew",
+	"author": {
+		"name": "Andrew",
+		"email": "aandrew.me@pm.me"
+	},
 	"license": "MIT",
 	"description": "Download videos and audios from YouTube",
 	"devDependencies": {

@@ -1,8 +1,3 @@
-//! Todo
-//! Filename needs to be filtered
-//! File size needs to be modified
-//! Scrollbar needs to be customized
-
 const express = require("express");
 const app = express();
 const http = require("http");
@@ -203,6 +198,9 @@ app.post("/download", async (req, res) => {
 			ytdl(url, { quality: itag })
 				.on("progress", (_, downloaded, size) => {
 					const progress = (downloaded / size) * 100;
+					if (progress == 100){
+						io.to(socketId).emit("saved", `${downloadDir}`);
+					}
 					io.sockets
 						.to(req.cookies.id)
 						.emit("audioProgress", progress);
