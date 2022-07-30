@@ -17,6 +17,16 @@
         <div id="themeToggleInside"></div>
     </div>
 
+    <!-- Menu icon -->
+    <img src="menu.png" alt="menu" id="menuIcon">
+
+    <!-- Menu -->
+    <div id="menu">
+        <a href="/preferences" class="menuItem">Preferences</a>
+        <a href="/about" class="menuItem">About</a>
+    </div>
+
+
     <h1>YouTube Downloader</h1>
     <input type="text" name="url" placeholder="Paste Video URL or ID here" id="url" autofocus>
     <!-- Get info button -->
@@ -84,10 +94,14 @@
 
         <p id="savedMsg"></p>
 
-        <div id="progressBox">
+        <div class="progressBox" id="videoProgressBox">
             <label>Video Progress: <progress max="100" value="0" id="videoProgress"></progress></label>
             <br>
             <label>Audio Progress: <progress max="100" value="0" id="audioProgress"></progress></label>
+        </div>
+
+        <div class="progressBox" id="audioProgressBox">
+            <label>Download Progress: <progress max="100" value="0" id="onlyAudioProgress"></progress></label>
         </div>
 
 
@@ -95,6 +109,10 @@
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
+        function getId(id) {
+            return (document.getElementById(id))
+        }
+
         let totalProgress = 0
         const socket = io();
 
@@ -102,32 +120,45 @@
             document.cookie = "id=" + id + "; SameSite=Strict"
         })
 
+        // Video and audio progress
         socket.on("videoProgress", (progress) => {
-            document.getElementById("progressBox").style.display = "inline-block"
-            document.getElementById("preparingBox").style.display = "none"
-            document.getElementById("videoProgress").value = progress
             if (progress != 100) {
-                document.querySelector(".submitBtn").style.display = "none"
-            }
-            else {
-                document.querySelector(".submitBtn").style.display = "inline-block"
+                getId("videoProgressBox").style.display = "block"
+                getId("preparingBox").style.display = "none"
+                getId("videoProgress").value = progress
             }
         })
 
         socket.on("audioProgress", (progress) => {
-            document.getElementById("progressBox").style.display = "inline-block"
-            document.getElementById("preparingBox").style.display = "none"
 
-            document.getElementById("audioProgress").value = progress
+            if (progress != 100) {
+                getId("preparingBox").style.display = "none"
+                getId("audioProgress").value = progress
+            }
+        })
+
+        ////////////
+
+        // Only audio progress
+        socket.on("onlyAudioProgress", (progress) => {
+            if (progress != 100) {
+                getId("preparingBox").style.display = "none"
+                getId("audioProgressBox").style.display = "block"
+                getId("onlyAudioProgress").value = progress
+            }
+
         })
 
         socket.on("saved", (savedLocation) => {
             const notify = new Notification('ytDownloaded', {
-                body: "Video saved successfully.",
+                body: "File saved successfully.",
                 icon: 'icon.png'
             });
-            document.getElementById("savedMsg").innerHTML = `Video saved to <a href='file://${savedLocation}'>${savedLocation}</a>`
-            document.getElementById("progressBox").style.display = "none"
+            getId("videoProgressBox").style.display = "none";
+            getId("audioProgressBox").style.display = "none";
+            document.querySelector(".submitBtn").style.display = "inline-block"
+
+            getId("savedMsg").innerHTML = `File saved to <a class="savedMsg" href='file://${savedLocation}'>${savedLocation}</a>`
         })
     </script>
 </body>

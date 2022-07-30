@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preferences</title>
+    <link rel="stylesheet" href="extra.css">
+</head>
+<body>
+    <a href="/" id="back">Home</a>
+    <h1>Preferences</h1>
+    <p>1. Download location (Full path without quotation marks)</p>
+    <input type="text" id="savePath" placeholder="Full path without quotation marks">
+
+    <button id="save">Save</button>
+
+    <p id="msg"></pid>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        function getId(id){
+            return document.getElementById(id)
+        }
+        let socket = io()
+
+        socket.emit("downloadPath")
+
+        socket.on("downloadPath", (message)=>{
+            const path = message
+            getId("savePath").value = message
+        })
+
+        getId("save").addEventListener("click", ()=>{
+            const newPath = getId("savePath").value 
+            socket.emit("newPath", newPath)
+        })
+
+        socket.on("pathSaved", (saved)=>{
+            if (saved){
+                getId("msg").textContent = "Location Saved successfully"
+            }
+            else{
+                getId("msg").textContent = "Not saved, some error has occured."
+            }
+        })
+    </script>
+</body>
+</html>

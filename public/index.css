@@ -1,10 +1,10 @@
-:root{
+:root {
 	--background: whitesmoke;
-	--text:rgb(20, 20, 20);
-	--box-main:rgb(143, 239, 207);
-	--box-toggle:rgb(108, 231, 190);
+	--text: rgb(20, 20, 20);
+	--box-main: rgb(143, 239, 207);
+	--box-toggle: rgb(108, 231, 190);
 	--box-toggleOn: rgb(67, 212, 164);
-	--theme-toggle:rgb(147, 174, 185);
+	--theme-toggle: rgb(147, 174, 185);
 }
 
 body {
@@ -15,12 +15,48 @@ body {
 	font-size: xx-large;
 	padding: 10px;
 	background-color: var(--background);
-	color:var(--text)
+	color: var(--text);
 }
 
 #title {
 	font-size: x-large;
 	font-family: sans-serif;
+}
+
+#menuIcon{
+	position: absolute;
+	top:10px;
+	right:10px;
+	width:40px;
+	height:40px;
+	cursor: pointer;
+	transition: .3s;
+}
+
+#menu{
+	display:none;
+	flex-direction: column;
+	backdrop-filter: blur(16px) saturate(160%);
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
+    background-color: rgba(17, 25, 40, 0.75);
+    border-radius: 12px;
+	position: absolute;
+	top:40px;
+	right:50px;
+	padding:15px;
+	text-align: left;
+	opacity:1;
+	font-size: large;
+}
+.menuItem{
+	color:white;
+	text-decoration: none;
+	padding:5px;
+
+}
+.menuItem:active, .menuItem:link{
+	color:white;
+	
 }
 
 h1 {
@@ -46,14 +82,20 @@ input[type="text"] {
 	cursor: pointer;
 
 	/* animation-name: clickAnimation; */
-	animation-duration: .5s;
+	animation-duration: 0.5s;
 	animation-timing-function: linear;
 }
 
 @keyframes clickAnimation {
-	0% {background-color: rgb(64, 227, 64);}
-	50% {background-color: rgb(40, 126, 40);}
-	100% {background-color: rgb(64, 227, 64);}
+	0% {
+		background-color: rgb(64, 227, 64);
+	}
+	50% {
+		background-color: rgb(40, 126, 40);
+	}
+	100% {
+		background-color: rgb(64, 227, 64);
+	}
 }
 
 #hidden {
@@ -63,10 +105,10 @@ input[type="text"] {
 	border-radius: 10px;
 	width: 80%;
 	padding: 10px 10px 20px 10px;
-	color:var(--text);
+	color: var(--text);
 }
-#progressBox{
-	display:none;
+#videoProgressBox, #audioProgressBox {
+	display: none;
 }
 
 #btnContainer {
@@ -83,7 +125,7 @@ input[type="text"] {
 	border-radius: 10px;
 	cursor: pointer;
 	padding: 8px;
-	color:var(--text)
+	color: var(--text);
 }
 
 select {
@@ -94,7 +136,7 @@ select {
 	cursor: pointer;
 	font-size: large;
 	margin: 8px;
-	outline:none;
+	outline: none;
 }
 
 label {
@@ -116,9 +158,9 @@ label {
 	border: none;
 	font-size: large;
 	cursor: pointer;
-	display:inline-block;
-	
-	animation-duration: .5s;
+	display: inline-block;
+
+	animation-duration: 0.5s;
 	animation-timing-function: linear;
 }
 
@@ -126,15 +168,15 @@ label {
 	color: rgb(250, 59, 59);
 }
 
-#loadingWrapper{
-	display:none;
+#loadingWrapper {
+	display: none;
 	flex-direction: row;
 	justify-content: center;
 	align-items: center;
 }
 
-#preparingBox{
-	display:none;
+#preparingBox {
+	display: none;
 	flex-direction: row;
 	justify-content: center;
 	align-items: center;
@@ -144,8 +186,8 @@ svg {
 	width: 100px;
 	height: 100px;
 	display: inline-block;
-	margin-left:20px
-  }
+	margin-left: 20px;
+}
 
 #themeToggle {
 	width: 55px;
@@ -167,25 +209,28 @@ svg {
 	position: relative;
 	transition: linear;
 	transition-duration: 0.4s;
-	left:0px;
+	left: 0px;
 }
 
-a{
-	color:rgb(131, 222, 253);
+.savedMsg {
+	color: rgb(131, 222, 253);
 }
-a:active, a:link{
-	color:rgb(131, 222, 253)
+.savedMsg:active,
+.savedMsg:link {
+	color: rgb(131, 222, 253);
 }
+
+/* Scrollbar */
+
 body::-webkit-scrollbar {
 	width: 5px;
-	
-  }
-   
-  body::-webkit-scrollbar-track {
+}
+
+body::-webkit-scrollbar-track {
 	box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-  }
-   
-  body::-webkit-scrollbar-thumb {
+}
+
+body::-webkit-scrollbar-thumb {
 	background-color: rgb(79, 78, 78);
 	border-radius: 5px;
-  }
+}

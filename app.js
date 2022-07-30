@@ -13,22 +13,158 @@ const ffmpeg = require("ffmpeg-static");
 const cp = require("child_process");
 const os = require("os");
 
+// Directories
 const homedir = os.homedir();
-fs.mkdirSync(homedir + "/Videos/ytDownloader/temp", { recursive: true });
-const downloadDir = homedir + "/Videos/ytDownloader/";
-const tempDir = homedir + "/Videos/ytDownloader/temp/";
-fs.readdirSync(tempDir).forEach((f) => fs.rmSync(`${tempDir}/${f}`));
+const appdir = homedir + "/.ytDownloader/";
+const tempDir = appdir + "temp/";
+const configPath = appdir + "config.json";
+fs.mkdirSync(homedir + "/.ytDownloader/temp", { recursive: true });
+let config;
+
+// Download directory
+let downloadDir = "";
+
+
+// Handling config file
+
+fs.readFile(configPath, (err) => {
+	if (err) {
+		fs.writeFileSync(configPath, "{}");
+	}
+
+	try {
+		config = require(configPath);
+	} catch (error) {
+		// If config file is not in correct format
+		fs.writeFileSync(configPath, "{}");
+		config = require(configPath);
+	}
+
+	if (config.location) {
+		fs.readdir(config.location, (err) => {
+			if (err) {
+				fs.mkdir(config.location, { recursive: true }, (err) => {
+					if (err) {
+						console.log("Incorrect filepath in config");
+						downloadDir = homedir + "/ytDownloader";
+					} else {
+						downloadDir = config.location;
+					}
+				});
+			} else {
+				fs.writeFile(config.location + "/.test", "", (err) => {
+					// If that location is not accessible
+					if (err) {
+						downloadDir = homedir + "/ytDownloader";
+						console.log(
+							"Not allowed to use that location to save files"
+						);
+					} else {
+						downloadDir = config.location;
+						fs.rm(config.location + "/.test", (err) => {
+							if (err) console.log(err);
+						});
+					}
+				});
+			}
+		});
+	} else {
+		downloadDir = homedir + "/ytDownloader/";
+	}
+});
+
+//////
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname + "/public"));
+const htmlPath = __dirname + "/html/";
 app.use(cookieParser());
+
+// Clearing tempDir
+fs.readdirSync(tempDir).forEach((f) => fs.rmSync(`${tempDir}/${f}`));
+
+// Handling download location input from user
+async function checkPath(path) {
+	const check = new Promise((resolve, reject) => {
+		fs.readdir(path, (err) => {
+			// If directory doesn't exist, try creating it
+			if (err) {
+				fs.mkdir(path, (err) => {
+					if (err) {
+						reject(err);
+					} else {
+						console.log("Successfully created " + path);
+						resolve(true);
+					}
+				});
+			} else {
+				fs.writeFile(path + "/.test", "", (err) => {
+					// If that location is not accessible
+					if (err) {
+						reject(err);
+					} else {
+						fs.rm(path + "/.test", (err) => {
+							if (err) console.log(err);
+						});
+						resolve(true);
+					}
+				});
+			}
+		});
+	});
+
+	const result = await check;
+	return result;
+}
 
 io.on("connection", (socket) => {
 	socket.emit("id", socket.id);
+
+	socket.on("downloadPath", () => {
+		socket.emit("downloadPath", downloadDir);
+	});
+
+	socket.on("newPath", (userPath) => {
+		let path;
+		if (userPath[userPath.length-1] == "/"){
+			path = userPath
+		}
+		else{
+			path = userPath + "/"
+		}
+		
+		checkPath(path)
+			.then((response) => {
+				const newConfig = {
+					location: path,
+				};
+				fs.writeFile(configPath, JSON.stringify(newConfig), (err) => {
+					if (!err) {
+						socket.emit("pathSaved", true);
+						downloadDir = path;
+					} else {
+						socket.emit("pathSaved", false);
+					}
+				});
+			})
+			.catch((error) => {
+				socket.emit("pathSaved", false);
+			});
+	});
 });
 
+// GET routes
+
 app.get("/", (req, res) => {
-	res.sendFile(__dirname + "/index.html");
+	res.sendFile(htmlPath + "index.html");
+});
+
+app.get("/about", (req, res) => {
+	res.sendFile(htmlPath + "about.html");
+});
+
+app.get("/preferences", (req, res) => {
+	res.sendFile(htmlPath + "preferences.html");
 });
 
 async function getVideoInfo(url) {
@@ -182,9 +318,6 @@ app.post("/download", async (req, res) => {
 								);
 								io.to(socketId).emit("saved", `${downloadDir}`);
 							}
-							if (stdout) {
-								console.log("stdout this time");
-							}
 						}
 					);
 				})
@@ -198,12 +331,11 @@ app.post("/download", async (req, res) => {
 			ytdl(url, { quality: itag })
 				.on("progress", (_, downloaded, size) => {
 					const progress = (downloaded / size) * 100;
-					if (progress == 100){
+					if (progress == 100) {
 						io.to(socketId).emit("saved", `${downloadDir}`);
 					}
-					io.sockets
-						.to(req.cookies.id)
-						.emit("audioProgress", progress);
+					io.to(socketId)
+						.emit("onlyAudioProgress", progress);
 				})
 				.pipe(fs.createWriteStream(downloadDir + filename));
 		}
@@ -214,6 +346,8 @@ app.post("/test", (req, res) => {
 	console.log(req.body);
 });
 
-server.listen(3000, () => {
-	console.log("Server: http://localhost:3000");
+const PORT=59876
+
+server.listen(PORT , () => {
+	console.log("Server: http://localhost:" + PORT);
 });
