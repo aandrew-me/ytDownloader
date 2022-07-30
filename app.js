@@ -69,7 +69,7 @@ fs.readFile(configPath, (err) => {
 			}
 		});
 	} else {
-		downloadDir = homedir + "/ytDownloader/";
+		downloadDir = homedir + "/Videos/ytDownloader/";
 	}
 });
 

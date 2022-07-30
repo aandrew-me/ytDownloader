@@ -31,7 +31,7 @@
 	},
 	"build": {
 		"productName": "YTDownloader",
-		"appId": "com.andrew.ytdownloader",
+		"appId": "org.andrew.ytdownloader",
 		"mac": {
 			"category": "Utility",
 			"target": [
@@ -61,7 +61,8 @@
 		"linux": {
 			"target": [
 				"AppImage",
-				"deb"
+				"deb",
+				"flatpak"
 			],
 			"category": "Utility"
 		},
