@@ -207,7 +207,7 @@ app.post("/download", async (req, res) => {
 			extension = format.mimeType.split("; ")[0].split("/")[1];
 		} else {
 			if (format.audioCodec === "mp4a.40.2") {
-				extension = "mp4a";
+				extension = "m4a";
 			} else {
 				extension = format.audioCodec;
 			}
@@ -252,7 +252,7 @@ app.post("/download", async (req, res) => {
 
 		if (extension == "mp4") {
 			audioTag = 140;
-			audioExtension = "mp4a";
+			audioExtension = "m4a";
 		} else {
 			audioTag = 251;
 			audioExtension = "opus";
