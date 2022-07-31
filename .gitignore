@@ -2,5 +2,6 @@ node_modules
 release
 package-lock.json
 test.js
-.directory
+.*
+!/.gitignore
 todo.txt
