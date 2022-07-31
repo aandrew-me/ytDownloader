@@ -9,7 +9,7 @@
 		"ytdl-core": "^4.11.0"
 	},
 	"name": "ytdownloader",
-	"version": "1.5.4",
+	"version": "1.5.5",
 	"main": "main.js",
 	"scripts": {
 		"start": "electron .",
@@ -32,6 +32,13 @@
 	"build": {
 		"productName": "YTDownloader",
 		"appId": "org.andrew.ytdownloader",
+		"files": [
+			"./resources/**/*",
+			"*.js",
+			"./html/**/*",
+			"./resources/**/*",
+			"./public/**/*"
+		],
 		"mac": {
 			"category": "Utility",
 			"target": [

@@ -100,7 +100,7 @@ function getInfo() {
 						const itag = format.itag;
 
 						if (pattern.test(format.audioCodec)) {
-							audioCodec = "m4a";
+							audioCodec = "mp4a";
 						} else {
 							audioCodec = format.audioCodec;
 						}
