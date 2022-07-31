@@ -11,6 +11,10 @@ A GUI for downloading Video and Audio files from YouTube using Nodejs and Electr
 
 ✅ Available on Windows and Linux
 
+✅ Fast download speed
+
+✅ No external dependencies needed
+
 ## Screenshots
 
 ![ss](https://user-images.githubusercontent.com/66430340/181747909-f16e30dc-a7c3-40cb-876b-54f0ea8d4e42.jpg)
