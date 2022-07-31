@@ -23,6 +23,12 @@
 		"name": "Andrew",
 		"email": "aandrew.me@pm.me"
 	},
+	"publish": {
+		"provider": "github",
+		"owner": "aandrew-me",
+		"repo": "ytDownloader",
+		"private": false
+	  },
 	"license": "MIT",
 	"description": "Download videos and audios from YouTube",
 	"devDependencies": {
@@ -37,7 +43,8 @@
 			"*.js",
 			"./html/**/*",
 			"./resources/**/*",
-			"./public/**/*"
+			"./public/**/*",
+			"package.json"
 		],
 		"mac": {
 			"category": "Utility",
