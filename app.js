@@ -207,7 +207,7 @@ app.post("/download", async (req, res) => {
 			extension = format.mimeType.split("; ")[0].split("/")[1];
 		} else {
 			if (format.audioCodec === "mp4a.40.2") {
-				extension = "m4a";
+				extension = "mp4a";
 			} else {
 				extension = format.audioCodec;
 			}
@@ -219,7 +219,8 @@ app.post("/download", async (req, res) => {
 		} else {
 			quality = format.audioBitrate + "kbps";
 		}
-		const filename = title + "_" + quality + "." + extension;
+		const randomNum = Math.random().toFixed(5).toString("16").slice(2)
+		const filename = `${title}_${randomNum}_${quality}.${extension}`
 		const info = {
 			format: format,
 			title: title,
