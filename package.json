@@ -74,7 +74,9 @@
 		},
 		"linux": {
 			"target": [
-				"AppImage"
+				"Appimage",
+				"deb",
+				"flatpak"
 			],
 			"category": "Utility"
 		},
