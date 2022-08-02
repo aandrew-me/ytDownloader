@@ -24,7 +24,6 @@ let config;
 // Download directory
 let downloadDir = "";
 
-
 // Handling config file
 
 fs.readFile(configPath, (err) => {
@@ -127,13 +126,12 @@ io.on("connection", (socket) => {
 
 	socket.on("newPath", (userPath) => {
 		let path;
-		if (userPath[userPath.length-1] == "/"){
-			path = userPath
+		if (userPath[userPath.length - 1] == "/") {
+			path = userPath;
+		} else {
+			path = userPath + "/";
 		}
-		else{
-			path = userPath + "/"
-		}
-		
+
 		checkPath(path)
 			.then((response) => {
 				const newConfig = {
@@ -219,8 +217,8 @@ app.post("/download", async (req, res) => {
 		} else {
 			quality = format.audioBitrate + "kbps";
 		}
-		const randomNum = Math.random().toFixed(5).toString("16").slice(2)
-		const filename = `${title}_${randomNum}_${quality}.${extension}`
+		const randomNum = Math.random().toFixed(5).toString("16").slice(2);
+		const filename = `${title}_${randomNum}_${quality}.${extension}`;
 		const info = {
 			format: format,
 			title: title,
@@ -235,13 +233,18 @@ app.post("/download", async (req, res) => {
 		const format = info.format;
 		const extension = info.extension;
 		let filename = "";
+		// Trying to remove ambiguous characters
 		for (let i = 0; i < info.filename.length; i++) {
-			const pattern = /^[a-zA-Z0-9.]$/g;
+			const pattern = /^[`~!@#$%^&*:;,<>?/|'"-+=\]\[]$/g;
 			let letter = "";
 			if (pattern.test(info.filename[i])) {
-				letter = info.filename[i];
+				letter = "";
 			} else {
-				letter = "_";
+				if (info.filename[i] == " ") {
+					letter = "_";
+				} else {
+					letter = info.filename[i];
+				}
 			}
 			filename += letter;
 		}
@@ -336,8 +339,7 @@ app.post("/download", async (req, res) => {
 					if (progress == 100) {
 						io.to(socketId).emit("saved", `${downloadDir}`);
 					}
-					io.to(socketId)
-						.emit("onlyAudioProgress", progress);
+					io.to(socketId).emit("onlyAudioProgress", progress);
 				})
 				.pipe(fs.createWriteStream(downloadDir + filename));
 		}
@@ -348,8 +350,8 @@ app.post("/test", (req, res) => {
 	console.log(req.body);
 });
 
-const PORT=59876
+const PORT = 59876;
 
-server.listen(PORT , () => {
+server.listen(PORT, () => {
 	console.log("Server: http://localhost:" + PORT);
 });

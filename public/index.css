@@ -1,6 +1,6 @@
 :root {
 	--background: whitesmoke;
-	--text: rgb(20, 20, 20);
+	--text: rgb(45, 45, 45);
 	--box-main: rgb(143, 239, 207);
 	--box-toggle: rgb(108, 231, 190);
 	--box-toggleOn: rgb(67, 212, 164);
@@ -213,11 +213,11 @@ svg {
 }
 
 .savedMsg {
-	color: rgb(131, 222, 253);
+	color: rgb(52, 170, 234);
+	cursor: pointer;
 }
-.savedMsg:active,
-.savedMsg:link {
-	color: rgb(131, 222, 253);
+#savedMsg{
+	cursor: pointer;
 }
 
 /* Scrollbar */

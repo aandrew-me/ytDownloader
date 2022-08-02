@@ -42,3 +42,8 @@ input[type="text"]{
 a{
     color:rgb(34, 136, 199);
 }
+
+input[type="checkbox"]{
+    width:20px;
+    height:20px;
+}

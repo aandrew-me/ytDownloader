@@ -186,11 +186,9 @@ getId("menuIcon").addEventListener("click", (event) => {
 		const fade = setInterval(() => {
 			if (count >= 10) {
 				clearInterval(fade);
-				console.log("end")
 			} else {
 				opacity -= .1
 				getId("menu").style.opacity = opacity;
-				console.log("doing")
 				count++;
 			}
 		}, 50);
@@ -253,11 +251,20 @@ let darkTheme = false;
 let circle = getId("themeToggleInside");
 const root = document.querySelector(":root");
 
+let enabledTransparent = localStorage.getItem("enabledTransparent")
+let bgColor = ""
+if (enabledTransparent == "true"){
+ bgColor = "rgba(40,40,40, .7)"
+}
+else{
+bgColor = "rgb(40,40,40)"
+}
+
 function toggle() {
 	if (darkTheme == false) {
 		circle.style.left = "25px";
 
-		root.style.setProperty("--background", "rgb(40,40,40)");
+		root.style.setProperty("--background", bgColor);
 		root.style.setProperty("--text", "white");
 		root.style.setProperty("--box-main", "rgb(80,80,80)");
 		root.style.setProperty("--box-toggle", "rgb(70,70,70)");
@@ -269,7 +276,7 @@ function toggle() {
 		circle.style.left = "0px";
 
 		root.style.setProperty("--background", "whitesmoke");
-		root.style.setProperty("--text", "rgb(20, 20, 20)");
+		root.style.setProperty("--text", "rgba(45, 45, 45)");
 		root.style.setProperty("--box-main", "rgb(143, 239, 207)");
 		root.style.setProperty("--box-toggle", "rgb(108, 231, 190)");
 		root.style.setProperty("--theme-toggle", "rgb(147, 174, 185)");

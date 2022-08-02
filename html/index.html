@@ -109,6 +109,7 @@
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
+        const electron = require("electron")
         function getId(id) {
             return (document.getElementById(id))
         }
@@ -158,8 +159,14 @@
             getId("audioProgressBox").style.display = "none";
             document.querySelector(".submitBtn").style.display = "inline-block"
 
-            getId("savedMsg").innerHTML = `File saved to <a class="savedMsg" href='file://${savedLocation}'>${savedLocation}</a>`
+            getId("savedMsg").innerHTML = `File saved. Click to open <b title="Click to open" class="savedMsg">${savedLocation}</b>`
+
+            getId("savedMsg").addEventListener("click", (e) => {
+                electron.shell.openPath(savedLocation)
+            })
         })
+
+
     </script>
 </body>
 
