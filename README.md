@@ -30,7 +30,7 @@ Download and install the exe file
 
 Linux has several options available - AppImage, deb and flatpak.
 
-**AppImage** is supported on most Linux distros and has Auto-Update support.
+**AppImage** is supported on most Linux distros and has Auto-Update support. So it is recommended.
 It just needs to be executed after downloading. See more about [AppImages here](https://appimage.org/).
 
 For Debian based distros like Ubuntu .deb file is available. Download and run -
@@ -54,10 +54,6 @@ cd ytDownloader
 npm i
 ```
 
-To run with Nodejs :
-```
-node app
-```
 To run with [Electron](https://www.electronjs.org/) :
 ```
 npm start
