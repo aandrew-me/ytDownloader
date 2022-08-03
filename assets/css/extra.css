@@ -38,12 +38,24 @@ input[type="text"]{
     top:15px;
     right:15px;
     font-size: large;
+    cursor: pointer;
 }
 a{
     color:rgb(34, 136, 199);
+    cursor: pointer;
 }
 
 input[type="checkbox"]{
     width:20px;
     height:20px;
+}
+
+#selectLocation{
+    padding:10px;
+    border:none;
+    border-radius: 10px;
+    font-size: large;
+    color:white;
+    background-color: rgb(56, 209, 56);
+    cursor: pointer;
 }

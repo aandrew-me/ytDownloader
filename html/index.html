@@ -6,8 +6,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Youtube Video Downloader</title>
-    <link rel="stylesheet" href="index.css">
-    <script src="index.js" defer></script>
+    <link rel="stylesheet" href="../assets/css/index.css">
+    <script src="../src/renderer.js" defer></script>
+    <script src="../src/index.js" defer></script>
 
 </head>
 
@@ -18,12 +19,12 @@
     </div>
 
     <!-- Menu icon -->
-    <img src="menu.png" alt="menu" id="menuIcon">
+    <img src="../assets/images/menu.png" alt="menu" id="menuIcon">
 
     <!-- Menu -->
     <div id="menu">
-        <a href="/preferences" class="menuItem">Preferences</a>
-        <a href="/about" class="menuItem">About</a>
+        <a id="preferenceWin" class="menuItem">Preferences</a>
+        <a id="aboutWin" class="menuItem">About</a>
     </div>
 
 
@@ -107,67 +108,6 @@
 
     </div>
 
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-        const electron = require("electron")
-        function getId(id) {
-            return (document.getElementById(id))
-        }
-
-        let totalProgress = 0
-        const socket = io();
-
-        socket.on("id", (id) => {
-            document.cookie = "id=" + id + "; SameSite=Strict"
-        })
-
-        // Video and audio progress
-        socket.on("videoProgress", (progress) => {
-            if (progress != 100) {
-                getId("videoProgressBox").style.display = "block"
-                getId("preparingBox").style.display = "none"
-                getId("videoProgress").value = progress
-            }
-        })
-
-        socket.on("audioProgress", (progress) => {
-
-            if (progress != 100) {
-                getId("preparingBox").style.display = "none"
-                getId("audioProgress").value = progress
-            }
-        })
-
-        ////////////
-
-        // Only audio progress
-        socket.on("onlyAudioProgress", (progress) => {
-            if (progress != 100) {
-                getId("preparingBox").style.display = "none"
-                getId("audioProgressBox").style.display = "block"
-                getId("onlyAudioProgress").value = progress
-            }
-
-        })
-
-        socket.on("saved", (savedLocation) => {
-            const notify = new Notification('ytDownloader', {
-                body: "File saved successfully.",
-                icon: 'icon.png'
-            });
-            getId("videoProgressBox").style.display = "none";
-            getId("audioProgressBox").style.display = "none";
-            document.querySelector(".submitBtn").style.display = "inline-block"
-
-            getId("savedMsg").innerHTML = `File saved. Click to open <b title="Click to open" class="savedMsg">${savedLocation}</b>`
-
-            getId("savedMsg").addEventListener("click", (e) => {
-                electron.shell.openPath(savedLocation)
-            })
-        })
-
-
-    </script>
 </body>
 
 </html>

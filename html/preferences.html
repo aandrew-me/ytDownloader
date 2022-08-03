@@ -5,46 +5,41 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Preferences</title>
-    <link rel="stylesheet" href="extra.css">
+    <link rel="stylesheet" href="../assets/css/extra.css">
 </head>
 <body>
-    <a href="/" id="back">Home</a>
+    <a id="back">Home</a>
     <h1>Preferences</h1>
-    <p>1. Download location (Full path without quotation marks)</p>
-    <input type="text" id="savePath" placeholder="Full path without quotation marks">
-
-    <button id="save">Save</button>
+    <p>1. Download location</p>
+    <p>Default location: <span id="path"></span></p>
+    <button id="selectLocation">Select Download Location</button>
 
     <p id="msg"></pid>
 
     <p>2. Enable transparent dark (only Linux) <input type="checkbox" id="enableTransparent"></p>
 
-    <script src="/socket.io/socket.io.js"></script>
     <script>
+        let downloadPath = localStorage.getItem("downloadPath")
+        getId("path").textContent = downloadPath
+
+
+        const { ipcRenderer, dialog } = require("electron")
         function getId(id){
             return document.getElementById(id)
         }
-        let socket = io()
 
-        socket.emit("downloadPath")
-
-        socket.on("downloadPath", (message)=>{
-            const path = message
-            getId("savePath").value = message
+        getId("back").addEventListener("click", ()=>{
+            ipcRenderer.send("load-page", __dirname + "/index.html")
         })
 
-        getId("save").addEventListener("click", ()=>{
-            const newPath = getId("savePath").value 
-            socket.emit("newPath", newPath)
+        getId("selectLocation").addEventListener("click", ()=>{
+            ipcRenderer.send("select-location", "")
         })
 
-        socket.on("pathSaved", (saved)=>{
-            if (saved){
-                getId("msg").textContent = "Location Saved successfully"
-            }
-            else{
-                getId("msg").textContent = "Not saved, some error has occured."
-            }
+        ipcRenderer.on("downloadPath", (event, downloadPath)=>{
+            console.log(downloadPath);
+            localStorage.setItem("downloadPath", downloadPath)
+            getId("path").textContent = downloadPath
         })
 
         const enabledTransparent = getId("enableTransparent")

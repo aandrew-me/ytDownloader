@@ -1,16 +1,14 @@
-const { app, BrowserWindow, dialog } = require("electron");
+const { app, BrowserWindow, dialog, ipcMain } = require("electron");
 const { autoUpdater } = require("electron-updater");
-const path = require("path");
-require("./app.js");
+let win
 
 function createWindow() {
 	let isTransparent = false;
 	if (process.platform == "linux") {
 		isTransparent = true;
-		console.log("Using linux");
 	}
 
-	const win = new BrowserWindow({
+		win = new BrowserWindow({
 		show: false,
 		icon: __dirname + "/public/icon.png",
 		spellcheck: false,
@@ -21,9 +19,11 @@ function createWindow() {
         }
 	});
 
-	win.loadURL("http://localhost:59876");
+	win.loadFile("./html/index.html")
 	win.maximize();
+	win.setMenu(null)
 	win.show();
+	// win.webContents.openDevTools()
 	autoUpdater.checkForUpdatesAndNotify();
 }
 
@@ -39,6 +39,22 @@ app.whenReady().then(() => {
 		app.setAppUserModelId(app.name);
 	}
 });
+
+
+ipcMain.on("load-page", (event, arg) => {
+	win.loadFile(arg)
+})
+
+ipcMain.on("select-location", ()=>{
+	const location = dialog.showOpenDialogSync(win, {
+		properties: ['openFile', 'openDirectory']
+	  })
+
+	if (location){
+		win.webContents.send("downloadPath", location)
+	}
+})
+
 
 app.on("window-all-closed", () => {
 	if (process.platform !== "darwin") {
