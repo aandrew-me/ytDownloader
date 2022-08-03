@@ -285,7 +285,7 @@ function download(type) {
 								getId("videoProgressBox").style.display =
 									"block";
 								getId("preparingBox").style.display = "none";
-								getId("videoProgress").value = progress;
+								getId("videoProgress").value = videoProgress;
 							}
 							if (videoProgress == 100) {
 								resolve("video downloaded");
@@ -305,7 +305,7 @@ function download(type) {
 
 							if (audioProgress != 100) {
 								getId("preparingBox").style.display = "none";
-								getId("audioProgress").value = progress;
+								getId("audioProgress").value = audioProgress;
 							} else if (audioProgress == 100) {
 								resolve("audio downloaded");
 							}

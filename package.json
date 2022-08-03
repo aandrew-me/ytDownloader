@@ -42,7 +42,9 @@
 			"./html/**/*",
 			"./resources/**/*",
 			"./public/**/*",
-			"package.json"
+			"package.json",
+			"./assets/**/*",
+			"./src/**/*"
 		],
 		"mac": {
 			"category": "Utility",

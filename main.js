@@ -19,11 +19,11 @@ function createWindow() {
         }
 	});
 
-	win.loadFile("./html/index.html")
+	win.loadFile("html/index.html")
 	win.maximize();
 	win.setMenu(null)
 	win.show();
-	// win.webContents.openDevTools()
+	win.webContents.openDevTools()
 	autoUpdater.checkForUpdatesAndNotify();
 }
 
