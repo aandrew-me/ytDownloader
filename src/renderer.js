@@ -3,15 +3,14 @@ const ytdl = require("ytdl-core");
 const cp = require("child_process");
 const os = require("os");
 const ffmpeg = require("ffmpeg-static");
-const { BrowserWindow, shell, remote, ipcRenderer } = require("electron");
-
-
+const path = require("path")
+const { shell, ipcRenderer, app } = require("electron");
 
 // Directories
 const homedir = os.homedir();
-const appdir = homedir + "/.ytDownloader/";
-const tempDir = appdir + "temp/";
-fs.mkdirSync(homedir + "/.ytDownloader/temp", { recursive: true });
+const appdir = path.join(homedir,".ytDownloader");
+const tempDir = path.join(appdir, "temp");
+fs.mkdirSync(path.join(homedir, ".ytDownloader/temp"), { recursive: true });
 let config;
 
 // Download directory
@@ -32,40 +31,6 @@ else{
 
 // Clearing tempDir
 fs.readdirSync(tempDir).forEach((f) => fs.rmSync(`${tempDir}/${f}`));
-
-// Handling download location input from user
-async function checkPath(path) {
-	const check = new Promise((resolve, reject) => {
-		fs.readdir(path, (err) => {
-			// If directory doesn't exist, try creating it
-			if (err) {
-				fs.mkdir(path, (err) => {
-					if (err) {
-						reject(err);
-					} else {
-						console.log("Successfully created " + path);
-						resolve(true);
-					}
-				});
-			} else {
-				fs.writeFile(path + "/.test", "", (err) => {
-					// If that location is not accessible
-					if (err) {
-						reject(err);
-					} else {
-						fs.rm(path + "/.test", (err) => {
-							if (err) console.log(err);
-						});
-						resolve(true);
-					}
-				});
-			}
-		});
-	});
-
-	const result = await check;
-	return result;
-}
 
 // Collecting info from youtube
 async function getVideoInfo(url) {
@@ -291,7 +256,7 @@ function download(type) {
 								resolve("video downloaded");
 							}
 						})
-						.pipe(fs.createWriteStream(tempDir + videoName));
+						.pipe(fs.createWriteStream(path.join(tempDir, videoName)));
 				}),
 
 				new Promise((resolve, reject) => {
@@ -310,16 +275,16 @@ function download(type) {
 								resolve("audio downloaded");
 							}
 						})
-						.pipe(fs.createWriteStream(tempDir + audioName));
+						.pipe(fs.createWriteStream(path.join(tempDir, audioName)));
 				}),
 			];
 
 			Promise.all([arr[0], arr[1]])
 				.then((response) => {
 					cp.exec(
-						`"${ffmpeg}" -i "${tempDir + videoName}" -i "${
-							tempDir + audioName
-						}" -c copy "${downloadDir + "/" + filename}"`,
+						`"${ffmpeg}" -i "${path.join(tempDir, videoName)}" -i "${
+							path.join(tempDir, audioName)
+						}" -c copy "${path.join(downloadDir, filename)}"`,
 						(error, stdout, stderr) => {
 							if (error) {
 								console.log(error);
@@ -353,7 +318,7 @@ function download(type) {
 						afterSave(downloadDir, filename);
 					}
 				})
-				.pipe(fs.createWriteStream(downloadDir + "/" + filename));
+				.pipe(fs.createWriteStream(path.join(downloadDir, filename)));
 		}
 	});
 }
@@ -374,7 +339,8 @@ function afterSave(location, filename) {
 	).innerHTML = `File saved. Click to open <b title="Click to open" class="savedMsg">${location}</b>`;
 
 	getId("savedMsg").addEventListener("click", (e) => {
-		shell.showItemInFolder(location + "/" + filename);
+		shell.showItemInFolder(path.join(location, filename));
+		log(path.join(location, filename))
 	});
 }
 

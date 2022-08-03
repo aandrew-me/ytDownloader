@@ -23,13 +23,12 @@ function createWindow() {
 	win.maximize();
 	win.setMenu(null)
 	win.show();
-	win.webContents.openDevTools()
+	// win.webContents.openDevTools()
 	autoUpdater.checkForUpdatesAndNotify();
 }
 
 app.whenReady().then(() => {
 	createWindow();
-
 	app.on("activate", () => {
 		if (BrowserWindow.getAllWindows().length === 0) {
 			createWindow();
