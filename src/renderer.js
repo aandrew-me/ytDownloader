@@ -27,6 +27,7 @@ if (localPath){
 }
 else{
 	downloadDir = appdir
+	localStorage.setItem("downloadPath", appdir)
 }
 
 // Clearing tempDir
