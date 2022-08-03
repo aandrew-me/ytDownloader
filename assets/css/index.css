@@ -1,10 +1,10 @@
 :root {
-	--background: whitesmoke;
-	--text: rgb(45, 45, 45);
-	--box-main: rgb(143, 239, 207);
-	--box-toggle: rgb(108, 231, 190);
+	--background:rgb(40,40,40);
+	--text:white;
+	--box-main:rgb(80,80,80);
+	--box-toggle:rgb(70,70,70);
 	--box-toggleOn: rgb(67, 212, 164);
-	--theme-toggle: rgb(147, 174, 185);
+	--theme-toggle:rgb(80, 193, 238)
 }
 
 body {
@@ -16,6 +16,7 @@ body {
 	padding: 10px;
 	background-color: var(--background);
 	color: var(--text);
+	transition: .4s;
 }
 
 #title {
