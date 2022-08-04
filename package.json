@@ -1,16 +1,16 @@
 {
 	"dependencies": {
-		"electron-updater": "^5.0.5",
+		"electron-updater": "^5.2.1",
 		"ffmpeg-static": "^5.0.2",
 		"ytdl-core": "^4.11.0"
 	},
 	"name": "ytdownloader",
-	"version": "1.7.0",
+	"version": "1.7.1",
 	"main": "main.js",
 	"scripts": {
 		"start": "electron .",
-		"watch":"nodemon --exec electron .",
-		"debug":"electron --inspect=5858 .",
+		"watch": "nodemon --exec electron .",
+		"debug": "electron --inspect=5858 .",
 		"windows": "rm -rf ./node_modules && electron-builder -w",
 		"linux": "rm -rf ./node_modules && electron-builder -l",
 		"mac": "rm -rf ./node_modules && electron-builder -m",
@@ -26,12 +26,12 @@
 		"owner": "aandrew-me",
 		"repo": "ytDownloader",
 		"private": false
-	  },
+	},
 	"license": "MIT",
 	"description": "Download videos and audios from YouTube",
 	"devDependencies": {
 		"electron": "19.0.9",
-		"electron-builder": "^23.1.0"
+		"electron-builder": "^23.3.3"
 	},
 	"build": {
 		"productName": "YTDownloader",
