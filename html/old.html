@@ -1,0 +1,79 @@
+<h2>YouTube Downloader</h2>
+    <input type="text" name="url" placeholder="Paste Video URL or ID here" id="url" autofocus>
+    <!-- Get info button -->
+    <button id="getInfo" onclick="clickAnimation('getInfo')">Get info</button>
+
+    <p id="incorrectMsg"></p>
+
+    <div id="loadingWrapper">
+        <span>Loading</span>
+        <svg version="1.1" id="L4" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
+            y="0px" viewBox="0 0 100 100" enable-background="new 0 0 0 0" xml:space="preserve">
+            <circle fill="rgb(84, 171, 222)" stroke="none" cx="6" cy="50" r="6">
+                <animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite" begin="0.1" />
+            </circle>
+            <circle fill="rgb(84, 171, 222)" stroke="none" cx="26" cy="50" r="6">
+                <animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite" begin="0.2" />
+            </circle>
+            <circle fill="rgb(84, 171, 222)" stroke="none" cx="46" cy="50" r="6">
+                <animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite" begin="0.3" />
+            </circle>
+        </svg>
+    </div>
+
+
+    <div id="hidden">
+        <div id="btnContainer">
+            <button class="toggleBtn" id="videoToggle">Video</button>
+            <button class="toggleBtn" id="audioToggle">Audio</button>
+        </div>
+        <p id="title">Title: </p>
+
+        <div id="videoList">
+            <label>Select Format - </label>
+            <select id="videoFormatSelect">
+            </select>
+            <br>
+            <input type="hidden" name="url" class="url" id="url">
+            <button class="submitBtn" id="videoDownload">Download</button>
+        </div>
+
+        <div id="audioList">
+            <label>Select Format - </label>
+            <select id="audioFormatSelect">
+            </select>
+            <br>
+            <input type="hidden" name="url" class="url">
+            <button class="submitBtn" id="audioDownload">Download</button>
+        </div>
+
+        <div id="preparingBox">
+            <span>Preparing</span>
+            <svg version="1.1" id="L4" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                x="0px" y="0px" viewBox="0 0 100 100" enable-background="new 0 0 0 0" xml:space="preserve">
+                <circle fill="rgb(84, 171, 222)" stroke="none" cx="6" cy="50" r="6">
+                    <animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite" begin="0.1" />
+                </circle>
+                <circle fill="rgb(84, 171, 222)" stroke="none" cx="26" cy="50" r="6">
+                    <animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite" begin="0.2" />
+                </circle>
+                <circle fill="rgb(84, 171, 222)" stroke="none" cx="46" cy="50" r="6">
+                    <animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite" begin="0.3" />
+                </circle>
+            </svg>
+        </div>
+
+        <p id="savedMsg"></p>
+
+        <div class="progressBox" id="videoProgressBox">
+            <label>Video Progress: <progress max="100" value="0" id="videoProgress"></progress></label>
+            <br>
+            <label>Audio Progress: <progress max="100" value="0" id="audioProgress"></progress></label>
+        </div>
+
+        <div class="progressBox" id="audioProgressBox">
+            <label>Download Progress: <progress max="100" value="0" id="onlyAudioProgress"></progress></label>
+        </div>
+
+
+    </div>

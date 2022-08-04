@@ -1,10 +1,10 @@
 :root {
-	--background:rgb(40,40,40);
-	--text:white;
-	--box-main:rgb(80,80,80);
-	--box-toggle:rgb(70,70,70);
+	--background: rgb(40, 40, 40);
+	--text: white;
+	--box-main: rgb(80, 80, 80);
+	--box-toggle: rgb(70, 70, 70);
 	--box-toggleOn: rgb(67, 212, 164);
-	--theme-toggle:rgb(80, 193, 238)
+	--theme-toggle: rgb(80, 193, 238);
 }
 
 body {
@@ -12,80 +12,83 @@ body {
 		Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
 		sans-serif;
 	text-align: center;
-	font-size: xx-large;
 	padding: 10px;
 	background-color: var(--background);
 	color: var(--text);
-	transition: .4s;
+	transition: 0.4s;
+	font-size: large;
 }
 
-#title {
-	font-size: x-large;
-	font-family: sans-serif;
-}
-
-#menuIcon{
+#menuIcon {
 	position: absolute;
-	top:10px;
-	right:10px;
-	width:40px;
-	height:40px;
+	top: 10px;
+	right: 10px;
+	width: 40px;
+	height: 40px;
 	cursor: pointer;
-	transition: .3s;
+	transition: 0.3s;
 }
 
-#menu{
-	display:none;
+#menu {
+	display: none;
 	flex-direction: column;
 	backdrop-filter: blur(16px) saturate(160%);
-    -webkit-backdrop-filter: blur(16px) saturate(160%);
-    background-color: rgba(17, 25, 40, 0.75);
-    border-radius: 12px;
+	-webkit-backdrop-filter: blur(16px) saturate(160%);
+	background-color: rgba(17, 25, 40, 0.75);
+	border-radius: 12px;
 	position: absolute;
-	top:40px;
-	right:50px;
-	padding:15px;
+	top: 40px;
+	right: 50px;
+	padding: 15px;
 	text-align: left;
-	opacity:1;
+	opacity: 1;
 	font-size: large;
 }
-.menuItem{
-	color:white;
-	text-decoration: none;
-	padding:5px;
-	cursor:pointer;
-
-}
-.menuItem:active, .menuItem:link{
-	color:white;
-	
-}
-
-h2{
-	margin-top:0;
-}
-
-input[type="text"] {
-	padding: 10px;
-	border-radius: 10px;
-	border: 1px solid gray;
-	outline: none;
-	font-size: large;
-	width: 70%;
-}
-
-#getInfo {
-	padding: 10px;
-	background-color: rgb(64, 227, 64);
-	border: none;
-	border-radius: 8px;
+.menuItem {
 	color: white;
-	font-size: large;
+	text-decoration: none;
+	padding: 5px;
 	cursor: pointer;
+}
+.menuItem:active,
+.menuItem:link {
+	color: white;
+}
 
-	/* animation-name: clickAnimation; */
-	animation-duration: 0.5s;
-	animation-timing-function: linear;
+.item {
+	display: flex;
+	width: 80%;
+	height: 100px;
+	background-color: rgb(100, 100, 100);
+	margin: 10px auto;
+	border-radius: 10px;
+	padding: 20px 10px;
+	align-items: center;
+	justify-content: space-between;
+}
+
+@media screen and (max-width:650px) {
+	.item{
+		width:90%;
+	}
+}
+
+.itemIcon {
+	max-width: 160px;
+	max-height: 90px;
+	border-radius: 10px;
+	padding:5px;
+}
+
+.itemTitle{
+	font-family: sans-serif;
+}
+.itemBody{
+	height:90%;
+	width:100%;
+	display:flex;
+	flex-direction: column;
+	justify-content: space-between;
 }
 
 @keyframes clickAnimation {
@@ -109,7 +112,8 @@ input[type="text"] {
 	padding: 10px 10px 20px 10px;
 	color: var(--text);
 }
-#videoProgressBox, #audioProgressBox {
+#videoProgressBox,
+#audioProgressBox {
 	display: none;
 }
 
@@ -153,7 +157,6 @@ label {
 
 .submitBtn {
 	padding: 15px;
-	margin: 15px;
 	border-radius: 8px;
 	background-color: rgb(64, 227, 64);
 	color: white;
@@ -218,7 +221,7 @@ svg {
 	color: rgb(52, 170, 234);
 	cursor: pointer;
 }
-#savedMsg{
+#savedMsg {
 	cursor: pointer;
 }
 

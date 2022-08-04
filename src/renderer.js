@@ -4,7 +4,7 @@ const cp = require("child_process");
 const os = require("os");
 const ffmpeg = require("ffmpeg-static");
 const path = require("path")
-const { shell, ipcRenderer, app } = require("electron");
+const { shell, ipcRenderer, clipboard } = require("electron");
 
 // Directories
 const homedir = os.homedir();
@@ -45,6 +45,13 @@ async function getVideoInfo(url) {
 	})
 	return info;
 }
+
+// Pasting url from clipboard
+let url;
+getId("pasteUrl").addEventListener("click", ()=>{
+	url = clipboard.readText()
+	console.log(url);
+})
 
 // Getting video info
 async function getInfo() {
@@ -158,16 +165,6 @@ async function getInfo() {
 			"Some error has occured. Check your connection and use correct URL";
 	}
 }
-
-getId("getInfo").addEventListener("click", (event) => {
-	getInfo();
-});
-
-getId("url").addEventListener("keypress", (event) => {
-	if (event.key == "Enter") {
-		getInfo();
-	}
-});
 
 // Video download event
 getId("videoDownload").addEventListener("click", (event) => {
