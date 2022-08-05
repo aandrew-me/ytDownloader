@@ -75,6 +75,8 @@ function toggle() {
 		root.style.setProperty("--box-main", "rgb(80,80,80)");
 		root.style.setProperty("--box-toggle", "rgb(70,70,70)");
 		root.style.setProperty("--theme-toggle", "rgb(80, 193, 238)");
+		root.style.setProperty("--item-bg", "rgb(60, 60, 60)")
+		root.style.setProperty("--box-shadow", "none");
 
 		darkTheme = true;
 		localStorage.setItem("theme", "dark");
@@ -86,6 +88,10 @@ function toggle() {
 		root.style.setProperty("--box-main", "rgb(143, 239, 207)");
 		root.style.setProperty("--box-toggle", "rgb(108, 231, 190)");
 		root.style.setProperty("--theme-toggle", "rgb(147, 174, 185)");
+		root.style.setProperty("--item-bg", "#ececec")
+		root.style.setProperty("--box-shadow", 	"2px 2px 5px rgb(92, 92, 92), -2px -2px 5px rgb(219, 219, 219)")
+
+
 
 		darkTheme = false;
 		localStorage.setItem("theme", "light");

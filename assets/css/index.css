@@ -5,6 +5,8 @@
 	--box-toggle: rgb(70, 70, 70);
 	--box-toggleOn: rgb(67, 212, 164);
 	--theme-toggle: rgb(80, 193, 238);
+	--item-bg: rgb(60, 60, 60);
+	--box-shadow: none;
 }
 
 body {
@@ -60,12 +62,15 @@ body {
 	position: relative;
 	width: 86%;
 	height: 100px;
-	background-color: rgb(100, 100, 100);
+	background-color: var(--item-bg);
+	color:var(--text);
 	margin: 10px auto;
 	border-radius: 10px;
 	padding: 20px 10px;
 	align-items: center;
 	justify-content: space-between;
+	box-shadow: var(--box-shadow);
+
 }
 
 @media screen and (max-width: 650px) {
