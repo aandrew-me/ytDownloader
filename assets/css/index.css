@@ -57,7 +57,8 @@ body {
 
 .item {
 	display: flex;
-	width: 80%;
+	position: relative;
+	width: 86%;
 	height: 100px;
 	background-color: rgb(100, 100, 100);
 	margin: 10px auto;
@@ -67,9 +68,9 @@ body {
 	justify-content: space-between;
 }
 
-@media screen and (max-width:650px) {
-	.item{
-		width:90%;
+@media screen and (max-width: 650px) {
+	.item {
+		width: 90%;
 	}
 }
 
@@ -77,19 +78,35 @@ body {
 	max-width: 160px;
 	max-height: 90px;
 	border-radius: 10px;
-	padding:5px;
+	margin: 0 10px 0 0;
 }
 
-.itemTitle{
+.itemTitle {
 	font-family: sans-serif;
 }
-.itemBody{
-	height:90%;
-	width:100%;
-	display:flex;
+.itemBody {
+	height: 90%;
+	width: 100%;
+	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
 }
+.itemProgress{
+	font-weight:bold;
+	cursor: pointer;
+
+}
+
+.itemClose{
+	position: absolute;
+	top:5px;
+	right:5px;
+	cursor: pointer;
+	cursor: pointer;
+	width:15px;
+	height:15px;
+}
+
 
 @keyframes clickAnimation {
 	0% {
@@ -106,15 +123,20 @@ body {
 #hidden {
 	display: none;
 	/* display: inline-block; */
+	position: absolute;
+	z-index: 1;
+	left: 0;
+	right: 0;
+	margin: auto;
+	top:20%;
 	background-color: var(--box-main);
 	border-radius: 10px;
 	width: 80%;
 	padding: 10px 10px 20px 10px;
 	color: var(--text);
 }
-#videoProgressBox,
-#audioProgressBox {
-	display: none;
+.hiddenVideoProgress, .hiddenAudioProgress{
+	display:none;
 }
 
 #btnContainer {
@@ -164,6 +186,7 @@ label {
 	font-size: large;
 	cursor: pointer;
 	display: inline-block;
+	outline:none;
 
 	animation-duration: 0.5s;
 	animation-timing-function: linear;
@@ -174,6 +197,7 @@ label {
 }
 
 #loadingWrapper {
+	/* Default is flex */
 	display: none;
 	flex-direction: row;
 	justify-content: center;

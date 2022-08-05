@@ -28,22 +28,67 @@
     </div>
 
 
-    <button id="pasteUrl" class="submitBtn">Click to paste video URL or Id</button>
+    <button id="pasteUrl" class="submitBtn">Click to paste video URL or ID (Ctrl + V)</button>
 
-    
+    <div id="loadingWrapper">
+        <span>Processing </span>
+        <svg version="1.1" id="L4" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
+            y="0px" viewBox="0 0 100 100" enable-background="new 0 0 0 0" xml:space="preserve">
+            <circle fill="rgb(84, 171, 222)" stroke="none" cx="6" cy="50" r="6">
+                <animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite" begin="0.1" />
+            </circle>
+            <circle fill="rgb(84, 171, 222)" stroke="none" cx="26" cy="50" r="6">
+                <animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite" begin="0.2" />
+            </circle>
+            <circle fill="rgb(84, 171, 222)" stroke="none" cx="46" cy="50" r="6">
+                <animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite" begin="0.3" />
+            </circle>
+        </svg>
+    </div>
+    <p id="incorrectMsg"></p>
+
+    <div id="hidden">
+
+        <div id="btnContainer">
+            <button class="toggleBtn" id="videoToggle">Video</button>
+            <button class="toggleBtn" id="audioToggle">Audio</button>
+        </div>
+        <p id="title">Title: </p>
+
+        <div id="videoList">
+            <label>Select Format - </label>
+            <select id="videoFormatSelect">
+            </select>
+            <br>
+            <input type="hidden" name="url" class="url" id="url">
+            <button class="submitBtn" id="videoDownload">Download</button>
+        </div>
+
+        <div id="audioList">
+            <label>Select Format - </label>
+            <select id="audioFormatSelect">
+            </select>
+            <br>
+            <input type="hidden" name="url" class="url">
+            <button class="submitBtn" id="audioDownload">Download</button>
+        </div>
+
+    </div>
+
+
     <br><br><br><br>
 
-<!-- Downloads list -->
+    <!-- Downloads list -->
     <div id="list">
 
-        <div class="item">
+        <!-- <div class="item">
             <img src="https://img.youtube.com/vi/pXkctRYYGjo/mqdefault.jpg" alt="thumbnail" class="itemIcon">
 
             <div class="itemBody">
                 <div class="itemTitle">Qt5 C++ GUI Development Full Course For Beginners | C++ GUI</div>
                 <div class="itemProgress">20% downloaded</div>
             </div>
-        </div>
+        </div> -->
 
     </div>
 
