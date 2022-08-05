@@ -5,8 +5,6 @@ const os = require("os");
 const ffmpeg = require("ffmpeg-static");
 const path = require("path");
 const { shell, ipcRenderer, clipboard } = require("electron");
-const { get } = require("http");
-const { exit } = require("process");
 
 // Directories
 const homedir = os.homedir();
