@@ -76,7 +76,8 @@
 			"target": [
 				"Appimage",
 				"deb",
-				"flatpak"
+				"flatpak",
+				"pacman"
 			],
 			"category": "Utility"
 		},
