@@ -14,17 +14,16 @@ getId("menuIcon").addEventListener("click", (event) => {
 		getId("menuIcon").style.transform = "rotate(0deg)";
 		menuIsOpen = false;
 		let count = 0;
-		let opacity = 1
+		let opacity = 1;
 		const fade = setInterval(() => {
 			if (count >= 10) {
 				clearInterval(fade);
 			} else {
-				opacity -= .1
+				opacity -= 0.1;
 				getId("menu").style.opacity = opacity;
 				count++;
 			}
 		}, 50);
-
 	} else {
 		getId("menuIcon").style.transform = "rotate(90deg)";
 		menuIsOpen = true;
@@ -35,8 +34,6 @@ getId("menuIcon").addEventListener("click", (event) => {
 		}, 150);
 	}
 });
-
-
 
 // Video and audio toggle
 
@@ -61,13 +58,12 @@ let darkTheme = false;
 let circle = getId("themeToggleInside");
 const root = document.querySelector(":root");
 
-let enabledTransparent = localStorage.getItem("enabledTransparent")
-let bgColor = ""
-if (enabledTransparent == "true"){
- bgColor = "rgba(40,40,40, .7)"
-}
-else{
-bgColor = "rgb(40,40,40)"
+let enabledTransparent = localStorage.getItem("enabledTransparent");
+let bgColor = "";
+if (enabledTransparent == "true") {
+	bgColor = "rgba(40,40,40, .7)";
+} else {
+	bgColor = "rgb(40,40,40)";
 }
 
 function toggle() {

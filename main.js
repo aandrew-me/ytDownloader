@@ -1,6 +1,6 @@
 const { app, BrowserWindow, dialog, ipcMain } = require("electron");
 const { autoUpdater } = require("electron-updater");
-let win
+let win;
 
 function createWindow() {
 	let isTransparent = false;
@@ -8,22 +8,22 @@ function createWindow() {
 		isTransparent = true;
 	}
 
-		win = new BrowserWindow({
+	win = new BrowserWindow({
 		show: false,
 		icon: __dirname + "/public/icon.png",
 		spellcheck: false,
 		transparent: isTransparent,
 		webPreferences: {
-            nodeIntegration: true,
-            contextIsolation: false
-        }
+			nodeIntegration: true,
+			contextIsolation: false,
+		},
 	});
 
-	win.loadFile("html/index.html")
+	win.loadFile("html/index.html");
 	win.maximize();
 	// win.setMenu(null)
 	win.show();
-	win.webContents.openDevTools()
+	win.webContents.openDevTools();
 	autoUpdater.checkForUpdatesAndNotify();
 }
 
@@ -39,21 +39,19 @@ app.whenReady().then(() => {
 	}
 });
 
-
 ipcMain.on("load-page", (event, arg) => {
-	win.loadFile(arg)
-})
+	win.loadFile(arg);
+});
 
-ipcMain.on("select-location", ()=>{
+ipcMain.on("select-location", () => {
 	const location = dialog.showOpenDialogSync(win, {
-		properties: ['openFile', 'openDirectory']
-	  })
+		properties: ["openFile", "openDirectory"],
+	});
 
-	if (location){
-		win.webContents.send("downloadPath", location)
+	if (location) {
+		win.webContents.send("downloadPath", location);
 	}
-})
-
+});
 
 app.on("window-all-closed", () => {
 	if (process.platform !== "darwin") {

@@ -425,14 +425,9 @@ function download(type) {
 					getId(
 						newFolderName + "prog"
 					).textContent = `Progress: ${progress}%`;
-
 				})
-				.on("end", ()=>{
-					afterSave(
-						downloadDir,
-						filename,
-						newFolderName + "prog"
-					);
+				.on("end", () => {
+					afterSave(downloadDir, filename, newFolderName + "prog");
 				})
 				.pipe(fs.createWriteStream(path.join(downloadDir, filename)));
 		}
