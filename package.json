@@ -5,7 +5,7 @@
 		"ytdl-core": "^4.11.0"
 	},
 	"name": "ytdownloader",
-	"version": "2.0.1",
+	"version": "2.0.2",
 	"main": "main.js",
 	"scripts": {
 		"start": "electron .",
@@ -14,7 +14,7 @@
 		"windows": "rm -rf ./node_modules && electron-builder -w",
 		"linux": "rm -rf ./node_modules && electron-builder -l",
 		"mac": "rm -rf ./node_modules && electron-builder -m",
-		"publish-linux": "rm -rf ./node_modules && electron-builder -l --publish=always",
+		"publish-linux": "rm -rf ./node_modules && electron-builder -l --publish=always -c.snap.publish=github",
 		"publish-windows": "rm -rf ./node_modules && electron-builder -w --publish=always"
 	},
 	"author": {

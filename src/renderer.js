@@ -460,10 +460,11 @@ function afterSave(location, filename, progressId) {
 		body: "File saved successfully.",
 		icon: "../assets/images/icon.png",
 	});
-	getId(progressId).innerHTML = `<b>File saved. Click to Open</b>`;
-	getId(progressId).addEventListener("click", () => {
-		shell.showItemInFolder(path.join(location, filename));
-	});
+	getId(progressId).innerHTML = `<b onClick="showItem('${location}', '${filename}')">File saved. Click to Open</b>`;
+}
+
+function showItem(location, filename){
+	shell.showItemInFolder(path.join(location, filename));
 }
 
 // Function to find video/audio info
