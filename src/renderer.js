@@ -8,9 +8,9 @@ const { shell, ipcRenderer, clipboard } = require("electron");
 
 // Directories
 const homedir = os.homedir();
-const appdir = path.join(homedir, ".ytDownloader");
-const tempDir = path.join(appdir, "temp");
-fs.mkdirSync(path.join(homedir, ".ytDownloader/temp"), { recursive: true });
+const appdir = path.join(homedir, "ytDownloader");
+const tempDir = path.join(homedir,".ytDownloader", "temp");
+fs.mkdirSync(tempDir, { recursive: true });
 let config;
 
 // Download directory
@@ -30,7 +30,7 @@ if (localPath) {
 }
 
 // Clearing tempDir
-fs.readdirSync(tempDir).forEach((f) => fs.rmdir(`${tempDir}/${f}`, () => {}));
+fs.readdirSync(tempDir).forEach((f) => fs.rmdir(`${tempDir}/${f}`, {recursive:true} ,() => {}));
 
 // Collecting info from youtube
 async function getVideoInfo(url) {
