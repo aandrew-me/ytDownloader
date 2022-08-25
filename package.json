@@ -80,9 +80,6 @@
 			],
 			"category": "Utility"
 		},
-		"snap": {
-			"compression": "lzo"
-		},
 		"win": {
 			"target": "nsis"
 		},
