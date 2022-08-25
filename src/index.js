@@ -61,7 +61,7 @@ const root = document.querySelector(":root");
 let enabledTransparent = localStorage.getItem("enabledTransparent");
 let bgColor = "";
 if (enabledTransparent == "true") {
-	bgColor = "rgba(40,40,40, .7)";
+	bgColor = "rgba(40,40,40, .9)";
 } else {
 	bgColor = "rgb(40,40,40)";
 }
@@ -84,7 +84,7 @@ function toggle() {
 		circle.style.left = "0px";
 
 		root.style.setProperty("--background", "whitesmoke");
-		root.style.setProperty("--text", "rgba(45, 45, 45)");
+		root.style.setProperty("--text", "rgb(45, 45, 45)");
 		root.style.setProperty("--box-main", "rgb(143, 239, 207)");
 		root.style.setProperty("--box-toggle", "rgb(108, 231, 190)");
 		root.style.setProperty("--theme-toggle", "rgb(147, 174, 185)");

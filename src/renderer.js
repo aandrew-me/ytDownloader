@@ -11,7 +11,6 @@ const homedir = os.homedir();
 const appdir = path.join(homedir, "ytDownloader");
 const tempDir = path.join(homedir,".ytDownloader", "temp");
 fs.mkdirSync(tempDir, { recursive: true });
-let config;
 
 // Download directory
 let downloadDir = "";
