@@ -27,6 +27,7 @@ if (localPath) {
 	downloadDir = appdir;
 	localStorage.setItem("downloadPath", appdir);
 }
+fs.mkdir(downloadDir, {recursive:true}, ()=>{})
 
 // Clearing tempDir
 fs.readdirSync(tempDir).forEach((f) => fs.rmdir(`${tempDir}/${f}`, {recursive:true} ,() => {}));
