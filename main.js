@@ -1,6 +1,6 @@
 const { app, BrowserWindow, dialog, ipcMain } = require("electron");
 const { autoUpdater } = require("electron-updater");
-let win;
+let win, secondaryWindow;
 
 function createWindow() {
 	let isTransparent = false;
@@ -21,7 +21,7 @@ function createWindow() {
 
 	win.loadFile("html/index.html");
 	win.maximize();
-	// win.setMenu(null)
+	win.setMenu(null)
 	win.show();
 	// win.webContents.openDevTools();
 	autoUpdater.checkForUpdatesAndNotify();
@@ -39,8 +39,25 @@ app.whenReady().then(() => {
 	}
 });
 
-ipcMain.on("load-page", (event, arg) => {
-	win.loadFile(arg);
+ipcMain.on("load-page", (event, file) => {
+	secondaryWindow = new BrowserWindow({
+		webPreferences: {
+			nodeIntegration: true,
+			contextIsolation: false,
+		},
+		parent: win,
+		modal: true,
+		show: false,
+	});
+	// win.loadFile(file);
+	secondaryWindow.loadFile(file);
+	secondaryWindow.maximize();
+	secondaryWindow.show();
+});
+
+ipcMain.on("close-secondary", () => {
+	secondaryWindow.close();
+	secondaryWindow = null;
 });
 
 ipcMain.on("select-location", () => {

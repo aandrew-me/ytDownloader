@@ -188,13 +188,21 @@ label {
 	background-color: rgb(64, 227, 64);
 	color: white;
 	border: none;
+	border-bottom: 5px solid rgb(50, 185, 50);
 	font-size: large;
 	cursor: pointer;
 	display: inline-block;
 	outline:none;
+	position:relative;
 
 	animation-duration: 0.5s;
 	animation-timing-function: linear;
+}
+.submitBtn:active{
+	border:none;
+	top:5px;
+	margin-bottom: 5px;
+	transition:.3s;
 }
 
 #incorrectMsg {

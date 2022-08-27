@@ -40,7 +40,9 @@ async function getVideoInfo(url) {
 		.then((data) => {
 			info = data;
 		})
-		.catch((error) => {});
+		.catch((error) => {
+			console.log(error);
+		});
 	return info;
 }
 
@@ -509,11 +511,28 @@ async function findInfo(url, itag) {
 }
 
 // Opening windows
+function closeMenu(){
+	getId("menuIcon").style.transform = "rotate(0deg)";
+		menuIsOpen = false;
+		let count = 0;
+		let opacity = 1;
+		const fade = setInterval(() => {
+			if (count >= 10) {
+				clearInterval(fade);
+			} else {
+				opacity -= 0.1;
+				getId("menu").style.opacity = opacity;
+				count++;
+			}
+		}, 50);
+}
 
 getId("preferenceWin").addEventListener("click", () => {
+	closeMenu()
 	ipcRenderer.send("load-page", __dirname + "/preferences.html");
 });
 
 getId("aboutWin").addEventListener("click", () => {
+	closeMenu()
 	ipcRenderer.send("load-page", __dirname + "/about.html");
 });

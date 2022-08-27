@@ -10,6 +10,7 @@
 <body>
     <a id="back">Home</a>
     <h1>Preferences</h1>
+    <strong>Restart app for changes to take place</strong>
     <p>1. Download location</p>
     <p>Default location: <span id="path"></span></p>
     <button id="selectLocation">Select Download Location</button>
@@ -29,7 +30,7 @@
         }
 
         getId("back").addEventListener("click", ()=>{
-            ipcRenderer.send("load-page", __dirname + "/index.html")
+            ipcRenderer.send("close-secondary")
         })
 
         getId("selectLocation").addEventListener("click", ()=>{

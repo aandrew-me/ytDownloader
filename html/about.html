@@ -27,9 +27,7 @@
         const { ipcRenderer, shell } = require("electron")
 
         document.getElementById("back").addEventListener("click", ()=>{
-            ipcRenderer.send("load-page", __dirname + "/index.html")
-        })
-
+            ipcRenderer.send("close-secondary")        })
         document.getElementById("sourceLink").addEventListener("click", ()=>{
             shell.openExternal("https://github.com/aandrew-me/ytDownloader")
         })

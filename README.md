@@ -15,7 +15,7 @@ A GUI for downloading Video and Audio files from YouTube using Nodejs and Electr
 
 ✅ No external dependencies needed
 
-✅ And ofcourse no trackers or ads
+✅ And of-course no trackers or ads
 
 ## Screenshots
 
@@ -69,4 +69,8 @@ npm i
 To run with [Electron](https://www.electronjs.org/) :
 ```
 npm start
+```
+To build for Linux
+```
+npm run linux
 ```
