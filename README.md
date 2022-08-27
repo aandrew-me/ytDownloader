@@ -38,24 +38,15 @@ Download and install the exe file
 
 ## Linux
 
-Linux has several options available - AppImage, deb and flatpak.
+Linux has several options available - AppImage, Deb, Snap and flatpak.
 
 ### AppImage
-**AppImage** is supported on most Linux distros and has Auto-Update support. So it is recommended.
+
+**AppImage** format is supported on most Linux distros and has Auto-Update support. So it is recommended.
 It just needs to be executed after downloading. See more about [AppImages here](https://appimage.org/).
 
-### Flatpak
-The app is available on **Flathub** [here](https://flathub.org/apps/details/me.aandrew.ytdownloader)
+[AppImageLauncher](https://github.com/TheAssassin/AppImageLauncher) is recommended for integrating AppImages.
 
-To install run 
-```
-flatpak install flathub me.aandrew.ytdownloader
-```
-After installing, a .desktop file should be added and the app should be available in app search.
-Othrwise it also can be launched by executing
-```
-flatpak run me.aandrew.ytdownloader
-```
 
 ### Debian package
 For Debian based distros like Ubuntu .deb file is available. Download and run -
