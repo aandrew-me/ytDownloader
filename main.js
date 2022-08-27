@@ -51,6 +51,7 @@ ipcMain.on("load-page", (event, file) => {
 	});
 	// win.loadFile(file);
 	secondaryWindow.loadFile(file);
+	secondaryWindow.setMenu(null)
 	secondaryWindow.maximize();
 	secondaryWindow.show();
 });
@@ -61,12 +62,12 @@ ipcMain.on("close-secondary", () => {
 });
 
 ipcMain.on("select-location", () => {
-	const location = dialog.showOpenDialogSync(win, {
+	const location = dialog.showOpenDialogSync(secondaryWindow, {
 		properties: ["openFile", "openDirectory"],
 	});
 
 	if (location) {
-		win.webContents.send("downloadPath", location);
+		secondaryWindow.webContents.send("downloadPath", location);
 	}
 });
 
