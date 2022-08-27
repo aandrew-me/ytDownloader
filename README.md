@@ -1,6 +1,11 @@
 # YouTube Downloader
 A GUI for downloading Video and Audio files from YouTube using Nodejs and Electron
 
+
+<a href="https://flathub.org/apps/details/me.aandrew.ytdownloader"><img src="https://flathub.org/assets/badges/flathub-badge-en.svg" style="width:180px;"></a>
+[![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/ytdownloader)
+
+
 ## Features
 
 ✅ Light/Dark mode
