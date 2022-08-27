@@ -1,5 +1,5 @@
 # YouTube Downloader
-A GUI for downloading Video and Audio files from YouTube using Nodejs and Electron
+A modern GUI App for downloading videos and audios from Youtube.
 
 
 <a href="https://flathub.org/apps/details/me.aandrew.ytdownloader"><img src="https://flathub.org/assets/badges/flathub-badge-en.svg" style="width:180px;"></a>
