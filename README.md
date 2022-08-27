@@ -24,7 +24,8 @@ A modern GUI App for downloading videos and audios from Youtube.
 
 ## Screenshots
 
-![ss](https://user-images.githubusercontent.com/66430340/181747909-f16e30dc-a7c3-40cb-876b-54f0ea8d4e42.jpg)
+![image](https://user-images.githubusercontent.com/66430340/187023169-e4cd9b81-1968-4758-85b7-2287808d914d.png)
+<!--![ss](https://user-images.githubusercontent.com/66430340/181747909-f16e30dc-a7c3-40cb-876b-54f0ea8d4e42.jpg)-->
 ![ss2](https://user-images.githubusercontent.com/66430340/181747920-4df80914-278f-4350-9328-015e9e0bcf16.jpg)
 
 
