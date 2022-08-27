@@ -36,6 +36,7 @@
 	"build": {
 		"productName": "YTDownloader",
 		"appId": "org.andrew.ytdownloader",
+		"artifactName":"${productName}.${ext}",
 		"files": [
 			"./resources/**/*",
 			"*.js",
