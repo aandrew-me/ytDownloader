@@ -21,7 +21,7 @@ function createWindow() {
 
 	win.loadFile("html/index.html");
 	win.maximize();
-	win.setMenu(null)
+	// win.setMenu(null)
 	win.show();
 	// win.webContents.openDevTools();
 	autoUpdater.checkForUpdatesAndNotify();
