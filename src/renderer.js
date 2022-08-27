@@ -1,5 +1,4 @@
 const fs = require("fs");
-const ytdl = require("ytdl-core");
 const cp = require("child_process");
 const os = require("os");
 const ffmpeg = require("ffmpeg-static");
