@@ -2,6 +2,7 @@
 	"dependencies": {
 		"electron-updater": "^5.2.1",
 		"ffmpeg-static": "^5.0.2",
+		"yt-dlp-wrap": "^2.3.11",
 		"ytdl-core": "^4.11.1"
 	},
 	"name": "ytdownloader",
