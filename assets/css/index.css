@@ -33,13 +33,30 @@ body {
 }
 #popup{
 	position:absolute;
+	padding:20px;
 	top:50%;
 	left:50%;
 	width:300px;
 	border-radius: 10px;
 	transform: translate(-50%, -50%);
-	background-color: gray;
+	background-color: rgb(91, 91, 91);
 	color:white;
+}
+
+#tryBtn{
+	background-color:rgb(137, 226, 255);
+	color:rgb(35, 35, 35);
+	border:none;
+	border-bottom: 4px solid rgb(63, 169, 205);
+	padding:10px;
+	border-radius: 10px;
+	cursor:pointer;
+	position:relative;
+}
+#tryBtn:active{
+	top:4px;
+	margin-bottom:4px;
+	border:none;
 }
 
 #menuIcon {

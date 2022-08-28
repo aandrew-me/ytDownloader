@@ -16,7 +16,7 @@ fs.mkdirSync(tempDir, { recursive: true });
 let downloadDir = "";
 
 // Global variables
-let title, onlyvideo, id, thumbnail;
+let title, onlyvideo, id, thumbnail, ytdlp;
 let willBeSaved = true;
 
 function getId(id) {
@@ -37,40 +37,55 @@ fs.mkdir(downloadDir, { recursive: true }, () => {});
 let ytDlp;
 let ytdlpPath = path.join(os.homedir(), ".ytDownloader", "ytdlp");
 
+// Downloading yt-dlp
+async function downloadYtdlp() {
+	document.querySelector("#popupBox p").textContent = "Downloading yt-dlp";
+	getId("popupSvg").style.display = "inline";
+
+	await YTDlpWrap.downloadFromGithub(ytdlpPath);
+	getId("popupBox").style.display = "none";
+	ytDlp = ytdlpPath;
+	console.log("yt-dlp bin Path: " + ytDlp);
+	ytdlp = new YTDlpWrap(ytDlp);
+}
+
 // Checking is yt-dlp has been installed by user
 cp.exec("yt-dlp --version", (error, stdout, stderr) => {
 	if (error) {
 		// Checking if yt-dlp has been installed by program
 		cp.exec(`${ytdlpPath} --version`, (error, stdout, stderr) => {
 			if (error) {
-				getId("popupBox").style.display = "block"
+				getId("popupBox").style.display = "block";
 				process.on("uncaughtException", (reason, promise) => {
+					document.querySelector("#popupBox p").textContent =
+						"Failed to download yt-dlp. Please check your connection and try again";
+					getId("popupSvg").style.display = "none";
+					getId(
+						"popup"
+					).innerHTML += `<button id="tryBtn">Try again</button>`;
 					console.log("Failed to download yt-dlp");
+
+					getId("tryBtn").addEventListener("click", () => {
+						getId("popup").removeChild(getId("popup").lastChild);
+						downloadYtdlp();
+					});
 				});
-				
-				async function download() {
-					await YTDlpWrap.downloadFromGithub(ytdlpPath);
-					getId("popupBox").style.display = "none"
-					ytDlp = ytdlpPath
-					console.log("yt-dlp bin Path: " + ytDlp);
-				}
 
-				download()
-
+				downloadYtdlp();
 			} else {
 				console.log("yt-dlp binary is present in PATH");
-				ytDlp = ytdlpPath
+				ytDlp = ytdlpPath;
 				console.log("yt-dlp bin Path: " + ytDlp);
-
+				ytdlp = new YTDlpWrap(ytDlp);
 			}
 		});
 	} else {
 		console.log("yt-dlp binary is present in PATH");
-		ytDlp = "yt-dlp"
+		ytDlp = "yt-dlp";
+		ytdlp = new YTDlpWrap(ytDlp);
 		console.log("yt-dlp bin Path: " + ytDlp);
 	}
 });
-
 
 function defaultVideoToggle() {
 	videoToggle.style.backgroundColor = "var(--box-toggleOn)";
@@ -105,7 +120,7 @@ async function getInfo(url) {
 	getId("videoFormatSelect").innerHTML = "";
 	getId("audioFormatSelect").innerHTML = "";
 	let info;
-	cp.exec(`yt-dlp -j ${url}`, (error, stdout, stderr) => {
+	cp.exec(`${ytDlp} -j ${url}`, (error, stdout, stderr) => {
 		try {
 			info = JSON.parse(stdout);
 		} catch (error) {
@@ -208,8 +223,8 @@ async function getInfo(url) {
 							format_id +
 							"'>" +
 							"Quality: " +
-							format.format_note ||
-						"Unknown quality" +
+							(format.format_note ||
+						"Unknown quality") +
 							" | " +
 							audio_ext +
 							" | " +
@@ -269,37 +284,39 @@ getId("audioDownload").addEventListener("click", (event) => {
 	download("audio");
 });
 
-function restorePrevious() {
-	if (!localStorage.getItem("itemList")) return;
-	const items = JSON.parse(localStorage.getItem("itemList"));
-	if (items) {
-		console.log(items);
-		items.forEach((item) => {
-			const newItem = `
-			<div class="item" id="${item.id}">
-			<img src="../assets/images/close.png" onClick="fadeItem('${item.id}')" class="itemClose"}" id="${
-				item.id + ".close"
-			}">
-			<img src="${item.thumbnail}" alt="thumbnail" class="itemIcon">
-		
-			<div class="itemBody">
-				<div class="itemTitle">${item.title}</div>
-				<div class="itemType">${item.type}</div>
-				<input disabled type="range" value="0" class="hiddenVideoProgress" id="${
-					item.id + "vid"
-				}"></input>
-				<input disabled type="range" value="0" class="hiddenAudioProgress" id="${
-					item.id + "aud"
-				}"></input>
-				<div id="${item.id + "prog"}" class="itemProgress">Progress: ${item.progress}%</div>
-				<button class="resumeBtn">Resume</button>
-			</div>
-		</div>
-		`;
-			getId("list").innerHTML += newItem;
-		});
-	}
-}
+// function restorePrevious() {
+// 	if (!localStorage.getItem("itemList")) return;
+// 	const items = JSON.parse(localStorage.getItem("itemList"));
+// 	if (items) {
+// 		console.log(items);
+// 		items.forEach((item) => {
+// 			const newItem = `
+// 			<div class="item" id="${item.id}">
+// 			<img src="../assets/images/close.png" onClick="fadeItem('${
+// 				item.id
+// 			}')" class="itemClose"}" id="${item.id + ".close"}">
+// 			<img src="${item.thumbnail}" alt="thumbnail" class="itemIcon">
+
+// 			<div class="itemBody">
+// 				<div class="itemTitle">${item.title}</div>
+// 				<div class="itemType">${item.type}</div>
+// 				<input disabled type="range" value="0" class="hiddenVideoProgress" id="${
+// 					item.id + "vid"
+// 				}"></input>
+// 				<input disabled type="range" value="0" class="hiddenAudioProgress" id="${
+// 					item.id + "aud"
+// 				}"></input>
+// 				<div id="${item.id + "prog"}" class="itemProgress">Progress: ${
+// 				item.progress
+// 			}%</div>
+// 				<button class="resumeBtn">Resume</button>
+// 			</div>
+// 		</div>
+// 		`;
+// 			getId("list").innerHTML += newItem;
+// 		});
+// 	}
+// }
 
 // restorePrevious()
 //////////////////////////////
@@ -412,7 +429,8 @@ function download(type) {
 				`${format_id}+${audioFormat}`,
 				"-o",
 				`${path.join(downloadDir, filename)}`,
-				'--ffmpeg-location', ffmpeg
+				"--ffmpeg-location",
+				ffmpeg,
 			],
 			{ shell: true, detached: true },
 			controller.signal
@@ -421,7 +439,15 @@ function download(type) {
 		// If downloading only audio or video with audio
 	} else {
 		downloadProcess = ytdlp.exec(
-			[url, "-f", format_id, "-o", `${path.join(downloadDir, filename)}`, '--ffmpeg-location', ffmpeg],
+			[
+				url,
+				"-f",
+				format_id,
+				"-o",
+				`${path.join(downloadDir, filename)}`,
+				"--ffmpeg-location",
+				ffmpeg,
+			],
 			{ shell: true, detached: true },
 			controller.signal
 		);
