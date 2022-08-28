@@ -379,7 +379,7 @@ function download(type) {
 		<img src="../assets/images/close.png" onClick="fadeItem('${randomId}')" class="itemClose"}" id="${
 		randomId + ".close"
 	}">
-		<img src="${thumbnail}" alt="thumbnail" class="itemIcon">
+		<img src="${thumbnail}" alt="No thumbnail" class="itemIcon" crossorigin="anonymous">
 
 		<div class="itemBody">
 			<div class="itemTitle">${title}</div>
@@ -505,7 +505,10 @@ function download(type) {
 
 				afterSave(downloadDir, filename, randomId + "prog");
 			}
-		});
+		})
+		.on("error", (error) => {
+			getId(randomId + "prog").textContent = "Some error has occured"
+		})
 }
 
 // Removing item

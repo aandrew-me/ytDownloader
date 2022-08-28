@@ -75,7 +75,7 @@ function toggle() {
 		root.style.setProperty("--box-main", "rgb(80,80,80)");
 		root.style.setProperty("--box-toggle", "rgb(70,70,70)");
 		root.style.setProperty("--theme-toggle", "rgb(80, 193, 238)");
-		root.style.setProperty("--item-bg", "rgb(60, 60, 60)")
+		root.style.setProperty("--item-bg", "rgb(60, 60, 60)");
 		root.style.setProperty("--box-shadow", "none");
 
 		darkTheme = true;
@@ -88,10 +88,11 @@ function toggle() {
 		root.style.setProperty("--box-main", "rgb(174 249 224)");
 		root.style.setProperty("--box-toggle", "rgb(108, 231, 190)");
 		root.style.setProperty("--theme-toggle", "rgb(147, 174, 185)");
-		root.style.setProperty("--item-bg", "#ececec")
-		root.style.setProperty("--box-shadow", 	"2px 2px 5px rgb(92, 92, 92), -2px -2px 5px rgb(219, 219, 219)")
-
-
+		root.style.setProperty("--item-bg", "#ececec");
+		root.style.setProperty(
+			"--box-shadow",
+			"2px 2px 5px rgb(92, 92, 92), -2px -2px 5px rgb(219, 219, 219)"
+		);
 
 		darkTheme = false;
 		localStorage.setItem("theme", "light");
@@ -115,4 +116,15 @@ function clickAnimation(id) {
 	setTimeout(() => {
 		getId(id).style.animationName = "";
 	}, 500);
+}
+let advancedHidden = true;
+
+function advancedToggle() {
+	if (advancedHidden) {
+		getId("advanced").style.display = "block";
+		advancedHidden = false;
+	} else {
+		getId("advanced").style.display = "none";
+		advancedHidden = true;
+	}
 }

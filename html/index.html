@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+    <header ></header>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,8 +16,9 @@
 <div id="popupBox">
     <div id="popup">
         <p>yt-dlp is being downloaded.</p>
-        <svg id="popupSvg" version="1.1" id="L4" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
-            y="0px" viewBox="0 0 100 100" enable-background="new 0 0 0 0" xml:space="preserve">
+        <svg id="popupSvg" version="1.1" id="L4" xmlns="http://www.w3.org/2000/svg"
+            xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 100 100"
+            enable-background="new 0 0 0 0" xml:space="preserve">
             <circle fill="rgb(84, 171, 222)" stroke="none" cx="6" cy="50" r="6">
                 <animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite" begin="0.1" />
             </circle>
@@ -80,6 +82,7 @@
             <br>
             <input type="hidden" name="url" class="url" id="url">
             <button class="submitBtn" id="videoDownload">Download</button>
+            <!-- <button id="advancedToggle" onClick ="advancedToggle()">Advanced</button> -->
         </div>
 
         <div id="audioList">
@@ -89,10 +92,21 @@
             <br>
             <input type="hidden" name="url" class="url">
             <button class="submitBtn" id="audioDownload">Download</button>
+            <!-- <button id="advancedToggle" onClick ="advancedToggle()">Advanced</button> -->
+
+        </div>
+
+        <div id="advanced">
+            <p>Download particular time-range</p>
+            <label>Start</label>
+            <input type="text" name="startTime" class="time">
+            :
+            <input type="text" name="endTime" class="time">
+            <label>End</label>
+
         </div>
 
     </div>
-
 
     <br><br><br><br>
 

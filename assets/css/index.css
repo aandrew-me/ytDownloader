@@ -20,43 +20,43 @@ body {
 	transition: 0.4s;
 	font-size: large;
 }
-#popupBox{
-	width:100vw;
-	height:100vh;
-	margin:0;
+#popupBox {
+	width: 100vw;
+	height: 100vh;
+	margin: 0;
 	background-color: rgba(17, 25, 40, 0.75);
-	position:absolute;
-	top:0;
-	left:0;
+	position: absolute;
+	top: 0;
+	left: 0;
 	z-index: 2;
-	display:none;
+	display: none;
 }
-#popup{
-	position:absolute;
-	padding:20px;
-	top:50%;
-	left:50%;
-	width:300px;
+#popup {
+	position: absolute;
+	padding: 20px;
+	top: 50%;
+	left: 50%;
+	width: 300px;
 	border-radius: 10px;
 	transform: translate(-50%, -50%);
 	background-color: rgb(91, 91, 91);
-	color:white;
+	color: white;
 }
 
-#tryBtn{
-	background-color:rgb(137, 226, 255);
-	color:rgb(35, 35, 35);
-	border:none;
+#tryBtn {
+	background-color: rgb(137, 226, 255);
+	color: rgb(35, 35, 35);
+	border: none;
 	border-bottom: 4px solid rgb(63, 169, 205);
-	padding:10px;
+	padding: 10px;
 	border-radius: 10px;
-	cursor:pointer;
-	position:relative;
+	cursor: pointer;
+	position: relative;
 }
-#tryBtn:active{
-	top:4px;
-	margin-bottom:4px;
-	border:none;
+#tryBtn:active {
+	top: 4px;
+	margin-bottom: 4px;
+	border: none;
 }
 
 #menuIcon {
@@ -83,7 +83,7 @@ body {
 	text-align: left;
 	opacity: 1;
 	font-size: large;
-	z-index:2;
+	z-index: 2;
 }
 .menuItem {
 	color: white;
@@ -102,14 +102,13 @@ body {
 	width: 86%;
 	height: 100px;
 	background-color: var(--item-bg);
-	color:var(--text);
+	color: var(--text);
 	margin: 10px auto;
 	border-radius: 10px;
 	padding: 20px 10px;
 	align-items: center;
 	justify-content: space-between;
 	box-shadow: var(--box-shadow);
-
 }
 
 @media screen and (max-width: 650px) {
@@ -135,31 +134,29 @@ body {
 	flex-direction: column;
 	justify-content: space-between;
 }
-.itemProgress{
-	font-weight:bold;
+.itemProgress {
+	font-weight: bold;
 	cursor: pointer;
-
 }
 
-.itemClose{
+.itemClose {
 	position: absolute;
-	top:5px;
-	right:5px;
+	top: 5px;
+	right: 5px;
 	cursor: pointer;
 	cursor: pointer;
-	width:15px;
-	height:15px;
+	width: 15px;
+	height: 15px;
 }
 
-#closeHidden{
-	bottom:5px;
+#closeHidden {
+	bottom: 5px;
 	position: absolute;
-	right:5px;
+	right: 5px;
 	cursor: pointer;
 	cursor: pointer;
-	width:15px;
-	height:15px;
-
+	width: 15px;
+	height: 15px;
 }
 
 #hidden {
@@ -170,7 +167,7 @@ body {
 	left: 0;
 	right: 0;
 	margin: auto;
-	top:20%;
+	top: 20%;
 	background-color: var(--box-main);
 	border-radius: 10px;
 	width: 80%;
@@ -178,8 +175,9 @@ body {
 	color: var(--text);
 	box-shadow: var(--box-shadow);
 }
-.hiddenVideoProgress, .hiddenAudioProgress{
-	display:none;
+.hiddenVideoProgress,
+.hiddenAudioProgress {
+	display: none;
 }
 
 #btnContainer {
@@ -222,24 +220,24 @@ label {
 
 .submitBtn {
 	padding: 15px;
-	border-radius: 8px;
+	border-radius: 10px;
 	background-color: rgb(64, 227, 64);
 	color: white;
 	border: none;
-	border-bottom: 5px solid rgb(50, 185, 50);
+	border-bottom: 4px solid rgb(50, 185, 50);
 	font-size: large;
 	cursor: pointer;
 	display: inline-block;
-	outline:none;
-	position:relative;
+	outline: none;
+	position: relative;
 }
-.submitBtn:active{
+.submitBtn:active {
 	border: none;
-	top:5px;
-	margin-bottom:5px;
+	top: 4px;
+	margin-bottom: 4px;
 }
 
-.resumeBtn{
+.resumeBtn {
 	padding: 10px;
 	border-radius: 8px;
 	background-color: rgb(64, 227, 64);
@@ -248,15 +246,21 @@ label {
 	border-bottom: 4px solid rgb(50, 185, 50);
 	cursor: pointer;
 	display: inline-block;
-	outline:none;
-	position:absolute;
-	right:10px;
+	outline: none;
+	position: absolute;
+	right: 10px;
 	bottom: 10px;
-	width:100px;
+	width: 100px;
 }
-.resumeBtn:active{
-	border:none;
-	bottom:6px;
+
+.time {
+	padding: 8px;
+	border: none;
+	outline: none;
+	border-radius: 5px;
+	width: 60px;
+	font-size: large;
+	margin: 5px;
 }
 
 #incorrectMsg {
@@ -314,6 +318,29 @@ svg {
 }
 #savedMsg {
 	cursor: pointer;
+}
+
+#advancedToggle {
+	color: white;
+	background-color: rgb(231, 80, 80);
+	border: none;
+	border-bottom: 4px solid rgb(180, 49, 49);
+	position: relative;
+	padding: 15px;
+	border-radius: 10px;
+	cursor: pointer;
+	margin: 8px;
+	font-size: large;
+}
+
+#advancedToggle:active {
+	top: 4px;
+	margin-bottom: 4px;
+	border: none;
+}
+
+#advanced {
+	display: none;
 }
 
 /* Scrollbar */
