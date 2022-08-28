@@ -23,15 +23,21 @@ function getId(id) {
 	return document.getElementById(id);
 }
 
-let localPath = localStorage.getItem("downloadPath");
+function downloadPathSelection(){
+	let localPath = localStorage.getItem("downloadPath");
 
-if (localPath) {
-	downloadDir = localPath;
-} else {
-	downloadDir = appdir;
-	localStorage.setItem("downloadPath", appdir);
+	if (localPath) {
+		downloadDir = localPath;
+	} else {
+		downloadDir = appdir;
+		localStorage.setItem("downloadPath", appdir);
+	}
+	fs.mkdir(downloadDir, { recursive: true }, () => {});
 }
-fs.mkdir(downloadDir, { recursive: true }, () => {});
+
+downloadPathSelection()
+
+
 
 // Checking for yt-dlp
 let ytDlp;
@@ -105,6 +111,11 @@ function pasteUrl() {
 	getInfo(url);
 }
 
+getId("closeHidden").addEventListener("click", ()=>{
+	getId("hidden").style.display = "none";
+	getId("loadingWrapper").style.display = "none";
+})
+
 document.addEventListener("keydown", (event) => {
 	if (event.ctrlKey && event.key == "v") {
 		pasteUrl();
@@ -117,6 +128,7 @@ getId("pasteUrl").addEventListener("click", () => {
 
 // Getting video info
 async function getInfo(url) {
+	downloadPathSelection()
 	getId("videoFormatSelect").innerHTML = "";
 	getId("audioFormatSelect").innerHTML = "";
 	let info;

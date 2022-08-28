@@ -83,6 +83,7 @@ body {
 	text-align: left;
 	opacity: 1;
 	font-size: large;
+	z-index:2;
 }
 .menuItem {
 	color: white;
@@ -148,6 +149,17 @@ body {
 	cursor: pointer;
 	width:15px;
 	height:15px;
+}
+
+#closeHidden{
+	bottom:5px;
+	position: absolute;
+	right:5px;
+	cursor: pointer;
+	cursor: pointer;
+	width:15px;
+	height:15px;
+
 }
 
 #hidden {

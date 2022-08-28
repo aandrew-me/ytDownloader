@@ -5,7 +5,7 @@
 		"yt-dlp-wrap": "^2.3.11"
 	},
 	"name": "ytdownloader",
-	"version": "2.1.0",
+	"version": "3.0.0",
 	"main": "main.js",
 	"scripts": {
 		"start": "electron .",
