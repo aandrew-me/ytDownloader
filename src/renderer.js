@@ -83,7 +83,7 @@ async function getInfo(url) {
 		if (info) {
 			title = info.title;
 			id = info.id;
-			thumbnail = info.thumbnail
+			thumbnail = info.thumbnail;
 			const formats = info.formats;
 			console.log(formats);
 
@@ -114,24 +114,35 @@ async function getInfo(url) {
 			}
 
 			for (let format of formats) {
-				let size = (
-					Number(format.filesize || format.filesize_approx) / 1000000
-				).toFixed(2);
+				let size;
+				if (format.filesize || format.filesize_approx){
+					size = (
+						Number(format.filesize || format.filesize_approx) / 1000000
+					).toFixed(2)
+				}
+				else{
+					size = "Unknown size"
+				}
 
 				// For videos
 				if (
 					format.video_ext !== "none" &&
 					format.audio_ext === "none"
 				) {
-					size = (Number(size) + 0 || Number(audioSize)).toFixed(2);
-					size = size + " MB";
+					if (size !== "Unknown size"){
+						size = (Number(size) + 0 || Number(audioSize)).toFixed(2);
+						size = size + " MB";
+					}
+
 					const format_id = format.format_id + "|" + format.ext;
 
 					const element =
 						"<option value='" +
 						format_id +
 						"'>" +
-						(format.format_note || format.resolution) +
+						(format.format_note ||
+							format.resolution ||
+							"Unknown quality") +
 						"  |  " +
 						format.ext +
 						"  |  " +
@@ -158,14 +169,16 @@ async function getInfo(url) {
 
 					const element =
 						"<option value='" +
-						format_id +
-						"'>" +
-						format.format_note +
-						" | " +
-						audio_ext +
-						" | " +
-						size +
-						"</option>";
+							format_id +
+							"'>" +
+							"Quality: " +
+							format.format_note ||
+						"Unknown quality" +
+							" | " +
+							audio_ext +
+							" | " +
+							size +
+							"</option>";
 					getId("audioFormatSelect").innerHTML += element;
 				}
 				// Both audio and video available
@@ -173,17 +186,23 @@ async function getInfo(url) {
 					format.audio_ext !== "none" ||
 					(format.acodec !== "none" && format.video_ext !== "none")
 				) {
-					let size = (
-						Number(format.filesize || format.filesize_approx) /
-						1000000
-					).toFixed(2);
-					console.log("filesize " + format.filesize);
-					console.log("filesize_approx " + format.filesize_approx);
+					let size;
+					if (format.filesize || format.filesize_approx) {
+						size = (
+							Number(format.filesize || format.filesize_approx) /
+							1000000
+						).toFixed(2);
+					}
+					else{
+						size = "Unknown size"
+					}
 					const element =
 						"<option value='" +
 						(format.format_id + "|" + format.ext) +
 						"'>" +
-						(format.format_note || format.resolution) +
+						(format.format_note ||
+							format.resolution ||
+							"Unknown quality") +
 						"  |  " +
 						format.ext +
 						"  |  " +
@@ -216,7 +235,7 @@ getId("audioDownload").addEventListener("click", (event) => {
 });
 
 //////////////////////////////
-// Downloading with ytdl
+// Downloading with yt-dlp
 //////////////////////////////
 
 function download(type) {
@@ -227,12 +246,9 @@ function download(type) {
 	const randomId = Math.random().toFixed(10).toString().slice(2);
 
 	if (type === "video") {
-
 		format_id = getId("videoFormatSelect").value.split("|")[0];
 		ext = getId("videoFormatSelect").value.split("|")[1];
-
 	} else {
-
 		format_id = getId("audioFormatSelect").value.split("|")[0];
 		if (getId("audioFormatSelect").value.split("|")[1] === "webm") {
 			ext = "opus";
@@ -263,7 +279,7 @@ function download(type) {
 	`;
 	getId("list").innerHTML += newItem;
 	getId("loadingWrapper").style.display = "none";
-	let cancelled = false;
+	getId(randomId + "prog").textContent = "Preparing...";
 
 	getId(randomId + ".close").addEventListener("click", () => {
 		if (getId(randomId)) {
@@ -290,6 +306,13 @@ function download(type) {
 	}
 	filename += filename + `.${ext}`;
 	console.log(path.join(downloadDir, filename));
+
+	let audioFormat;
+	if (ext === "mp4") {
+		audioFormat = "m4a";
+	} else {
+		audioFormat = "ba";
+	}
 	if (type === "video" && onlyvideo) {
 		// If video has no sound, audio needs to be downloaded
 		console.log("Downloading both video and audio");
@@ -297,7 +320,7 @@ function download(type) {
 		downloadProcess = ytdlp.exec([
 			url,
 			"-f",
-			format_id + "+ba",
+			`${format_id}+${audioFormat}`,
 			"-o",
 			`${path.join(downloadDir, filename)}`,
 		]);
@@ -312,12 +335,15 @@ function download(type) {
 			`${path.join(downloadDir, filename)}`,
 		]);
 	}
+	getId(randomId + ".close").addEventListener("click", ()=>{
+		downloadProcess
+	})
 
 	downloadProcess
 		.on("progress", (progress) => {
-			getId(
-				randomId + "prog"
-			).textContent = `Progress: ${progress.percent}%  Speed: ${progress.currentSpeed}`;
+			getId(randomId + "prog").textContent = `Progress: ${
+				progress.percent
+			}%  Speed: ${progress.currentSpeed || 0}`;
 		})
 		.on("close", () => {
 			afterSave(downloadDir, filename, randomId + "prog");
