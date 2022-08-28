@@ -2,10 +2,9 @@ const fs = require("fs");
 const cp = require("child_process");
 const os = require("os");
 const ffmpeg = require("ffmpeg-static");
-const YTDlpWrap = require("yt-dlp-wrap").default;
-const ytdlp = new YTDlpWrap("yt-dlp");
 const path = require("path");
 const { shell, ipcRenderer, clipboard } = require("electron");
+const { default: YTDlpWrap } = require("yt-dlp-wrap");
 
 // Directories
 const homedir = os.homedir();
@@ -18,6 +17,7 @@ let downloadDir = "";
 
 // Global variables
 let title, onlyvideo, id, thumbnail;
+let willBeSaved = true;
 
 function getId(id) {
 	return document.getElementById(id);
@@ -33,10 +33,44 @@ if (localPath) {
 }
 fs.mkdir(downloadDir, { recursive: true }, () => {});
 
-// Clearing tempDir
-fs.readdirSync(tempDir).forEach((f) =>
-	fs.rmdir(`${tempDir}/${f}`, { recursive: true }, () => {})
-);
+// Checking for yt-dlp
+let ytDlp;
+let ytdlpPath = path.join(os.homedir(), ".ytDownloader", "ytdlp");
+
+// Checking is yt-dlp has been installed by user
+cp.exec("yt-dlp --version", (error, stdout, stderr) => {
+	if (error) {
+		// Checking if yt-dlp has been installed by program
+		cp.exec(`${ytdlpPath} --version`, (error, stdout, stderr) => {
+			if (error) {
+				getId("popupBox").style.display = "block"
+				process.on("uncaughtException", (reason, promise) => {
+					console.log("Failed to download yt-dlp");
+				});
+				
+				async function download() {
+					await YTDlpWrap.downloadFromGithub(ytdlpPath);
+					getId("popupBox").style.display = "none"
+					ytDlp = ytdlpPath
+					console.log("yt-dlp bin Path: " + ytDlp);
+				}
+
+				download()
+
+			} else {
+				console.log("yt-dlp binary is present in PATH");
+				ytDlp = ytdlpPath
+				console.log("yt-dlp bin Path: " + ytDlp);
+
+			}
+		});
+	} else {
+		console.log("yt-dlp binary is present in PATH");
+		ytDlp = "yt-dlp"
+		console.log("yt-dlp bin Path: " + ytDlp);
+	}
+});
+
 
 function defaultVideoToggle() {
 	videoToggle.style.backgroundColor = "var(--box-toggleOn)";
@@ -115,13 +149,13 @@ async function getInfo(url) {
 
 			for (let format of formats) {
 				let size;
-				if (format.filesize || format.filesize_approx){
+				if (format.filesize || format.filesize_approx) {
 					size = (
-						Number(format.filesize || format.filesize_approx) / 1000000
-					).toFixed(2)
-				}
-				else{
-					size = "Unknown size"
+						Number(format.filesize || format.filesize_approx) /
+						1000000
+					).toFixed(2);
+				} else {
+					size = "Unknown size";
 				}
 
 				// For videos
@@ -129,8 +163,10 @@ async function getInfo(url) {
 					format.video_ext !== "none" &&
 					format.audio_ext === "none"
 				) {
-					if (size !== "Unknown size"){
-						size = (Number(size) + 0 || Number(audioSize)).toFixed(2);
+					if (size !== "Unknown size") {
+						size = (Number(size) + 0 || Number(audioSize)).toFixed(
+							2
+						);
 						size = size + " MB";
 					}
 
@@ -192,9 +228,8 @@ async function getInfo(url) {
 							Number(format.filesize || format.filesize_approx) /
 							1000000
 						).toFixed(2);
-					}
-					else{
-						size = "Unknown size"
+					} else {
+						size = "Unknown size";
 					}
 					const element =
 						"<option value='" +
@@ -234,6 +269,39 @@ getId("audioDownload").addEventListener("click", (event) => {
 	download("audio");
 });
 
+function restorePrevious() {
+	if (!localStorage.getItem("itemList")) return;
+	const items = JSON.parse(localStorage.getItem("itemList"));
+	if (items) {
+		console.log(items);
+		items.forEach((item) => {
+			const newItem = `
+			<div class="item" id="${item.id}">
+			<img src="../assets/images/close.png" onClick="fadeItem('${item.id}')" class="itemClose"}" id="${
+				item.id + ".close"
+			}">
+			<img src="${item.thumbnail}" alt="thumbnail" class="itemIcon">
+		
+			<div class="itemBody">
+				<div class="itemTitle">${item.title}</div>
+				<div class="itemType">${item.type}</div>
+				<input disabled type="range" value="0" class="hiddenVideoProgress" id="${
+					item.id + "vid"
+				}"></input>
+				<input disabled type="range" value="0" class="hiddenAudioProgress" id="${
+					item.id + "aud"
+				}"></input>
+				<div id="${item.id + "prog"}" class="itemProgress">Progress: ${item.progress}%</div>
+				<button class="resumeBtn">Resume</button>
+			</div>
+		</div>
+		`;
+			getId("list").innerHTML += newItem;
+		});
+	}
+}
+
+// restorePrevious()
 //////////////////////////////
 // Downloading with yt-dlp
 //////////////////////////////
@@ -256,6 +324,22 @@ function download(type) {
 			ext = getId("audioFormatSelect").value.split("|")[1];
 		}
 	}
+
+	let itemList = [];
+	if (localStorage.getItem("itemList")) {
+		itemList = JSON.parse(localStorage.getItem("itemList"));
+	}
+	const itemInfo = {
+		id: randomId,
+		format_id: format_id,
+		title: title,
+		url: url,
+		ext: ext,
+		type: type,
+		thumbnail: thumbnail,
+	};
+	itemList.push(itemInfo);
+	localStorage.setItem("itemList", JSON.stringify(itemList));
 
 	const newItem = `
 		<div class="item" id="${randomId}">
@@ -304,49 +388,81 @@ function download(type) {
 		}
 		filename += letter;
 	}
-	filename += filename + `.${ext}`;
+	filename = filename + `.${ext}`;
 	console.log(path.join(downloadDir, filename));
 
 	let audioFormat;
+
 	if (ext === "mp4") {
 		audioFormat = "m4a";
 	} else {
 		audioFormat = "ba";
 	}
+
+	let controller = new AbortController();
+
 	if (type === "video" && onlyvideo) {
 		// If video has no sound, audio needs to be downloaded
 		console.log("Downloading both video and audio");
 
-		downloadProcess = ytdlp.exec([
-			url,
-			"-f",
-			`${format_id}+${audioFormat}`,
-			"-o",
-			`${path.join(downloadDir, filename)}`,
-		]);
+		downloadProcess = ytdlp.exec(
+			[
+				url,
+				"-f",
+				`${format_id}+${audioFormat}`,
+				"-o",
+				`${path.join(downloadDir, filename)}`,
+				'--ffmpeg-location', ffmpeg
+			],
+			{ shell: true, detached: true },
+			controller.signal
+		);
 
 		// If downloading only audio or video with audio
 	} else {
-		downloadProcess = ytdlp.exec([
-			url,
-			"-f",
-			format_id,
-			"-o",
-			`${path.join(downloadDir, filename)}`,
-		]);
+		downloadProcess = ytdlp.exec(
+			[url, "-f", format_id, "-o", `${path.join(downloadDir, filename)}`, '--ffmpeg-location', ffmpeg],
+			{ shell: true, detached: true },
+			controller.signal
+		);
 	}
-	getId(randomId + ".close").addEventListener("click", ()=>{
-		downloadProcess
-	})
+
+	getId(randomId + ".close").addEventListener("click", () => {
+		willBeSaved = false;
+		console.log("Cancelled");
+		controller.abort();
+	});
 
 	downloadProcess
 		.on("progress", (progress) => {
 			getId(randomId + "prog").textContent = `Progress: ${
 				progress.percent
 			}%  Speed: ${progress.currentSpeed || 0}`;
+
+			const items = JSON.parse(localStorage.getItem("itemList"));
+			// Clearing item from localstorage
+			for (let item of items) {
+				if (item.id == randomId) {
+					item.progress = progress.percent;
+					break;
+				}
+			}
+			localStorage.setItem("itemList", JSON.stringify(items));
 		})
 		.on("close", () => {
-			afterSave(downloadDir, filename, randomId + "prog");
+			if (willBeSaved) {
+				const items = JSON.parse(localStorage.getItem("itemList"));
+				// Clearing item from localstorage
+				for (let item of items) {
+					if (item.id == randomId) {
+						items.splice(items.indexOf(item), 1);
+						break;
+					}
+				}
+				localStorage.setItem("itemList", JSON.stringify(items));
+
+				afterSave(downloadDir, filename, randomId + "prog");
+			}
 		});
 }
 

@@ -20,6 +20,27 @@ body {
 	transition: 0.4s;
 	font-size: large;
 }
+#popupBox{
+	width:100vw;
+	height:100vh;
+	margin:0;
+	background-color: rgba(17, 25, 40, 0.75);
+	position:absolute;
+	top:0;
+	left:0;
+	z-index: 2;
+	display:none;
+}
+#popup{
+	position:absolute;
+	top:50%;
+	left:50%;
+	width:300px;
+	border-radius: 10px;
+	transform: translate(-50%, -50%);
+	background-color: gray;
+	color:white;
+}
 
 #menuIcon {
 	position: absolute;
@@ -112,19 +133,6 @@ body {
 	height:15px;
 }
 
-
-@keyframes clickAnimation {
-	0% {
-		background-color: rgb(64, 227, 64);
-	}
-	50% {
-		background-color: rgb(40, 126, 40);
-	}
-	100% {
-		background-color: rgb(64, 227, 64);
-	}
-}
-
 #hidden {
 	display: none;
 	/* display: inline-block; */
@@ -194,15 +202,31 @@ label {
 	display: inline-block;
 	outline:none;
 	position:relative;
-
-	animation-duration: 0.5s;
-	animation-timing-function: linear;
 }
 .submitBtn:active{
-	border:none;
+	border: none;
 	top:5px;
-	margin-bottom: 5px;
-	transition:.3s;
+	margin-bottom:5px;
+}
+
+.resumeBtn{
+	padding: 10px;
+	border-radius: 8px;
+	background-color: rgb(64, 227, 64);
+	color: white;
+	border: none;
+	border-bottom: 4px solid rgb(50, 185, 50);
+	cursor: pointer;
+	display: inline-block;
+	outline:none;
+	position:absolute;
+	right:10px;
+	bottom: 10px;
+	width:100px;
+}
+.resumeBtn:active{
+	border:none;
+	bottom:6px;
 }
 
 #incorrectMsg {

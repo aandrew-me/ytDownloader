@@ -2,8 +2,7 @@
 	"dependencies": {
 		"electron-updater": "^5.2.1",
 		"ffmpeg-static": "^5.0.2",
-		"yt-dlp-wrap": "^2.3.11",
-		"ytdl-core": "^4.11.1"
+		"yt-dlp-wrap": "^2.3.11"
 	},
 	"name": "ytdownloader",
 	"version": "2.1.0",
@@ -37,7 +36,7 @@
 	"build": {
 		"productName": "YTDownloader",
 		"appId": "org.andrew.ytdownloader",
-		"artifactName":"${productName}.${ext}",
+		"artifactName": "${productName}.${ext}",
 		"files": [
 			"./resources/**/*",
 			"*.js",
