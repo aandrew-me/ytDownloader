@@ -23,7 +23,7 @@ function getId(id) {
 	return document.getElementById(id);
 }
 
-function downloadPathSelection(){
+function downloadPathSelection() {
 	let localPath = localStorage.getItem("downloadPath");
 
 	if (localPath) {
@@ -35,9 +35,7 @@ function downloadPathSelection(){
 	fs.mkdir(downloadDir, { recursive: true }, () => {});
 }
 
-downloadPathSelection()
-
-
+downloadPathSelection();
 
 // Checking for yt-dlp
 let ytDlp;
@@ -51,8 +49,8 @@ async function downloadYtdlp() {
 	await YTDlpWrap.downloadFromGithub(ytdlpPath);
 	getId("popupBox").style.display = "none";
 	ytDlp = ytdlpPath;
-	console.log("yt-dlp bin Path: " + ytDlp);
 	ytdlp = new YTDlpWrap(ytDlp);
+	console.log("yt-dlp bin Path: " + ytDlp);
 }
 
 // Checking is yt-dlp has been installed by user
@@ -81,8 +79,15 @@ cp.exec("yt-dlp --version", (error, stdout, stderr) => {
 			} else {
 				console.log("yt-dlp binary is present in PATH");
 				ytDlp = ytdlpPath;
-				console.log("yt-dlp bin Path: " + ytDlp);
 				ytdlp = new YTDlpWrap(ytDlp);
+				cp.spawn(`${ytDlp}`, ["-U"])
+					.stdout.on("data", (data) =>
+						console.log(data.toString("utf8"))
+					)
+					.stderr.on("data", (data) => {
+						console.log(data.toString("utf8"));
+					});
+				console.log("yt-dlp bin Path: " + ytDlp);
 			}
 		});
 	} else {
@@ -111,10 +116,10 @@ function pasteUrl() {
 	getInfo(url);
 }
 
-getId("closeHidden").addEventListener("click", ()=>{
+getId("closeHidden").addEventListener("click", () => {
 	getId("hidden").style.display = "none";
 	getId("loadingWrapper").style.display = "none";
-})
+});
 
 document.addEventListener("keydown", (event) => {
 	if (event.ctrlKey && event.key == "v") {
@@ -128,7 +133,7 @@ getId("pasteUrl").addEventListener("click", () => {
 
 // Getting video info
 async function getInfo(url) {
-	downloadPathSelection()
+	downloadPathSelection();
 	getId("videoFormatSelect").innerHTML = "";
 	getId("audioFormatSelect").innerHTML = "";
 	let info;
@@ -232,16 +237,15 @@ async function getInfo(url) {
 
 					const element =
 						"<option value='" +
-							format_id +
-							"'>" +
-							"Quality: " +
-							(format.format_note ||
-						"Unknown quality") +
-							" | " +
-							audio_ext +
-							" | " +
-							size +
-							"</option>";
+						format_id +
+						"'>" +
+						"Quality: " +
+						(format.format_note || "Unknown quality") +
+						" | " +
+						audio_ext +
+						" | " +
+						size +
+						"</option>";
 					getId("audioFormatSelect").innerHTML += element;
 				}
 				// Both audio and video available

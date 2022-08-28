@@ -85,7 +85,7 @@ function toggle() {
 
 		root.style.setProperty("--background", "whitesmoke");
 		root.style.setProperty("--text", "rgb(45, 45, 45)");
-		root.style.setProperty("--box-main", "rgb(143, 239, 207)");
+		root.style.setProperty("--box-main", "rgb(174 249 224)");
 		root.style.setProperty("--box-toggle", "rgb(108, 231, 190)");
 		root.style.setProperty("--theme-toggle", "rgb(147, 174, 185)");
 		root.style.setProperty("--item-bg", "#ececec")

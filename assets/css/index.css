@@ -3,10 +3,10 @@
 	--text: white;
 	--box-main: rgb(80, 80, 80);
 	--box-toggle: rgb(70, 70, 70);
-	--box-toggleOn: rgb(67, 212, 164);
+	--box-toggleOn: rgb(28 232 138);
 	--theme-toggle: rgb(80, 193, 238);
 	--item-bg: rgb(60, 60, 60);
-	--box-shadow: none;
+	--box-shadow: 3px 3px 10px gray;
 }
 
 body {
@@ -176,6 +176,7 @@ body {
 	width: 80%;
 	padding: 10px 10px 20px 10px;
 	color: var(--text);
+	box-shadow: var(--box-shadow);
 }
 .hiddenVideoProgress, .hiddenAudioProgress{
 	display:none;
