@@ -344,11 +344,11 @@ getId("audioDownload").addEventListener("click", (event) => {
 // Time formatting
 
 // function timeFormat(duration) {
-// 	// Hours, minutes and seconds
+	// Hours, minutes and seconds
 // 	var hrs = ~~(duration / 3600);
 // 	var mins = ~~((duration % 3600) / 60);
 // 	var secs = ~~duration % 60;
-// 	// Ouput like "1:01" or "4:03:59" or "123:03:59"
+	// Ouput like "1:01" or "4:03:59" or "123:03:59"
 // 	var ret = "";
 // 	if (hrs > 0) {
 // 		ret += "" + hrs + ":" + (mins < 10 ? "0" : "");
@@ -501,8 +501,8 @@ function download(type) {
 		downloadProcess = ytdlp.exec(
 			[
 				url,
-				rangeOption,
-				rangeCmd,
+				// rangeOption,
+				// rangeCmd,
 				"-f",
 				format_id,
 				"-o",
