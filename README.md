@@ -1,5 +1,5 @@
-# YouTube Downloader
-A modern GUI App for downloading videos and audios from Youtube.
+# YtDownloader
+]A modern GUI video downloader supporting [hundreds of sites](https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md)
 
 
 <a href="https://flathub.org/apps/details/me.aandrew.ytdownloader"><img src="https://flathub.org/assets/badges/flathub-badge-en.svg" style="width:180px;"></a>
@@ -15,13 +15,12 @@ A modern GUI App for downloading videos and audios from Youtube.
 
 ✅ Light/Dark mode
 
-✅ Video download support (High resolution supported)
+✅ Supports hundreds of sites including Youtube, Facebook, Instagram, Tiktok, Twitter and so on.
 
-✅ Audio download support
 
 ✅ Available on Windows and Linux
 
-✅ Fast download speed
+✅ Fast download speeds
 
 ✅ No external dependencies needed
 
