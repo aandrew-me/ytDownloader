@@ -43,12 +43,20 @@ downloadPathSelection();
 let ytDlp;
 let ytdlpPath = path.join(os.homedir(), ".ytDownloader", "ytdlp");
 
+// ytdlp download path
+let ytdlpDownloadPath;
+if (os.platform() == "win32") {
+	ytdlpDownloadPath = path.join(os.homedir(), ".ytDownloader", "ytdlp.exe");
+} else {
+	ytdlpDownloadPath = path.join(os.homedir(), ".ytDownloader", "ytdlp");
+}
+
 // Downloading yt-dlp
 async function downloadYtdlp() {
 	document.querySelector("#popupBox p").textContent = "Downloading yt-dlp";
 	getId("popupSvg").style.display = "inline";
 
-	await YTDlpWrap.downloadFromGithub(ytdlpPath);
+	await YTDlpWrap.downloadFromGithub(ytdlpDownloadPath);
 	getId("popupBox").style.display = "none";
 	ytDlp = ytdlpPath;
 	ytdlp = new YTDlpWrap(ytDlp);
@@ -86,9 +94,7 @@ cp.exec("yt-dlp --version", (error, stdout, stderr) => {
 					.stdout.on("data", (data) =>
 						console.log(data.toString("utf8"))
 					)
-					.stderr.on("data", (data) => {
-						console.log(data.toString("utf8"));
-					});
+
 				console.log("yt-dlp bin Path: " + ytDlp);
 			}
 		});
@@ -162,6 +168,7 @@ async function getInfo(url) {
 				element.value = url;
 			});
 
+			getId("loadingWrapper").style.display = "none";
 			getId("hidden").style.display = "inline-block";
 			getId("title").innerHTML = "<b>Title</b>: " + title;
 			getId("videoList").style.display = "block";
@@ -337,18 +344,16 @@ getId("audioDownload").addEventListener("click", (event) => {
 // 	}
 // }
 
-
 // restorePrevious()
-
 
 // Time formatting
 
 // function timeFormat(duration) {
-	// Hours, minutes and seconds
+// Hours, minutes and seconds
 // 	var hrs = ~~(duration / 3600);
 // 	var mins = ~~((duration % 3600) / 60);
 // 	var secs = ~~duration % 60;
-	// Ouput like "1:01" or "4:03:59" or "123:03:59"
+// Ouput like "1:01" or "4:03:59" or "123:03:59"
 // 	var ret = "";
 // 	if (hrs > 0) {
 // 		ret += "" + hrs + ":" + (mins < 10 ? "0" : "");
