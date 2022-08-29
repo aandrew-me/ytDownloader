@@ -16,7 +16,9 @@ fs.mkdirSync(tempDir, { recursive: true });
 let downloadDir = "";
 
 // Global variables
-let title, onlyvideo, id, thumbnail, ytdlp;
+let title, onlyvideo, id, thumbnail, ytdlp, duration;
+let rangeCmd = "";
+let rangeOption = "--download-sections";
 let willBeSaved = true;
 
 function getId(id) {
@@ -150,6 +152,7 @@ async function getInfo(url) {
 			title = info.title;
 			id = info.id;
 			thumbnail = info.thumbnail;
+			duration = info.duration;
 			const formats = info.formats;
 			console.log(formats);
 
@@ -334,12 +337,51 @@ getId("audioDownload").addEventListener("click", (event) => {
 // 	}
 // }
 
+
 // restorePrevious()
+
+
+// Time formatting
+
+// function timeFormat(duration) {
+// 	// Hours, minutes and seconds
+// 	var hrs = ~~(duration / 3600);
+// 	var mins = ~~((duration % 3600) / 60);
+// 	var secs = ~~duration % 60;
+// 	// Ouput like "1:01" or "4:03:59" or "123:03:59"
+// 	var ret = "";
+// 	if (hrs > 0) {
+// 		ret += "" + hrs + ":" + (mins < 10 ? "0" : "");
+// 	}
+// 	ret += "" + mins + ":" + (secs < 10 ? "0" : "");
+// 	ret += "" + secs;
+// 	return ret;
+// }
+
+// Manage advanced options
+// function manageAdvanced(duration) {
+// 	let startTime = getId("startTime").value;
+// 	let endTime = getId("endTime").value;
+
+// 	if (startTime && !endTime) {
+// 		rangeCmd = `*${startTime}-${timeFormat(duration)}`;
+// 	} else if (!startTime && endTime) {
+// 		rangeCmd = `*0-${endTime}`;
+// 	} else if (startTime && endTime) {
+// 		rangeCmd = `*${startTime}-${endTime}`;
+// 	} else {
+// 		rangeOption = "";
+// 	}
+
+// 	console.log("Range option: " + rangeOption);
+// 	console.log("rangeCmd:" + rangeCmd);
+// }
 //////////////////////////////
 // Downloading with yt-dlp
 //////////////////////////////
 
 function download(type) {
+	// manageAdvanced(duration);
 	const url = getId("url").value;
 	let ext;
 
@@ -441,6 +483,8 @@ function download(type) {
 		downloadProcess = ytdlp.exec(
 			[
 				url,
+				// rangeOption,
+				// rangeCmd,
 				"-f",
 				`${format_id}+${audioFormat}`,
 				"-o",
@@ -457,6 +501,8 @@ function download(type) {
 		downloadProcess = ytdlp.exec(
 			[
 				url,
+				rangeOption,
+				rangeCmd,
 				"-f",
 				format_id,
 				"-o",
@@ -507,8 +553,9 @@ function download(type) {
 			}
 		})
 		.on("error", (error) => {
-			getId(randomId + "prog").textContent = "Some error has occured"
-		})
+			getId(randomId + "prog").textContent = "Some error has occured";
+			console.log(error);
+		});
 }
 
 // Removing item
