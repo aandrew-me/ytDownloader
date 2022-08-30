@@ -9,6 +9,10 @@ const { default: YTDlpWrap } = require("yt-dlp-wrap");
 // Directories
 const homedir = os.homedir();
 const appdir = path.join(homedir, "ytDownloader");
+const hiddenDir = path.join(homedir, ".ytDownloader");
+
+fs.mkdir(hiddenDir, { recursive: true }, () => {});
+
 
 // Download directory
 let downloadDir = "";
