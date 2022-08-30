@@ -54,7 +54,7 @@ audioToggle.addEventListener("click", (event) => {
 /////////////
 
 // Toggle theme
-let darkTheme = false;
+let darkTheme = true;
 let circle = getId("themeToggleInside");
 const root = document.querySelector(":root");
 
@@ -89,6 +89,7 @@ function toggle() {
 		root.style.setProperty("--box-toggle", "rgb(108, 231, 190)");
 		root.style.setProperty("--theme-toggle", "rgb(147, 174, 185)");
 		root.style.setProperty("--item-bg", "#ececec");
+		root.style.setProperty("--box-shadow", "3px 3px 10px gray");
 		root.style.setProperty(
 			"--box-shadow",
 			"2px 2px 5px rgb(92, 92, 92), -2px -2px 5px rgb(219, 219, 219)"

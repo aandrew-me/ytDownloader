@@ -6,7 +6,7 @@
 	--box-toggleOn: rgb(28 232 138);
 	--theme-toggle: rgb(80, 193, 238);
 	--item-bg: rgb(60, 60, 60);
-	--box-shadow: 3px 3px 10px gray;
+	--box-shadow: none;
 }
 
 body {
@@ -94,6 +94,10 @@ body {
 .menuItem:active,
 .menuItem:link {
 	color: white;
+}
+
+#pasteUrl{
+	display:none;
 }
 
 .item {

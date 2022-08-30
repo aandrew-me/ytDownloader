@@ -9,8 +9,6 @@ const { default: YTDlpWrap } = require("yt-dlp-wrap");
 // Directories
 const homedir = os.homedir();
 const appdir = path.join(homedir, "ytDownloader");
-const tempDir = path.join(homedir, ".ytDownloader", "temp");
-fs.mkdirSync(tempDir, { recursive: true });
 
 // Download directory
 let downloadDir = "";
@@ -60,6 +58,7 @@ async function downloadYtdlp() {
 	getId("popupBox").style.display = "none";
 	ytDlp = ytdlpPath;
 	ytdlp = new YTDlpWrap(ytDlp);
+	getId("pasteUrl").style.display = "inline-block";
 	console.log("yt-dlp bin Path: " + ytDlp);
 }
 
@@ -90,11 +89,10 @@ cp.exec("yt-dlp --version", (error, stdout, stderr) => {
 				console.log("yt-dlp binary is present in PATH");
 				ytDlp = ytdlpPath;
 				ytdlp = new YTDlpWrap(ytDlp);
-				cp.spawn(`${ytDlp}`, ["-U"])
-					.stdout.on("data", (data) =>
-						console.log(data.toString("utf8"))
-					)
-
+				cp.spawn(`${ytDlp}`, ["-U"]).stdout.on("data", (data) =>
+					console.log(data.toString("utf8"))
+				);
+				getId("pasteUrl").style.display = "inline-block";
 				console.log("yt-dlp bin Path: " + ytDlp);
 			}
 		});
@@ -102,6 +100,7 @@ cp.exec("yt-dlp --version", (error, stdout, stderr) => {
 		console.log("yt-dlp binary is present in PATH");
 		ytDlp = "yt-dlp";
 		ytdlp = new YTDlpWrap(ytDlp);
+		getId("pasteUrl").style.display = "inline-block";
 		console.log("yt-dlp bin Path: " + ytDlp);
 	}
 });
@@ -349,11 +348,11 @@ getId("audioDownload").addEventListener("click", (event) => {
 // Time formatting
 
 // function timeFormat(duration) {
-// Hours, minutes and seconds
+// 	// Hours, minutes and seconds
 // 	var hrs = ~~(duration / 3600);
 // 	var mins = ~~((duration % 3600) / 60);
 // 	var secs = ~~duration % 60;
-// Ouput like "1:01" or "4:03:59" or "123:03:59"
+// 	// Ouput like "1:01" or "4:03:59" or "123:03:59"
 // 	var ret = "";
 // 	if (hrs > 0) {
 // 		ret += "" + hrs + ":" + (mins < 10 ? "0" : "");
@@ -364,6 +363,7 @@ getId("audioDownload").addEventListener("click", (event) => {
 // }
 
 // Manage advanced options
+
 // function manageAdvanced(duration) {
 // 	let startTime = getId("startTime").value;
 // 	let endTime = getId("endTime").value;
@@ -480,11 +480,12 @@ function download(type) {
 	}
 
 	let controller = new AbortController();
+	// console.log(rangeOption + " " + rangeCmd);
+
 
 	if (type === "video" && onlyvideo) {
 		// If video has no sound, audio needs to be downloaded
 		console.log("Downloading both video and audio");
-
 		downloadProcess = ytdlp.exec(
 			[
 				url,
@@ -497,7 +498,7 @@ function download(type) {
 				"--ffmpeg-location",
 				ffmpeg,
 			],
-			{ shell: true, detached: true },
+			{ shell: true, detached: false },
 			controller.signal
 		);
 
@@ -515,7 +516,7 @@ function download(type) {
 				"--ffmpeg-location",
 				ffmpeg,
 			],
-			{ shell: true, detached: true },
+			{ shell: true, detached: false },
 			controller.signal
 		);
 	}
@@ -542,6 +543,9 @@ function download(type) {
 			}
 			localStorage.setItem("itemList", JSON.stringify(items));
 		})
+		.once("ytDlpEvent", (eventType, eventData) =>
+		getId(randomId + "prog").textContent = "Downloading..."
+		)
 		.on("close", () => {
 			if (willBeSaved) {
 				const items = JSON.parse(localStorage.getItem("itemList"));
