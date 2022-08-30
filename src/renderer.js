@@ -8,7 +8,7 @@ const { default: YTDlpWrap } = require("yt-dlp-wrap");
 
 // Directories
 const homedir = os.homedir();
-const appdir = path.join(homedir, "ytDownloader");
+const appdir = path.join(homedir, "Downloads");
 const hiddenDir = path.join(homedir, ".ytDownloader");
 
 fs.mkdir(hiddenDir, { recursive: true }, () => {});
@@ -147,12 +147,16 @@ async function getInfo(url) {
 	downloadPathSelection();
 	getId("videoFormatSelect").innerHTML = "";
 	getId("audioFormatSelect").innerHTML = "";
+	getId("startTime").value = "";
+	getId("endTime").value = "";
+
 	let info;
 	cp.exec(`${ytDlp} -j ${url}`, (error, stdout, stderr) => {
 		try {
 			info = JSON.parse(stdout);
 		} catch (error) {
 			info = false;
+			console.log(error);
 		}
 
 		console.log(info);
@@ -313,6 +317,8 @@ getId("audioDownload").addEventListener("click", (event) => {
 	download("audio");
 });
 
+// Restore previous uncompleted downloads
+
 // function restorePrevious() {
 // 	if (!localStorage.getItem("itemList")) return;
 // 	const items = JSON.parse(localStorage.getItem("itemList"));
@@ -366,7 +372,7 @@ getId("audioDownload").addEventListener("click", (event) => {
 // 	return ret;
 // }
 
-// Manage advanced options
+// Manage advanced options, needs to be called
 
 // function manageAdvanced(duration) {
 // 	let startTime = getId("startTime").value;
@@ -435,12 +441,6 @@ function download(type) {
 		<div class="itemBody">
 			<div class="itemTitle">${title}</div>
 			<div class="itemType">${type}</div>
-			<input disabled type="range" value="0" class="hiddenVideoProgress" id="${
-				randomId + "vid"
-			}"></input>
-			<input disabled type="range" value="0" class="hiddenAudioProgress" id="${
-				randomId + "aud"
-			}"></input>
 			<div id="${randomId + "prog"}" class="itemProgress"></div>
 		</div>
 	</div>
@@ -472,7 +472,8 @@ function download(type) {
 		}
 		filename += letter;
 	}
-	filename = filename + `.${ext}`;
+	filename =
+		filename + Math.random().toFixed(3).toString().slice(2) + `.${ext}`;
 	console.log(path.join(downloadDir, filename));
 
 	let audioFormat;
@@ -490,6 +491,7 @@ function download(type) {
 	if (type === "video" && onlyvideo) {
 		// If video has no sound, audio needs to be downloaded
 		console.log("Downloading both video and audio");
+
 		downloadProcess = ytdlp.exec(
 			[
 				url,
@@ -547,9 +549,9 @@ function download(type) {
 			}
 			localStorage.setItem("itemList", JSON.stringify(items));
 		})
-		.once("ytDlpEvent", (eventType, eventData) =>
-		getId(randomId + "prog").textContent = "Downloading..."
-		)
+		.once("ytDlpEvent", (eventType, eventData) => {
+			getId(randomId + "prog").textContent = "Downloading...";
+		})
 		.on("close", () => {
 			if (willBeSaved) {
 				const items = JSON.parse(localStorage.getItem("itemList"));
@@ -566,8 +568,10 @@ function download(type) {
 			}
 		})
 		.on("error", (error) => {
-			getId(randomId + "prog").textContent = "Some error has occured";
-			console.log(error);
+			getId(randomId + "prog").textContent =
+				"Some error has occured. Hover to see details";
+			getId(randomId + "prog").title = error.message;
+			console.log(error.message);
 		});
 }
 

@@ -5,7 +5,7 @@
 	--box-toggle: rgb(70, 70, 70);
 	--box-toggleOn: rgb(28 232 138);
 	--theme-toggle: rgb(80, 193, 238);
-	--item-bg: rgb(60, 60, 60);
+	--item-bg: rgb(70, 70, 70);
 	--box-shadow: none;
 }
 
@@ -104,7 +104,6 @@ body {
 	display: flex;
 	position: relative;
 	width: 86%;
-	height: 100px;
 	background-color: var(--item-bg);
 	color: var(--text);
 	margin: 10px auto;
@@ -141,8 +140,8 @@ body {
 .itemProgress {
 	font-weight: bold;
 	cursor: pointer;
+	margin-top:10px;
 }
-
 .itemClose {
 	position: absolute;
 	top: 5px;
@@ -178,10 +177,6 @@ body {
 	padding: 10px 10px 20px 10px;
 	color: var(--text);
 	box-shadow: var(--box-shadow);
-}
-.hiddenVideoProgress,
-.hiddenAudioProgress {
-	display: none;
 }
 
 #btnContainer {
