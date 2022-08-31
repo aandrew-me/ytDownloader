@@ -84,6 +84,7 @@ body {
 	opacity: 1;
 	font-size: large;
 	z-index: 2;
+	font-family: sans-serif;
 }
 .menuItem {
 	color: white;

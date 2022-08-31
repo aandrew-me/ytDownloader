@@ -52,6 +52,7 @@
   </content_rating>
  
  <releases>
+  <release version="3.1.0" date="2022-08-31"/>
   <release version="3.0.0" date="2022-08-29"/>
   <release version="2.1.2" date="2022-08-28"/>
   <release version="2.1.1" date="2022-08-27"/>
