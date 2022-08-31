@@ -75,7 +75,7 @@ function toggle() {
 		root.style.setProperty("--box-main", "rgb(80,80,80)");
 		root.style.setProperty("--box-toggle", "rgb(70,70,70)");
 		root.style.setProperty("--theme-toggle", "rgb(80, 193, 238)");
-		root.style.setProperty("--item-bg", "rgb(60, 60, 60)");
+		root.style.setProperty("--item-bg", "rgb(75, 75, 75)");
 		root.style.setProperty("--box-shadow", "none");
 
 		darkTheme = true;
