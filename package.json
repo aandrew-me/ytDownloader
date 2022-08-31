@@ -45,7 +45,8 @@
 			"./public/**/*",
 			"package.json",
 			"./assets/**/*",
-			"./src/**/*"
+			"./src/**/*",
+			"ffmpeg*"
 		],
 		"mac": {
 			"category": "Utility",

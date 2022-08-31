@@ -380,12 +380,16 @@ function manageAdvanced(duration) {
 
 	if (startTime && !endTime) {
 		rangeCmd = `*${startTime}-${timeFormat(duration)}`;
+		rangeOption = "--download-sections";
 	} else if (!startTime && endTime) {
 		rangeCmd = `*0-${endTime}`;
+		rangeOption = "--download-sections";
 	} else if (startTime && endTime) {
 		rangeCmd = `*${startTime}-${endTime}`;
+		rangeOption = "--download-sections";
 	} else {
 		rangeOption = "";
+		rangeCmd = ""
 	}
 
 	console.log("Range option: " + rangeOption);
@@ -485,7 +489,7 @@ function download(type) {
 	}
 
 	let controller = new AbortController();
-	// console.log(rangeOption + " " + rangeCmd);
+	console.log(rangeOption + " " + rangeCmd);
 
 
 	if (type === "video" && onlyvideo) {

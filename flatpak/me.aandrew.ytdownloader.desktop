@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Youtube Downloader
+Comment=Download videos and audios from YouTube and more
+Exec=run.sh
+Type=Application
+Icon=me.aandrew.ytdownloader
+Categories=Utility;

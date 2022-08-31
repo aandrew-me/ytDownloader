@@ -141,6 +141,7 @@ body {
 	font-weight: bold;
 	cursor: pointer;
 	margin-top:10px;
+	font-family: sans-serif;
 }
 .itemClose {
 	position: absolute;
