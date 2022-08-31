@@ -10,6 +10,7 @@
 	"scripts": {
 		"start": "electron .",
 		"watch": "nodemon --exec electron .",
+		"dist": "electron-builder",
 		"debug": "electron --inspect=5858 .",
 		"windows": "./windows.sh && electron-builder -w",
 		"linux": "./linux.sh && electron-builder -l",
