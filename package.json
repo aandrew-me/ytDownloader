@@ -1,21 +1,20 @@
 {
 	"dependencies": {
 		"electron-updater": "^5.2.1",
-		"ffmpeg-static": "^5.1.0",
-		"yt-dlp-wrap": "^2.3.11"
+		"yt-dlp-wrap": "^2.3.11",
+		"yt-dlp-wrap-extended": "^2.3.12"
 	},
 	"name": "ytdownloader",
-	"version": "3.0.2",
+	"version": "3.1.0",
 	"main": "main.js",
 	"scripts": {
 		"start": "electron .",
 		"watch": "nodemon --exec electron .",
 		"debug": "electron --inspect=5858 .",
-		"windows": "rm -rf ./node_modules && electron-builder -w",
-		"linux": "rm -rf ./node_modules && electron-builder -l",
-		"mac": "rm -rf ./node_modules && electron-builder -m",
-		"publish-linux": "rm -rf ./node_modules && electron-builder -l --publish=always",
-		"publish-windows": "rm -rf ./node_modules && electron-builder -w --publish=always"
+		"windows": "./windows.sh && electron-builder -w",
+		"linux": "./linux.sh && electron-builder -l",
+		"publish-linux": "./linux.sh && electron-builder -l --publish=always",
+		"publish-windows": "./windows.sh && electron-builder -w --publish=always"
 	},
 	"author": {
 		"name": "Andrew",

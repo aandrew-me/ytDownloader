@@ -1,10 +1,10 @@
 const fs = require("fs");
 const cp = require("child_process");
 const os = require("os");
-const ffmpeg = require("ffmpeg-static");
+const ffmpeg = __dirname + "/../ffmpeg"
 const path = require("path");
 const { shell, ipcRenderer, clipboard } = require("electron");
-const { default: YTDlpWrap } = require("yt-dlp-wrap");
+const { default: YTDlpWrap } = require("yt-dlp-wrap-extended");
 
 // Directories
 const homedir = os.homedir();
@@ -357,46 +357,46 @@ getId("audioDownload").addEventListener("click", (event) => {
 
 // Time formatting
 
-// function timeFormat(duration) {
-// 	// Hours, minutes and seconds
-// 	var hrs = ~~(duration / 3600);
-// 	var mins = ~~((duration % 3600) / 60);
-// 	var secs = ~~duration % 60;
-// 	// Ouput like "1:01" or "4:03:59" or "123:03:59"
-// 	var ret = "";
-// 	if (hrs > 0) {
-// 		ret += "" + hrs + ":" + (mins < 10 ? "0" : "");
-// 	}
-// 	ret += "" + mins + ":" + (secs < 10 ? "0" : "");
-// 	ret += "" + secs;
-// 	return ret;
-// }
+function timeFormat(duration) {
+	// Hours, minutes and seconds
+	var hrs = ~~(duration / 3600);
+	var mins = ~~((duration % 3600) / 60);
+	var secs = ~~duration % 60;
+	// Ouput like "1:01" or "4:03:59" or "123:03:59"
+	var ret = "";
+	if (hrs > 0) {
+		ret += "" + hrs + ":" + (mins < 10 ? "0" : "");
+	}
+	ret += "" + mins + ":" + (secs < 10 ? "0" : "");
+	ret += "" + secs;
+	return ret;
+}
 
 // Manage advanced options, needs to be called
 
-// function manageAdvanced(duration) {
-// 	let startTime = getId("startTime").value;
-// 	let endTime = getId("endTime").value;
+function manageAdvanced(duration) {
+	let startTime = getId("startTime").value;
+	let endTime = getId("endTime").value;
 
-// 	if (startTime && !endTime) {
-// 		rangeCmd = `*${startTime}-${timeFormat(duration)}`;
-// 	} else if (!startTime && endTime) {
-// 		rangeCmd = `*0-${endTime}`;
-// 	} else if (startTime && endTime) {
-// 		rangeCmd = `*${startTime}-${endTime}`;
-// 	} else {
-// 		rangeOption = "";
-// 	}
+	if (startTime && !endTime) {
+		rangeCmd = `*${startTime}-${timeFormat(duration)}`;
+	} else if (!startTime && endTime) {
+		rangeCmd = `*0-${endTime}`;
+	} else if (startTime && endTime) {
+		rangeCmd = `*${startTime}-${endTime}`;
+	} else {
+		rangeOption = "";
+	}
 
-// 	console.log("Range option: " + rangeOption);
-// 	console.log("rangeCmd:" + rangeCmd);
-// }
+	console.log("Range option: " + rangeOption);
+	console.log("rangeCmd:" + rangeCmd);
+}
 //////////////////////////////
 // Downloading with yt-dlp
 //////////////////////////////
 
 function download(type) {
-	// manageAdvanced(duration);
+	manageAdvanced(duration);
 	const url = getId("url").value;
 	let ext;
 
@@ -495,8 +495,8 @@ function download(type) {
 		downloadProcess = ytdlp.exec(
 			[
 				url,
-				// rangeOption,
-				// rangeCmd,
+				rangeOption,
+				rangeCmd,
 				"-f",
 				`${format_id}+${audioFormat}`,
 				"-o",
@@ -513,8 +513,8 @@ function download(type) {
 		downloadProcess = ytdlp.exec(
 			[
 				url,
-				// rangeOption,
-				// rangeCmd,
+				rangeOption,
+				rangeCmd,
 				"-f",
 				format_id,
 				"-o",
@@ -533,6 +533,7 @@ function download(type) {
 		controller.abort();
 	});
 
+	
 	downloadProcess
 		.on("progress", (progress) => {
 			getId(randomId + "prog").textContent = `Progress: ${
@@ -601,9 +602,15 @@ function afterSave(location, filename, progressId) {
 		body: "File saved successfully.",
 		icon: "../assets/images/icon.png",
 	});
+	let finalLocation = location
+	let finalFilename = filename
+	if (os.platform() === "win32"){
+		finalLocation = location.split(path.sep).join("\\\\")
+		finalFilename = filename.split(path.sep).join("\\\\")
+	}
 	getId(
 		progressId
-	).innerHTML = `<b onClick="showItem('${location}', '${filename}')">File saved. Click to Open</b>`;
+	).innerHTML = `<b onClick="showItem('${finalLocation}', '${finalFilename}')">File saved. Click to Open</b>`;
 }
 
 function showItem(location, filename) {
