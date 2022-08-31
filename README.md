@@ -17,12 +17,11 @@ A modern GUI video downloader supporting [hundreds of sites](https://github.com/
 
 ✅ Supports hundreds of sites including Youtube, Facebook, Instagram, Tiktok, Twitter and so on.
 
+✅ Advanced options like Range Selection
 
 ✅ Available on Windows and Linux
 
 ✅ Fast download speeds
-
-✅ No external dependencies needed
 
 ✅ And of-course no trackers or ads
 

@@ -28,7 +28,7 @@
 		"private": false
 	},
 	"license": "MIT",
-	"description": "Download videos and audios from YouTube",
+	"description": "Download videos and audios from YouTube and many other sites",
 	"devDependencies": {
 		"electron": "20.0.3",
 		"electron-builder": "^23.3.3"
