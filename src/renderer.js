@@ -1,9 +1,15 @@
 const cp = require("child_process");
+const os = require("os");
 let ffmpeg;
-ffmpeg = __dirname + "/../ffmpeg"
+if (os.platform() === "win32"){
+	ffmpeg = __dirname + "\\..\\ffmpeg.exe"
+}
+else{
+	ffmpeg = __dirname + "/../ffmpeg"
+}
 
 const fs = require("fs");
-const os = require("os");
+
 const path = require("path");
 const { shell, ipcRenderer, clipboard } = require("electron");
 const { default: YTDlpWrap } = require("yt-dlp-wrap-extended");
