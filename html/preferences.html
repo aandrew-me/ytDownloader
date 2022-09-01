@@ -8,15 +8,15 @@
     <link rel="stylesheet" href="../assets/css/extra.css">
 </head>
 <body>
-    <a id="back">Home</a>
+    <a id="back">Homepage</a>
     <h1>Preferences</h1>
-    <p>1. Download location</p>
+    <strong>Download location</strong>
     <p>Default location: <span id="path"></span></p>
     <button id="selectLocation">Select Download Location</button>
 
     <p id="msg"></pid>
 
-    <p>2. Enable transparent dark (only Linux, needs restart) <input type="checkbox" id="enableTransparent"></p>
+    <p>Enable transparent dark (only Linux, needs restart)<input type="checkbox" id="enableTransparent"></p>
 
     <script>
         let downloadPath = localStorage.getItem("downloadPath")

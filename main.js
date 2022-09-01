@@ -1,5 +1,6 @@
 const { app, BrowserWindow, dialog, ipcMain } = require("electron");
 const { autoUpdater } = require("electron-updater");
+autoUpdater.autoDownload = false;
 let win, secondaryWindow;
 
 function createWindow() {
@@ -24,10 +25,14 @@ function createWindow() {
 	// win.setMenu(null)
 	win.show();
 	// win.webContents.openDevTools();
-	autoUpdater.checkForUpdatesAndNotify();
+	autoUpdater.checkForUpdates();
 }
 
 app.whenReady().then(() => {
+	// Logging
+	console.log("Locale:" + app.getLocale());
+	console.log("Version: " + app.getVersion());
+
 	createWindow();
 	app.on("activate", () => {
 		if (BrowserWindow.getAllWindows().length === 0) {
@@ -36,6 +41,20 @@ app.whenReady().then(() => {
 	});
 	if (process.platform === "win32") {
 		app.setAppUserModelId(app.name);
+	}
+});
+
+ipcMain.on("get-version", () => {
+	const version = app.getVersion();
+	secondaryWindow.webContents.send("version", version);
+	console.log("Sent " + version);
+});
+
+ipcMain.on("get-locale", () => {
+	const locale = app.getLocale();
+	win.webContents.send("locale", locale);
+	if (secondaryWindow) {
+		secondaryWindow.webContents.send("locale", locale);
 	}
 });
 
@@ -49,9 +68,8 @@ ipcMain.on("load-page", (event, file) => {
 		modal: true,
 		show: false,
 	});
-	// win.loadFile(file);
 	secondaryWindow.loadFile(file);
-	secondaryWindow.setMenu(null)
+	// secondaryWindow.setMenu(null);
 	secondaryWindow.maximize();
 	secondaryWindow.show();
 });
@@ -78,27 +96,33 @@ app.on("window-all-closed", () => {
 });
 
 // Auto updater events
-
 autoUpdater.on("update-available", (_event, releaseNotes, releaseName) => {
 	const dialogOpts = {
 		type: "info",
-		buttons: ["Ok"],
-		title: "Application Update",
-		message: process.platform === "win32" ? releaseNotes : releaseName,
-		detail: "A new version is being downloaded.",
+		buttons: ["Update", "No"],
+		title: "Update Available",
+		detail: process.platform === "win32" ? releaseNotes : releaseName,
+		message: "A new version is available, do you want to update?",
 	};
-	dialog.showMessageBox(dialogOpts, (response) => {});
+	dialog.showMessageBox(dialogOpts, (buttonIndex) => {
+		if (buttonIndex === 0) {
+			autoUpdater.downloadUpdate();
+		}
+	});
 });
 
 autoUpdater.on("update-downloaded", (_event, releaseNotes, releaseName) => {
 	const dialogOpts = {
 		type: "info",
 		buttons: ["Restart", "Later"],
-		title: "Application Update",
-		message: process.platform === "win32" ? releaseNotes : releaseName,
-		detail: "A new version has been downloaded. Restart the application to apply the updates.",
+		title: "Update Ready",
+		message: "Install and restart now?",
 	};
 	dialog.showMessageBox(dialogOpts).then((returnValue) => {
-		if (returnValue.response === 0) autoUpdater.quitAndInstall();
+		if (returnValue.response === 0) {
+			autoUpdater.quitAndInstall();
+		} else {
+			autoUpdater.autoInstallOnAppQuit();
+		}
 	});
 });

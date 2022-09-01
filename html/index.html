@@ -11,11 +11,14 @@
     <script src="../src/renderer.js" defer></script>
     <script src="../src/index.js" defer></script>
 
+    <!-- Translating -->
+    <script>window.i18n = new(require('../translations/i18n'));</script>
+
 </head>
 
 <div id="popupBox">
     <div id="popup">
-        <p>yt-dlp is being downloaded.</p>
+        <p>yt-dlp is being downloaded</p>
         <svg id="popupSvg" version="1.1" id="L4" xmlns="http://www.w3.org/2000/svg"
             xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 100 100"
             enable-background="new 0 0 0 0" xml:space="preserve">
@@ -73,7 +76,7 @@
             <button class="toggleBtn" id="videoToggle">Video</button>
             <button class="toggleBtn" id="audioToggle">Audio</button>
         </div>
-        <p id="title">Title: </p>
+        <p id="title">Title </p>
 
         <div id="videoList">
             <label>Select Format - </label>
@@ -97,11 +100,11 @@
         </div>
 
         <div id="advanced">
-            <p>Download particular time-range</p>
+            <p id="rangeText">Download particular time-range</p>
             <label>Start</label>
             <input type="text" id="startTime" class="time" placeholder="00:00" title="If kept empty, it will start from the beginning">
             :
-            <input type="text" id="endTime" class="time" placeholder="10:00" title="If kept empty, it will be downloaded to the end.">
+            <input type="text" id="endTime" class="time" placeholder="10:00" title="If kept empty, it will be downloaded to the end">
             <label>End</label>
 
         </div>
@@ -113,6 +116,10 @@
     <!-- Downloads list -->
     <div id="list">
     </div>
+
+    <script>
+        require("../src/translate_index")
+    </script>
 
 </body>
 

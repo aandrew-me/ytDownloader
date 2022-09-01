@@ -11,10 +11,10 @@
 </head>
 
 <body>
-    <a id="back">Home</a>
-    <h1>ytDownloader</h1>
+    <a id="back">Homepage</a>
+    <h1>ytDownloader <span id="version"></span></h1>
 
-    <p>ytDownloader lets you download videos (and sometimes audios) from hundreds of sites like Youtube, Facebook, Instagram, Tiktok, Twitter and so on.
+    <p>ytDownloader lets you download videos (and sometimes audios) from hundreds of sites like Youtube, Facebook, Instagram, Tiktok, Twitter and so on
     </p>
 
     <p>It's a Free and Open Source app built on top of Node.js and Electron. yt-dlp has been used for downloading</p>
@@ -23,6 +23,11 @@
 
     <script>
         const { ipcRenderer, shell } = require("electron")
+
+        ipcRenderer.send("get-version")
+        ipcRenderer.once("version", (event, version) => {
+            document.getElementById("version").textContent = version;
+        })
 
         document.getElementById("back").addEventListener("click", ()=>{
             ipcRenderer.send("close-secondary")        })
