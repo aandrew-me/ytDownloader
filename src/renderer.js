@@ -1,7 +1,9 @@
-const fs = require("fs");
 const cp = require("child_process");
+let ffmpeg;
+ffmpeg = __dirname + "/../ffmpeg"
+
+const fs = require("fs");
 const os = require("os");
-const ffmpeg = __dirname + "/../ffmpeg"
 const path = require("path");
 const { shell, ipcRenderer, clipboard } = require("electron");
 const { default: YTDlpWrap } = require("yt-dlp-wrap-extended");
