@@ -1,61 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Preferences</title>
+    <title id="title">Preferences</title>
     <link rel="stylesheet" href="../assets/css/extra.css">
+    <!-- Translating -->
+    <script>window.i18n = new (require('../translations/i18n'));</script>
 </head>
+
 <body>
     <a id="back">Homepage</a>
-    <h1>Preferences</h1>
-    <strong>Download location</strong>
-    <p>Default location: <span id="path"></span></p>
+    <h1 id="preferences">Preferences</h1>
+    <br><br>
+    <strong id="dlText">Download location</strong>
+    <br><br>
+    <span id="clText">Current download location - </span><span id="path"></span>
+    <br><br>
     <button id="selectLocation">Select Download Location</button>
 
-    <p id="msg"></pid>
-
-    <p>Enable transparent dark (only Linux, needs restart)<input type="checkbox" id="enableTransparent"></p>
-
-    <script>
-        let downloadPath = localStorage.getItem("downloadPath")
-        getId("path").textContent = downloadPath
+    <p id="msg">
+        </pid>
 
 
-        const { ipcRenderer, dialog } = require("electron")
-        function getId(id){
-            return document.getElementById(id)
-        }
+        <span id="transparentText">Enable transparent dark mode(only Linux, needs restart)</span><input type="checkbox"
+            id="enableTransparent">
 
-        getId("back").addEventListener("click", ()=>{
-            ipcRenderer.send("close-secondary")
-        })
+        <br><br>
 
-        getId("selectLocation").addEventListener("click", ()=>{
-            ipcRenderer.send("select-location", "")
-        })
+        <label>Select Language</label>
+        <select id="select" onchange="changeLanguage()">
+            <option value="en">English</option>
+            <option value="ru">Русский</option>
+        </select>
 
-        ipcRenderer.on("downloadPath", (event, downloadPath)=>{
-            console.log(downloadPath);
-            localStorage.setItem("downloadPath", downloadPath)
+        <script>
+            let downloadPath = localStorage.getItem("downloadPath")
             getId("path").textContent = downloadPath
-        })
 
-        const enabledTransparent = getId("enableTransparent")
-        enabledTransparent.addEventListener("change", (event)=>{
-            if (enabledTransparent.checked){
-                localStorage.setItem("enabledTransparent", "true")
+            const { ipcRenderer, dialog } = require("electron")
+            function getId(id) {
+                return document.getElementById(id)
             }
-            else{
-                localStorage.setItem("enabledTransparent", "false")
-            }
-        })
 
-        const localEnabledTransparent = localStorage.getItem("enabledTransparent")
-        if (localEnabledTransparent == "true"){
-            enabledTransparent.checked = true
-        }
-    </script>
+            getId("back").addEventListener("click", () => {
+                ipcRenderer.send("close-secondary")
+            })
+
+            getId("selectLocation").addEventListener("click", () => {
+                ipcRenderer.send("select-location", "")
+            })
+
+            ipcRenderer.on("downloadPath", (event, downloadPath) => {
+                console.log(downloadPath);
+                localStorage.setItem("downloadPath", downloadPath)
+                getId("path").textContent = downloadPath
+            })
+
+            const enabledTransparent = getId("enableTransparent")
+            enabledTransparent.addEventListener("change", (event) => {
+                if (enabledTransparent.checked) {
+                    localStorage.setItem("enabledTransparent", "true")
+                }
+                else {
+                    localStorage.setItem("enabledTransparent", "false")
+                }
+            })
+
+            const localEnabledTransparent = localStorage.getItem("enabledTransparent")
+            if (localEnabledTransparent == "true") {
+                enabledTransparent.checked = true
+            }
+            const language = localStorage.getItem("language")
+
+            if (language) {
+                getId("select").value = language
+            }
+            function changeLanguage() {
+                const language = getId("select").value
+                localStorage.setItem("language", language)
+                
+            }
+
+            require("../src/translate_preferences")
+        </script>
 </body>
+
 </html>

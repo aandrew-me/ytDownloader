@@ -9,6 +9,10 @@ body{
 }
 h1{
     margin-top:0;
+    display: inline-block;
+}
+#version{
+    margin:5px;
 }
 input[type="text"]{
     padding:10px;
@@ -58,4 +62,14 @@ input[type="checkbox"]{
     color:white;
     background-color: rgb(56, 209, 56);
     cursor: pointer;
+}
+select {
+	padding: 15px;
+	background-color: rgb(127, 253, 127);
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+	font-size: large;
+	margin: 8px;
+	outline: none;
 }

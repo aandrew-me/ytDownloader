@@ -1,34 +1,39 @@
-const path = require("path")
-const electron = require('electron')
-const fs = require('fs');
-const { ipcRenderer } = require("electron");
+const path = require("path");
+const electron = require("electron");
+const fs = require("fs");
 let loadedLanguage;
+let userSelectedLanguage = false;
 let locale;
-if(electron.app){
-     locale = app.getLocale()
+if (electron.app) {
+	locale = electron.app.getLocale();
+} else {
+	locale = navigator.language
 }
-else{
-     ipcRenderer.send("get-locale")
-     ipcRenderer.once("locale", (event, locale)=>{
-          locale = locale
-     })
+
+// Check localstorage for language
+if (localStorage.getItem("language")){
+	locale =  localStorage.getItem("language")
+	userSelectedLanguage = true;
 }
 
 module.exports = i18n;
 
 function i18n() {
-    if(fs.existsSync(path.join(__dirname, locale + '.json'))) {
-         loadedLanguage = JSON.parse(fs.readFileSync(path.join(__dirname, locale + '.json'), 'utf8'))
-    }
-    else {
-         loadedLanguage = JSON.parse(fs.readFileSync(path.join(__dirname, 'en.json'), 'utf8'))
-    }
+	if (fs.existsSync(path.join(__dirname, locale + ".json"))) {
+		loadedLanguage = JSON.parse(
+			fs.readFileSync(path.join(__dirname, locale + ".json"), "utf8")
+		);
+	} else {
+		loadedLanguage = JSON.parse(
+			fs.readFileSync(path.join(__dirname, "main.json"), "utf8")
+		);
+	}
 }
 
-i18n.prototype.__ = function(phrase) {
-    let translation = loadedLanguage[phrase]
-    if(translation === undefined) {
-         translation = phrase
-    }
-    return translation
-}
+i18n.prototype.__ = function (phrase) {
+	let translation = loadedLanguage[phrase];
+	if (translation === undefined) {
+		translation = phrase;
+	}
+	return translation;
+};

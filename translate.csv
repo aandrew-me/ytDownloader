@@ -1,0 +1,25 @@
+Click to paste video URL or ID [Ctrl + V]
+Preferences
+About
+Download location
+Current download location - 
+Enable transparent dark mode(only Linux, needs restart)
+Please wait, yt-dlp is being downloaded
+Video
+Audio
+Title 
+Select Format 
+Download
+Select Download Location
+More options
+Start
+Select Language
+Download particular time-range
+End
+If kept empty, it will start from the beginning
+If kept empty, it will be downloaded to the end
+Homepage
+ytDownloader lets you download videos (and sometimes audios) from hundreds of sites like Youtube, Facebook, Instagram, Tiktok, Twitter and so on
+It's a Free and Open Source app built on top of Node.js and Electron. yt-dlp has been used for downloading
+Source Code is available
+here

@@ -16,7 +16,7 @@ function createWindow() {
 		transparent: isTransparent,
 		webPreferences: {
 			nodeIntegration: true,
-			contextIsolation: false,
+			contextIsolation: false
 		},
 	});
 
@@ -47,15 +47,6 @@ app.whenReady().then(() => {
 ipcMain.on("get-version", () => {
 	const version = app.getVersion();
 	secondaryWindow.webContents.send("version", version);
-	console.log("Sent " + version);
-});
-
-ipcMain.on("get-locale", () => {
-	const locale = app.getLocale();
-	win.webContents.send("locale", locale);
-	if (secondaryWindow) {
-		secondaryWindow.webContents.send("locale", locale);
-	}
 });
 
 ipcMain.on("load-page", (event, file) => {

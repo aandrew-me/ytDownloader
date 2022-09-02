@@ -1,55 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop">
   <id>me.aandrew.ytdownloader</id>
-  <name>Youtube Downloader</name>
+  <name>Youtube Downloader Plus</name>
   <summary>Download videos and audios from Youtube and other sites</summary>
   <description>
-    <p>YtDownloader lets you download videos and audios of different qualities from Youtube with high speed. It also supports hundreds of other sites including the popular ones but not limited to Facebook, Instagram, Tiktok, Twitter.</p>
-    <p>✅ Supports Light/Dark mode</p>
+    <p>YtDownloader lets you download videos and audios of different qualities from Youtube with high speed. It also supports hundreds of other sites including the popular ones but not limited to Facebook, Instagram, Tiktok, Twitter, Twitch and so on.</p>
+    <p>✅ Supports Light/Dark/Transparent mode</p>
     <p>✅ Supports high quality video resolutions</p>
+    <p>✅ Supports downloading particular ranges</p>
     <p>✅ Completely free and open source</p>
+    <p>✅ Fast download speeds</p>
   </description>
   <project_license>MIT</project_license>
   <metadata_license>CC0-1.0</metadata_license>
   <screenshots>
     <screenshot type="default">
-      <image>https://user-images.githubusercontent.com/66430340/181747909-f16e30dc-a7c3-40cb-876b-54f0ea8d4e42.jpg</image>
+      <image>https://user-images.githubusercontent.com/66430340/188084613-706262fd-db82-403f-8dad-03dd2a50cfe9.png</image>
     </screenshot>
     <screenshot>
-      <image>https://user-images.githubusercontent.com/66430340/181747920-4df80914-278f-4350-9328-015e9e0bcf16.jpg</image>
+      <image>https://user-images.githubusercontent.com/66430340/188084389-5e060523-07c3-42db-b282-7f446cb257fa.png</image>
     </screenshot>
   </screenshots>
   <url type="homepage">https://github.com/aandrew-me/ytDownloader</url>
   
-  <content_rating type="oars-1.1">
-    <content_attribute id="violence-cartoon">none</content_attribute>
-    <content_attribute id="violence-fantasy">none</content_attribute>
-    <content_attribute id="violence-realistic">none</content_attribute>
-    <content_attribute id="violence-bloodshed">none</content_attribute>
-    <content_attribute id="violence-sexual">none</content_attribute>
-    <content_attribute id="violence-desecration">none</content_attribute>
-    <content_attribute id="violence-slavery">none</content_attribute>
-    <content_attribute id="violence-worship">none</content_attribute>
-    <content_attribute id="drugs-alcohol">none</content_attribute>
-    <content_attribute id="drugs-narcotics">none</content_attribute>
-    <content_attribute id="drugs-tobacco">none</content_attribute>
-    <content_attribute id="sex-nudity">none</content_attribute>
-    <content_attribute id="sex-themes">none</content_attribute>
-    <content_attribute id="sex-homosexuality">none</content_attribute>
-    <content_attribute id="sex-prostitution">none</content_attribute>
-    <content_attribute id="sex-adultery">none</content_attribute>
-    <content_attribute id="sex-appearance">none</content_attribute>
-    <content_attribute id="language-profanity">none</content_attribute>
-    <content_attribute id="language-humor">none</content_attribute>
-    <content_attribute id="language-discrimination">none</content_attribute>
-    <content_attribute id="social-chat">none</content_attribute>
-    <content_attribute id="social-info">none</content_attribute>
-    <content_attribute id="social-audio">none</content_attribute>
-    <content_attribute id="social-location">none</content_attribute>
-    <content_attribute id="social-contacts">none</content_attribute>
-    <content_attribute id="money-purchasing">none</content_attribute>
-    <content_attribute id="money-gambling">none</content_attribute>
-  </content_rating>
+  <content_rating type="oars-1.1"/>
  
  <releases>
   <release version="3.1.0" date="2022-08-31"/>

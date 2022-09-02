@@ -8,20 +8,23 @@
     <title>About</title>
     <link rel="stylesheet" href="../assets/css/extra.css">
 
+    <!-- Translating -->
+    <script>window.i18n = new (require('../translations/i18n'));</script>
 </head>
 
 <body>
     <a id="back">Homepage</a>
-    <h1>ytDownloader <span id="version"></span></h1>
+    <h1>ytDownloader </h1><span id="version"></span>
 
-    <p>ytDownloader lets you download videos (and sometimes audios) from hundreds of sites like Youtube, Facebook, Instagram, Tiktok, Twitter and so on
-    </p>
+    <p id="txt1">ytDownloader lets you download videos (and sometimes audios) from hundreds of sites like Youtube, Facebook, Instagram, Tiktok, Twitter and so on</p>
 
-    <p>It's a Free and Open Source app built on top of Node.js and Electron. yt-dlp has been used for downloading</p>
+    <p id="txt2">It's a Free and Open Source app built on top of Node.js and Electron. yt-dlp has been used for downloading</p>
 
-    <p>Source Code is available <a id="sourceLink">here</a></p>
+    <span id="txt3">Source Code is available </span><a id="sourceLink">here</a>
 
     <script>
+        require("../src/translate_about")
+
         const { ipcRenderer, shell } = require("electron")
 
         ipcRenderer.send("get-version")
@@ -29,11 +32,13 @@
             document.getElementById("version").textContent = version;
         })
 
-        document.getElementById("back").addEventListener("click", ()=>{
-            ipcRenderer.send("close-secondary")        })
-        document.getElementById("sourceLink").addEventListener("click", ()=>{
+        document.getElementById("back").addEventListener("click", () => {
+            ipcRenderer.send("close-secondary")
+        })
+        document.getElementById("sourceLink").addEventListener("click", () => {
             shell.openExternal("https://github.com/aandrew-me/ytDownloader")
         })
+
     </script>
 </body>
 

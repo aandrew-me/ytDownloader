@@ -27,8 +27,8 @@ A modern GUI video downloader supporting [hundreds of sites](https://github.com/
 
 ## Screenshots
 
-![image](https://user-images.githubusercontent.com/66430340/187023169-e4cd9b81-1968-4758-85b7-2287808d914d.png)
-![image](https://user-images.githubusercontent.com/66430340/187023235-45095832-a357-4323-8cdd-50cfd6305d29.png)
+![image](https://user-images.githubusercontent.com/66430340/188084613-706262fd-db82-403f-8dad-03dd2a50cfe9.png)
+![image](https://user-images.githubusercontent.com/66430340/188084389-5e060523-07c3-42db-b282-7f446cb257fa.png)
 
 <!--![ss](https://user-images.githubusercontent.com/66430340/181747909-f16e30dc-a7c3-40cb-876b-54f0ea8d4e42.jpg)-->
 <!--![ss2](https://user-images.githubusercontent.com/66430340/181747920-4df80914-278f-4350-9328-015e9e0bcf16.jpg) -->
