@@ -18,6 +18,8 @@ const { default: YTDlpWrap } = require("yt-dlp-wrap-extended");
 const homedir = os.homedir();
 const appdir = path.join(homedir, "Downloads");
 const hiddenDir = path.join(homedir, ".ytDownloader");
+const i18n = new(require('../translations/i18n'))
+
 
 fs.mkdir(hiddenDir, { recursive: true }, () => {});
 
@@ -83,11 +85,11 @@ cp.exec("yt-dlp --version", (error, stdout, stderr) => {
 				getId("popupBox").style.display = "block";
 				process.on("uncaughtException", (reason, promise) => {
 					document.querySelector("#popupBox p").textContent =
-						"Failed to download yt-dlp. Please check your connection and try again";
+						i18n.__("Failed to download yt-dlp. Please check your connection and try again");
 					getId("popupSvg").style.display = "none";
 					getId(
 						"popup"
-					).innerHTML += `<button id="tryBtn">Try again</button>`;
+					).innerHTML += `<button id="tryBtn">${i18n.__("Try again")}</button>`;
 					console.log("Failed to download yt-dlp");
 
 					getId("tryBtn").addEventListener("click", () => {
@@ -185,7 +187,7 @@ async function getInfo(url) {
 
 			getId("loadingWrapper").style.display = "none";
 			getId("hidden").style.display = "inline-block";
-			getId("title").innerHTML = "<b>Title</b>: " + title;
+			getId("title").innerHTML = `<b>${i18n.__("Title ")}</b>: ` + title;
 			getId("videoList").style.display = "block";
 			videoToggle.style.backgroundColor = "rgb(67, 212, 164)";
 
@@ -212,7 +214,7 @@ async function getInfo(url) {
 						1000000
 					).toFixed(2);
 				} else {
-					size = "Unknown size";
+					size = i18n.__("Unknown size");
 				}
 
 				// For videos
@@ -224,7 +226,7 @@ async function getInfo(url) {
 						size = (Number(size) + 0 || Number(audioSize)).toFixed(
 							2
 						);
-						size = size + " MB";
+						size = size + " " + i18n.__("MB");
 					}
 
 					const format_id = format.format_id + "|" + format.ext;
@@ -265,7 +267,7 @@ async function getInfo(url) {
 						format_id +
 						"'>" +
 						"Quality: " +
-						(format.format_note || "Unknown quality") +
+						(format.format_note || i18n.__("Unknown quality")) +
 						" | " +
 						audio_ext +
 						" | " +
@@ -285,7 +287,7 @@ async function getInfo(url) {
 							1000000
 						).toFixed(2);
 					} else {
-						size = "Unknown size";
+						size = i18n.__("Unknown size");
 					}
 					const element =
 						"<option value='" +
@@ -293,12 +295,12 @@ async function getInfo(url) {
 						"'>" +
 						(format.format_note ||
 							format.resolution ||
-							"Unknown quality") +
+							i18n.__("Unknown quality")) +
 						"  |  " +
 						format.ext +
 						"  |  " +
-						size +
-						" MB" +
+						size + " " +
+						i18n.__("MB") +
 						"</option>";
 					getId("videoFormatSelect").innerHTML += element;
 				}
@@ -306,7 +308,7 @@ async function getInfo(url) {
 		} else {
 			getId("loadingWrapper").style.display = "none";
 			getId("incorrectMsg").textContent =
-				"Some error has occured. Check your connection and use correct URL";
+				i18n.__("Some error has occured. Check your connection and use correct URL");
 		}
 	});
 }
@@ -548,9 +550,9 @@ function download(type) {
 	
 	downloadProcess
 		.on("progress", (progress) => {
-			getId(randomId + "prog").textContent = `Progress: ${
+			getId(randomId + "prog").textContent = `${i18n.__("Progress")}: ${
 				progress.percent
-			}%  Speed: ${progress.currentSpeed || 0}`;
+			}%  ${i18n.__("Speed")}: ${progress.currentSpeed || 0}`;
 
 			const items = JSON.parse(localStorage.getItem("itemList"));
 			// Clearing item from localstorage
@@ -563,7 +565,7 @@ function download(type) {
 			localStorage.setItem("itemList", JSON.stringify(items));
 		})
 		.once("ytDlpEvent", (eventType, eventData) => {
-			getId(randomId + "prog").textContent = "Downloading...";
+			getId(randomId + "prog").textContent = i18n.__("Downloading...");
 		})
 		.on("close", () => {
 			if (willBeSaved) {
@@ -582,7 +584,7 @@ function download(type) {
 		})
 		.on("error", (error) => {
 			getId(randomId + "prog").textContent =
-				"Some error has occured. Hover to see details";
+				i18n.__("Some error has occured. Hover to see details");
 			getId(randomId + "prog").title = error.message;
 			console.log(error.message);
 		});
@@ -611,7 +613,7 @@ function fadeItem(id) {
 
 function afterSave(location, filename, progressId) {
 	const notify = new Notification("ytDownloader", {
-		body: "File saved successfully.",
+		body: i18n.__("File saved successfully"),
 		icon: "../assets/images/icon.png",
 	});
 	let finalLocation = location
@@ -622,7 +624,7 @@ function afterSave(location, filename, progressId) {
 	}
 	getId(
 		progressId
-	).innerHTML = `<b onClick="showItem('${finalLocation}', '${finalFilename}')">File saved. Click to Open</b>`;
+	).innerHTML = `<b onClick="showItem('${finalLocation}', '${finalFilename}')">${i18n.__("File saved. Click to Open")}</b>`;
 }
 
 function showItem(location, filename) {

@@ -4,7 +4,7 @@ function getId(id){
 function querySelector(element){
     return document.querySelector(element)
 }
-var i18n = new(require('../translations/i18n'))
+const i18n = new(require('../translations/i18n'))
 
 // Translating texts
 getId("back").textContent = i18n.__("Homepage")
