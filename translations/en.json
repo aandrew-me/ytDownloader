@@ -39,5 +39,11 @@
 	"Progress":"Progress",
 	"Speed":"Speed",
 	"Quality":"Quality",
-	"Restart app":"Restart app"
+	"Restart app":"Restart app",
+	"Subtitles":"Subtitles",
+	"Download subtitles if available":"Download subtitles if available",
+	"Download auto generated subtitles":"Download auto generated subtitles",
+	"Extract Audio from Video":"Extract Audio from Video",
+	"Extract":"Extract"
+
 }
