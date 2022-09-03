@@ -25,7 +25,7 @@ function i18n() {
 		);
 	} else {
 		loadedLanguage = JSON.parse(
-			fs.readFileSync(path.join(__dirname, "main.json"), "utf8")
+			fs.readFileSync(path.join(__dirname, "en.json"), "utf8")
 		);
 	}
 }

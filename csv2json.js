@@ -1,11 +1,11 @@
 // Converts the csv translation file to json and puts in translations folder
 
 // Language of output file
-const language = "ru";
+const language = "en";
 
 const { readFileSync, writeFileSync } = require("fs");
 
-let csvFile = readFileSync("input.csv", { encoding: "utf-8" });
+let csvFile = readFileSync("translate.csv", { encoding: "utf-8" });
 let result = "";
 
 let count = 0;
