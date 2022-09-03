@@ -266,7 +266,7 @@ async function getInfo(url) {
 						"<option value='" +
 						format_id +
 						"'>" +
-						"Quality: " +
+						i18n.__("Quality") + ": " +
 						(format.format_note || i18n.__("Unknown quality")) +
 						" | " +
 						audio_ext +
