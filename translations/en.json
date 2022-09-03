@@ -4,7 +4,7 @@
 	"About": "About",
 	"Download location": "Download location",
 	"Current download location - ": "Current download location - ",
-	"Enable transparent dark mode(only Linux, needs restart)": "Enable transparent dark mode(only Linux, needs restart)",
+	"Enable transparent dark mode(only Linux, needs relaunch)": "Enable transparent dark mode(only Linux, needs relaunch)",
 	"Please wait, yt-dlp is being downloaded": "Please wait, yt-dlp is being downloaded",
 	"Video": "Video",
 	"Audio": "Audio",
@@ -14,7 +14,7 @@
 	"Select Download Location": "Select Download Location",
 	"More options": "More options",
 	"Start": "Start",
-	"Select Language": "Select Language",
+	"Select Language (Requires relaunch)": "Select Language (Requires relaunch)",
 	"Download particular time-range": "Download particular time-range",
 	"End": "End",
 	"If kept empty, it will start from the beginning": "If kept empty, it will start from the beginning",
@@ -25,8 +25,8 @@
 	"Source Code is available ": "Source Code is available ",
 	"here": "here",
 	"Processing": "Processing",
-	"Some error has occured. Check your connection and use correct URL":"Some error has occured. Check your connection and use correct URL",
-	"Failed to download yt-dlp. Please check your connection and try again": "Failed to download yt-dlp. Please check your connection and try again",
+	"Some error has occured. Check your network and use correct URL":"Some error has occured. Check your network and use correct URL",
+	"Failed to download yt-dlp. Please check your network and try again": "Failed to download yt-dlp. Please check your network and try again",
 	"Try again":"Try again",
 	"Unknown size":"Unknown size",
 	"MB":"MB",
@@ -38,5 +38,6 @@
 	"Preparing":"Preparing",
 	"Progress":"Progress",
 	"Speed":"Speed",
-	"Quality":"Quality"
+	"Quality":"Quality",
+	"Restart app":"Restart app"
 }

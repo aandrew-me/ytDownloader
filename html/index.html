@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <header ></header>
+    <header></header>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,7 +12,7 @@
     <script src="../src/index.js" defer></script>
 
     <!-- Translating -->
-    <script>window.i18n = new(require('../translations/i18n'));</script>
+    <script>window.i18n = new (require('../translations/i18n'));</script>
 
 </head>
 
@@ -54,7 +54,7 @@
     <button id="pasteUrl" class="submitBtn">Click to paste video URL or ID [Ctrl + V]</button>
 
     <div id="loadingWrapper">
-        <span id="processing">Processing </span>
+        <span id="processing">Loading </span>
         <svg version="1.1" id="L4" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
             y="0px" viewBox="0 0 100 100" enable-background="new 0 0 0 0" xml:space="preserve">
             <circle fill="rgb(84, 171, 222)" stroke="none" cx="6" cy="50" r="6">
@@ -85,29 +85,57 @@
             <br>
             <input type="hidden" name="url" class="url" id="url">
             <button class="submitBtn" id="videoDownload">Download</button>
-            <button id="advancedToggle" onClick ="advancedToggle()">More options</button>
+            <button id="advancedVideoToggle" class="advancedToggle" onClick="advancedToggle()">More options</button>
         </div>
 
         <div id="audioList">
-            <label>Select Format </label>
-            <select id="audioFormatSelect">
-            </select>
-            <br>
-            <input type="hidden" name="url" class="url">
-            <button class="submitBtn" id="audioDownload">Download</button>
-            <button id="advancedToggle" onClick ="advancedToggle()">Advanced</button>
-
+            <div id="audioPresent">
+                <label>Select Format </label>
+                <select id="audioFormatSelect">
+                </select>
+                <br>
+                <input type="hidden" name="url" class="url">
+                <button class="submitBtn" id="audioDownload">Download</button>
+                <button id="advancedAudioToggle" class="advancedToggle" onClick="advancedToggle()">More options</button>
+            </div>
         </div>
-
         <div id="advanced">
             <p id="rangeText">Download particular time-range</p>
             <label id="start">Start</label>
-            <input type="text" id="startTime" class="time" placeholder="00:00" title="If kept empty, it will start from the beginning">
+            <input type="text" id="startTime" class="time" placeholder="00:00"
+                title="If kept empty, it will start from the beginning">
             :
-            <input type="text" id="endTime" class="time" placeholder="10:00" title="If kept empty, it will be downloaded to the end">
+            <input type="text" id="endTime" class="time" placeholder="10:00"
+                title="If kept empty, it will be downloaded to the end">
             <label id="end">End</label>
 
+            <br><br>
+
+            <h3>Subtitles</h3>
+            <span>Download subtitles if available</span>
+            <input id="subChecked" type="checkbox">
+
+            <br><br>
+            <span>Download auto generated subtitles</span>
+            <input id="autoSubChecked" type="checkbox">
         </div>
+
+        <!-- Extraction options start -->
+        <h2>Extract Audio from Video</h2>
+        <label>Select Format </label>
+        <select id="extractSelection">
+            <option value="mp3">Mp3</option>
+            <option value="aac">Aac</option>
+            <option value="m4a">M4a</option>
+            <option value="opus">Opus</option>
+            <option value="wav">Wav</option>
+            <option value="alac">Alac</option>
+            <option value="flac">Flac</option>
+            <option value="vorbis">Vorbis</option>
+        </select>
+        <button id="extractBtn">Extract audio</button>
+        <!-- Extraction options end -->
+
 
     </div>
 

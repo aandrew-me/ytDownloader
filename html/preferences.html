@@ -13,6 +13,9 @@
 
 <body>
     <a id="back">Homepage</a>
+    <a id="restart" onclick="restartApp()">Restart app</a>
+
+
     <h1 id="preferences">Preferences</h1>
     <br><br>
     <strong id="dlText">Download location</strong>
@@ -30,7 +33,7 @@
 
         <br><br>
 
-        <label id="selectLn">Select Language</label>
+        <label id="selectLn">Select Language (Requires reload)</label>
         <select id="select" onchange="changeLanguage()">
             <option value="en">English</option>
             <option value="ru">Русский</option>
@@ -43,6 +46,10 @@
             const { ipcRenderer, dialog } = require("electron")
             function getId(id) {
                 return document.getElementById(id)
+            }
+
+            function restartApp(){
+                ipcRenderer.send("restart")
             }
 
             getId("back").addEventListener("click", () => {

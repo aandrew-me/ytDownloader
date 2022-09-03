@@ -219,6 +219,14 @@ label {
 	display: none;
 }
 
+input[type="checkbox"]{
+    width:20px;
+    height:20px;
+    position: relative;
+    left:5px;
+	top:4px;
+}
+
 .submitBtn {
 	padding: 15px;
 	border-radius: 10px;
@@ -320,8 +328,30 @@ svg {
 #savedMsg {
 	cursor: pointer;
 }
+button{
+	outline:none;
+}
 
-#advancedToggle {
+#extractBtn{
+	color: white;
+	background-color: rgb(80, 128, 230);
+	border: none;
+	border-bottom: 4px solid rgb(44, 78, 180);
+	position: relative;
+	padding: 15px;
+	border-radius: 10px;
+	cursor: pointer;
+	margin: 8px;
+	font-size: large;
+}
+
+#extractBtn:active{
+	top: 4px;
+	margin-bottom: 12px;
+	border: none;
+}
+
+.advancedToggle {
 	color: white;
 	background-color: rgb(231, 80, 80);
 	border: none;
@@ -334,9 +364,9 @@ svg {
 	font-size: large;
 }
 
-#advancedToggle:active {
+.advancedToggle:active {
 	top: 4px;
-	margin-bottom: 4px;
+	margin-bottom: 12px;
 	border: none;
 }
 

@@ -35,12 +35,25 @@ input[type="text"]{
 #back{
     text-decoration: none;
     padding:8px;
-    border-radius: 8px;
+    border-radius: 10px;
     background-color: rgb(51, 177, 219);
     color:white;
     position: absolute;
     top:15px;
     right:15px;
+    font-size: large;
+    cursor: pointer;
+}
+
+#restart{
+    text-decoration: none;
+    padding:8px;
+    border-radius: 10px;
+    background-color: rgb(210 69 27);
+    color:white;
+    position: absolute;
+    top:15px;
+    right:120px;
     font-size: large;
     cursor: pointer;
 }
@@ -52,6 +65,9 @@ a{
 input[type="checkbox"]{
     width:20px;
     height:20px;
+    position: relative;
+    left:5px;
+    top: 5px;
 }
 
 #selectLocation{

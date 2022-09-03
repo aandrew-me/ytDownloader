@@ -44,6 +44,11 @@ app.whenReady().then(() => {
 	}
 });
 
+ipcMain.on("restart", () => {
+	app.relaunch();
+	app.exit();
+})
+
 ipcMain.on("get-version", () => {
 	const version = app.getVersion();
 	secondaryWindow.webContents.send("version", version);
@@ -61,7 +66,7 @@ ipcMain.on("load-page", (event, file) => {
 	});
 	secondaryWindow.loadFile(file);
 	// secondaryWindow.setMenu(null);
-	secondaryWindow.maximize();
+	// secondaryWindow.maximize();
 	secondaryWindow.show();
 });
 

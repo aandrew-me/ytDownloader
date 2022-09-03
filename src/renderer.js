@@ -1,11 +1,10 @@
 const cp = require("child_process");
 const os = require("os");
 let ffmpeg;
-if (os.platform() === "win32"){
-	ffmpeg = __dirname + "\\..\\ffmpeg.exe"
-}
-else{
-	ffmpeg = __dirname + "/../ffmpeg"
+if (os.platform() === "win32") {
+	ffmpeg = __dirname + "\\..\\ffmpeg.exe";
+} else {
+	ffmpeg = __dirname + "/../ffmpeg";
 }
 
 const fs = require("fs");
@@ -18,18 +17,18 @@ const { default: YTDlpWrap } = require("yt-dlp-wrap-extended");
 const homedir = os.homedir();
 const appdir = path.join(homedir, "Downloads");
 const hiddenDir = path.join(homedir, ".ytDownloader");
-const i18n = new(require('../translations/i18n'))
-
+const i18n = new (require("../translations/i18n"))();
 
 fs.mkdir(hiddenDir, { recursive: true }, () => {});
-
 
 // Download directory
 let downloadDir = "";
 
 // Global variables
-let title, onlyvideo, id, thumbnail, ytdlp, duration;
+let title, onlyvideo, id, thumbnail, ytdlp, duration, extractFormat;
 let rangeCmd = "";
+let subs = ""
+let autoSubs = ""
 let rangeOption = "--download-sections";
 let willBeSaved = true;
 
@@ -84,12 +83,13 @@ cp.exec("yt-dlp --version", (error, stdout, stderr) => {
 			if (error) {
 				getId("popupBox").style.display = "block";
 				process.on("uncaughtException", (reason, promise) => {
-					document.querySelector("#popupBox p").textContent =
-						i18n.__("Failed to download yt-dlp. Please check your connection and try again");
+					document.querySelector("#popupBox p").textContent = i18n.__(
+						"Failed to download yt-dlp. Please check your network and try again"
+					);
 					getId("popupSvg").style.display = "none";
-					getId(
-						"popup"
-					).innerHTML += `<button id="tryBtn">${i18n.__("Try again")}</button>`;
+					getId("popup").innerHTML += `<button id="tryBtn">${i18n.__(
+						"Try again"
+					)}</button>`;
 					console.log("Failed to download yt-dlp");
 
 					getId("tryBtn").addEventListener("click", () => {
@@ -154,6 +154,7 @@ getId("pasteUrl").addEventListener("click", () => {
 
 // Getting video info
 async function getInfo(url) {
+	let audioIsPresent = false;
 	downloadPathSelection();
 	getId("videoFormatSelect").innerHTML = "";
 	getId("audioFormatSelect").innerHTML = "";
@@ -193,12 +194,13 @@ async function getInfo(url) {
 
 			let audioSize = 0;
 
-			// Getting approx size of audio file
+			// Getting approx size of audio file and checking if audio is present
 			for (let format of formats) {
 				if (
 					format.audio_ext !== "none" ||
 					(format.acodec !== "none" && format.video_ext === "none")
 				) {
+					audioIsPresent = true;
 					onlyvideo = true;
 					audioSize =
 						Number(format.filesize || format.filesize_approx) /
@@ -266,7 +268,8 @@ async function getInfo(url) {
 						"<option value='" +
 						format_id +
 						"'>" +
-						i18n.__("Quality") + ": " +
+						i18n.__("Quality") +
+						": " +
 						(format.format_note || i18n.__("Unknown quality")) +
 						" | " +
 						audio_ext +
@@ -299,16 +302,25 @@ async function getInfo(url) {
 						"  |  " +
 						format.ext +
 						"  |  " +
-						size + " " +
+						size +
+						" " +
 						i18n.__("MB") +
 						"</option>";
 					getId("videoFormatSelect").innerHTML += element;
 				}
+
+				// When there is no audio
+				if (audioIsPresent === false) {
+					getId("audioPresent").style.display = "none";
+				} else {
+					getId("audioPresent").style.display = "block";
+				}
 			}
 		} else {
 			getId("loadingWrapper").style.display = "none";
-			getId("incorrectMsg").textContent =
-				i18n.__("Some error has occured. Check your connection and use correct URL");
+			getId("incorrectMsg").textContent = i18n.__(
+				"Some error has occured. Check your connection and use correct URL"
+			);
 		}
 	});
 }
@@ -316,15 +328,19 @@ async function getInfo(url) {
 // Video download event
 getId("videoDownload").addEventListener("click", (event) => {
 	getId("hidden").style.display = "none";
-	clickAnimation("videoDownload");
 	download("video");
 });
 
 // Audio download event
 getId("audioDownload").addEventListener("click", (event) => {
 	getId("hidden").style.display = "none";
-	clickAnimation("audioDownload");
 	download("audio");
+});
+
+getId("extractBtn").addEventListener("click", () => {
+	extractFormat = getId("extractSelection").value;
+	getId("hidden").style.display = "none";
+	download("extract");
 });
 
 // Restore previous uncompleted downloads
@@ -399,7 +415,23 @@ function manageAdvanced(duration) {
 		rangeOption = "--download-sections";
 	} else {
 		rangeOption = "";
-		rangeCmd = ""
+		rangeCmd = "";
+	}
+
+	// If subtitles are checked
+	if (getId("subChecked").checked){
+		subs = "--write-subs"
+	}
+	else{
+		subs = ""
+	}
+
+	// If autosubs are checked
+	if (getId("autoSubChecked").checked){
+		autoSubs = "--write-auto-subs"
+	}
+	else{
+		subs = ""
 	}
 
 	console.log("Range option: " + rangeOption);
@@ -420,7 +452,7 @@ function download(type) {
 	if (type === "video") {
 		format_id = getId("videoFormatSelect").value.split("|")[0];
 		ext = getId("videoFormatSelect").value.split("|")[1];
-	} else {
+	} else if (type === "audio") {
 		format_id = getId("audioFormatSelect").value.split("|")[0];
 		if (getId("audioFormatSelect").value.split("|")[1] === "webm") {
 			ext = "opus";
@@ -486,9 +518,7 @@ function download(type) {
 		}
 		filename += letter;
 	}
-	filename =
-		filename + Math.random().toFixed(3).toString().slice(2) + `.${ext}`;
-	console.log(path.join(downloadDir, filename));
+	filename = filename + Math.random().toFixed(3).toString().slice(2);
 
 	let audioFormat;
 
@@ -500,7 +530,6 @@ function download(type) {
 
 	let controller = new AbortController();
 	console.log(rangeOption + " " + rangeCmd);
-
 
 	if (type === "video" && onlyvideo) {
 		// If video has no sound, audio needs to be downloaded
@@ -514,16 +543,18 @@ function download(type) {
 				"-f",
 				`${format_id}+${audioFormat}`,
 				"-o",
-				`${path.join(downloadDir, filename)}`,
+				`${path.join(downloadDir, filename + `.${ext}`)}`,
 				"--ffmpeg-location",
 				ffmpeg,
+				subs,
+				autoSubs
 			],
 			{ shell: true, detached: false },
 			controller.signal
 		);
 
 		// If downloading only audio or video with audio
-	} else {
+	} else if (type === "audio") {
 		downloadProcess = ytdlp.exec(
 			[
 				url,
@@ -532,7 +563,24 @@ function download(type) {
 				"-f",
 				format_id,
 				"-o",
-				`${path.join(downloadDir, filename)}`,
+				`${path.join(downloadDir, filename + `.${ext}`)}`,
+				"--ffmpeg-location",
+				ffmpeg,
+				subs,
+				autoSubs
+			],
+			{ shell: true, detached: false },
+			controller.signal
+		);
+	} else if (type === "extract") {
+		downloadProcess = ytdlp.exec(
+			[
+				url,
+				"-x",
+				"--audio-format",
+				extractFormat,
+				"-o",
+				`${path.join(downloadDir, filename + `.${extractFormat}`)}`,
 				"--ffmpeg-location",
 				ffmpeg,
 			],
@@ -547,12 +595,17 @@ function download(type) {
 		controller.abort();
 	});
 
-	
 	downloadProcess
 		.on("progress", (progress) => {
-			getId(randomId + "prog").textContent = `${i18n.__("Progress")}: ${
-				progress.percent
-			}%  ${i18n.__("Speed")}: ${progress.currentSpeed || 0}`;
+			if (progress == 100){
+				getId(randomId + "prog").textContent = i18n.__("Processing")
+			}
+			else{
+				getId(randomId + "prog").textContent = `${i18n.__("Progress")}: ${
+					progress.percent
+				}%  ${i18n.__("Speed")}: ${progress.currentSpeed || 0}`;
+			}
+			
 
 			const items = JSON.parse(localStorage.getItem("itemList"));
 			// Clearing item from localstorage
@@ -579,12 +632,28 @@ function download(type) {
 				}
 				localStorage.setItem("itemList", JSON.stringify(items));
 
-				afterSave(downloadDir, filename, randomId + "prog");
+				if (type === "extract") {
+					console.log(path.join(downloadDir, filename + `.${extractFormat}`));
+
+					afterSave(
+						downloadDir,
+						filename + `.${extractFormat}`,
+						randomId + "prog"
+					);
+				} else {
+					console.log(path.join(downloadDir, filename + `.${ext}`));
+					afterSave(
+						downloadDir,
+						filename + `.${ext}`,
+						randomId + "prog"
+					);
+				}
 			}
 		})
 		.on("error", (error) => {
-			getId(randomId + "prog").textContent =
-				i18n.__("Some error has occured. Hover to see details");
+			getId(randomId + "prog").textContent = i18n.__(
+				"Some error has occured. Hover to see details"
+			);
 			getId(randomId + "prog").title = error.message;
 			console.log(error.message);
 		});
@@ -616,15 +685,17 @@ function afterSave(location, filename, progressId) {
 		body: i18n.__("File saved successfully"),
 		icon: "../assets/images/icon.png",
 	});
-	let finalLocation = location
-	let finalFilename = filename
-	if (os.platform() === "win32"){
-		finalLocation = location.split(path.sep).join("\\\\")
-		finalFilename = filename.split(path.sep).join("\\\\")
+	let finalLocation = location;
+	let finalFilename = filename;
+	if (os.platform() === "win32") {
+		finalLocation = location.split(path.sep).join("\\\\");
+		finalFilename = filename.split(path.sep).join("\\\\");
 	}
 	getId(
 		progressId
-	).innerHTML = `<b onClick="showItem('${finalLocation}', '${finalFilename}')">${i18n.__("File saved. Click to Open")}</b>`;
+	).innerHTML = `<b onClick="showItem('${finalLocation}', '${finalFilename}')">${i18n.__(
+		"File saved. Click to Open"
+	)}</b>`;
 }
 
 function showItem(location, filename) {

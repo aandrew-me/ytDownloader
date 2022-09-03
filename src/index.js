@@ -17,6 +17,7 @@ getId("menuIcon").addEventListener("click", (event) => {
 		let opacity = 1;
 		const fade = setInterval(() => {
 			if (count >= 10) {
+				getId("menu").style.display = "none"
 				clearInterval(fade);
 			} else {
 				opacity -= 0.1;
@@ -110,14 +111,6 @@ if (storageTheme == "dark") {
 	toggle();
 }
 ////
-
-function clickAnimation(id) {
-	getId(id).style.animationName = "clickAnimation";
-
-	setTimeout(() => {
-		getId(id).style.animationName = "";
-	}, 500);
-}
 let advancedHidden = true;
 
 function advancedToggle() {
