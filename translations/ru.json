@@ -4,7 +4,7 @@
 	"About": "О программе",
 	"Download location": "Папка загрузки",
 	"Current download location - ": "Текущее место загрузки - ",
-	"Enable transparent dark mode(only Linux, needs restart)": "Включить прозрачный темный режим (только для Linux, требуется перезагрузка)",
+	"Enable transparent dark mode(only Linux, needs relaunch)": "Enable transparent dark mode(only Linux, needs relaunch)",
 	"Please wait, yt-dlp is being downloaded": "Пожалуйста, подождите, yt-dlp загружается",
 	"Video": "Видео",
 	"Audio": "Аудио",
@@ -14,7 +14,7 @@
 	"Select Download Location": "Выберите место загрузки",
 	"More options": "Дополнительные опции",
 	"Start": "Начало",
-	"Select Language": "Выберите язык",
+	"Select Language (Requires relaunch)": "Select Language (Requires relaunch)",
 	"Download particular time-range": "Скачать определенную часть",
 	"End": "Конец",
 	"If kept empty, it will start from the beginning": "Если оставить пустым, оно начнется с начала",
@@ -25,8 +25,8 @@
 	"Source Code is available ": "Исходный код доступен ",
 	"here": "здесь",
 	"Processing": "Загружается",
-	"Some error has occured. Check your connection and use correct URL": "Произошла ошибка. Проверьте свою сеть и используйте правильный URL",
-	"Failed to download yt-dlp. Please check your connection and try again": "Не удалось загрузить yt-dlp. Пожалуйста, проверьте свою сеть и попробуйте снова",
+	"Some error has occured. Check your network and use correct URL": "Some error has occured. Check your network and use correct URL",
+	"Failed to download yt-dlp. Please check your network and try again": "Failed to download yt-dlp. Please check your network and try again",
 	"Try again": "Пробовать снова",
 	"Unknown size": "Размер неизвестен",
 	"MB": "MБ",
@@ -37,5 +37,7 @@
 	"File saved. Click to Open": "Файл сохранён. Нажмите, чтобы открыть",
 	"Preparing": "Идет подготовка",
 	"Progress": "Прогресс",
-	"Speed": "Скорость"
+	"Speed": "Скорость",
+	"Quality": "Quality",
+	"Restart app": "Restart app"
 }
