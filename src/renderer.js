@@ -30,7 +30,6 @@ let rangeCmd = "";
 // let subs = ""
 // let autoSubs = ""
 let rangeOption = "--download-sections";
-let willBeSaved = true;
 
 function getId(id) {
 	return document.getElementById(id);
@@ -353,7 +352,7 @@ async function getInfo(url) {
 		} else {
 			getId("loadingWrapper").style.display = "none";
 			getId("incorrectMsg").textContent = i18n.__(
-				"Some error has occured. Check your connection and use correct URL"
+				"Some error has occured. Check your network and use correct URL"
 			);
 		}
 	});
@@ -476,6 +475,7 @@ function manageAdvanced(duration) {
 //////////////////////////////
 
 function download(type) {
+	let willBeSaved = true;
 	manageAdvanced(duration);
 	const url = getId("url").value;
 	let ext;
@@ -528,7 +528,7 @@ function download(type) {
 	`;
 	getId("list").innerHTML += newItem;
 	getId("loadingWrapper").style.display = "none";
-	getId(randomId + "prog").textContent = "Preparing...";
+	getId(randomId + "prog").textContent = i18n.__("Preparing...");
 
 	getId(randomId + ".close").addEventListener("click", () => {
 		if (getId(randomId)) {
@@ -633,22 +633,21 @@ function download(type) {
 
 	getId(randomId + ".close").addEventListener("click", () => {
 		willBeSaved = false;
-		console.log("Cancelled");
-		controller.abort();
+		controller.abort()
 	});
 
 	downloadProcess
 		.on("progress", (progress) => {
-			// if (progress.percent == 100) {
-			// 	getId(randomId + "prog").textContent =
-			// 		i18n.__("Processing") + "...";
-			// } else {
+			if (progress.percent == 100) {
+				getId(randomId + "prog").textContent =
+					i18n.__("Processing") + "...";
+			} else {
 				getId(randomId + "prog").textContent = `${i18n.__(
 					"Progress"
 				)}: ${progress.percent}%  ${i18n.__("Speed")}: ${
 					progress.currentSpeed || 0
 				}`;
-			// }
+			}
 
 			const items = JSON.parse(localStorage.getItem("itemList"));
 			// Clearing item from localstorage

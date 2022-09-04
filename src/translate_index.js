@@ -11,8 +11,9 @@ getId("pasteUrl").textContent = i18n.__("Click to paste video URL or ID [Ctrl + 
 querySelector("#popup p").textContent = i18n.__("yt-dlp is being downloaded")
 getId("preferenceWin").textContent = i18n.__("Preferences")
 getId("aboutWin").textContent = i18n.__("About")
-querySelector("#videoList label").textContent = i18n.__("Select Format ")
-querySelector("#audioList label").textContent = i18n.__("Select Format ")
+document.querySelectorAll(".formatSelect").forEach(element => {
+    element.textContent = i18n.__("Select Format ")
+});
 getId("videoDownload").textContent = i18n.__("Download")
 getId("audioDownload").textContent = i18n.__("Download")
 getId("advancedVideoToggle").textContent = i18n.__("More options")

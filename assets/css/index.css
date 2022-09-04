@@ -99,6 +99,7 @@ body {
 
 #pasteUrl{
 	display:none;
+	margin-top:10px;
 }
 
 .item {
