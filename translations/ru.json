@@ -5,7 +5,7 @@
 	"Download location": "Папка загрузки",
 	"Current download location - ": "Текущее место загрузки - ",
 	"Enable transparent dark mode(only Linux, needs relaunch)": "Enable transparent dark mode(only Linux, needs relaunch)",
-	"Please wait, yt-dlp is being downloaded": "Пожалуйста, подождите, yt-dlp загружается",
+	"Please wait, necessary files are being downloaded": "Please wait, necessary files are being downloaded",
 	"Video": "Видео",
 	"Audio": "Аудио",
 	"Title ": "Название ",
@@ -24,9 +24,9 @@
 	"It's a Free and Open Source app built on top of Node.js and Electron. yt-dlp has been used for downloading": "Это бесплатное приложение с открытым исходным кодом, созданное поверх Node.js и Electron. yt-dlp используется для загрузки",
 	"Source Code is available ": "Исходный код доступен ",
 	"here": "здесь",
-	"Processing": "Загружается",
+	"Processing": "Обрабатывается",
 	"Some error has occured. Check your network and use correct URL": "Some error has occured. Check your network and use correct URL",
-	"Failed to download yt-dlp. Please check your network and try again": "Failed to download yt-dlp. Please check your network and try again",
+	"Failed to download necessary files. Please check your network and try again": "Failed to download necessary files. Please check your network and try again",
 	"Try again": "Пробовать снова",
 	"Unknown size": "Размер неизвестен",
 	"MB": "MБ",
@@ -44,5 +44,6 @@
 	"Download subtitles if available": "Download subtitles if available",
 	"Download auto generated subtitles": "Download auto generated subtitles",
 	"Extract Audio from Video": "Extract Audio from Video",
-	"Extract": "Extract"
+	"Extract": "Extract",
+	"Downloading necessary files": "Downloading necessary files"
 }
