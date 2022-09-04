@@ -46,7 +46,8 @@
 			"package.json",
 			"./assets/**/*",
 			"./src/**/*",
-			"ffmpeg*"
+			"ffmpeg*",
+			"translations"
 		],
 		"mac": {
 			"category": "Utility",

@@ -5,7 +5,7 @@
 	"Download location": "Download location",
 	"Current download location - ": "Current download location - ",
 	"Enable transparent dark mode(only Linux, needs relaunch)": "Enable transparent dark mode(only Linux, needs relaunch)",
-	"Please wait, yt-dlp is being downloaded": "Please wait, yt-dlp is being downloaded",
+	"Please wait, necessary files are being downloaded": "Please wait, necessary files are being downloaded",
 	"Video": "Video",
 	"Audio": "Audio",
 	"Title ": "Title ",
@@ -26,7 +26,7 @@
 	"here": "here",
 	"Processing": "Processing",
 	"Some error has occured. Check your network and use correct URL":"Some error has occured. Check your network and use correct URL",
-	"Failed to download yt-dlp. Please check your network and try again": "Failed to download yt-dlp. Please check your network and try again",
+	"Failed to download necessary files. Please check your network and try again": "Failed to download necessary files. Please check your network and try again",
 	"Try again":"Try again",
 	"Unknown size":"Unknown size",
 	"MB":"MB",
@@ -44,6 +44,7 @@
 	"Download subtitles if available":"Download subtitles if available",
 	"Download auto generated subtitles":"Download auto generated subtitles",
 	"Extract Audio from Video":"Extract Audio from Video",
-	"Extract":"Extract"
+	"Extract":"Extract",
+	"Downloading necessary files":"Downloading necessary files"
 
 }

@@ -2,9 +2,9 @@ const cp = require("child_process");
 const os = require("os");
 let ffmpeg;
 if (os.platform() === "win32") {
-	ffmpeg = __dirname + "\\..\\ffmpeg.exe";
+	ffmpeg = `"${__dirname}\\..\\ffmpeg.exe"`;
 } else {
-	ffmpeg = __dirname + "/../ffmpeg";
+	ffmpeg = `"${__dirname}/../ffmpeg"`;
 }
 
 const fs = require("fs");
@@ -27,8 +27,8 @@ let downloadDir = "";
 // Global variables
 let title, onlyvideo, id, thumbnail, ytdlp, duration, extractFormat;
 let rangeCmd = "";
-let subs = ""
-let autoSubs = ""
+// let subs = ""
+// let autoSubs = ""
 let rangeOption = "--download-sections";
 let willBeSaved = true;
 
@@ -64,10 +64,44 @@ if (os.platform() == "win32") {
 
 // Downloading yt-dlp
 async function downloadYtdlp() {
-	document.querySelector("#popupBox p").textContent = "Downloading yt-dlp";
+	document.querySelector("#popupBox p").textContent = i18n.__(
+		"Please wait, necessary files are being downloaded"
+	);
 	getId("popupSvg").style.display = "inline";
 
-	await YTDlpWrap.downloadFromGithub(ytdlpDownloadPath);
+	// Downloading appropriate version of yt-dlp
+	if (os.platform() == "linux") {
+		// Checking python version
+		try {
+			const result = cp.execSync("python3 --version", {
+				encoding: "utf-8",
+			});
+			const minorVersion = Number(result.split(" ")[1].split(".")[1]);
+			if (minorVersion >= 7) {
+				await YTDlpWrap.downloadFromGithub(ytdlpDownloadPath);
+			} else {
+				// Downloading full binary if python version is less than 3.7
+				await YTDlpWrap.downloadFromGithub(
+					ytdlpDownloadPath,
+					"",
+					"linux",
+					true
+				);
+			}
+		} catch (error) {
+			// Downloading full binary of python3 is not there
+			await YTDlpWrap.downloadFromGithub(
+				ytdlpDownloadPath,
+				"",
+				"linux",
+				true
+			);
+		}
+	} else {
+		// In case of windows
+		await YTDlpWrap.downloadFromGithub(ytdlpDownloadPath);
+	}
+
 	getId("popupBox").style.display = "none";
 	ytDlp = ytdlpPath;
 	ytdlp = new YTDlpWrap(ytDlp);
@@ -84,7 +118,7 @@ cp.exec("yt-dlp --version", (error, stdout, stderr) => {
 				getId("popupBox").style.display = "block";
 				process.on("uncaughtException", (reason, promise) => {
 					document.querySelector("#popupBox p").textContent = i18n.__(
-						"Failed to download yt-dlp. Please check your network and try again"
+						"Failed to download necessary files. Please check your network and try again"
 					);
 					getId("popupSvg").style.display = "none";
 					getId("popup").innerHTML += `<button id="tryBtn">${i18n.__(
@@ -418,21 +452,21 @@ function manageAdvanced(duration) {
 		rangeCmd = "";
 	}
 
-	// If subtitles are checked
-	if (getId("subChecked").checked){
-		subs = "--write-subs"
-	}
-	else{
-		subs = ""
-	}
+	// // If subtitles are checked
+	// if (getId("subChecked").checked){
+	// 	subs = "--write-subs"
+	// }
+	// else{
+	// 	subs = ""
+	// }
 
-	// If autosubs are checked
-	if (getId("autoSubChecked").checked){
-		autoSubs = "--write-auto-subs"
-	}
-	else{
-		subs = ""
-	}
+	// // If autosubs are checked
+	// if (getId("autoSubChecked").checked){
+	// 	autoSubs = "--write-auto-subs"
+	// }
+	// else{
+	// 	autoSubs = ""
+	// }
 
 	console.log("Range option: " + rangeOption);
 	console.log("rangeCmd:" + rangeCmd);
@@ -445,6 +479,7 @@ function download(type) {
 	manageAdvanced(duration);
 	const url = getId("url").value;
 	let ext;
+	let extractExt;
 
 	let format_id;
 	const randomId = Math.random().toFixed(10).toString().slice(2);
@@ -486,7 +521,7 @@ function download(type) {
 
 		<div class="itemBody">
 			<div class="itemTitle">${title}</div>
-			<div class="itemType">${type}</div>
+			<div class="itemType">${type === "video" ? "video" : "audio"}</div>
 			<div id="${randomId + "prog"}" class="itemProgress"></div>
 		</div>
 	</div>
@@ -546,8 +581,8 @@ function download(type) {
 				`${path.join(downloadDir, filename + `.${ext}`)}`,
 				"--ffmpeg-location",
 				ffmpeg,
-				subs,
-				autoSubs
+				// subs,
+				// autoSubs
 			],
 			{ shell: true, detached: false },
 			controller.signal
@@ -566,13 +601,20 @@ function download(type) {
 				`${path.join(downloadDir, filename + `.${ext}`)}`,
 				"--ffmpeg-location",
 				ffmpeg,
-				subs,
-				autoSubs
+				// subs,
+				// autoSubs
 			],
 			{ shell: true, detached: false },
 			controller.signal
 		);
 	} else if (type === "extract") {
+		if (extractFormat == "alac") {
+			extractExt = "m4a";
+		} else if (extractFormat == "vorbis") {
+			extractExt = "ogg";
+		} else {
+			extractExt = extractFormat;
+		}
 		downloadProcess = ytdlp.exec(
 			[
 				url,
@@ -580,7 +622,7 @@ function download(type) {
 				"--audio-format",
 				extractFormat,
 				"-o",
-				`${path.join(downloadDir, filename + `.${extractFormat}`)}`,
+				`${path.join(downloadDir, filename + `.${extractExt}`)}`,
 				"--ffmpeg-location",
 				ffmpeg,
 			],
@@ -597,15 +639,16 @@ function download(type) {
 
 	downloadProcess
 		.on("progress", (progress) => {
-			if (progress == 100){
-				getId(randomId + "prog").textContent = i18n.__("Processing")
-			}
-			else{
-				getId(randomId + "prog").textContent = `${i18n.__("Progress")}: ${
-					progress.percent
-				}%  ${i18n.__("Speed")}: ${progress.currentSpeed || 0}`;
-			}
-			
+			// if (progress.percent == 100) {
+			// 	getId(randomId + "prog").textContent =
+			// 		i18n.__("Processing") + "...";
+			// } else {
+				getId(randomId + "prog").textContent = `${i18n.__(
+					"Progress"
+				)}: ${progress.percent}%  ${i18n.__("Speed")}: ${
+					progress.currentSpeed || 0
+				}`;
+			// }
 
 			const items = JSON.parse(localStorage.getItem("itemList"));
 			// Clearing item from localstorage
@@ -620,27 +663,32 @@ function download(type) {
 		.once("ytDlpEvent", (eventType, eventData) => {
 			getId(randomId + "prog").textContent = i18n.__("Downloading...");
 		})
-		.on("close", () => {
+		.once("close", () => {
 			if (willBeSaved) {
-				const items = JSON.parse(localStorage.getItem("itemList"));
-				// Clearing item from localstorage
-				for (let item of items) {
-					if (item.id == randomId) {
-						items.splice(items.indexOf(item), 1);
-						break;
-					}
-				}
-				localStorage.setItem("itemList", JSON.stringify(items));
+				// const items = JSON.parse(localStorage.getItem("itemList"));
+				// // Clearing item from localstorage
+				// for (let item of items) {
+				// 	if (item.id == randomId) {
+				// 		items.splice(items.indexOf(item), 1);
+				// 		break;
+				// 	}
+				// }
+				// localStorage.setItem("itemList", JSON.stringify(items));
 
+				// If extration is done
 				if (type === "extract") {
-					console.log(path.join(downloadDir, filename + `.${extractFormat}`));
+					console.log(
+						path.join(downloadDir, filename + `.${extractFormat}`)
+					);
 
 					afterSave(
 						downloadDir,
-						filename + `.${extractFormat}`,
+						filename + `.${extractExt}`,
 						randomId + "prog"
 					);
-				} else {
+				}
+				// If download is done
+				else {
 					console.log(path.join(downloadDir, filename + `.${ext}`));
 					afterSave(
 						downloadDir,
@@ -650,13 +698,14 @@ function download(type) {
 				}
 			}
 		})
-		.on("error", (error) => {
+		.once("error", (error) => {
 			getId(randomId + "prog").textContent = i18n.__(
 				"Some error has occured. Hover to see details"
 			);
 			getId(randomId + "prog").title = error.message;
 			console.log(error.message);
-		});
+		})
+
 }
 
 // Removing item
@@ -682,9 +731,14 @@ function fadeItem(id) {
 
 function afterSave(location, filename, progressId) {
 	const notify = new Notification("ytDownloader", {
-		body: i18n.__("File saved successfully"),
+		body: i18n.__("File saved. Click to Open"),
 		icon: "../assets/images/icon.png",
-	});
+	})
+
+	notify.onclick = () =>{
+		showItem(finalLocation, finalFilename);
+	}
+		
 	let finalLocation = location;
 	let finalFilename = filename;
 	if (os.platform() === "win32") {

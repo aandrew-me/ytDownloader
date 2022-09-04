@@ -18,7 +18,7 @@
 
 <div id="popupBox">
     <div id="popup">
-        <p>Please wait, yt-dlp is being downloaded</p>
+        <p>Please wait, necessary files are being downloaded</p>
         <svg id="popupSvg" version="1.1" id="L4" xmlns="http://www.w3.org/2000/svg"
             xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 100 100"
             enable-background="new 0 0 0 0" xml:space="preserve">
@@ -100,7 +100,7 @@
             </div>
         </div>
         <div id="advanced">
-            <p id="rangeText">Download particular time-range</p>
+            <p id="rangeText" title="DASH Webm not supported">Download particular time-range</p>
             <label id="start">Start</label>
             <input type="text" id="startTime" class="time" placeholder="00:00"
                 title="If kept empty, it will start from the beginning">
@@ -110,14 +110,13 @@
             <label id="end">End</label>
 
             <br><br>
-
-            <h3>Subtitles</h3>
+            <!-- <h3>Subtitles</h3>
             <span>Download subtitles if available</span>
             <input id="subChecked" type="checkbox">
 
             <br><br>
             <span>Download auto generated subtitles</span>
-            <input id="autoSubChecked" type="checkbox">
+            <input id="autoSubChecked" type="checkbox"> -->
         </div>
 
         <!-- Extraction options start -->
@@ -131,7 +130,7 @@
             <option value="wav">Wav</option>
             <option value="alac">Alac</option>
             <option value="flac">Flac</option>
-            <option value="vorbis">Vorbis</option>
+            <option value="vorbis">Vorbis (ogg)</option>
         </select>
         <button id="extractBtn">Extract</button>
         <!-- Extraction options end -->
