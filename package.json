@@ -34,8 +34,8 @@
 		"electron-builder": "^23.3.3"
 	},
 	"build": {
-		"productName": "ytDownloader",
-		"appId": "me.aandrew.ytdownloader",
+		"productName": "YTDownloader",
+		"appId": "org.aandrew.ytdownloader",
 		"artifactName": "${productName}.${ext}",
 		"files": [
 			"./resources/**/*",
