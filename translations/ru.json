@@ -45,5 +45,8 @@
 	"Download auto generated subtitles": "Скачать автоматически созданные субтитры",
 	"Extract Audio from Video": "Извлечь аудио из видео",
 	"Extract": "Извлечь",
-	"Downloading necessary files": "Скачиваются необходимые файлы"
+	"Downloading necessary files": "Скачиваются необходимые файлы",
+	"low": "low",
+	"medium": "medium",
+	"ytDownloader lets you download videos and audios from hundreds of sites like Youtube, Facebook, Instagram, Tiktok, Twitter and so on": "ytDownloader lets you download videos and sometimes from hundreds of sites like Youtube, Facebook, Instagram, Tiktok, Twitter and so on"
 }
