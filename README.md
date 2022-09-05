@@ -61,6 +61,7 @@ Translations into other languages would be highly appreciated. If you want to he
 |English  | ✔️ |
 |Russian | ✔️ |
 | Ukrainian | ✔️ [KotoWhiskas](https://github.com/KotoWhiskas) |
+| Turkish | ✔️ [nxjosephofficial](https://github.com/nxjosephofficial) |
 
 ## For building or running from source code
 
