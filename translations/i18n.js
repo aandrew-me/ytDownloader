@@ -15,6 +15,9 @@ if (localStorage.getItem("language")){
 	locale =  localStorage.getItem("language")
 	userSelectedLanguage = true;
 }
+else{
+	localStorage.setItem("language", locale.slice(0, 2))
+}
 
 module.exports = i18n;
 

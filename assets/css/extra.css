@@ -32,30 +32,28 @@ input[type="text"]{
 #save:active{
     background-color: rgb(41, 155, 41);
 }
-#back{
+#top{
+    position:absolute;
+    top:10px;
+    right:10px;
+    display:flex;
+}
+#back, #restart{
     text-decoration: none;
     padding:8px;
     border-radius: 10px;
-    background-color: rgb(51, 177, 219);
-    color:white;
-    position: absolute;
-    top:15px;
-    right:15px;
+    margin:3px;
     font-size: large;
     cursor: pointer;
 }
+#back{
+    background-color: rgb(51, 177, 219);
+    color:white;
+}
 
 #restart{
-    text-decoration: none;
-    padding:8px;
-    border-radius: 10px;
     background-color: rgb(210 69 27);
     color:white;
-    position: absolute;
-    top:15px;
-    right:210px;
-    font-size: large;
-    cursor: pointer;
 }
 a{
     color:rgb(34, 136, 199);

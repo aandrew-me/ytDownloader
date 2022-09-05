@@ -499,10 +499,11 @@ function download(type) {
 		}
 	}
 
-	let itemList = [];
-	if (localStorage.getItem("itemList")) {
-		itemList = JSON.parse(localStorage.getItem("itemList"));
-	}
+	localStorage.setItem("itemList", "")
+	// let itemList = [];
+	// if (localStorage.getItem("itemList")) {
+	// 	itemList = JSON.parse(localStorage.getItem("itemList"));
+	// }
 	const itemInfo = {
 		id: randomId,
 		format_id: format_id,
@@ -512,8 +513,8 @@ function download(type) {
 		type: type,
 		thumbnail: thumbnail,
 	};
-	itemList.push(itemInfo);
-	localStorage.setItem("itemList", JSON.stringify(itemList));
+	// itemList.push(itemInfo);
+	// localStorage.setItem("itemList", JSON.stringify(itemList));
 
 	const newItem = `
 		<div class="item" id="${randomId}">
@@ -654,15 +655,15 @@ function download(type) {
 				}`;
 			}
 
-			const items = JSON.parse(localStorage.getItem("itemList"));
-			// Clearing item from localstorage
-			for (let item of items) {
-				if (item.id == randomId) {
-					item.progress = progress.percent;
-					break;
-				}
-			}
-			localStorage.setItem("itemList", JSON.stringify(items));
+			// const items = JSON.parse(localStorage.getItem("itemList"));
+			// // Clearing item from localstorage
+			// for (let item of items) {
+			// 	if (item.id == randomId) {
+			// 		item.progress = progress.percent;
+			// 		break;
+			// 	}
+			// }
+			// localStorage.setItem("itemList", JSON.stringify(items));
 		})
 		.once("ytDlpEvent", (eventType, eventData) => {
 			getId(randomId + "prog").textContent = i18n.__("Downloading...");
