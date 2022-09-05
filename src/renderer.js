@@ -27,7 +27,8 @@ let downloadDir = "";
 // Global variables
 let title, onlyvideo, id, thumbnail, ytdlp, duration, extractFormat;
 let rangeCmd = "";
-// let subs = ""
+let subs = ""
+let subLangs;
 // let autoSubs = ""
 let rangeOption = "--download-sections";
 
@@ -108,7 +109,7 @@ async function downloadYtdlp() {
 	console.log("yt-dlp bin Path: " + ytDlp);
 }
 
-// Checking is yt-dlp has been installed by user
+// Checking if yt-dlp has been installed by user
 cp.exec("yt-dlp --version", (error, stdout, stderr) => {
 	if (error) {
 		// Checking if yt-dlp has been installed by program
@@ -159,7 +160,7 @@ function defaultVideoToggle() {
 	getId("videoList").style.display = "block";
 }
 
-//! Pasting url from clipboard
+// Pasting url from clipboard
 
 function pasteUrl() {
 	defaultVideoToggle();
@@ -451,13 +452,15 @@ function manageAdvanced(duration) {
 		rangeCmd = "";
 	}
 
-	// // If subtitles are checked
-	// if (getId("subChecked").checked){
-	// 	subs = "--write-subs"
-	// }
-	// else{
-	// 	subs = ""
-	// }
+	// If subtitles are checked
+	if (getId("subChecked").checked){
+		subs = "--write-subs"
+		subLangs = "--sub-langs all"
+	}
+	else{
+		subs = ""
+		subLangs = ""
+	}
 
 	// // If autosubs are checked
 	// if (getId("autoSubChecked").checked){
@@ -581,7 +584,8 @@ function download(type) {
 				`${path.join(downloadDir, filename + `.${ext}`)}`,
 				"--ffmpeg-location",
 				ffmpeg,
-				// subs,
+				subs,
+				subLangs
 				// autoSubs
 			],
 			{ shell: true, detached: false },
@@ -601,7 +605,8 @@ function download(type) {
 				`${path.join(downloadDir, filename + `.${ext}`)}`,
 				"--ffmpeg-location",
 				ffmpeg,
-				// subs,
+				subs,
+				subLangs
 				// autoSubs
 			],
 			{ shell: true, detached: false },

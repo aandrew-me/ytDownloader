@@ -77,11 +77,19 @@ input[type="checkbox"]{
     font-size: large;
     color:white;
     background-color: rgb(56, 209, 56);
+    border-bottom: 4px solid rgb(41, 155, 41);
     cursor: pointer;
+    position: relative;
+}
+#selectLocation:active{
+    border-bottom: none;
+    top: 4px;
+    margin-bottom: 4px;
+
 }
 select {
 	padding: 15px;
-	background-color: rgb(127, 253, 127);
+	background-color: rgb(88, 232, 88);
 	border: none;
 	border-radius: 8px;
 	cursor: pointer;
