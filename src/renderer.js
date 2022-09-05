@@ -271,7 +271,7 @@ async function getInfo(url) {
 						"<option value='" +
 						format_id +
 						"'>" +
-						(format.format_note ||
+						(i18n.__(format.format_note) ||
 							format.resolution ||
 							"Unknown quality") +
 						"  |  " +
@@ -304,7 +304,7 @@ async function getInfo(url) {
 						"'>" +
 						i18n.__("Quality") +
 						": " +
-						(format.format_note || i18n.__("Unknown quality")) +
+						(i18n.__(format.format_note) || i18n.__("Unknown quality")) +
 						" | " +
 						audio_ext +
 						" | " +
@@ -330,7 +330,7 @@ async function getInfo(url) {
 						"<option value='" +
 						(format.format_id + "|" + format.ext) +
 						"'>" +
-						(format.format_note ||
+						(i18n.__(format.format_note) ||
 							format.resolution ||
 							i18n.__("Unknown quality")) +
 						"  |  " +

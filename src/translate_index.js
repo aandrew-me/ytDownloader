@@ -24,3 +24,7 @@ getId("endTime").title = i18n.__("If kept empty, it will be downloaded to the en
 getId("processing").textContent = i18n.__("Processing")
 getId("start").textContent = i18n.__("Start")
 getId("end").textContent = i18n.__("End")
+getId("subHeader").textContent = i18n.__("Subtitles")
+getId("subTxt").textContent =i18n.__("Download subtitles if available")
+getId("extractHeader").textContent =i18n.__("Extract Audio from Video")
+getId("extractBtn").textContent =i18n.__("Extract")
