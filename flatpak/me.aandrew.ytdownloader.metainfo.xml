@@ -4,7 +4,7 @@
   <name>Youtube Downloader Plus</name>
   <summary>Download videos and audios from Youtube and other sites</summary>
   <description>
-    <p>YtDownloader lets you download videos and audios of different qualities from Youtube with high speed. It also supports hundreds of other sites including the popular ones but not limited to Facebook, Instagram, Tiktok, Twitter, Twitch and so on.</p>
+    <p>ytDownloader lets you download videos and audios of different qualities from Youtube with high speed. It also supports hundreds of other sites including the popular ones but not limited to Facebook, Instagram, Tiktok, Twitter, Twitch and so on.</p>
     <p>✅ Supports Light/Dark/Transparent mode</p>
     <p>✅ Supports high quality video resolutions</p>
     <p>✅ Supports downloading particular ranges</p>
@@ -26,6 +26,7 @@
   <content_rating type="oars-1.1"/>
  
  <releases>
+  <release version="3.2.0" date="2022-09-5"/>
   <release version="3.1.0" date="2022-08-31"/>
   <release version="3.0.0" date="2022-08-29"/>
   <release version="2.1.2" date="2022-08-28"/>

@@ -65,7 +65,7 @@ ipcMain.on("load-page", (event, file) => {
 		show: false,
 	});
 	secondaryWindow.loadFile(file);
-	// secondaryWindow.setMenu(null);
+	secondaryWindow.setMenu(null);
 	// secondaryWindow.maximize();
 	secondaryWindow.show();
 });
