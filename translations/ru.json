@@ -35,7 +35,7 @@
 	"Some error has occured. Hover to see details": "Произошла ошибка. Чтобы увидеть подробности, наведите курсор",
 	"File saved successfully": "Файл успешно сохранен",
 	"File saved. Click to Open": "Файл сохранён. Нажмите, чтобы открыть",
-	"Preparing": "Идет подготовка",
+	"Preparing...": "Preparing...",
 	"Progress": "Прогресс",
 	"Speed": "Скорость",
 	"Quality": "Quality",
