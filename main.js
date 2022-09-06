@@ -100,8 +100,8 @@ autoUpdater.on("update-available", (_event, releaseNotes, releaseName) => {
 		detail: process.platform === "win32" ? releaseNotes : releaseName,
 		message: "A new version is available, do you want to update?",
 	};
-	dialog.showMessageBox(dialogOpts, (buttonIndex) => {
-		if (buttonIndex === 0) {
+	dialog.showMessageBox(dialogOpts).then((returnValue) =>{
+		if (returnValue.response === 0) {
 			autoUpdater.downloadUpdate();
 		}
 	});
