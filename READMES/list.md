@@ -1,1 +1,2 @@
-[Turkish](README_tr.md)
+## Available languages
+- [Turkish](README_tr.md)
