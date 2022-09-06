@@ -592,28 +592,8 @@ function download(type) {
 			{ shell: true, detached: false },
 			controller.signal
 		);
-
-		// If downloading only audio or video with audio
-	} else if (type === "audio") {
-		downloadProcess = ytdlp.exec(
-			[
-				url,
-				rangeOption,
-				rangeCmd,
-				"-f",
-				format_id,
-				"-o",
-				`${path.join(downloadDir, filename + `.${ext}`)}`,
-				"--ffmpeg-location",
-				ffmpeg,
-				subs,
-				subLangs
-				// autoSubs
-			],
-			{ shell: true, detached: false },
-			controller.signal
-		);
-	} else if (type === "extract") {
+		}
+		else if (type === "extract") {
 		if (extractFormat == "alac") {
 			extractExt = "m4a";
 		} else if (extractFormat == "vorbis") {
@@ -636,6 +616,27 @@ function download(type) {
 			controller.signal
 		);
 	}
+	// If downloading only audio or video with audio
+	else {
+		downloadProcess = ytdlp.exec(
+			[
+				url,
+				rangeOption,
+				rangeCmd,
+				"-f",
+				format_id,
+				"-o",
+				`${path.join(downloadDir, filename + `.${ext}`)}`,
+				"--ffmpeg-location",
+				ffmpeg,
+				subs,
+				subLangs
+				// autoSubs
+			],
+			{ shell: true, detached: false },
+			controller.signal
+		);
+	} 
 
 	getId(randomId + ".close").addEventListener("click", () => {
 		willBeSaved = false;
