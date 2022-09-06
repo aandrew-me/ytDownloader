@@ -1,4 +1,4 @@
-# YtDownloader
+# ytDownloader
 A modern GUI video and audio downloader supporting [hundreds of sites](https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md)
 
 <a href="https://flathub.org/apps/details/me.aandrew.ytdownloader"><img src="https://flathub.org/assets/badges/flathub-badge-en.svg" style="width:180px;"></a>
@@ -7,6 +7,8 @@ A modern GUI video and audio downloader supporting [hundreds of sites](https://g
 [![Get AppImage](https://raw.githubusercontent.com/srevinsaju/get-appimage/master/static/badges/get-appimage-branding-blue.png)](https://github.com/aandrew-me/ytDownloader/releases/latest/download/YTDownloader.AppImage)
 <a href="https://github.com/aandrew-me/ytDownloader/releases/latest/download/YTDownloader.exe
 "><img src="https://user-images.githubusercontent.com/66430340/187172806-a8edd12a-ef58-4a05-96a3-99d7490b42f6.png" style="width:190px;"></a>
+
+ README in [other languages](READMES/list.md)
 
 ## Features 🚀
 
@@ -52,7 +54,7 @@ For Debian based distros like Ubuntu .deb file is available. Download and run -
 sudo dpkg -i file_name.deb
 ```
 ## Internationalization 🌍
-Translations into other languages would be highly appreciated. If you want to help translating the app to other languages, you can join from [here](https://crwd.in/ytdownloader).
+Translations into other languages would be highly appreciated. If you want to help translating the app to other languages, you can join from [here](https://crwd.in/ytdownloader). Open a new issue and that language will be added to Crowdin.
 
 ### Available languages
 

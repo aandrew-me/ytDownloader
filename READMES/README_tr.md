@@ -1,3 +1,4 @@
+<!-- Readme in Turkish language by nxjosephofficial -->
 # YtDownloader
 [Yüzlerce site](https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md)yi destekleyen, modern bir video indirme programı
 
