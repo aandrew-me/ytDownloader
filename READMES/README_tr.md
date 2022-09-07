@@ -1,5 +1,5 @@
 <!-- Readme in Turkish language by nxjosephofficial -->
-# YtDownloader
+# ytDownloader
 [Yüzlerce site](https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md)yi destekleyen, modern bir video indirme programı
 
 
@@ -28,8 +28,8 @@
 
 ## Ekran Görüntüleri
 
-![image](https://user-images.githubusercontent.com/66430340/188084613-706262fd-db82-403f-8dad-03dd2a50cfe9.png)
-![image](https://user-images.githubusercontent.com/66430340/188084389-5e060523-07c3-42db-b282-7f446cb257fa.png)
+![image](https://user-images.githubusercontent.com/61632416/188954447-356acb65-09fb-43da-b79f-655767f4d2bb.png)
+![image](https://user-images.githubusercontent.com/61632416/188954452-fd59f517-1d42-47be-ac8e-b0f9cab2c4b6.png)
 
 <!--![ss](https://user-images.githubusercontent.com/66430340/181747909-f16e30dc-a7c3-40cb-876b-54f0ea8d4e42.jpg)-->
 <!--![ss2](https://user-images.githubusercontent.com/66430340/181747920-4df80914-278f-4350-9328-015e9e0bcf16.jpg) -->
