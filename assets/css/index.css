@@ -154,6 +154,10 @@ body {
 	width: 15px;
 	height: 15px;
 }
+.itemType{
+	font-style: italic;
+	margin-top: 5px;
+}
 
 #closeHidden {
 	bottom: 5px;

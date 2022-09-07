@@ -576,7 +576,6 @@ function download(type) {
 
 		downloadProcess = ytdlp.exec(
 			[
-				url,
 				rangeOption,
 				rangeCmd,
 				"-f",
@@ -586,8 +585,9 @@ function download(type) {
 				"--ffmpeg-location",
 				ffmpeg,
 				subs,
-				subLangs
-				// autoSubs
+				subLangs,
+				"--no-playlist",
+				url
 			],
 			{ shell: true, detached: false },
 			controller.signal
@@ -603,7 +603,6 @@ function download(type) {
 		}
 		downloadProcess = ytdlp.exec(
 			[
-				url,
 				"-x",
 				"--audio-format",
 				extractFormat,
@@ -611,6 +610,7 @@ function download(type) {
 				`${path.join(downloadDir, filename + `.${extractExt}`)}`,
 				"--ffmpeg-location",
 				ffmpeg,
+				url
 			],
 			{ shell: true, detached: false },
 			controller.signal
@@ -620,7 +620,6 @@ function download(type) {
 	else {
 		downloadProcess = ytdlp.exec(
 			[
-				url,
 				rangeOption,
 				rangeCmd,
 				"-f",
@@ -630,8 +629,9 @@ function download(type) {
 				"--ffmpeg-location",
 				ffmpeg,
 				subs,
-				subLangs
-				// autoSubs
+				subLangs,
+				"--no-playlist",
+				url
 			],
 			{ shell: true, detached: false },
 			controller.signal
