@@ -2,6 +2,10 @@
 <component type="desktop">
   <id>me.aandrew.ytdownloader</id>
   <name>Youtube Downloader Plus</name>
+  <developer_name>Andrew</developer_name>
+  <url type="bugtracker">https://github.com/aandrew-me/ytDownloader/issues</url>
+  <url type="translate">https://github.com/aandrew-me/ytDownloader#internationalization-</url>
+
   <summary>Download videos and audios from Youtube and other sites</summary>
   <description>
     <p>ytDownloader lets you download videos and audios of different qualities from Youtube with high speed. It also supports hundreds of other sites including the popular ones but not limited to Facebook, Instagram, Tiktok, Twitter, Twitch and so on.</p>
@@ -26,6 +30,7 @@
   <content_rating type="oars-1.1"/>
  
  <releases>
+  <release version="3.3.0" date="2022-09-8"/>
   <release version="3.2.2" date="2022-09-7"/>
   <release version="3.2.1" date="2022-09-6"/>
   <release version="3.2.0" date="2022-09-5"/>
