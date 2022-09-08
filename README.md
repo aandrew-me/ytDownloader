@@ -61,9 +61,12 @@ Translations into other languages would be highly appreciated. If you want to he
 |Name|Status  |
 |--|--|
 |English  | ✔️ |
+|Italian  | ✔️ [albanobattistella](https://github.com/albanobattistella)|
 |Russian | ✔️ |
-| Ukrainian | ✔️ [KotoWhiskas](https://github.com/KotoWhiskas) |
+|Spanish | ✔️ [haggen88](https://github.com/haggen88)|
 | Turkish | ✔️ [nxjosephofficial](https://github.com/nxjosephofficial) |
+| Ukrainian | ✔️ [KotoWhiskas](https://github.com/KotoWhiskas) |
+
 
 ## For building or running from source code
 
