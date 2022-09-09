@@ -52,7 +52,7 @@
 		"mac": {
 			"category": "Utility",
 			"target": [
-				"dmg"
+				"zip"
 			]
 		},
 		"dmg": {
