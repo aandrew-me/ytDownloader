@@ -5,7 +5,7 @@
 		"yt-dlp-wrap-extended": "^2.3.12"
 	},
 	"name": "ytdownloader",
-	"version": "3.3.0",
+	"version": "3.3.1",
 	"main": "main.js",
 	"scripts": {
 		"start": "electron .",
@@ -53,7 +53,8 @@
 			"category": "Utility",
 			"target": [
 				"zip"
-			]
+			],
+			"artifactName":"${productName}_Mac.${ext}"
 		},
 		"dmg": {
 			"contents": [

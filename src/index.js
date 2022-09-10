@@ -55,8 +55,10 @@ audioToggle.addEventListener("click", (event) => {
 /////////////
 
 // Toggle theme
-let darkTheme = true;
 let circle = getId("themeToggleInside");
+let darkTheme = true;
+circle.style.left = "25px";
+
 const root = document.querySelector(":root");
 
 let enabledTransparent = localStorage.getItem("enabledTransparent");

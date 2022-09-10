@@ -3,6 +3,8 @@ const { autoUpdater } = require("electron-updater");
 autoUpdater.autoDownload = false;
 let win, secondaryWindow;
 
+app.commandLine.appendSwitch("--enable-features", "Metal")
+
 function createWindow() {
 	let isTransparent = false;
 	if (process.platform == "linux") {

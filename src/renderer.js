@@ -98,7 +98,7 @@ async function downloadYtdlp() {
 			);
 		}
 	} else {
-		// In case of windows
+		// In case of windows/mac
 		await YTDlpWrap.downloadFromGithub(ytdlpDownloadPath);
 	}
 
@@ -196,7 +196,7 @@ async function getInfo(url) {
 	getId("endTime").value = "";
 
 	let info;
-	cp.exec(`${ytDlp} -j ${url}`, (error, stdout, stderr) => {
+	cp.exec(`${ytDlp} -j --no-playlist "${url}"`, (error, stdout, stderr) => {
 		try {
 			info = JSON.parse(stdout);
 		} catch (error) {
@@ -587,7 +587,7 @@ function download(type) {
 				subs,
 				subLangs,
 				"--no-playlist",
-				url
+				`"${url}"`
 			],
 			{ shell: true, detached: false },
 			controller.signal
@@ -610,7 +610,7 @@ function download(type) {
 				`${path.join(downloadDir, filename + `.${extractExt}`)}`,
 				"--ffmpeg-location",
 				ffmpeg,
-				url
+				`"${url}"`
 			],
 			{ shell: true, detached: false },
 			controller.signal
@@ -631,7 +631,7 @@ function download(type) {
 				subs,
 				subLangs,
 				"--no-playlist",
-				url
+				`"${url}"`
 			],
 			{ shell: true, detached: false },
 			controller.signal
