@@ -188,6 +188,7 @@ getId("pasteUrl").addEventListener("click", () => {
 
 // Getting video info
 async function getInfo(url) {
+	onlyvideo = false
 	let audioIsPresent = false;
 	downloadPathSelection();
 	getId("videoFormatSelect").innerHTML = "";

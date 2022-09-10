@@ -34,7 +34,7 @@ A modern GUI video and audio downloader supporting [hundreds of sites](https://g
 
 # Installation
 ## Windows
-Download and install the exe file
+Download and install the exe file. Windows defender may create problems as usual.
 
 ## Linux
 
