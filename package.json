@@ -14,8 +14,10 @@
 		"debug": "electron --inspect=5858 .",
 		"windows": "./windows.sh && electron-builder -w",
 		"linux": "./linux.sh && electron-builder -l",
-		"publish-linux": "./linux.sh && electron-builder -l --publish=always",
-		"publish-windows": "./windows.sh && electron-builder -w --publish=always"
+		"mac":"./mac.sh && electron-builder -m",
+		"publish-linux": "cp ../ffmpeg-bin/ffmpeg . && electron-builder -l --publish=always",
+		"publish-windows": "cp ../ffmpeg-bin/ffmpeg.exe . && electron-builder -w --publish=always",
+		"publish-mac":"cp ../ffmpeg-bin/mac/ffmpeg . && electron-builder -m --publish=always"
 	},
 	"author": {
 		"name": "Andrew",

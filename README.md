@@ -39,7 +39,6 @@ Download and install the exe file. Windows defender may create problems as usual
 ## Linux
 
 Linux has several options available - AppImage, Deb, Snap and flatpak.
-
 ### AppImage
 
 **AppImage** format is supported on most Linux distros and has Auto-Update support. So it is recommended.
@@ -51,8 +50,15 @@ It just needs to be executed after downloading. See more about [AppImages here](
 ### Debian package
 For Debian based distros like Ubuntu .deb file is available. Download and run -
 ```
-sudo dpkg -i file_name.deb
+sudo dpkg -i YTDownloader.deb
 ```
+## macOS
+Since the app is not signed, when you will try to open the app, macOS will not allow you to open it. So you will need to follow some steps to open it.
+
+1. Click on **System Preferences** on your Mac Dock.
+2. Choose **Security & Privacy**
+3. The app will be shown there. Click on **Open**
+
 ## Internationalization 🌍
 Translations into other languages would be highly appreciated. If you want to help translating the app to other languages, you can join from [here](https://crwd.in/ytdownloader). Open a new issue and that language will be added to Crowdin.
 
@@ -90,4 +96,8 @@ npm run linux
 To build for Windows
 ```
 npm run windows
+```
+To build for macOS
+```
+npm run mac
 ```
