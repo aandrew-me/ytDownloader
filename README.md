@@ -69,7 +69,7 @@ Translations into other languages would be highly appreciated. If you want to he
 |Name|Status  |
 |--|--|
 |English  | ✔️ |
-|Finnish | ✔️ [heidiwenger](https://github.com/heidiwenger)|
+|Finnish | ✔️ [LINUX-SAUNA](https://t.me/linuxsauna)|
 |Italian  | ✔️ [albanobattistella](https://github.com/albanobattistella)|
 |Russian | ✔️ |
 |Spanish | ✔️ [haggen88](https://github.com/haggen88)|
