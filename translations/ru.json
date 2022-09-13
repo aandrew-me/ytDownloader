@@ -20,7 +20,6 @@
 	"If kept empty, it will start from the beginning": "Если оставить пустым, оно начнется с начала",
 	"If kept empty, it will be downloaded to the end": "Если оставить пустым, оно будет скачено до конца",
 	"Homepage": "Главная страница",
-	"ytDownloader lets you download videos (and sometimes audios) from hundreds of sites like Youtube, Facebook, Instagram, Tiktok, Twitter and so on": "ytDownloader позволяет скачать видео (а иногда и аудио) с сотен сайтов, таких как Youtube, Facebook, Instagram, Tiktok, Twitter и так далее",
 	"It's a Free and Open Source app built on top of Node.js and Electron. yt-dlp has been used for downloading": "Это бесплатное приложение с открытым исходным кодом, созданное поверх Node.js и Electron. yt-dlp используется для загрузки",
 	"Source Code is available ": "Исходный код доступен ",
 	"here": "здесь",
@@ -48,5 +47,6 @@
 	"Downloading necessary files": "Скачиваются необходимые файлы",
 	"low": "низкая",
 	"medium": "средняя",
-	"ytDownloader lets you download videos and audios from hundreds of sites like Youtube, Facebook, Instagram, Tiktok, Twitter and so on": "ytDownloader позволяет скачать видео и аудио с сотен сайтов, таких как Youtube, Facebook, Instagram, Tiktok, Twitter и так далее"
+	"ytDownloader lets you download videos and audios from hundreds of sites like Youtube, Facebook, Instagram, Tiktok, Twitter and so on": "ytDownloader позволяет скачать видео и аудио с сотен сайтов, таких как Youtube, Facebook, Instagram, Tiktok, Twitter и так далее",
+	"Click to paste video link from clipboard [Ctrl + V]": "Нажмите чтобы вставить ссылку видео из буфера обмена [Ctrl + V]"
 }
