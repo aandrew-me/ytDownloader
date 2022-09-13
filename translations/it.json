@@ -20,7 +20,6 @@
 	"If kept empty, it will start from the beginning": "Se lasciato vuoto, ricomincerà dall'inizio",
 	"If kept empty, it will be downloaded to the end": "Se lasciato vuoto, verrà scaricato fino alla fine",
 	"Homepage": "Homepage",
-	"ytDownloader lets you download videos (and sometimes audios) from hundreds of sites like Youtube, Facebook, Instagram, Tiktok, Twitter and so on": "ytDownloader ti consente di scaricare video (e talvolta audio) da centinaia di siti come Youtube, Facebook, Instagram, Tiktok, Twitter e così via",
 	"It's a Free and Open Source app built on top of Node.js and Electron. yt-dlp has been used for downloading": "È un'app gratuita e open source basata su Node.js ed Electron. yt-dlp è stato utilizzato per il download",
 	"Source Code is available ": "Il codice sorgente è disponibile ",
 	"here": "qui",
@@ -48,5 +47,6 @@
 	"Downloading necessary files": "Scaricamento dei file necessari",
 	"low": "bassa",
 	"medium": "media",
-	"ytDownloader lets you download videos and audios from hundreds of sites like Youtube, Facebook, Instagram, Tiktok, Twitter and so on": "ytDownloader ti consente di scaricare video e audio da centinaia di siti come Youtube, Facebook, Instagram, Tiktok, Twitter e così via"
+	"ytDownloader lets you download videos and audios from hundreds of sites like Youtube, Facebook, Instagram, Tiktok, Twitter and so on": "ytDownloader ti consente di scaricare video e audio da centinaia di siti come Youtube, Facebook, Instagram, Tiktok, Twitter e così via",
+	"Click to paste video link from clipboard [Ctrl + V]": "Click to paste video link from clipboard [Ctrl + V]"
 }
