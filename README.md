@@ -8,6 +8,8 @@ A modern GUI video and audio downloader supporting [hundreds of sites](https://g
 <a href="https://github.com/aandrew-me/ytDownloader/releases/latest/download/YTDownloader.exe
 "><img src="https://user-images.githubusercontent.com/66430340/187172806-a8edd12a-ef58-4a05-96a3-99d7490b42f6.png" style="width:190px;"></a>
 
+<a href="https://github.com/aandrew-me/ytDownloader/releases/latest/download/YTDownloader_Mac.zip"><img src="https://user-images.githubusercontent.com/66430340/189808142-0a4725c6-b167-4afd-98f1-dfcb16bfbd43.png" style="width:200px;"></a>
+
  README in [other languages](READMES/list.md)
 
 ## Features 🚀
