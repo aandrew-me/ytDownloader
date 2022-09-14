@@ -558,7 +558,7 @@ function download(type) {
 		}
 		filename += letter;
 	}
-	filename = filename + Math.random().toFixed(3).toString().slice(2);
+	filename = filename.slice(0,100) + Math.random().toFixed(3).toString().slice(2);
 
 	let audioFormat;
 
