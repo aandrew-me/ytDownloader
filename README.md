@@ -23,7 +23,7 @@ A modern GUI video and audio downloader supporting [hundreds of sites](https://g
 
 ✅ Advanced options like Range Selection
 
-✅ Available on Windows and Linux
+✅ Available on Linux, Windows & macOS
 
 ✅ Fast download speeds
 
