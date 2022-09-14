@@ -38,10 +38,10 @@ A modern GUI video and audio downloader supporting [hundreds of sites](https://g
 <!--![ss2](https://user-images.githubusercontent.com/66430340/181747920-4df80914-278f-4350-9328-015e9e0bcf16.jpg) -->
 
 # Installation
-## Windows
+## Windows 🪟
 Download and install the exe file. Windows defender may create problems as usual.
 
-## Linux
+## Linux 🐧
 
 Linux has several options available - AppImage, Deb, Snap and flatpak.
 ### AppImage
@@ -57,7 +57,7 @@ For Debian based distros like Ubuntu .deb file is available. Download and run -
 ```
 sudo dpkg -i YTDownloader.deb
 ```
-## macOS
+## macOS 🍎
 Since the app is not signed, when you will try to open the app, macOS will not allow you to open it. So you will need to follow some steps to open it.
 
 1. Click on **System Preferences** on your Mac Dock.
@@ -67,12 +67,13 @@ Since the app is not signed, when you will try to open the app, macOS will not a
 ## Internationalization 🌍
 Translations into other languages would be highly appreciated. If you want to help translating the app to other languages, you can join from [here](https://crwd.in/ytdownloader). Open a new issue and that language will be added to Crowdin.
 
-### Available languages
+### ✅ Available languages
 
-|Name|Status  |
+|Name |Status (Credits)  |
 |--|--|
 |English  | ✔️ |
 |Finnish | ✔️ [LINUX-SAUNA](https://t.me/linuxsauna)|
+|German | ✔️ [Proxycon](https://github.com/proxycon)|
 |Italian  | ✔️ [albanobattistella](https://github.com/albanobattistella)|
 |Russian | ✔️ |
 |Spanish | ✔️ [haggen88](https://github.com/haggen88)|
