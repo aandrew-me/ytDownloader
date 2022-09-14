@@ -1,4 +1,8 @@
-# ytDownloader
+# ytDownloader 
+
+<p><a href="https://flatstat.mijorus.it/app/me.aandrew.ytdownloader"  align="center"><img width="150" src="https://img.shields.io/endpoint?url=https://flathub-stats-backend.vercel.app/badges/me.aandrew.ytdownloader/shields.io.json"></a></p>
+
+
 A modern GUI video and audio downloader supporting [hundreds of sites](https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md)
 
 <a href="https://flathub.org/apps/details/me.aandrew.ytdownloader"><img src="https://flathub.org/assets/badges/flathub-badge-en.svg" style="width:180px;"></a>
