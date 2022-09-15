@@ -235,10 +235,10 @@ input[type="checkbox"]{
 .submitBtn {
 	padding: 15px;
 	border-radius: 10px;
-	background-color: rgb(49, 179, 49);
+	background-color: rgb(4, 207, 21);
 	color: white;
 	border: none;
-	border-bottom: 5.5px solid rgb(37, 135, 37);
+	border-bottom: 5.5px solid rgb(13, 133, 13);
 	font-size: large;
 	cursor: pointer;
 	display: inline-block;
