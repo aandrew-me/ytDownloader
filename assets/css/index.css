@@ -234,7 +234,7 @@ input[type="checkbox"]{
 
 .submitBtn {
 	padding: 15px;
-	border-radius: 8px;
+	border-radius: 10px;
 	background-color: rgb(49, 179, 49);
 	color: white;
 	border: none;
@@ -359,9 +359,9 @@ button{
 
 .advancedToggle {
 	color: white;
-	background-color: rgb(231, 80, 80);
+	background-color: rgb(217, 68, 68);
 	border: none;
-	border-bottom: 4px solid rgb(180, 49, 49);
+	border-bottom: 5px solid rgb(180, 49, 49);
 	position: relative;
 	padding: 15px;
 	border-radius: 10px;
@@ -371,8 +371,8 @@ button{
 }
 
 .advancedToggle:active {
-	top: 4px;
-	margin-bottom: 12px;
+	top: 5px;
+	margin-bottom: 13px;
 	border: none;
 }
 
