@@ -29,7 +29,7 @@
 		"repo": "ytDownloader",
 		"private": false
 	},
-	"license": "MIT",
+	"license": "GPL-3.0",
 	"description": "Download videos and audios from YouTube and many other sites",
 	"devDependencies": {
 		"electron": "20.0.3",
