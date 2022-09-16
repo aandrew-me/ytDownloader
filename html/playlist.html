@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playlist download</title>
+    <link rel="stylesheet" href="../assets/css/index.css">
+    <script src="../src/playlist.js" defer></script>
+    <script src="../src/common.js" defer></script>
+    <!-- Translating -->
+    <script>window.i18n = new (require('../translations/i18n'));</script>
+    <style>
+        #playlistName {
+            padding: 30px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Theme toggle -->
+    <div id="themeToggle" onclick="toggle()">
+        <div id="themeToggleInside"></div>
+    </div>
+
+    <!-- Menu icon -->
+    <img src="../assets/images/menu.png" alt="menu" id="menuIcon">
+
+    <!-- Menu -->
+    <div id="menu">
+        <a id="homeWin" class="menuItem">Homepage</a>
+        <a id="preferenceWin" class="menuItem">Preferences</a>
+        <a id="aboutWin" class="menuItem">About</a>
+    </div>
+
+    <button class="submitBtn" id="pasteLink">Click to paste playlist link from clipboard [Ctrl + V]</button>
+
+    <div id="options">
+        <br>
+        <strong>Link:</strong><span id="link"></span>
+        <br><br>
+
+        <label>Select Format</label>
+        <select id="select">
+            <option value="144">144p</option>
+            <option value="240">240p</option>
+            <option value="360">360p</option>
+            <option value="480">480p</option>
+            <option value="720">720p (HD)</option>
+            <option value="1080">1080p (FHD)</option>
+            <option value="1440">1440p</option>
+            <option value="2160">2160p (4k)</option>
+        </select>
+
+        <button class="submitBtn" id="download">Download</button>
+
+        <p id="incorrectMsg"></p>
+    </div>
+
+    <h2 id="playlistName"></h2>
+    <div id="list">
+    </div>
+</body>
+
+</html>

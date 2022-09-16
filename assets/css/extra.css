@@ -26,7 +26,7 @@ input[type="text"]{
     border-radius: 8px;
     border:none;
     color:rgb(255, 255, 255);
-    background-color: rgb(56, 209, 56);
+    background-color: rgb(49, 215, 49);
     cursor: pointer;
 }
 #save:active{

@@ -105,6 +105,7 @@ async function downloadYtdlp() {
 	getId("popupBox").style.display = "none";
 	ytDlp = ytdlpPath;
 	ytdlp = new YTDlpWrap(ytDlp);
+	localStorage.setItem("ytdlp", ytDlp)
 	getId("pasteUrl").style.display = "inline-block";
 	console.log("yt-dlp bin Path: " + ytDlp);
 }
@@ -137,6 +138,7 @@ cp.exec("yt-dlp --version", (error, stdout, stderr) => {
 				console.log("yt-dlp binary is present in PATH");
 				ytDlp = ytdlpPath;
 				ytdlp = new YTDlpWrap(ytDlp);
+				localStorage.setItem("ytdlp", ytDlp)
 				cp.spawn(`${ytDlp}`, ["-U"]).stdout.on("data", (data) =>
 					console.log(data.toString("utf8"))
 				);
@@ -148,6 +150,7 @@ cp.exec("yt-dlp --version", (error, stdout, stderr) => {
 		console.log("yt-dlp binary is present in PATH");
 		ytDlp = "yt-dlp";
 		ytdlp = new YTDlpWrap(ytDlp);
+		localStorage.setItem("ytdlp", ytDlp)
 		getId("pasteUrl").style.display = "inline-block";
 		console.log("yt-dlp bin Path: " + ytDlp);
 	}
@@ -569,7 +572,7 @@ function download(type) {
 		audioFormat = "ba";
 	}
 
-	let controller = new AbortController();
+	const controller = new AbortController();
 	console.log(rangeOption + " " + rangeCmd);
 
 	if (type === "video" && onlyvideo) {
@@ -790,3 +793,8 @@ getId("aboutWin").addEventListener("click", () => {
 	closeMenu();
 	ipcRenderer.send("load-page", __dirname + "/about.html");
 });
+
+getId("playlistWin").addEventListener("click", ()=>{
+	closeMenu();
+	ipcRenderer.send("load-win", __dirname + "/playlist.html");
+})

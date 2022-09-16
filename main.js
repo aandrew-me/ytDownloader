@@ -56,6 +56,9 @@ ipcMain.on("get-version", () => {
 	secondaryWindow.webContents.send("version", version);
 });
 
+ipcMain.on("load-win", (event, file)=>{
+	win.loadFile(file)
+})
 ipcMain.on("load-page", (event, file) => {
 	secondaryWindow = new BrowserWindow({
 		webPreferences: {
