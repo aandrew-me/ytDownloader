@@ -48,5 +48,8 @@
 	"low": "низька",
 	"medium": "середня",
 	"ytDownloader lets you download videos and audios from hundreds of sites like Youtube, Facebook, Instagram, Tiktok, Twitter and so on": "ytDownloader дозволяє завантажувати відео та аудіо з сотень сайтів, таких як Youtube, Facebook, Instagram, Tiktok, Twitter і так далі",
-	"Click to paste video link from clipboard [Ctrl + V]": "Натисніть, щоб вставити відео посилання з буфера обміну [Ctrl + V]"
+	"Click to paste video link from clipboard [Ctrl + V]": "Натисніть, щоб вставити відео посилання з буфера обміну [Ctrl + V]",
+	"Click to paste playlist link from clipboard [Ctrl + V]": "Click to paste playlist link from clipboard [Ctrl + V]",
+	"Link:": "Link:",
+	"Downloading playlist:": "Downloading playlist:"
 }

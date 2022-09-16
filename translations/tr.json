@@ -48,5 +48,8 @@
 	"low": "düşük",
 	"medium": "orta",
 	"ytDownloader lets you download videos and audios from hundreds of sites like Youtube, Facebook, Instagram, Tiktok, Twitter and so on": "ytDownloader ile Youtube, Facebook, Instagram, Tiktok ve Twitter gibi yüzlerce siteden videolar ve sesler indirebilirsiniz",
-	"Click to paste video link from clipboard [Ctrl + V]": "Panodaki bağlantıyı yapıştırmak için tıklayın veya [Ctrl + V]"
+	"Click to paste video link from clipboard [Ctrl + V]": "Panodaki bağlantıyı yapıştırmak için tıklayın veya [Ctrl + V]",
+	"Click to paste playlist link from clipboard [Ctrl + V]": "Panodaki oynatma listesi bağlantısını yapıştırmak için tıklayın veya [Ctrl + V]",
+	"Link:": "Link:",
+	"Downloading playlist:": "Downloading playlist:"
 }
