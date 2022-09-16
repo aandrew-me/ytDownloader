@@ -1,4 +1,4 @@
-const { clipboard } = require("electron");
+const { clipboard, shell, ipcRenderer } = require("electron");
 const { default: YTDlpWrap } = require("yt-dlp-wrap-extended");
 const path = require("path");
 let url;
@@ -15,6 +15,8 @@ function pasteLink() {
 	url = clipboard.readText();
 	getId("link").textContent = " " + url;
 	getId("options").style.display = "block";
+	getId("incorrectMsg").textContent = "";
+
 }
 
 getId("pasteLink").addEventListener("click", () => {
@@ -28,13 +30,14 @@ document.addEventListener("keydown", (event) => {
 });
 
 // Patterns
-const playlistName = "Downloading playlist: ";
+const playlistTxt = "Downloading playlist: ";
 const videoIndex = "Downloading video ";
 //  Downloading playlist: Inkscape Tutorials
 // Downloading video 1 of 82
 
 getId("download").addEventListener("click", () => {
 	let count = 0;
+	let playlistName;
 
 	getId("options").style.display = "none";
 	getId("pasteLink").style.display = "none";
@@ -51,6 +54,7 @@ getId("download").addEventListener("click", () => {
 			"-o",
 			`"${path.join(
 				downloadDir,
+				"%(playlist_title)s",
 				"%(title)s_%(playlist_index)s.%(ext)s"
 			)}"`,
 
@@ -63,8 +67,10 @@ getId("download").addEventListener("click", () => {
 	downloadProcess.on("ytDlpEvent", (eventType, eventData) => {
 		console.log(eventData);
 
-		if (eventData.includes(playlistName)) {
-			getId("playlistName").textContent = eventData;
+		if (eventData.includes(playlistTxt)) {
+			playlistName = eventData.split(":")[1].slice(1)
+			getId("playlistName").textContent = i18n.__("Downloading playlist:") + " "+ playlistName;
+			console.log(playlistName);
 		}
 
 		if (eventData.includes(videoIndex)) {
@@ -72,12 +78,12 @@ getId("download").addEventListener("click", () => {
 			const itemTitle = i18n.__("Video") + " " + eventData.split(" ")[3];
 
 			if (count > 1) {
-				getId(`p${count - 1}`).textContent = i18n.__("File saved successfully")
+				getId(`p${count - 1}`).textContent = i18n.__("File saved. Click to Open")
 			}
 
-			const item = `<div class="item">
+			const item = `<div class="playlistItem">
 			<p class="itemTitle">${itemTitle}</p>
-			<p class="itemProgress" id="p${count}">${i18n.__("Downloading...")}</p>
+			<p class="itemProgress" onclick="openFolder('${path.join(downloadDir, playlistName)}')" id="p${count}">${i18n.__("Downloading...")}</p>
 			</div>`;
 			getId("list").innerHTML += item;
 		}
@@ -90,6 +96,9 @@ getId("download").addEventListener("click", () => {
 	});
 
 	downloadProcess.on("error", (error) => {
+		getId("pasteLink").style.display = "inline-block"
+		getId("options").style.display = "block";
+		getId("playlistName").textContent = ""
 		getId("incorrectMsg").textContent = error;
 	});
 
@@ -98,3 +107,39 @@ getId("download").addEventListener("click", () => {
 
 	})
 });
+
+
+function openFolder(location){
+	shell.openPath(location)
+}
+
+
+function closeMenu() {
+	getId("menuIcon").style.transform = "rotate(0deg)";
+	menuIsOpen = false;
+	let count = 0;
+	let opacity = 1;
+	const fade = setInterval(() => {
+		if (count >= 10) {
+			clearInterval(fade);
+		} else {
+			opacity -= 0.1;
+			getId("menu").style.opacity = opacity;
+			count++;
+		}
+	}, 50);
+}
+
+getId("preferenceWin").addEventListener("click", () => {
+	closeMenu();
+	ipcRenderer.send("load-page", __dirname + "/preferences.html");
+});
+
+getId("aboutWin").addEventListener("click", () => {
+	closeMenu();
+	ipcRenderer.send("load-page", __dirname + "/about.html");
+});
+getId("homeWin").addEventListener("click", ()=>{
+	closeMenu();
+	ipcRenderer.send("load-win", __dirname + "/index.html");
+})

@@ -114,6 +114,19 @@ body {
 	align-items: center;
 	justify-content: space-between;
 }
+.playlistItem{
+	display: flex;
+	position: relative;
+	width: 86%;
+	background-color: var(--item-bg);
+	color: var(--text);
+    padding:10px 25px;
+    border-radius: 25px;
+	align-items: center;
+	justify-content: space-between;
+	margin: 10px auto;
+
+}
 
 @media screen and (max-width: 650px) {
 	.item {
@@ -182,7 +195,16 @@ body {
 	width: 80%;
 	padding: 10px 10px 20px 10px;
 	color: var(--text);
-	box-shadow: var(--box-shadow);
+}
+
+#options{
+	display:none;
+	position:relative;
+	top:20px;
+	background-color: var(--box-main);
+	border-radius: 10px;
+	padding: 10px;
+	color: var(--text);
 }
 
 #btnContainer {

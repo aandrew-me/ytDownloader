@@ -9,9 +9,13 @@
     <link rel="stylesheet" href="../assets/css/index.css">
     <script src="../src/playlist.js" defer></script>
     <script src="../src/common.js" defer></script>
-    <link rel="stylesheet" href="../assets/css/playlist.css">
     <!-- Translating -->
     <script>window.i18n = new (require('../translations/i18n'));</script>
+    <style>
+        #playlistName {
+            padding: 30px;
+        }
+    </style>
 </head>
 
 <body>
@@ -26,6 +30,7 @@
 
     <!-- Menu -->
     <div id="menu">
+        <a id="homeWin" class="menuItem">Homepage</a>
         <a id="preferenceWin" class="menuItem">Preferences</a>
         <a id="aboutWin" class="menuItem">About</a>
     </div>
