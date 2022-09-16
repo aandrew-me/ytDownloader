@@ -48,6 +48,7 @@ if (enabledTransparent == "true") {
 
 function toggle() {
 	if (darkTheme == false) {
+		// Switching to dark theme
 		circle.style.left = "25px";
 
 		root.style.setProperty("--background", bgColor);
@@ -56,11 +57,11 @@ function toggle() {
 		root.style.setProperty("--box-toggle", "rgb(70,70,70)");
 		root.style.setProperty("--theme-toggle", "rgb(80, 193, 238)");
 		root.style.setProperty("--item-bg", "rgb(75, 75, 75)");
-		root.style.setProperty("--box-shadow", "none");
 
 		darkTheme = true;
 		localStorage.setItem("theme", "dark");
 	} else {
+		// Switching to light theme
 		circle.style.left = "0px";
 
 		root.style.setProperty("--background", "whitesmoke");
@@ -68,12 +69,8 @@ function toggle() {
 		root.style.setProperty("--box-main", "rgb(174 249 224)");
 		root.style.setProperty("--box-toggle", "rgb(108, 231, 190)");
 		root.style.setProperty("--theme-toggle", "rgb(147, 174, 185)");
-		root.style.setProperty("--item-bg", "#ececec");
-		root.style.setProperty("--box-shadow", "3px 3px 10px gray");
-		root.style.setProperty(
-			"--box-shadow",
-			"2px 2px 5px rgb(92, 92, 92), -2px -2px 5px rgb(219, 219, 219)"
-		);
+		root.style.setProperty("--item-bg", "#dddddd");
+
 
 		darkTheme = false;
 		localStorage.setItem("theme", "light");

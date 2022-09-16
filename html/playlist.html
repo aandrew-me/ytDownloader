@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -9,11 +10,12 @@
     <script src="../src/playlist.js" defer></script>
     <script src="../src/common.js" defer></script>
     <link rel="stylesheet" href="../assets/css/playlist.css">
-        <!-- Translating -->
+    <!-- Translating -->
     <script>window.i18n = new (require('../translations/i18n'));</script>
 </head>
+
 <body>
-    
+
     <!-- Theme toggle -->
     <div id="themeToggle" onclick="toggle()">
         <div id="themeToggleInside"></div>
@@ -51,5 +53,10 @@
 
         <p id="incorrectMsg"></p>
     </div>
+
+    <h2 id="playlistName"></h2>
+    <div id="list">
+    </div>
 </body>
+
 </html>

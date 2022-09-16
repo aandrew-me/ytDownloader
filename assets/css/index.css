@@ -113,7 +113,6 @@ body {
 	padding: 20px 10px;
 	align-items: center;
 	justify-content: space-between;
-	box-shadow: var(--box-shadow);
 }
 
 @media screen and (max-width: 650px) {
