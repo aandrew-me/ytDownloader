@@ -143,3 +143,12 @@ getId("homeWin").addEventListener("click", ()=>{
 	closeMenu();
 	ipcRenderer.send("load-win", __dirname + "/index.html");
 })
+
+// Translations
+getId("pasteLink").textContent = i18n.__("Click to paste playlist link from clipboard [Ctrl + V]")
+getId("preferenceWin").textContent = i18n.__("Preferences")
+getId("aboutWin").textContent = i18n.__("About")
+getId("homeWin").textContent = i18n.__("Homepage")
+getId("linkTitle").textContent = i18n.__("Link:")
+getId("videoFormat").textContent = i18n.__("Select Format ")
+getId("download").textContent = i18n.__("Download")
