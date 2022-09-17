@@ -41,7 +41,7 @@
 		"artifactName": "${productName}.${ext}",
 		"files": [
 			"./resources/**/*",
-			"*.js",
+			"main.js",
 			"./html/**/*",
 			"./resources/**/*",
 			"./public/**/*",
@@ -87,7 +87,8 @@
 			"category": "Utility"
 		},
 		"win": {
-			"target": "nsis"
+			"target": "nsis",
+			"artifactName": "${productName}_Win.${ext}"
 		},
 		"nsis": {
 			"allowToChangeInstallationDirectory": true,
