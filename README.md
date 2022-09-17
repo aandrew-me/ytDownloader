@@ -96,7 +96,7 @@ To run with [Electron](https://www.electronjs.org/) :
 ```
 npm start
 ```
-To build for Linux (It will create packages as specified in package.json)
+To build for Linux (It will create packages as specified in package.json). The builds are stored in **release** folder.
 ```
 npm run linux
 ```
