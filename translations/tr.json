@@ -51,5 +51,6 @@
 	"Click to paste video link from clipboard [Ctrl + V]": "Panodaki bağlantıyı yapıştırmak için tıklayın veya [Ctrl + V]",
 	"Click to paste playlist link from clipboard [Ctrl + V]": "Panodaki oynatma listesi bağlantısını yapıştırmak için tıklayın veya [Ctrl + V]",
 	"Link:": "Link:",
-	"Downloading playlist:": "Downloading playlist:"
+	"Downloading playlist:": "İndirilen oynatma listesi:",
+	"Download playlist": "Oynatma listesini indir"
 }
