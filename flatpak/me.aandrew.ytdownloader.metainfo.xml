@@ -11,6 +11,7 @@
     <p>ytDownloader lets you download videos and audios of different qualities from hundreds of other sites including the popular ones but not limited to Youtube,  Facebook, Instagram, Tiktok, Twitter, Twitch and so on.</p>
     <p>✅ Supports Light/Dark/Transparent mode</p>
     <p>✅ Supports high quality video resolutions</p>
+    <p>✅ Supports playlist downloads</p>
     <p>✅ Supports downloading particular ranges</p>
     <p>✅ Supports downloading subtitles</p>
     <p>✅ Completely free and open source</p>
@@ -31,6 +32,7 @@
   <content_rating type="oars-1.1"/>
  
  <releases>
+  <release version="3.4.0" date="2022-09-18"/>
   <release version="3.4.0" date="2022-09-14"/>
   <release version="3.3.3" date="2022-09-14"/>
   <release version="3.3.2" date="2022-09-13"/>
