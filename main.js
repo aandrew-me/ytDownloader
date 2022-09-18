@@ -27,7 +27,9 @@ function createWindow() {
 	// win.setMenu(null)
 	win.show();
 	// win.webContents.openDevTools();
-	autoUpdater.checkForUpdates();
+	if (process.platform !== "darwin"){
+		autoUpdater.checkForUpdates();
+	}
 }
 
 app.whenReady().then(() => {
