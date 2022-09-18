@@ -49,7 +49,8 @@
 	"medium": "media",
 	"ytDownloader lets you download videos and audios from hundreds of sites like Youtube, Facebook, Instagram, Tiktok, Twitter and so on": "ytDownloader ti consente di scaricare video e audio da centinaia di siti come Youtube, Facebook, Instagram, Tiktok, Twitter e così via",
 	"Click to paste video link from clipboard [Ctrl + V]": "Fare clic per incollare il collegamento video dagli appunti [Ctrl + V]",
-	"Click to paste playlist link from clipboard [Ctrl + V]": "Click to paste playlist link from clipboard [Ctrl + V]",
-	"Link:": "Link:",
-	"Downloading playlist:": "Downloading playlist:"
+	"Click to paste playlist link from clipboard [Ctrl + V]": "Fare clic per incollare il link della playlist dagli appunti [Ctrl + V]",
+	"Link:": "Collegamento:",
+	"Downloading playlist:": "Scaricamento playlist:",
+	"Download playlist": "Scarica playlist"
 }

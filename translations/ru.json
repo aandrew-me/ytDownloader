@@ -51,5 +51,6 @@
 	"Click to paste video link from clipboard [Ctrl + V]": "Нажмите чтобы вставить ссылку видео из буфера обмена [Ctrl + V]",
 	"Click to paste playlist link from clipboard [Ctrl + V]": "Нажмите, чтобы вставить ссылку на плейлист из буфера обмена [Ctrl + V]",
 	"Link:": "Ссылка:",
-	"Downloading playlist:": "Скачивается Плейлист:"
+	"Downloading playlist:": "Скачивается Плейлист:",
+	"Download playlist": "Скачать плейлист"
 }
