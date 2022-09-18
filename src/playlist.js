@@ -38,6 +38,9 @@ const videoIndex = "Downloading video ";
 getId("download").addEventListener("click", () => {
 	let count = 0;
 	let playlistName;
+	const date = new Date();
+	const today = date.getFullYear()+'-'+(date.getMonth()+1)+'-'+date.getDate();
+	let playlistDirName = "Playlist_" + today;
 
 	getId("options").style.display = "none";
 	getId("pasteLink").style.display = "none";
@@ -54,7 +57,7 @@ getId("download").addEventListener("click", () => {
 			"-o",
 			`"${path.join(
 				downloadDir,
-				"%(playlist_title)s",
+				playlistDirName,
 				"%(title)s_%(playlist_index)s.%(ext)s"
 			)}"`,
 
@@ -83,7 +86,7 @@ getId("download").addEventListener("click", () => {
 
 			const item = `<div class="playlistItem">
 			<p class="itemTitle">${itemTitle}</p>
-			<p class="itemProgress" onclick="openFolder('${path.join(downloadDir, playlistName)}')" id="p${count}">${i18n.__("Downloading...")}</p>
+			<p class="itemProgress" onclick="openFolder('${path.join(downloadDir, playlistDirName)}')" id="p${count}">${i18n.__("Downloading...")}</p>
 			</div>`;
 			getId("list").innerHTML += item;
 		}
@@ -91,7 +94,7 @@ getId("download").addEventListener("click", () => {
 
 	downloadProcess.on("progress", (progress) => {
 		if (getId(`p${count}`)) {
-			getId(`p${count}`).textContent = `${i18n.__("Progress")} ${progress.percent}% | ${i18n.__("Speed")} ${progress.currentSpeed}`
+			getId(`p${count}`).textContent = `${i18n.__("Progress")} ${progress.percent}% | ${i18n.__("Speed")} ${progress.currentSpeed || 0}`
 		}
 	});
 
@@ -99,7 +102,8 @@ getId("download").addEventListener("click", () => {
 		getId("pasteLink").style.display = "inline-block"
 		getId("options").style.display = "block";
 		getId("playlistName").textContent = ""
-		getId("incorrectMsg").textContent = error;
+		getId("incorrectMsg").textContent = i18n.__("Some error has occured. Check your network and use correct URL");
+		getId("incorrectMsg").title = error
 	});
 
 	downloadProcess.on("close", ()=>{

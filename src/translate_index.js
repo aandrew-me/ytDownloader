@@ -7,10 +7,11 @@ function querySelector(element){
 const i18n = new(require('../translations/i18n'))
 
 // Translating texts
-getId("pasteUrl").textContent = i18n.__("Click to paste video URL or ID [Ctrl + V]")
+getId("pasteUrl").textContent = i18n.__("Click to paste video link from clipboard [Ctrl + V]")
 querySelector("#popup p").textContent = i18n.__("yt-dlp is being downloaded")
 getId("preferenceWin").textContent = i18n.__("Preferences")
 getId("aboutWin").textContent = i18n.__("About")
+getId("playlistWin").textContent = i18n.__("Download playlist")
 document.querySelectorAll(".formatSelect").forEach(element => {
     element.textContent = i18n.__("Select Format ")
 });

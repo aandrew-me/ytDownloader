@@ -99,7 +99,8 @@ body {
 
 #pasteUrl{
 	display:none;
-	margin-top:10px;
+	margin-top:15px;
+	font-weight: bold;
 }
 
 .item {
