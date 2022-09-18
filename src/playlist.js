@@ -1,6 +1,7 @@
 const { clipboard, shell, ipcRenderer } = require("electron");
 const { default: YTDlpWrap } = require("yt-dlp-wrap-extended");
 const path = require("path");
+const { platform } = require("os");
 let url;
 const ytDlp = localStorage.getItem("ytdlp");
 const ytdlp = new YTDlpWrap(ytDlp);
@@ -42,6 +43,11 @@ getId("download").addEventListener("click", () => {
 	const today = date.getFullYear()+'-'+(date.getMonth()+1)+'-'+date.getDate();
 	let playlistDirName = "Playlist_" + today;
 
+	// Opening folder
+	let folderLocation = path.join(downloadDir, playlistDirName)
+	if (platform() == "win32"){
+		folderLocation = folderLocation.split(path.sep).join("\\\\");
+	}
 	getId("options").style.display = "none";
 	getId("pasteLink").style.display = "none";
 	getId("playlistName").textContent = i18n.__("Processing") + "..."
@@ -86,7 +92,7 @@ getId("download").addEventListener("click", () => {
 
 			const item = `<div class="playlistItem">
 			<p class="itemTitle">${itemTitle}</p>
-			<p class="itemProgress" onclick="openFolder('${path.join(downloadDir, playlistDirName)}')" id="p${count}">${i18n.__("Downloading...")}</p>
+			<p class="itemProgress" onclick="openFolder('${folderLocation}')" id="p${count}">${i18n.__("Downloading...")}</p>
 			</div>`;
 			getId("list").innerHTML += item;
 		}
