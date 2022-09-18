@@ -1,9 +1,9 @@
-const { app, BrowserWindow, dialog, ipcMain } = require("electron");
+const { app, BrowserWindow, dialog, ipcMain, shell } = require("electron");
 const { autoUpdater } = require("electron-updater");
 autoUpdater.autoDownload = false;
 let win, secondaryWindow;
 
-app.commandLine.appendSwitch("--enable-features", "Metal")
+app.commandLine.appendSwitch("--enable-features", "Metal");
 
 function createWindow() {
 	let isTransparent = false;
@@ -18,7 +18,7 @@ function createWindow() {
 		transparent: isTransparent,
 		webPreferences: {
 			nodeIntegration: true,
-			contextIsolation: false
+			contextIsolation: false,
 		},
 	});
 
@@ -27,9 +27,7 @@ function createWindow() {
 	// win.setMenu(null)
 	win.show();
 	// win.webContents.openDevTools();
-	if (process.platform !== "darwin"){
-		autoUpdater.checkForUpdates();
-	}
+	autoUpdater.checkForUpdates();
 }
 
 app.whenReady().then(() => {
@@ -51,16 +49,16 @@ app.whenReady().then(() => {
 ipcMain.on("restart", () => {
 	app.relaunch();
 	app.exit();
-})
+});
 
 ipcMain.on("get-version", () => {
 	const version = app.getVersion();
 	secondaryWindow.webContents.send("version", version);
 });
 
-ipcMain.on("load-win", (event, file)=>{
-	win.loadFile(file)
-})
+ipcMain.on("load-win", (event, file) => {
+	win.loadFile(file);
+});
 ipcMain.on("load-page", (event, file) => {
 	secondaryWindow = new BrowserWindow({
 		webPreferences: {
@@ -100,18 +98,38 @@ app.on("window-all-closed", () => {
 
 // Auto updater events
 autoUpdater.on("update-available", (_event, releaseNotes, releaseName) => {
-	const dialogOpts = {
-		type: "info",
-		buttons: ["Update", "No"],
-		title: "Update Available",
-		detail: process.platform === "win32" ? releaseNotes : releaseName,
-		message: "A new version is available, do you want to update?",
-	};
-	dialog.showMessageBox(dialogOpts).then((returnValue) =>{
-		if (returnValue.response === 0) {
-			autoUpdater.downloadUpdate();
-		}
-	});
+	// For macOS
+	if (process.platform === "darwin") {
+		const dialogOpts = {
+			type: "info",
+			buttons: ["Download", "No"],
+			title: "Update Available",
+			detail: releaseName,
+			message: "A new version is available, do you want to download it?",
+		};
+		dialog.showMessageBox(dialogOpts).then((returnValue) => {
+			if (returnValue.response === 0) {
+				shell.openExternal(
+					"https://github.com/aandrew-me/ytDownloader/releases/latest/download/YTDownloader_Mac.zip"
+				);
+			}
+		});
+	}
+	// For Windows and Linux
+	else {
+		const dialogOpts = {
+			type: "info",
+			buttons: ["Update", "No"],
+			title: "Update Available",
+			detail: process.platform === "win32" ? releaseNotes : releaseName,
+			message: "A new version is available, do you want to update?",
+		};
+		dialog.showMessageBox(dialogOpts).then((returnValue) => {
+			if (returnValue.response === 0) {
+				autoUpdater.downloadUpdate();
+			}
+		});
+	}
 });
 
 autoUpdater.on("update-downloaded", (_event, releaseNotes, releaseName) => {
