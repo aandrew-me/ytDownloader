@@ -52,5 +52,6 @@
 	"Click to paste playlist link from clipboard [Ctrl + V]": "Haga clic para pegar el enlace de la lista de reproducción del portapapeles [Ctrl + V]",
 	"Link:": "Enlace:",
 	"Downloading playlist:": "Descargando lista de reproducción:",
-	"Download playlist": "Descargar lista de reproducción"
+	"Download playlist": "Descargar lista de reproducción",
+	"Playlist downloaded": "Playlist downloaded"
 }
