@@ -52,5 +52,6 @@
 	"Click to paste playlist link from clipboard [Ctrl + V]": "Нажмите, чтобы вставить ссылку на плейлист из буфера обмена [Ctrl + V]",
 	"Link:": "Ссылка:",
 	"Downloading playlist:": "Скачивается Плейлист:",
-	"Download playlist": "Скачать плейлист"
+	"Download playlist": "Скачать плейлист",
+	"Playlist downloaded": "Playlist downloaded"
 }
