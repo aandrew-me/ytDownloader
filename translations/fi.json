@@ -52,5 +52,6 @@
 	"Click to paste playlist link from clipboard [Ctrl + V]": "Napsauta liittääksesi kopioimasi soittolistalinkin leikepöydältä [Ctrl +V]",
 	"Link:": "Linkki:",
 	"Downloading playlist:": "Ladataan soittolista:",
-	"Download playlist": "Lataa soittolista"
+	"Download playlist": "Lataa soittolista",
+	"Playlist downloaded": "Playlist downloaded"
 }

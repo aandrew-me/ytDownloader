@@ -52,5 +52,6 @@
 	"Click to paste playlist link from clipboard [Ctrl + V]": "Fare clic per incollare il link della playlist dagli appunti [Ctrl + V]",
 	"Link:": "Collegamento:",
 	"Downloading playlist:": "Scaricamento playlist:",
-	"Download playlist": "Scarica playlist"
+	"Download playlist": "Scarica playlist",
+	"Playlist downloaded": "Playlist downloaded"
 }

@@ -52,5 +52,6 @@
 	"Click to paste playlist link from clipboard [Ctrl + V]": "Panodaki oynatma listesi bağlantısını yapıştırmak için tıklayın veya [Ctrl + V]",
 	"Link:": "Link:",
 	"Downloading playlist:": "İndirilen oynatma listesi:",
-	"Download playlist": "Oynatma listesini indir"
+	"Download playlist": "Oynatma listesini indir",
+	"Playlist downloaded": "Playlist downloaded"
 }

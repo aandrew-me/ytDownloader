@@ -52,5 +52,6 @@
 	"Click to paste playlist link from clipboard [Ctrl + V]": "Натисніть щоб вставити посилання зі списку відтворення з буфера обміну [Ctrl + V]",
 	"Link:": "Посилання:",
 	"Downloading playlist:": "Завантажується список відтворення:",
-	"Download playlist": "Завантажити плейліст"
+	"Download playlist": "Завантажити плейліст",
+	"Playlist downloaded": "Playlist downloaded"
 }

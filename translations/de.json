@@ -52,5 +52,6 @@
 	"Click to paste playlist link from clipboard [Ctrl + V]": "Klicken, um den Link der Wiedergabeliste aus der Zwischenablage [Strg + V] einzufügen",
 	"Link:": "Link:",
 	"Downloading playlist:": "Wiedergabeliste wird heruntergeladen:",
-	"Download playlist": "Playlist herunterladen"
+	"Download playlist": "Playlist herunterladen",
+	"Playlist downloaded": "Playlist downloaded"
 }
