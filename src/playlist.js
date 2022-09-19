@@ -33,8 +33,6 @@ document.addEventListener("keydown", (event) => {
 // Patterns
 const playlistTxt = "Downloading playlist: ";
 const videoIndex = "Downloading video ";
-//  Downloading playlist: Inkscape Tutorials
-// Downloading video 1 of 82
 
 getId("download").addEventListener("click", () => {
 	let count = 0;
@@ -64,7 +62,7 @@ getId("download").addEventListener("click", () => {
 			`"${path.join(
 				downloadDir,
 				playlistDirName,
-				"%(title)s_%(playlist_index)s.%(ext)s"
+				"%(playlist_index)s.%(title)s.%(ext)s"
 			)}"`,
 
 			`"${url}"`,
