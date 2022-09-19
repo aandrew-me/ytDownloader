@@ -52,5 +52,6 @@
 	"Click to paste playlist link from clipboard [Ctrl + V]": "Click to paste playlist link from clipboard [Ctrl + V]",
 	"Link:": "Link:",
 	"Downloading playlist:": "Downloading playlist:",
-	"Download playlist":"Download playlist"
+	"Download playlist":"Download playlist",
+	"Playlist downloaded":"Playlist downloaded"
 }

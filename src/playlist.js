@@ -111,7 +111,17 @@ getId("download").addEventListener("click", () => {
 	});
 
 	downloadProcess.on("close", ()=>{
+		getId(`p${count}`).textContent = i18n.__("File saved. Click to Open")
 		getId("pasteLink").style.display = "inline-block";
+
+		const notify = new Notification("ytDownloader", {
+			body: i18n.__("Playlist downloaded"),
+			icon: "../assets/images/icon.png",
+		})
+	
+		notify.onclick = () =>{
+			openFolder(folderLocation)
+		}
 
 	})
 });
