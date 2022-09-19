@@ -23,6 +23,8 @@ A modern GUI video and audio downloader supporting [hundreds of sites](https://g
 
 ✅ Advanced options like Range Selection
 
+✅ Download playlists
+
 ✅ Available on Linux, Windows & macOS
 
 ✅ Fast download speeds
