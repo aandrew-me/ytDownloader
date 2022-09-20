@@ -82,6 +82,11 @@ Translations into other languages would be highly appreciated. If you want to he
 | Turkish | ✔️ [nxjosephofficial](https://github.com/nxjosephofficial) |
 | Ukrainian | ✔️ [KotoWhiskas](https://github.com/KotoWhiskas) |
 
+## Used technologies
+- [yt-dlp](https://github.com/yt-dlp/yt-dlp)
+- [Electron](https://www.electronjs.org/)
+- [ffmpeg](https://ffmpeg.org/)
+- [nodeJS](https://nodejs.org/en/)
 
 ## For building or running from source code
 
