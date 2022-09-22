@@ -27,7 +27,7 @@ let downloadDir = "";
 // Global variables
 let title, onlyvideo, id, thumbnail, ytdlp, duration, extractFormat;
 let rangeCmd = "";
-let subs = ""
+let subs = "";
 let subLangs;
 // let autoSubs = ""
 let rangeOption = "--download-sections";
@@ -105,7 +105,7 @@ async function downloadYtdlp() {
 	getId("popupBox").style.display = "none";
 	ytDlp = ytdlpPath;
 	ytdlp = new YTDlpWrap(ytDlp);
-	localStorage.setItem("ytdlp", ytDlp)
+	localStorage.setItem("ytdlp", ytDlp);
 	getId("pasteUrl").style.display = "inline-block";
 	console.log("yt-dlp bin Path: " + ytDlp);
 }
@@ -138,7 +138,7 @@ cp.exec("yt-dlp --version", (error, stdout, stderr) => {
 				console.log("yt-dlp binary is present in PATH");
 				ytDlp = ytdlpPath;
 				ytdlp = new YTDlpWrap(ytDlp);
-				localStorage.setItem("ytdlp", ytDlp)
+				localStorage.setItem("ytdlp", ytDlp);
 				cp.spawn(`${ytDlp}`, ["-U"]).stdout.on("data", (data) =>
 					console.log(data.toString("utf8"))
 				);
@@ -150,7 +150,7 @@ cp.exec("yt-dlp --version", (error, stdout, stderr) => {
 		console.log("yt-dlp binary is present in PATH");
 		ytDlp = "yt-dlp";
 		ytdlp = new YTDlpWrap(ytDlp);
-		localStorage.setItem("ytdlp", ytDlp)
+		localStorage.setItem("ytdlp", ytDlp);
 		getId("pasteUrl").style.display = "inline-block";
 		console.log("yt-dlp bin Path: " + ytDlp);
 	}
@@ -191,7 +191,7 @@ getId("pasteUrl").addEventListener("click", () => {
 
 // Getting video info
 async function getInfo(url) {
-	onlyvideo = false
+	onlyvideo = false;
 	let audioIsPresent = false;
 	downloadPathSelection();
 	getId("videoFormatSelect").innerHTML = "";
@@ -199,18 +199,31 @@ async function getInfo(url) {
 	getId("startTime").value = "";
 	getId("endTime").value = "";
 
-	let info;
-	cp.exec(`${ytDlp} -j --no-playlist "${url}"`, (error, stdout, stderr) => {
-		try {
-			info = JSON.parse(stdout);
-		} catch (error) {
-			info = false;
-			console.log(error);
-		}
+	let validInfo = true;
+	let info = "";
 
-		console.log(info);
+	const infoProcess = cp.spawn(ytDlp, ["-j", "--no-playlist", `"${url}"`], {
+		shell: true,
+	});
 
-		if (info) {
+	infoProcess.stdout.on("data", (data) => {
+		info += data;
+	});
+
+	infoProcess.stderr.on("data", (error) => {
+		validInfo = false;
+		console.log(error.toString("utf8"));
+		getId("loadingWrapper").style.display = "none";
+		getId("incorrectMsg").textContent = i18n.__(
+			"Some error has occured. Check your network and use correct URL"
+		);
+	});
+
+	infoProcess.on("close", () => {
+		if (validInfo) {
+			info = JSON.parse(info);
+			console.log(info);
+
 			title = info.title;
 			id = info.id;
 			thumbnail = info.thumbnail;
@@ -308,7 +321,8 @@ async function getInfo(url) {
 						"'>" +
 						i18n.__("Quality") +
 						": " +
-						(i18n.__(format.format_note) || i18n.__("Unknown quality")) +
+						(i18n.__(format.format_note) ||
+							i18n.__("Unknown quality")) +
 						" | " +
 						audio_ext +
 						" | " +
@@ -354,11 +368,6 @@ async function getInfo(url) {
 					getId("audioPresent").style.display = "block";
 				}
 			}
-		} else {
-			getId("loadingWrapper").style.display = "none";
-			getId("incorrectMsg").textContent = i18n.__(
-				"Some error has occured. Check your network and use correct URL"
-			);
 		}
 	});
 }
@@ -457,13 +466,12 @@ function manageAdvanced(duration) {
 	}
 
 	// If subtitles are checked
-	if (getId("subChecked").checked){
-		subs = "--write-subs"
-		subLangs = "--sub-langs all"
-	}
-	else{
-		subs = ""
-		subLangs = ""
+	if (getId("subChecked").checked) {
+		subs = "--write-subs";
+		subLangs = "--sub-langs all";
+	} else {
+		subs = "";
+		subLangs = "";
 	}
 
 	// // If autosubs are checked
@@ -503,7 +511,7 @@ function download(type) {
 		}
 	}
 
-	localStorage.setItem("itemList", "")
+	localStorage.setItem("itemList", "");
 	// let itemList = [];
 	// if (localStorage.getItem("itemList")) {
 	// 	itemList = JSON.parse(localStorage.getItem("itemList"));
@@ -561,7 +569,7 @@ function download(type) {
 		}
 		filename += letter;
 	}
-	filename = filename.slice(0,100) 
+	filename = filename.slice(0, 100);
 	// + Math.random().toFixed(3).toString().slice(2);
 
 	let audioFormat;
@@ -592,13 +600,12 @@ function download(type) {
 				subs,
 				subLangs,
 				"--no-playlist",
-				`"${url}"`
+				`"${url}"`,
 			],
 			{ shell: true, detached: false },
 			controller.signal
 		);
-		}
-		else if (type === "extract") {
+	} else if (type === "extract") {
 		if (extractFormat == "alac") {
 			extractExt = "m4a";
 		} else if (extractFormat == "vorbis") {
@@ -615,7 +622,7 @@ function download(type) {
 				`${path.join(downloadDir, filename + `.${extractExt}`)}`,
 				"--ffmpeg-location",
 				ffmpeg,
-				`"${url}"`
+				`"${url}"`,
 			],
 			{ shell: true, detached: false },
 			controller.signal
@@ -636,16 +643,16 @@ function download(type) {
 				subs,
 				subLangs,
 				"--no-playlist",
-				`"${url}"`
+				`"${url}"`,
 			],
 			{ shell: true, detached: false },
 			controller.signal
 		);
-	} 
+	}
 
 	getId(randomId + ".close").addEventListener("click", () => {
 		willBeSaved = false;
-		controller.abort()
+		controller.abort();
 	});
 
 	downloadProcess
@@ -715,8 +722,7 @@ function download(type) {
 			);
 			getId(randomId + "prog").title = error.message;
 			console.log(error.message);
-		})
-
+		});
 }
 
 // Removing item
@@ -744,12 +750,12 @@ function afterSave(location, filename, progressId) {
 	const notify = new Notification("ytDownloader", {
 		body: i18n.__("File saved. Click to Open"),
 		icon: "../assets/images/icon.png",
-	})
+	});
 
-	notify.onclick = () =>{
+	notify.onclick = () => {
 		showItem(finalLocation, finalFilename);
-	}
-		
+	};
+
 	let finalLocation = location;
 	let finalFilename = filename;
 	if (os.platform() === "win32") {
@@ -794,7 +800,7 @@ getId("aboutWin").addEventListener("click", () => {
 	ipcRenderer.send("load-page", __dirname + "/about.html");
 });
 
-getId("playlistWin").addEventListener("click", ()=>{
+getId("playlistWin").addEventListener("click", () => {
 	closeMenu();
 	ipcRenderer.send("load-win", __dirname + "/playlist.html");
-})
+});
