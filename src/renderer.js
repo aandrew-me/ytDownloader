@@ -622,6 +622,7 @@ function download(type) {
 				`${path.join(downloadDir, filename + `.${extractExt}`)}`,
 				"--ffmpeg-location",
 				ffmpeg,
+				"--no-playlist",
 				`"${url}"`,
 			],
 			{ shell: true, detached: false },
