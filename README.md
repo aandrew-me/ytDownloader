@@ -45,10 +45,11 @@ Download and install the exe file. Windows defender may create problems as usual
 
 ## Linux 🐧
 
-Linux has several options available - AppImage, Deb, Snap and flatpak.
+Linux has several options available - Flatpak, AppImage, Deb, Snap and AUR.
+Flatpak is recommended.
 ### AppImage
 
-**AppImage** format is supported on most Linux distros and has Auto-Update support. So it is recommended.
+**AppImage** format is supported on most Linux distros and has Auto-Update support.
 It just needs to be executed after downloading. See more about [AppImages here](https://appimage.org/).
 
 [AppImageLauncher](https://github.com/TheAssassin/AppImageLauncher) is recommended for integrating AppImages.
@@ -59,6 +60,13 @@ For Debian based distros like Ubuntu .deb file is available. Download and run -
 ```
 sudo dpkg -i YTDownloader.deb
 ```
+
+### AUR package
+The app is available in [AUR](https://aur.archlinux.org/packages/ytdownloader-gui) with the name `ytdownloader-gui`. To build with pamac the required command is -
+```
+pamac install ytdownloader-gui
+```
+
 ## macOS 🍎
 Since the app is not signed, when you will try to open the app, macOS will not allow you to open it. So you will need to follow some steps to open it.
 
