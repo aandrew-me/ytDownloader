@@ -537,7 +537,7 @@ function download(type) {
 
 		<div class="itemBody">
 			<div class="itemTitle">${title}</div>
-			<div class="itemType">${type === "video" ? "video" : "audio"}</div>
+			<div class="itemType">${type === "video" ? i18n.__("Video") : i18n.__("Audio")}</div>
 			<div id="${randomId + "prog"}" class="itemProgress"></div>
 		</div>
 	</div>
