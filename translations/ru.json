@@ -53,5 +53,7 @@
 	"Link:": "Ссылка:",
 	"Downloading playlist:": "Скачивается Плейлист:",
 	"Download playlist": "Скачать плейлист",
-	"Playlist downloaded": "Плейлист загружен"
+	"Playlist downloaded": "Плейлист загружен",
+	"This option lets you download restricted content. You will get errors if cookies are not there": "This option lets you download restricted content. You will get errors if cookies are not there",
+	"Select browser to use cookies from": "Select browser to use cookies from"
 }
