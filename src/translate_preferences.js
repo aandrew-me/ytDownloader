@@ -16,3 +16,5 @@ getId("transparentText").textContent = i18n.__("Enable transparent dark mode(onl
 getId("preferences").textContent = i18n.__("Preferences")
 getId("selectLn").textContent = i18n.__("Select Language (Requires relaunch)")
 // getId("restart").textContent = i18n.__("Restart app")
+getId("browserInfo").title = i18n.__("This option lets you download restricted content. You will get errors if cookies are not there")
+getId("browserTxt").textContent = i18n.__("Select browser to use cookies from")

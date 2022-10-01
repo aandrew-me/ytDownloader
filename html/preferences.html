@@ -47,6 +47,20 @@
             <option value="tr">Türkçe</option>
         </select>
         
+        <br>
+        <span id="browserTxt">Select browser to use cookies from</span>
+        <span id="browserInfo"> ℹ️</span>
+        <select id="browser">
+            <option value="">None</option>
+            <option value="chrome">Chrome</option>
+            <option value="firefox">Firefox</option>
+            <option value="brave">Brave</option>
+            <option value="opera">Opera Mini</option>
+            <option value="edge">Edge</option>
+            <option value="chromium">Chromium</option>
+            <option value="safari">Safari</option>
+            <option value="vivaldi">Vivaldi</option>
+        </select>
 
         <script>
             let downloadPath = localStorage.getItem("downloadPath")
@@ -96,9 +110,18 @@
             }
             function changeLanguage() {
                 const language = getId("select").value
-                localStorage.setItem("language", language)
-                
+                localStorage.setItem("language", language)  
             }
+
+            let browser = localStorage.getItem("browser")
+            if (browser) {
+                getId("browser").value = browser
+            }
+
+            getId("browser").addEventListener("change", ()=>{
+                browser = getId("browser").value
+                localStorage.setItem("browser", browser)
+            })
 
             require("../src/translate_preferences")
         </script>

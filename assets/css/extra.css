@@ -95,3 +95,6 @@ select {
 	margin: 8px;
 	outline: none;
 }
+#browserInfo{
+    cursor: pointer;
+}

@@ -7,6 +7,8 @@ const ytDlp = localStorage.getItem("ytdlp");
 const ytdlp = new YTDlpWrap(ytDlp);
 const downloadDir = localStorage.getItem("downloadPath");
 const i18n = new (require("../translations/i18n"))();
+let cookieArg = "";
+let browser = "";
 
 function getId(id) {
 	return document.getElementById(id);
@@ -17,7 +19,6 @@ function pasteLink() {
 	getId("link").textContent = " " + url;
 	getId("options").style.display = "block";
 	getId("incorrectMsg").textContent = "";
-
 }
 
 getId("pasteLink").addEventListener("click", () => {
@@ -35,20 +36,30 @@ const playlistTxt = "Downloading playlist: ";
 const videoIndex = "Downloading video ";
 
 getId("download").addEventListener("click", () => {
+	// Whether to use browser cookies or not
+	if (localStorage.getItem("browser")) {
+		browser = localStorage.getItem("browser");
+	}
+	if (browser) {
+		cookieArg = "--cookies-from-browser";
+	} else {
+		cookieArg = "";
+	}
 	let count = 0;
 	let playlistName;
 	const date = new Date();
-	const today = date.getFullYear()+'-'+(date.getMonth()+1)+'-'+date.getDate();
+	const today =
+		date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
 	let playlistDirName = "Playlist_" + today;
 
 	// Opening folder
-	let folderLocation = path.join(downloadDir, playlistDirName)
-	if (platform() == "win32"){
+	let folderLocation = path.join(downloadDir, playlistDirName);
+	if (platform() == "win32") {
 		folderLocation = folderLocation.split(path.sep).join("\\\\");
 	}
 	getId("options").style.display = "none";
 	getId("pasteLink").style.display = "none";
-	getId("playlistName").textContent = i18n.__("Processing") + "..."
+	getId("playlistName").textContent = i18n.__("Processing") + "...";
 	const quality = getId("select").value;
 	const format = `"mp4[height<=${quality}]+m4a/mp4[height<=${quality}]/bv[height<=${quality}]+ba/best[height<=${quality}]/best"`;
 	const controller = new AbortController();
@@ -64,6 +75,8 @@ getId("download").addEventListener("click", () => {
 				playlistDirName,
 				"%(playlist_index)s.%(title)s.%(ext)s"
 			)}"`,
+			cookieArg,
+			browser,
 
 			`"${url}"`,
 		],
@@ -75,8 +88,9 @@ getId("download").addEventListener("click", () => {
 		console.log(eventData);
 
 		if (eventData.includes(playlistTxt)) {
-			playlistName = eventData.split(":")[1].slice(1)
-			getId("playlistName").textContent = i18n.__("Downloading playlist:") + " "+ playlistName;
+			playlistName = eventData.split(":")[1].slice(1);
+			getId("playlistName").textContent =
+				i18n.__("Downloading playlist:") + " " + playlistName;
 			console.log(playlistName);
 		}
 
@@ -85,12 +99,16 @@ getId("download").addEventListener("click", () => {
 			const itemTitle = i18n.__("Video") + " " + eventData.split(" ")[3];
 
 			if (count > 1) {
-				getId(`p${count - 1}`).textContent = i18n.__("File saved. Click to Open")
+				getId(`p${count - 1}`).textContent = i18n.__(
+					"File saved. Click to Open"
+				);
 			}
 
 			const item = `<div class="playlistItem">
 			<p class="itemTitle">${itemTitle}</p>
-			<p class="itemProgress" onclick="openFolder('${folderLocation}')" id="p${count}">${i18n.__("Downloading...")}</p>
+			<p class="itemProgress" onclick="openFolder('${folderLocation}')" id="p${count}">${i18n.__(
+				"Downloading..."
+			)}</p>
 			</div>`;
 			getId("list").innerHTML += item;
 		}
@@ -98,39 +116,40 @@ getId("download").addEventListener("click", () => {
 
 	downloadProcess.on("progress", (progress) => {
 		if (getId(`p${count}`)) {
-			getId(`p${count}`).textContent = `${i18n.__("Progress")} ${progress.percent}% | ${i18n.__("Speed")} ${progress.currentSpeed || 0}`
+			getId(`p${count}`).textContent = `${i18n.__("Progress")} ${
+				progress.percent
+			}% | ${i18n.__("Speed")} ${progress.currentSpeed || 0}`;
 		}
 	});
 
 	downloadProcess.on("error", (error) => {
-		getId("pasteLink").style.display = "inline-block"
+		getId("pasteLink").style.display = "inline-block";
 		getId("options").style.display = "block";
-		getId("playlistName").textContent = ""
-		getId("incorrectMsg").textContent = i18n.__("Some error has occured. Check your network and use correct URL");
-		getId("incorrectMsg").title = error
+		getId("playlistName").textContent = "";
+		getId("incorrectMsg").textContent = i18n.__(
+			"Some error has occured. Check your network and use correct URL"
+		);
+		getId("incorrectMsg").title = error;
 	});
 
-	downloadProcess.on("close", ()=>{
-		getId(`p${count}`).textContent = i18n.__("File saved. Click to Open")
+	downloadProcess.on("close", () => {
+		getId(`p${count}`).textContent = i18n.__("File saved. Click to Open");
 		getId("pasteLink").style.display = "inline-block";
 
 		const notify = new Notification("ytDownloader", {
 			body: i18n.__("Playlist downloaded"),
 			icon: "../assets/images/icon.png",
-		})
-	
-		notify.onclick = () =>{
-			openFolder(folderLocation)
-		}
+		});
 
-	})
+		notify.onclick = () => {
+			openFolder(folderLocation);
+		};
+	});
 });
 
-
-function openFolder(location){
-	shell.openPath(location)
+function openFolder(location) {
+	shell.openPath(location);
 }
-
 
 function closeMenu() {
 	getId("menuIcon").style.transform = "rotate(0deg)";
@@ -157,16 +176,18 @@ getId("aboutWin").addEventListener("click", () => {
 	closeMenu();
 	ipcRenderer.send("load-page", __dirname + "/about.html");
 });
-getId("homeWin").addEventListener("click", ()=>{
+getId("homeWin").addEventListener("click", () => {
 	closeMenu();
 	ipcRenderer.send("load-win", __dirname + "/index.html");
-})
+});
 
 // Translations
-getId("pasteLink").textContent = i18n.__("Click to paste playlist link from clipboard [Ctrl + V]")
-getId("preferenceWin").textContent = i18n.__("Preferences")
-getId("aboutWin").textContent = i18n.__("About")
-getId("homeWin").textContent = i18n.__("Homepage")
-getId("linkTitle").textContent = i18n.__("Link:")
-getId("videoFormat").textContent = i18n.__("Select Format ")
-getId("download").textContent = i18n.__("Download")
+getId("pasteLink").textContent = i18n.__(
+	"Click to paste playlist link from clipboard [Ctrl + V]"
+);
+getId("preferenceWin").textContent = i18n.__("Preferences");
+getId("aboutWin").textContent = i18n.__("About");
+getId("homeWin").textContent = i18n.__("Homepage");
+getId("linkTitle").textContent = i18n.__("Link:");
+getId("videoFormat").textContent = i18n.__("Select Format ");
+getId("download").textContent = i18n.__("Download");

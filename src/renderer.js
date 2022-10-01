@@ -31,6 +31,8 @@ let subs = "";
 let subLangs;
 // let autoSubs = ""
 let rangeOption = "--download-sections";
+let cookieArg = ""
+let browser = ""
 
 function getId(id) {
 	return document.getElementById(id);
@@ -199,10 +201,21 @@ async function getInfo(url) {
 	getId("startTime").value = "";
 	getId("endTime").value = "";
 
+	// Whether to use browser cookies or not
+	if (localStorage.getItem("browser")){
+		browser = localStorage.getItem("browser")
+	}
+	 if(browser){
+		cookieArg = "--cookies-from-browser"
+	 }
+	 else{
+		cookieArg = ""
+	 }
+
 	let validInfo = true;
 	let info = "";
 
-	const infoProcess = cp.spawn(ytDlp, ["-j", "--no-playlist", `"${url}"`], {
+	const infoProcess = cp.spawn(ytDlp, ["-j", "--no-playlist", cookieArg, browser, `"${url}"`], {
 		shell: true,
 	});
 
@@ -600,6 +613,8 @@ function download(type) {
 				subs,
 				subLangs,
 				"--no-playlist",
+				cookieArg,
+				browser,
 				`"${url}"`,
 			],
 			{ shell: true, detached: false },
@@ -623,6 +638,8 @@ function download(type) {
 				"--ffmpeg-location",
 				ffmpeg,
 				"--no-playlist",
+				cookieArg,
+				browser,
 				`"${url}"`,
 			],
 			{ shell: true, detached: false },
@@ -644,6 +661,8 @@ function download(type) {
 				subs,
 				subLangs,
 				"--no-playlist",
+				cookieArg,
+				browser,
 				`"${url}"`,
 			],
 			{ shell: true, detached: false },
