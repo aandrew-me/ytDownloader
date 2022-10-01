@@ -53,5 +53,7 @@
 	"Link:": "Linkki:",
 	"Downloading playlist:": "Ladataan soittolista:",
 	"Download playlist": "Lataa soittolista",
-	"Playlist downloaded": "Soittolista ladattu"
+	"Playlist downloaded": "Soittolista ladattu",
+	"This option lets you download restricted content. You will get errors if cookies are not there": "This option lets you download restricted content. You will get errors if cookies are not there",
+	"Select browser to use cookies from": "Select browser to use cookies from"
 }
