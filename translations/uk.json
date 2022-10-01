@@ -53,5 +53,7 @@
 	"Link:": "Посилання:",
 	"Downloading playlist:": "Завантажується список відтворення:",
 	"Download playlist": "Завантажити плейліст",
-	"Playlist downloaded": "Список відтворення завантажено"
+	"Playlist downloaded": "Список відтворення завантажено",
+	"This option lets you download restricted content. You will get errors if cookies are not there": "This option lets you download restricted content. You will get errors if cookies are not there",
+	"Select browser to use cookies from": "Select browser to use cookies from"
 }
