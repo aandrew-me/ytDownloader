@@ -53,5 +53,7 @@
 	"Link:": "Link:",
 	"Downloading playlist:": "İndirilen oynatma listesi:",
 	"Download playlist": "Oynatma listesini indir",
-	"Playlist downloaded": "Oynatma listesi indirildi"
+	"Playlist downloaded": "Oynatma listesi indirildi",
+	"This option lets you download restricted content. You will get errors if cookies are not there": "This option lets you download restricted content. You will get errors if cookies are not there",
+	"Select browser to use cookies from": "Select browser to use cookies from"
 }
