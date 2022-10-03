@@ -607,7 +607,7 @@ function download(type) {
 				"-f",
 				`${format_id}+${audioFormat}`,
 				"-o",
-				`${path.join(downloadDir, filename + `.${ext}`)}`,
+				`"${path.join(downloadDir, filename + `.${ext}`)}"`,
 				"--ffmpeg-location",
 				ffmpeg,
 				subs,
@@ -634,7 +634,7 @@ function download(type) {
 				"--audio-format",
 				extractFormat,
 				"-o",
-				`${path.join(downloadDir, filename + `.${extractExt}`)}`,
+				`"${path.join(downloadDir, filename + `.${extractExt}`)}"`,
 				"--ffmpeg-location",
 				ffmpeg,
 				"--no-playlist",
@@ -655,7 +655,7 @@ function download(type) {
 				"-f",
 				format_id,
 				"-o",
-				`${path.join(downloadDir, filename + `.${ext}`)}`,
+				`"${path.join(downloadDir, filename + `.${ext}`)}"`,
 				"--ffmpeg-location",
 				ffmpeg,
 				subs,
@@ -790,7 +790,7 @@ function afterSave(location, filename, progressId) {
 }
 
 function showItem(location, filename) {
-	shell.showItemInFolder(path.join(location, filename));
+	shell.showItemInFolder(`${path.join(location, filename)}`);
 }
 
 // Opening windows
