@@ -54,6 +54,6 @@
 	"Downloading playlist:": "Ladataan soittolista:",
 	"Download playlist": "Lataa soittolista",
 	"Playlist downloaded": "Soittolista ladattu",
-	"This option lets you download restricted content. You will get errors if cookies are not there": "This option lets you download restricted content. You will get errors if cookies are not there",
-	"Select browser to use cookies from": "Select browser to use cookies from"
+	"This option lets you download restricted content. You will get errors if cookies are not there": "Tämän vaihtoehdon avulla voit ladata rajoitetun sisällön. Saat virheitä, jos evästeitä ei ole",
+	"Select browser to use cookies from": "Valitse selain käyttääksesi evästeitä"
 }
