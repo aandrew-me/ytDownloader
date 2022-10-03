@@ -54,6 +54,6 @@
 	"Downloading playlist:": "Wiedergabeliste wird heruntergeladen:",
 	"Download playlist": "Playlist herunterladen",
 	"Playlist downloaded": "Wiedergabeliste heruntergeladen",
-	"This option lets you download restricted content. You will get errors if cookies are not there": "This option lets you download restricted content. You will get errors if cookies are not there",
-	"Select browser to use cookies from": "Select browser to use cookies from"
+	"This option lets you download restricted content. You will get errors if cookies are not there": "Mit dieser Option können Sie eingeschränkte Inhalte herunterladen. Sie werden Fehler erhalten, wenn Cookies nicht vorhanden sind",
+	"Select browser to use cookies from": "Browser zum Verwenden von Cookies auswählen"
 }
