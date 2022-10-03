@@ -55,5 +55,6 @@
 	"Download playlist":"Download playlist",
 	"Playlist downloaded":"Playlist downloaded",
 	"This option lets you download restricted content. You will get errors if cookies are not there":"This option lets you download restricted content. You will get errors if cookies are not there",
-	"Select browser to use cookies from":"Select browser to use cookies from"
+	"Select browser to use cookies from":"Select browser to use cookies from",
+	"None":"None"
 }
