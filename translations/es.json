@@ -55,5 +55,6 @@
 	"Download playlist": "Descargar lista de reproducción",
 	"Playlist downloaded": "Lista de reproducción descargada",
 	"This option lets you download restricted content. You will get errors if cookies are not there": "Esta opción le permite descargar contenido restringido. Obtendrá errores si no hay cookies",
-	"Select browser to use cookies from": "Seleccionar navegador para usar cookies de"
+	"Select browser to use cookies from": "Seleccionar navegador para usar cookies de",
+	"None": "Ninguna"
 }
