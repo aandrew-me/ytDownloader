@@ -54,6 +54,6 @@
 	"Downloading playlist:": "İndirilen oynatma listesi:",
 	"Download playlist": "Oynatma listesini indir",
 	"Playlist downloaded": "Oynatma listesi indirildi",
-	"This option lets you download restricted content. You will get errors if cookies are not there": "This option lets you download restricted content. You will get errors if cookies are not there",
-	"Select browser to use cookies from": "Select browser to use cookies from"
+	"This option lets you download restricted content. You will get errors if cookies are not there": "Bu seçenek kısıtlı içeriği indirmenize olanak sağlar. Çerezler bulunmuyorsa hata alırsınız",
+	"Select browser to use cookies from": "Çerezlerin kullanılacağı tarayıcıyı seçin"
 }
