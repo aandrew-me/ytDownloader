@@ -54,6 +54,6 @@
 	"Downloading playlist:": "Завантажується список відтворення:",
 	"Download playlist": "Завантажити плейліст",
 	"Playlist downloaded": "Список відтворення завантажено",
-	"This option lets you download restricted content. You will get errors if cookies are not there": "This option lets you download restricted content. You will get errors if cookies are not there",
-	"Select browser to use cookies from": "Select browser to use cookies from"
+	"This option lets you download restricted content. You will get errors if cookies are not there": "Ця опція дозволяє завантажувати весь контент обмеження. Ви отримаєте помилки, якщо файлів cookie немає",
+	"Select browser to use cookies from": "Виберіть браузер, щоб використовувати куки"
 }
