@@ -56,5 +56,12 @@
 	"Playlist downloaded": "Wiedergabeliste heruntergeladen",
 	"This option lets you download restricted content. You will get errors if cookies are not there": "Mit dieser Option können Sie eingeschränkte Inhalte herunterladen. Sie werden Fehler erhalten, wenn Cookies nicht vorhanden sind",
 	"Select browser to use cookies from": "Browser zum Verwenden von Cookies auswählen",
-	"None": "Keine"
+	"None": "Keine",
+	"A new version is available, do you want to download it?": "A new version is available, do you want to download it?",
+	"A new version is available, do you want to update?": "A new version is available, do you want to update?",
+	"Update": "Update",
+	"No": "No",
+	"Install and restart now?": "Install and restart now?",
+	"Restart": "Restart",
+	"Later": "Later"
 }
