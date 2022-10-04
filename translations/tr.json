@@ -56,5 +56,12 @@
 	"Playlist downloaded": "Oynatma listesi indirildi",
 	"This option lets you download restricted content. You will get errors if cookies are not there": "Bu seçenek kısıtlı içeriği indirmenize olanak sağlar. Çerezler bulunmuyorsa hata alırsınız",
 	"Select browser to use cookies from": "Çerezlerin kullanılacağı tarayıcıyı seçin",
-	"None": "Hiçbiri"
+	"None": "Hiçbiri",
+	"A new version is available, do you want to download it?": "A new version is available, do you want to download it?",
+	"A new version is available, do you want to update?": "A new version is available, do you want to update?",
+	"Update": "Update",
+	"No": "No",
+	"Install and restart now?": "Install and restart now?",
+	"Restart": "Restart",
+	"Later": "Later"
 }
