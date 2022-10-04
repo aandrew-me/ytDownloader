@@ -56,5 +56,13 @@
 	"Playlist downloaded":"Playlist downloaded",
 	"This option lets you download restricted content. You will get errors if cookies are not there":"This option lets you download restricted content. You will get errors if cookies are not there",
 	"Select browser to use cookies from":"Select browser to use cookies from",
-	"None":"None"
+	"None":"None",
+	"A new version is available, do you want to download it?":"A new version is available, do you want to download it?",
+	"A new version is available, do you want to update?":"A new version is available, do you want to update?",
+	"Update":"Update",
+	"No":"No",
+	"Install and restart now?":"Install and restart now?",
+	"Restart":"Restart",
+	"Later":"Later"
+
 }
