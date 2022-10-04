@@ -56,5 +56,12 @@
 	"Playlist downloaded": "Плейлист загружен",
 	"This option lets you download restricted content. You will get errors if cookies are not there": "Эта опция позволяет загружать ограниченный контент. Вы получите ошибки, если куки отсутствуют",
 	"Select browser to use cookies from": "Выберите браузер для использования куки",
-	"None": "Никакой"
+	"None": "Никакой",
+	"A new version is available, do you want to download it?": "A new version is available, do you want to download it?",
+	"A new version is available, do you want to update?": "A new version is available, do you want to update?",
+	"Update": "Update",
+	"No": "No",
+	"Install and restart now?": "Install and restart now?",
+	"Restart": "Restart",
+	"Later": "Later"
 }
