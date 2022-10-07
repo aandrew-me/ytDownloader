@@ -57,11 +57,11 @@
 	"This option lets you download restricted content. You will get errors if cookies are not there": "Bu seçenek kısıtlı içeriği indirmenize olanak sağlar. Çerezler bulunmuyorsa hata alırsınız",
 	"Select browser to use cookies from": "Çerezlerin kullanılacağı tarayıcıyı seçin",
 	"None": "Hiçbiri",
-	"A new version is available, do you want to download it?": "A new version is available, do you want to download it?",
-	"A new version is available, do you want to update?": "A new version is available, do you want to update?",
-	"Update": "Update",
-	"No": "No",
-	"Install and restart now?": "Install and restart now?",
-	"Restart": "Restart",
-	"Later": "Later"
+	"A new version is available, do you want to download it?": "Yeni bir versiyon mevcut, indirmek ister misiniz?",
+	"A new version is available, do you want to update?": "Yeni bir versiyon mevcut, güncellemek ister misiniz?",
+	"Update": "Güncelleme",
+	"No": "Hayır",
+	"Install and restart now?": "Yüklendikten sonra yeniden başlatılsın mı?",
+	"Restart": "Yeniden başlat",
+	"Later": "Daha sonra"
 }
