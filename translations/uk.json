@@ -56,5 +56,12 @@
 	"Playlist downloaded": "Список відтворення завантажено",
 	"This option lets you download restricted content. You will get errors if cookies are not there": "Ця опція дозволяє завантажувати весь контент обмеження. Ви отримаєте помилки, якщо файлів cookie немає",
 	"Select browser to use cookies from": "Виберіть браузер, щоб використовувати куки",
-	"None": "Жоден"
+	"None": "Жоден",
+	"A new version is available, do you want to download it?": "A new version is available, do you want to download it?",
+	"A new version is available, do you want to update?": "A new version is available, do you want to update?",
+	"Update": "Update",
+	"No": "No",
+	"Install and restart now?": "Install and restart now?",
+	"Restart": "Restart",
+	"Later": "Later"
 }

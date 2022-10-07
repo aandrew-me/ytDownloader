@@ -56,5 +56,12 @@
 	"Playlist downloaded": "Soittolista ladattu",
 	"This option lets you download restricted content. You will get errors if cookies are not there": "Tämän vaihtoehdon avulla voit ladata rajoitetun sisällön. Saat virheitä, jos evästeitä ei ole",
 	"Select browser to use cookies from": "Valitse selain käyttääksesi evästeitä",
-	"None": "Ei ole"
+	"None": "Ei ole",
+	"A new version is available, do you want to download it?": "A new version is available, do you want to download it?",
+	"A new version is available, do you want to update?": "A new version is available, do you want to update?",
+	"Update": "Update",
+	"No": "No",
+	"Install and restart now?": "Install and restart now?",
+	"Restart": "Restart",
+	"Later": "Later"
 }
