@@ -1,11 +1,10 @@
 {
 	"dependencies": {
 		"electron-updater": "^5.2.1",
-		"yt-dlp-wrap": "^2.3.11",
 		"yt-dlp-wrap-extended": "^2.3.12"
 	},
 	"name": "ytdownloader",
-	"version": "3.6.1",
+	"version": "3.6.2",
 	"main": "main.js",
 	"scripts": {
 		"start": "electron .",
