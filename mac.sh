@@ -4,6 +4,6 @@
 rm ffmpeg*
 wget https://evermeet.cx/ffmpeg/ffmpeg-5.1.1.7z
 7z e ffmpeg-5.1.1.7z
-chmod 777 ffmpeg
+chmod +x ffmpeg
 rm ffmpeg-5.1.1.7z
 
