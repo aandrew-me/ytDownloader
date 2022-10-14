@@ -80,7 +80,8 @@
 		"linux": {
 			"target": [
 				"Appimage",
-				"snap"
+				"snap",
+				"rpm"
 			],
 			"category": "Utility"
 		},
