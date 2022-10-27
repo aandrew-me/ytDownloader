@@ -57,11 +57,11 @@
 	"This option lets you download restricted content. You will get errors if cookies are not there": "Tämän vaihtoehdon avulla voit ladata rajoitetun sisällön. Saat virheitä, jos evästeitä ei ole",
 	"Select browser to use cookies from": "Valitse selain käyttääksesi evästeitä",
 	"None": "Ei ole",
-	"A new version is available, do you want to download it?": "A new version is available, do you want to download it?",
-	"A new version is available, do you want to update?": "A new version is available, do you want to update?",
-	"Update": "Update",
-	"No": "No",
-	"Install and restart now?": "Install and restart now?",
-	"Restart": "Restart",
-	"Later": "Later"
+	"A new version is available, do you want to download it?": "Uusi julkaisu on saatavilla, haluatko ladata sen?",
+	"A new version is available, do you want to update?": "Uusi julkaisu on saatavilla, haluatko päivittää?",
+	"Update": "Päivitä",
+	"No": "Ei",
+	"Install and restart now?": "Asenna ja uudelleenkäynnistä nyt?",
+	"Restart": "Uudelleenkäynnistys",
+	"Later": "Myöhemmin"
 }
