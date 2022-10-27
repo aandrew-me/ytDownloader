@@ -196,6 +196,13 @@ body {
 	color: var(--text);
 }
 
+#audioExtract{
+	margin:10px;
+	padding:10px;
+	background-color: var(--box-toggle);
+	border-radius: 10px;
+}
+
 #options{
 	display:none;
 	position:relative;
