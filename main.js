@@ -1,5 +1,8 @@
 const { app, BrowserWindow, dialog, ipcMain, shell } = require("electron");
 const { autoUpdater } = require("electron-updater");
+const fs = require("fs");
+const path = require("path");
+
 autoUpdater.autoDownload = false;
 let win, secondaryWindow;
 
@@ -29,11 +32,29 @@ function createWindow() {
 	// win.webContents.openDevTools();
 	autoUpdater.checkForUpdates();
 }
-
+let loadedLanguage;
 app.whenReady().then(() => {
 	// Logging
 	console.log("Locale:" + app.getLocale());
 	console.log("Version: " + app.getVersion());
+
+	let locale = app.getLocale();
+
+	if (fs.existsSync(path.join(__dirname, "translations", locale + ".json"))) {
+		loadedLanguage = JSON.parse(
+			fs.readFileSync(
+				path.join(__dirname, "translations", locale + ".json"),
+				"utf8"
+			)
+		);
+	} else {
+		loadedLanguage = JSON.parse(
+			fs.readFileSync(
+				path.join(__dirname, "translations", "en.json"),
+				"utf8"
+			)
+		);
+	}
 
 	createWindow();
 	app.on("activate", () => {
@@ -102,10 +123,12 @@ autoUpdater.on("update-available", (_event, releaseNotes, releaseName) => {
 	if (process.platform === "darwin") {
 		const dialogOpts = {
 			type: "info",
-			buttons: ["Download", "No"],
+			buttons: [i18n("Download"), i18n("No")],
 			title: "Update Available",
 			detail: releaseName,
-			message: "A new version is available, do you want to download it?",
+			message: i18n(
+				"A new version is available, do you want to download it?"
+			),
 		};
 		dialog.showMessageBox(dialogOpts).then((returnValue) => {
 			if (returnValue.response === 0) {
@@ -119,10 +142,10 @@ autoUpdater.on("update-available", (_event, releaseNotes, releaseName) => {
 	else {
 		const dialogOpts = {
 			type: "info",
-			buttons: ["Update", "No"],
+			buttons: [i18n("Update"), i18n("No")],
 			title: "Update Available",
 			detail: process.platform === "win32" ? releaseNotes : releaseName,
-			message: "A new version is available, do you want to update?",
+			message: i18n("A new version is available, do you want to update?"),
 		};
 		dialog.showMessageBox(dialogOpts).then((returnValue) => {
 			if (returnValue.response === 0) {
@@ -135,9 +158,9 @@ autoUpdater.on("update-available", (_event, releaseNotes, releaseName) => {
 autoUpdater.on("update-downloaded", (_event, releaseNotes, releaseName) => {
 	const dialogOpts = {
 		type: "info",
-		buttons: ["Restart", "Later"],
+		buttons: [i18n("Restart"), i18n("Later")],
 		title: "Update Ready",
-		message: "Install and restart now?",
+		message: i18n("Install and restart now?"),
 	};
 	dialog.showMessageBox(dialogOpts).then((returnValue) => {
 		if (returnValue.response === 0) {
@@ -147,3 +170,12 @@ autoUpdater.on("update-downloaded", (_event, releaseNotes, releaseName) => {
 		}
 	});
 });
+
+// Translation
+function i18n(phrase) {
+	let translation = loadedLanguage[phrase];
+	if (translation === undefined) {
+		translation = phrase;
+	}
+	return translation;
+}
