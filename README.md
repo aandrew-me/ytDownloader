@@ -75,6 +75,7 @@ Translations into other languages would be highly appreciated. If you want to he
 |Finnish | ✔️ [LINUX-SAUNA](https://t.me/linuxsauna)|
 |German | ✔️ [Proxycon](https://github.com/proxycon)|
 |Italian  | ✔️ [albanobattistella](https://github.com/albanobattistella)|
+|Portuguese (Brazil) | ✔️ [André](https://github.com/andre1828)|
 |Russian | ✔️ |
 |Spanish | ✔️ [haggen88](https://github.com/haggen88)|
 | Turkish | ✔️ [nxjosephofficial](https://github.com/nxjosephofficial) |
