@@ -35,7 +35,7 @@ document.addEventListener("keydown", (event) => {
 const playlistTxt = "Downloading playlist: ";
 const videoIndex = "Downloading video ";
 
-getId("download").addEventListener("click", () => {
+function download(type) {
 	// Whether to use browser cookies or not
 	if (localStorage.getItem("browser")) {
 		browser = localStorage.getItem("browser");
@@ -50,7 +50,8 @@ getId("download").addEventListener("click", () => {
 	const date = new Date();
 	const today =
 		date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
-	let playlistDirName = "Playlist_" + today;
+	let playlistDirName =
+		"Playlist" + Math.random().toFixed(5).toString().slice(2) + "_" + today;
 
 	// Opening folder
 	let folderLocation = path.join(downloadDir, playlistDirName);
@@ -60,32 +61,62 @@ getId("download").addEventListener("click", () => {
 	getId("options").style.display = "none";
 	getId("pasteLink").style.display = "none";
 	getId("playlistName").textContent = i18n.__("Processing") + "...";
-	const quality = getId("select").value;
-	const format = `"mp4[height<=${quality}]+m4a/mp4[height<=${quality}]/bv[height<=${quality}]+ba/best[height<=${quality}]/best"`;
+
+	let quality, format, downloadProcess;
+	if (type === "video") {
+		quality = getId("select").value;
+		format = `"mp4[height<=${quality}]+m4a/mp4[height<=${quality}]/bv[height<=${quality}]+ba/best[height<=${quality}]/best"`;
+	} else {
+		format = getId("audioSelect").value;
+	}
+
 	const controller = new AbortController();
 
-	const downloadProcess = ytdlp.exec(
-		[
-			"-f",
-			format,
-			"--yes-playlist",
-			"-o",
-			`"${path.join(
-				downloadDir,
-				playlistDirName,
-				"%(playlist_index)s.%(title)s.%(ext)s"
-			)}"`,
-			cookieArg,
-			browser,
+	if (type === "video") {
+		downloadProcess = ytdlp.exec(
+			[
+				"-f",
+				format,
+				"--yes-playlist",
+				"-o",
+				`"${path.join(
+					downloadDir,
+					playlistDirName,
+					"%(playlist_index)s.%(title)s.%(ext)s"
+				)}"`,
+				cookieArg,
+				browser,
 
-			`"${url}"`,
-		],
-		{ shell: true, detached: false },
-		controller.signal
-	);
+				`"${url}"`,
+			],
+			{ shell: true, detached: false },
+			controller.signal
+		);
+	} else {
+		downloadProcess = ytdlp.exec(
+			[
+				"--yes-playlist",
+				"-x",
+				"--audio-format",
+				format,
+				"-o",
+				`"${path.join(
+					downloadDir,
+					playlistDirName,
+					"%(playlist_index)s.%(title)s.%(ext)s"
+				)}"`,
+				cookieArg,
+				browser,
+
+				`"${url}"`,
+			],
+			{ shell: true, detached: false },
+			controller.signal
+		);
+	}
 
 	downloadProcess.on("ytDlpEvent", (eventType, eventData) => {
-		console.log(eventData);
+		// console.log(eventData);
 
 		if (eventData.includes(playlistTxt)) {
 			playlistName = eventData.split(":")[1].slice(1);
@@ -96,7 +127,12 @@ getId("download").addEventListener("click", () => {
 
 		if (eventData.includes(videoIndex)) {
 			count += 1;
-			const itemTitle = i18n.__("Video") + " " + eventData.split(" ")[3];
+			let itemTitle;
+			if (type === "video") {
+				itemTitle = i18n.__("Video") + " " + eventData.split(" ")[3];
+			} else {
+				itemTitle = i18n.__("Audio") + " " + eventData.split(" ")[3];
+			}
 
 			if (count > 1) {
 				getId(`p${count - 1}`).textContent = i18n.__(
@@ -145,6 +181,16 @@ getId("download").addEventListener("click", () => {
 			openFolder(folderLocation);
 		};
 	});
+}
+
+// Downloading video
+getId("download").addEventListener("click", () => {
+	download("video");
+});
+
+// Downloading audio
+getId("audioDownload").addEventListener("click", () => {
+	download("audio");
 });
 
 function openFolder(location) {
@@ -189,5 +235,7 @@ getId("preferenceWin").textContent = i18n.__("Preferences");
 getId("aboutWin").textContent = i18n.__("About");
 getId("homeWin").textContent = i18n.__("Homepage");
 getId("linkTitle").textContent = i18n.__("Link:");
-getId("videoFormat").textContent = i18n.__("Select Format ");
+getId("videoFormat").textContent = i18n.__("Select Video Format ");
+getId("audioFormat").textContent = i18n.__("Select Audio Format ");
+
 getId("download").textContent = i18n.__("Download");
