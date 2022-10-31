@@ -64,5 +64,7 @@
 	"Install and restart now?": "Instalar e reiniciar agora?",
 	"Restart": "Reiniciar",
 	"Later": "Depois",
-	"Extract Audio": "Extract Audio"
+	"Extract Audio": "Extract Audio",
+	"Select Video Format ": "Select Video Format ",
+	"Select Audio Format ": "Select Audio Format "
 }
