@@ -1,7 +1,7 @@
 const { clipboard, shell, ipcRenderer } = require("electron");
 const { default: YTDlpWrap } = require("yt-dlp-wrap-extended");
 const path = require("path");
-const os = require("os")
+const os = require("os");
 const { platform } = require("os");
 let url;
 const ytDlp = localStorage.getItem("ytdlp");
@@ -40,9 +40,15 @@ document.addEventListener("keydown", (event) => {
 
 // Patterns
 const playlistTxt = "Downloading playlist: ";
+const playlistIdTxt = " Downloading playlist ";
 const videoIndex = "Downloading video ";
+let playlistId = "";
+let folderLocation;
 
 function download(type) {
+	getId("list").innerHTML = ""
+	getId("playlistName").textContent = ""
+
 	// Whether to use browser cookies or not
 	if (localStorage.getItem("browser")) {
 		browser = localStorage.getItem("browser");
@@ -60,11 +66,6 @@ function download(type) {
 	let playlistDirName =
 		"Playlist" + Math.random().toFixed(5).toString().slice(2) + "_" + today;
 
-	// Opening folder
-	let folderLocation = path.join(downloadDir, playlistDirName);
-	if (platform() == "win32") {
-		folderLocation = folderLocation.split(path.sep).join("\\\\");
-	}
 	getId("options").style.display = "none";
 	getId("pasteLink").style.display = "none";
 	getId("playlistName").textContent = i18n.__("Processing") + "...";
@@ -88,7 +89,7 @@ function download(type) {
 				"-o",
 				`"${path.join(
 					downloadDir,
-					playlistDirName,
+					"Playlist_vid_%(playlist_id)s",
 					"%(playlist_index)s.%(title)s.%(ext)s"
 				)}"`,
 				cookieArg,
@@ -109,7 +110,7 @@ function download(type) {
 				"-o",
 				`"${path.join(
 					downloadDir,
-					playlistDirName,
+					"Playlist_aud_%(playlist_id)s",
 					"%(playlist_index)s.%(title)s.%(ext)s"
 				)}"`,
 				"--ffmpeg-location",
@@ -126,6 +127,20 @@ function download(type) {
 
 	downloadProcess.on("ytDlpEvent", (eventType, eventData) => {
 		// console.log(eventData);
+
+		if (eventData.includes(playlistIdTxt)) {
+			playlistId = eventData.split(" ")[3].split(";")[0];
+			// Opening folder
+			if (type === "video"){
+				folderLocation =  path.join(downloadDir, "Playlist_vid_" + playlistId);
+			}
+			else{
+				folderLocation =  path.join(downloadDir, "Playlist_aud_" + playlistId);
+			}
+			if (platform() == "win32") {
+				folderLocation =  folderLocation.split(path.sep).join("\\\\");
+			}
+		}
 
 		if (eventData.includes(playlistTxt)) {
 			playlistName = eventData.split(":")[1].slice(1);
