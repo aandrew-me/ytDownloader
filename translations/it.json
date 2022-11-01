@@ -57,11 +57,14 @@
 	"This option lets you download restricted content. You will get errors if cookies are not there": "Questa opzione consente di scaricare contenuti limitati. Si otterranno errori se i cookie non ci sono",
 	"Select browser to use cookies from": "Seleziona il browser da cui utilizzare i cookie",
 	"None": "Nessuna",
-	"A new version is available, do you want to download it?": "A new version is available, do you want to download it?",
-	"A new version is available, do you want to update?": "A new version is available, do you want to update?",
-	"Update": "Update",
+	"A new version is available, do you want to download it?": "È disponibile una nuova versione, vuoi scaricarla?",
+	"A new version is available, do you want to update?": "È disponibile una nuova versione, vuoi aggiornare?",
+	"Update": "Aggiorna",
 	"No": "No",
-	"Install and restart now?": "Install and restart now?",
-	"Restart": "Restart",
-	"Later": "Later"
+	"Install and restart now?": "Installare e riavviare ora?",
+	"Restart": "Riavvia",
+	"Later": "Dopo",
+	"Extract Audio": "Estrai Audio",
+	"Select Video Format ": "Seleziona Formato Video ",
+	"Select Audio Format ": "Seleziona Formato Audio "
 }

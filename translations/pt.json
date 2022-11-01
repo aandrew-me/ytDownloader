@@ -63,5 +63,8 @@
 	"No": "Não",
 	"Install and restart now?": "Instalar e reiniciar agora?",
 	"Restart": "Reiniciar",
-	"Later": "Depois"
+	"Later": "Depois",
+	"Extract Audio": "Extrair Áudio",
+	"Select Video Format ": "Selecionar Formato de Vídeo ",
+	"Select Audio Format ": "Seleccionar formato de audio "
 }

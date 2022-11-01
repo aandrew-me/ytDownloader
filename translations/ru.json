@@ -63,5 +63,8 @@
 	"No": "Нет",
 	"Install and restart now?": "Установить и перезапустить сейчас?",
 	"Restart": "Перезапустить",
-	"Later": "Позже"
+	"Later": "Позже",
+	"Extract Audio": "Извлечь аудио",
+	"Select Video Format ": "Выберите формат видео ",
+	"Select Audio Format ": "Выберите формат аудио "
 }
