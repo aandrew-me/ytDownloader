@@ -239,3 +239,4 @@ getId("videoFormat").textContent = i18n.__("Select Video Format ");
 getId("audioFormat").textContent = i18n.__("Select Audio Format ");
 
 getId("download").textContent = i18n.__("Download");
+getId("audioDownload").textContent = i18n.__("Download");
