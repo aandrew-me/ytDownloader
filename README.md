@@ -2,6 +2,10 @@
 
 <p><a href="https://flatstat.mijorus.it/app/me.aandrew.ytdownloader"  align="center"><img width="250" src="https://img.shields.io/endpoint?url=https://flathub-stats-backend.vercel.app/badges/me.aandrew.ytdownloader/shields.io.json"></a></p>
 
+[![Flathub](https://img.shields.io/flathub/v/me.aandrew.ytdownloader)](https://flathub.org/apps/details/me.aandrew.ytdownloader)
+[![AUR version](https://img.shields.io/aur/version/ytdownloader-gui)](https://aur.archlinux.org/packages/ytdownloader-gui)
+[![Snapcraft](https://badgen.net/snapcraft/v/ytdownloader)](https://snapcraft.io/ytdownloader)
+
 A modern GUI video and audio downloader supporting [hundreds of sites](https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md)
 
 <a href="https://flathub.org/apps/details/me.aandrew.ytdownloader"><img src="https://flathub.org/assets/badges/flathub-badge-en.svg" style="width:180px;"></a>
