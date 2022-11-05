@@ -60,6 +60,10 @@ The app is available in [AUR](https://aur.archlinux.org/packages/ytdownloader-gu
 ```
 pamac install ytdownloader-gui
 ```
+Using yay
+```
+yay -S ytdownloader-gui
+```
 
 ## macOS 🍎
 Since the app is not signed, when you will try to open the app, macOS will not allow you to open it. So you will need to follow some steps to open it.
