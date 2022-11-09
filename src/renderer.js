@@ -524,20 +524,20 @@ function download(type) {
 		}
 	}
 
-	localStorage.setItem("itemList", "");
+	// localStorage.setItem("itemList", "");
 	// let itemList = [];
 	// if (localStorage.getItem("itemList")) {
 	// 	itemList = JSON.parse(localStorage.getItem("itemList"));
 	// }
-	const itemInfo = {
-		id: randomId,
-		format_id: format_id,
-		title: title,
-		url: url,
-		ext: ext,
-		type: type,
-		thumbnail: thumbnail,
-	};
+	// const itemInfo = {
+	// 	id: randomId,
+	// 	format_id: format_id,
+	// 	title: title,
+	// 	url: url,
+	// 	ext: ext,
+	// 	type: type,
+	// 	thumbnail: thumbnail,
+	// };
 	// itemList.push(itemInfo);
 	// localStorage.setItem("itemList", JSON.stringify(itemList));
 
@@ -567,22 +567,26 @@ function download(type) {
 
 	let downloadProcess;
 	let filename = "";
+
+	// Filtering characters for Unix platforms
+	let pattern  = ["/"]
+
+	if (process.platform === "win32"){
+		pattern = ["[", "]", "*", "<", ">", "|", "\\", "/", "?"]
+	}
+
 	// Trying to remove ambiguous characters
 	for (let i = 0; i < title.length; i++) {
-		const pattern = /^[`~!@#$%^&*:;,<>?/|'"-+=\]\[]$/g;
 		let letter = "";
-		if (pattern.test(title[i])) {
+		if (pattern.includes(title[i])) {
 			letter = "";
 		} else {
-			if (title[i] == " ") {
-				letter = "_";
-			} else {
-				letter = title[i];
-			}
+			letter = title[i];
 		}
 		filename += letter;
 	}
 	filename = filename.slice(0, 100);
+	console.log(filename);
 	// + Math.random().toFixed(3).toString().slice(2);
 
 	let audioFormat;
