@@ -31,8 +31,8 @@ let subs = "";
 let subLangs;
 // let autoSubs = ""
 let rangeOption = "--download-sections";
-let cookieArg = ""
-let browser = ""
+let cookieArg = "";
+let browser = "";
 
 function getId(id) {
 	return document.getElementById(id);
@@ -202,22 +202,25 @@ async function getInfo(url) {
 	getId("endTime").value = "";
 
 	// Whether to use browser cookies or not
-	if (localStorage.getItem("browser")){
-		browser = localStorage.getItem("browser")
+	if (localStorage.getItem("browser")) {
+		browser = localStorage.getItem("browser");
 	}
-	 if(browser){
-		cookieArg = "--cookies-from-browser"
-	 }
-	 else{
-		cookieArg = ""
-	 }
+	if (browser) {
+		cookieArg = "--cookies-from-browser";
+	} else {
+		cookieArg = "";
+	}
 
 	let validInfo = true;
 	let info = "";
 
-	const infoProcess = cp.spawn(ytDlp, ["-j", "--no-playlist", cookieArg, browser, `"${url}"`], {
-		shell: true,
-	});
+	const infoProcess = cp.spawn(
+		ytDlp,
+		["-j", "--no-playlist", cookieArg, browser, `"${url}"`],
+		{
+			shell: true,
+		}
+	);
 
 	infoProcess.stdout.on("data", (data) => {
 		info += data;
@@ -550,7 +553,9 @@ function download(type) {
 
 		<div class="itemBody">
 			<div class="itemTitle">${title}</div>
-			<div class="itemType">${type === "video" ? i18n.__("Video") : i18n.__("Audio")}</div>
+			<div class="itemType">${
+				type === "video" ? i18n.__("Video") : i18n.__("Audio")
+			}</div>
 			<div id="${randomId + "prog"}" class="itemProgress"></div>
 		</div>
 	</div>
@@ -569,10 +574,10 @@ function download(type) {
 	let filename = "";
 
 	// Filtering characters for Unix platforms
-	let pattern  = ["/"]
+	let pattern = ["/", '"', "`"];
 
-	if (process.platform === "win32"){
-		pattern = ["[", "]", "*", "<", ">", "|", "\\", "/", "?"]
+	if (process.platform === "win32") {
+		pattern = ["[", "]", "*", "<", ">", "|", "\\", "/", "?", '"', "`"];
 	}
 
 	// Trying to remove ambiguous characters
@@ -788,7 +793,7 @@ function afterSave(location, filename, progressId) {
 	}
 	getId(
 		progressId
-	).innerHTML = `<b onClick="showItem('${finalLocation}', '${finalFilename}')">${i18n.__(
+	).innerHTML = `<b onClick="showItem(\`${finalLocation}\`, \`${finalFilename}\`)">${i18n.__(
 		"File saved. Click to Open"
 	)}</b>`;
 }
