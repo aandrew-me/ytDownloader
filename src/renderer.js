@@ -304,8 +304,7 @@ async function getInfo(url) {
 						"<option value='" +
 						format_id +
 						"'>" +
-						(i18n.__(format.format_note) ||
-							format.resolution ||
+						(format.resolution || i18n.__(format.format_note) ||
 							"Unknown quality") +
 						"  |  " +
 						format.ext +
