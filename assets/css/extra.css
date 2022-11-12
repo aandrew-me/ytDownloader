@@ -21,6 +21,12 @@ input[type="text"]{
     border:none;
     width:60%;
 }
+
+.prefBox{
+    display:flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
 #save{
     padding:10px;
     border-radius: 8px;
@@ -92,8 +98,9 @@ select {
 	border-radius: 8px;
 	cursor: pointer;
 	font-size: large;
-	margin: 8px;
 	outline: none;
+    position:relative;
+    bottom:8px;
 }
 #browserInfo{
     cursor: pointer;
