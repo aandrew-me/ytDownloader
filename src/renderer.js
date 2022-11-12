@@ -35,14 +35,14 @@ let cookieArg = "";
 let browser = "";
 
 // Video and audio preferences
-let preferredVideoQuality = ""
-let preferredAudioQuality = ""
-if (localStorage.getItem("preferredVideoQuality")){
-	preferredVideoQuality = localStorage.getItem("preferredVideoQuality")
+let preferredVideoQuality = "";
+let preferredAudioQuality = "";
+if (localStorage.getItem("preferredVideoQuality")) {
+	preferredVideoQuality = localStorage.getItem("preferredVideoQuality");
 }
-if (localStorage.getItem("preferredAudioQuality")){
-	preferredAudioQuality = localStorage.getItem("preferredAudioQuality")
-	getId("extractSelection").value = preferredAudioQuality
+if (localStorage.getItem("preferredAudioQuality")) {
+	preferredAudioQuality = localStorage.getItem("preferredAudioQuality");
+	getId("extractSelection").value = preferredAudioQuality;
 }
 
 function getId(id) {
@@ -204,6 +204,7 @@ getId("pasteUrl").addEventListener("click", () => {
 
 // Getting video info
 async function getInfo(url) {
+	let selected = false;
 	onlyvideo = false;
 	let audioIsPresent = false;
 	downloadPathSelection();
@@ -271,9 +272,19 @@ async function getInfo(url) {
 			videoToggle.style.backgroundColor = "rgb(67, 212, 164)";
 
 			let audioSize = 0;
+			let defaultVideoFormat = 0;
 
 			// Getting approx size of audio file and checking if audio is present
-			for (let format of formats) {		
+			for (let format of formats) {
+				// Find the item with the preferred video format
+				if (
+					format.height <= preferredVideoQuality &&
+					format.height > defaultVideoFormat &&
+					format.video_ext !== "none"
+				) {
+					defaultVideoFormat = format.height;
+				}
+
 				if (
 					format.audio_ext !== "none" ||
 					(format.acodec !== "none" && format.video_ext === "none")
@@ -285,9 +296,14 @@ async function getInfo(url) {
 						1000000;
 				}
 			}
-
 			for (let format of formats) {
 				let size;
+				let selectedText = "";
+				if (format.height == defaultVideoFormat && !selected) {
+					selectedText = " selected ";
+					selected = true;
+				}
+
 				if (format.filesize || format.filesize_approx) {
 					size = (
 						Number(format.filesize || format.filesize_approx) /
@@ -298,6 +314,7 @@ async function getInfo(url) {
 				}
 
 				// For videos
+
 				if (
 					format.video_ext !== "none" &&
 					format.audio_ext === "none"
@@ -309,14 +326,26 @@ async function getInfo(url) {
 						size = size + " " + i18n.__("MB");
 					}
 
-					const format_id = format.format_id + "|" + format.ext + "|" + format.height;
+					const format_id =
+						format.format_id +
+						"|" +
+						format.ext +
+						"|" +
+						(format.height || "NO");
 
 					const element =
 						"<option value='" +
 						format_id +
-						"'>" +
-						(`${format.height}p` || format.resolution || i18n.__(format.format_note) ||
-							"Unknown quality") +
+						"'" +
+						selectedText +
+						">" +
+						(format.height
+							? format.height + "p"
+							: "" ||
+							  format.resolution ||
+							  i18n.__(format.format_note) ||
+							  format.format_id ||
+							  "Unknown quality") +
 						"  |  " +
 						format.ext +
 						"  |  " +
@@ -411,10 +440,10 @@ getId("audioDownload").addEventListener("click", (event) => {
 });
 
 getId("extractBtn").addEventListener("click", () => {
-	const value = getId("extractSelection").value
+	const value = getId("extractSelection").value;
 	extractFormat = value;
-	preferredAudioQuality = value
-	localStorage.setItem("preferredAudioQuality", value)
+	preferredAudioQuality = value;
+	localStorage.setItem("preferredAudioQuality", value);
 	getId("hidden").style.display = "none";
 	download("extract");
 });
@@ -529,11 +558,16 @@ function download(type) {
 	const randomId = Math.random().toFixed(10).toString().slice(2);
 
 	if (type === "video") {
-		const videoValue = getId("videoFormatSelect").value
+		const videoValue = getId("videoFormatSelect").value;
 		format_id = videoValue.split("|")[0];
 		ext = videoValue.split("|")[1];
-		preferredVideoQuality = videoValue.split("|")[2]
-		localStorage.setItem("preferredVideoQuality", videoValue.split("|")[2])
+		if (videoValue.split("|")[2] != "NO") {
+			preferredVideoQuality = Number(videoValue.split("|")[2]);
+			localStorage.setItem(
+				"preferredVideoQuality",
+				Number(videoValue.split("|")[2])
+			);
+		}
 	} else if (type === "audio") {
 		format_id = getId("audioFormatSelect").value.split("|")[0];
 		if (getId("audioFormatSelect").value.split("|")[1] === "webm") {
