@@ -34,6 +34,17 @@ let rangeOption = "--download-sections";
 let cookieArg = "";
 let browser = "";
 
+// Video and audio preferences
+let preferredVideoQuality = ""
+let preferredAudioQuality = ""
+if (localStorage.getItem("preferredVideoQuality")){
+	preferredVideoQuality = localStorage.getItem("preferredVideoQuality")
+}
+if (localStorage.getItem("preferredAudioQuality")){
+	preferredAudioQuality = localStorage.getItem("preferredAudioQuality")
+	getId("extractSelection").value = preferredAudioQuality
+}
+
 function getId(id) {
 	return document.getElementById(id);
 }
@@ -262,7 +273,7 @@ async function getInfo(url) {
 			let audioSize = 0;
 
 			// Getting approx size of audio file and checking if audio is present
-			for (let format of formats) {
+			for (let format of formats) {		
 				if (
 					format.audio_ext !== "none" ||
 					(format.acodec !== "none" && format.video_ext === "none")
@@ -298,13 +309,13 @@ async function getInfo(url) {
 						size = size + " " + i18n.__("MB");
 					}
 
-					const format_id = format.format_id + "|" + format.ext;
+					const format_id = format.format_id + "|" + format.ext + "|" + format.height;
 
 					const element =
 						"<option value='" +
 						format_id +
 						"'>" +
-						(format.resolution || i18n.__(format.format_note) ||
+						(`${format.height}p` || format.resolution || i18n.__(format.format_note) ||
 							"Unknown quality") +
 						"  |  " +
 						format.ext +
@@ -400,7 +411,10 @@ getId("audioDownload").addEventListener("click", (event) => {
 });
 
 getId("extractBtn").addEventListener("click", () => {
-	extractFormat = getId("extractSelection").value;
+	const value = getId("extractSelection").value
+	extractFormat = value;
+	preferredAudioQuality = value
+	localStorage.setItem("preferredAudioQuality", value)
 	getId("hidden").style.display = "none";
 	download("extract");
 });
@@ -515,8 +529,11 @@ function download(type) {
 	const randomId = Math.random().toFixed(10).toString().slice(2);
 
 	if (type === "video") {
-		format_id = getId("videoFormatSelect").value.split("|")[0];
-		ext = getId("videoFormatSelect").value.split("|")[1];
+		const videoValue = getId("videoFormatSelect").value
+		format_id = videoValue.split("|")[0];
+		ext = videoValue.split("|")[1];
+		preferredVideoQuality = videoValue.split("|")[2]
+		localStorage.setItem("preferredVideoQuality", videoValue.split("|")[2])
 	} else if (type === "audio") {
 		format_id = getId("audioFormatSelect").value.split("|")[0];
 		if (getId("audioFormatSelect").value.split("|")[1] === "webm") {
