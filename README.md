@@ -85,12 +85,14 @@ Translations into other languages would be highly appreciated. If you want to he
 |German | ✔️ [Proxycon](https://github.com/proxycon)|
 |Italian  | ✔️ [albanobattistella](https://github.com/albanobattistella)|
 |Persian | ✔️ [TheBlueQuasar](https://github.com/TheBlueQuasar)|
+|Polish | ✔️ [MrQuerter](https://github.com/MrQuerter)|
 |Portuguese (Brazil) | ✔️ [André](https://github.com/andre1828)|
 |Russian | ✔️ |
 |Spanish | ✔️ [haggen88](https://github.com/haggen88)|
 | Turkish | ✔️ [nxjosephofficial](https://github.com/nxjosephofficial) |
 | Ukrainian | ✔️ [KotoWhiskas](https://github.com/KotoWhiskas) |
 
+Thanks to all of the translators 💙
 ## Used technologies
 - [yt-dlp](https://github.com/yt-dlp/yt-dlp)
 - [Electron](https://www.electronjs.org/)
