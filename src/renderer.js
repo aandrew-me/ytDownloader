@@ -340,7 +340,7 @@ async function getInfo(url) {
 						selectedText +
 						">" +
 						(format.height
-							? format.height + "p"
+							? format.height + "p" + (format.fps == 60 ? "60" : "")
 							: "" ||
 							  format.resolution ||
 							  i18n.__(format.format_note) ||
