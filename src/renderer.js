@@ -228,7 +228,7 @@ async function getInfo(url) {
 
 	const infoProcess = cp.spawn(
 		ytDlp,
-		["-j", "--no-playlist", cookieArg, browser, `"${url}"`],
+		["-j", "--no-playlist", "--no-warnings", cookieArg, browser, `"${url}"`],
 		{
 			shell: true,
 		}
