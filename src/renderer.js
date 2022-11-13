@@ -846,6 +846,8 @@ function afterSave(location, filename, progressId) {
 	).innerHTML = `<b onClick="showItem(\`${finalLocation}\`, \`${finalFilename}\`)">${i18n.__(
 		"File saved. Click to Open"
 	)}</b>`;
+
+	window.scrollTo(0, document.body.scrollHeight);
 }
 
 function showItem(location, filename) {
