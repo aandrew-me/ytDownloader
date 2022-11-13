@@ -74,6 +74,9 @@ function download(type) {
 	if (type === "video") {
 		quality = getId("select").value;
 		format = `"mp4[height<=${quality}]+m4a/mp4[height<=${quality}]/bv[height<=${quality}]+ba/best[height<=${quality}]/best"`;
+		if (getId("downloadBestQualityChecked").checked) {
+			format = "bv*+ba";
+		}
 	} else {
 		format = getId("audioSelect").value;
 	}
@@ -92,6 +95,8 @@ function download(type) {
 					"Playlist_vid_%(playlist_id)s",
 					"%(playlist_index)s.%(title)s.%(ext)s"
 				)}"`,
+				"--ffmpeg-location",
+				ffmpeg,
 				cookieArg,
 				browser,
 
@@ -140,6 +145,7 @@ function download(type) {
 			if (platform() == "win32") {
 				folderLocation =  folderLocation.split(path.sep).join("\\\\");
 			}
+			console.log(folderLocation);
 		}
 
 		if (eventData.includes(playlistTxt)) {
@@ -171,6 +177,8 @@ function download(type) {
 			)}</p>
 			</div>`;
 			getId("list").innerHTML += item;
+
+			window.scrollTo(0, document.body.scrollHeight);
 		}
 	});
 
@@ -206,6 +214,15 @@ function download(type) {
 		};
 	});
 }
+
+// Disable the option to select
+getId("downloadBestQualityChecked").addEventListener("click", () => {
+	if (getId("downloadBestQualityChecked").checked) {
+		getId("select").disabled = true;
+		return;
+	}
+	getId("select").disabled = false;
+});
 
 // Downloading video
 getId("download").addEventListener("click", () => {

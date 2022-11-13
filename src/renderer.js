@@ -243,7 +243,7 @@ async function getInfo(url) {
 		console.log(error.toString("utf8"));
 		getId("loadingWrapper").style.display = "none";
 		getId("incorrectMsg").textContent = i18n.__(
-			"Some error has occured. Check your network and use correct URL"
+			"Some error has occurred. Check your network and use correct URL"
 		);
 	});
 
