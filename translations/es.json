@@ -23,14 +23,12 @@
 	"Source Code is available ": "El código fuente está disponible ",
 	"here": "aquí",
 	"Processing": "Procesando",
-	"Some error has occured. Check your network and use correct URL": "Ha ocurrido algún error. Verifique su red y use la URL correcta",
 	"Failed to download necessary files. Please check your network and try again": "No se han podido descargar los archivos necesarios. Por favor, compruebe su red e inténtelo de nuevo",
 	"Try again": "Inténtelo de nuevo",
 	"Unknown size": "Tamaño desconocido",
 	"MB": "MB",
 	"Unknown quality": "Calidad desconocida",
 	"Downloading...": "Descargando...",
-	"Some error has occured. Hover to see details": "Ha ocurrido algún error. Pase el cursor para ver los detalles",
 	"File saved successfully": "Archivo guardado con éxito",
 	"File saved. Click to Open": "Archivo guardado. Haga clic para abrir",
 	"Preparing...": "Preparando...",
@@ -65,5 +63,8 @@
 	"Later": "Luego",
 	"Extract Audio": "Extraer Audio",
 	"Select Video Format ": "Seleccionar formato de vídeo ",
-	"Select Audio Format ": "Seleccionar formato de audio "
+	"Select Audio Format ": "Seleccionar formato de audio ",
+	"Maximum number of active downloads": "Maximum number of active downloads",
+	"Some error has occurred. Hover to see details": "Ha ocurrido algún error. Pase el cursor para ver los detalles",
+	"Some error has occurred. Check your network and use correct URL": "Ha ocurrido algún error. Verifique su red y use la URL correcta"
 }
