@@ -23,12 +23,14 @@
 	"Source Code is available ": "Kaynak kodu mevcuttur ",
 	"here": "burada",
 	"Processing": "İşleniyor",
+	"Some error has occurred. Check your network and use correct URL": "Hata oluştu. İnternetinizi kontrol edin ve doğru bir bağlantı kullanın",
 	"Failed to download necessary files. Please check your network and try again": "Dosyalar indirilemedi. Lütfen internetinizi kontrol edin ve tekrar deneyin",
 	"Try again": "Tekrar deneyin",
 	"Unknown size": "Bilinmeyen boyut",
 	"MB": "MB",
 	"Unknown quality": "Bilinmeyen kalite",
 	"Downloading...": "İndiriliyor...",
+	"Some error has occurred. Hover to see details": "Hata oluştu. Detayları görmek için üzerine gelin",
 	"File saved successfully": "Dosya başarıyla kaydedildi",
 	"File saved. Click to Open": "Dosya kaydedildi. Açmak için tıklayın",
 	"Preparing...": "Hazırlanıyor...",
@@ -64,7 +66,7 @@
 	"Extract Audio": "Sesi çıkart",
 	"Select Video Format ": "Video Formatını Seçin ",
 	"Select Audio Format ": "Ses Formatını Seçin ",
-	"Maximum number of active downloads": "Maksimum aktif indirme sayısı",
-	"Some error has occurred. Hover to see details": "Hata oluştu. Detayları görmek için üzerine gelin",
-	"Some error has occurred. Check your network and use correct URL": "Hata oluştu. İnternetinizi kontrol edin ve doğru bir bağlantı kullanın"
+	"Maximum number of active downloads": "Maximum number of active downloads",
+	"Preferred video quality": "Preferred video quality",
+	"Preferred audio format": "Preferred audio format"
 }
