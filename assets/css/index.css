@@ -421,3 +421,20 @@ body::-webkit-scrollbar-thumb {
 	background-color: rgb(79, 78, 78);
 	border-radius: 5px;
 }
+
+#goToTop {
+	display: none;
+	position: fixed;
+	bottom: 10px;
+	right: 10px;
+	z-index: 99;
+	border: none;
+	outline: none;
+	background-image: url(../images/up-arrow.png);
+	background-size: contain;
+	width: 40px;
+	height: 40px;
+	cursor: pointer;
+	color: white;
+	cursor: pointer;
+}  

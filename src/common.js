@@ -98,3 +98,21 @@ function advancedToggle() {
 		advancedHidden = true;
 	}
 }
+
+// Check scroll go to top
+
+window.onscroll = function() {scrollFunction()};
+
+function scrollFunction() {
+  if (document.body.scrollTop > 50 || document.documentElement.scrollTop > 50) {
+    getId("goToTop").style.display = "block";
+  } else {
+    getId("goToTop").style.display = "none";
+  }
+}
+
+// Function to scroll go to top
+
+getId("goToTop").addEventListener("click", () => {
+	window.scrollTo({top: 0, behavior: 'smooth'});
+});

@@ -243,7 +243,7 @@ async function getInfo(url) {
 		console.log(error.toString("utf8"));
 		getId("loadingWrapper").style.display = "none";
 		getId("incorrectMsg").textContent = i18n.__(
-			"Some error has occured. Check your network and use correct URL"
+			"Some error has occurred. Check your network and use correct URL"
 		);
 	});
 
@@ -846,6 +846,8 @@ function afterSave(location, filename, progressId) {
 	).innerHTML = `<b onClick="showItem(\`${finalLocation}\`, \`${finalFilename}\`)">${i18n.__(
 		"File saved. Click to Open"
 	)}</b>`;
+
+	window.scrollTo(0, document.body.scrollHeight);
 }
 
 function showItem(location, filename) {
