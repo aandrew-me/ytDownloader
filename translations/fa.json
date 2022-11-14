@@ -23,12 +23,14 @@
 	"Source Code is available ": "کد منبع دردسترس است ",
 	"here": "این‌جا",
 	"Processing": "درحال پردازش",
+	"Some error has occurred. Check your network and use correct URL": "خطایی رخ داده‌است. اتصال شبکه‌ی خود را بررسی کرده و از نشانی اینترنتی صحیح استفاده کنید",
 	"Failed to download necessary files. Please check your network and try again": "بارگیری پرونده‌های ضروری ناموفق بود. لطفا اتصال شبکه‌ی خود را بررسی کرده و دوباره تلاش کنید",
 	"Try again": "دوباره تلاش‌ کن",
 	"Unknown size": "اندازه‌ی نامشخص",
 	"MB": "مگابایت",
 	"Unknown quality": "کیفیت نامشخص",
 	"Downloading...": "درحال بارگیری...",
+	"Some error has occurred. Hover to see details": "خطایی رخ داده‌است. برای دیدن جزئیات نشانگر موس را نگه‌دارید",
 	"File saved successfully": "پرونده با موفقیت ذخیره شد",
 	"File saved. Click to Open": "پرونده ذخیره‌شد. برای بازکردن کلیک کنید",
 	"Preparing...": "درحال آماده‌سازی...",
@@ -65,6 +67,6 @@
 	"Select Video Format ": "انتخاب فرمت ویدیو ",
 	"Select Audio Format ": "انتخاب فرمت صدا ",
 	"Maximum number of active downloads": "Maximum number of active downloads",
-	"Some error has occurred. Hover to see details": "خطایی رخ داده‌است. برای دیدن جزئیات نشانگر موس را نگه‌دارید",
-	"Some error has occurred. Check your network and use correct URL": "خطایی رخ داده‌است. اتصال شبکه‌ی خود را بررسی کرده و از نشانی اینترنتی صحیح استفاده کنید"
+	"Preferred video quality": "Preferred video quality",
+	"Preferred audio format": "Preferred audio format"
 }
