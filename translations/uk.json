@@ -23,12 +23,14 @@
 	"Source Code is available ": "Доступний вихідний код ",
 	"here": "тут",
 	"Processing": "Обробка",
+	"Some error has occurred. Check your network and use correct URL": "Сталася помилка. Перевірте Вашу мережу та введіть коректний URL",
 	"Failed to download necessary files. Please check your network and try again": "Не вдалося завантажити необхідні файли. Будь ласка, перевірте мережу та спробуйте знову",
 	"Try again": "Спробуйте знову",
 	"Unknown size": "Невідомий розмір",
 	"MB": "МБ",
 	"Unknown quality": "Невідома якість",
 	"Downloading...": "Завантаження...",
+	"Some error has occurred. Hover to see details": "Сталася помилка. Наведіть мишею, щоб побачити деталі",
 	"File saved successfully": "Файл успішно збережений",
 	"File saved. Click to Open": "Файл збережено. Натисніть, щоб відкрити",
 	"Preparing...": "Підготовка...",
@@ -65,6 +67,6 @@
 	"Select Video Format ": "Оберіть формат відео ",
 	"Select Audio Format ": "Виберіть формат аудіо ",
 	"Maximum number of active downloads": "Maximum number of active downloads",
-	"Some error has occurred. Hover to see details": "Сталася помилка. Наведіть мишею, щоб побачити деталі",
-	"Some error has occurred. Check your network and use correct URL": "Сталася помилка. Перевірте Вашу мережу та введіть коректний URL"
+	"Preferred video quality": "Preferred video quality",
+	"Preferred audio format": "Preferred audio format"
 }
