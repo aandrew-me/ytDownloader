@@ -65,6 +65,9 @@
 	"Later":"Later",
 	"Extract Audio":"Extract Audio",
 	"Select Video Format ":"Select Video Format ",
-	"Select Audio Format ":"Select Audio Format "
+	"Select Audio Format ":"Select Audio Format ",
+	"Maximum number of active downloads":"Maximum number of active downloads",
+	"Preferred video quality": "Preferred video quality",
+	"Preferred audio format": "Preferred audio format"
 
 }
