@@ -797,7 +797,7 @@ function download(type) {
 		})
 		.once("error", (error) => {
 			getId(randomId + "prog").textContent = i18n.__(
-				"Some error has occured. Hover to see details"
+				"Some error has occurred. Hover to see details"
 			);
 			getId(randomId + "prog").title = error.message;
 			console.log(error.message);

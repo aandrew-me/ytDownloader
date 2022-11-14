@@ -195,7 +195,7 @@ function download(type) {
 		getId("options").style.display = "block";
 		getId("playlistName").textContent = "";
 		getId("incorrectMsg").textContent = i18n.__(
-			"Some error has occured. Check your network and use correct URL"
+			"Some error has occurred. Check your network and use correct URL"
 		);
 		getId("incorrectMsg").title = error;
 	});
