@@ -23,14 +23,12 @@
 	"Source Code is available ": "Исходный код доступен ",
 	"here": "здесь",
 	"Processing": "Обрабатывается",
-	"Some error has occured. Check your network and use correct URL": "Произошла ошибка. Проверьте свою сеть и используйте правильный URL",
 	"Failed to download necessary files. Please check your network and try again": "Не удалось загрузить необходимые файлы. Пожалуйста, проверьте сеть и повторите попытку",
 	"Try again": "Пробовать снова",
 	"Unknown size": "Размер неизвестен",
 	"MB": "MБ",
 	"Unknown quality": "Неизвестное качество",
 	"Downloading...": "Скачивается...",
-	"Some error has occured. Hover to see details": "Произошла ошибка. Чтобы увидеть подробности, наведите курсор",
 	"File saved successfully": "Файл успешно сохранен",
 	"File saved. Click to Open": "Файл сохранён. Нажмите, чтобы открыть",
 	"Preparing...": "Идет подготовка...",
@@ -65,5 +63,8 @@
 	"Later": "Позже",
 	"Extract Audio": "Извлечь аудио",
 	"Select Video Format ": "Выберите формат видео ",
-	"Select Audio Format ": "Выберите формат аудио "
+	"Select Audio Format ": "Выберите формат аудио ",
+	"Maximum number of active downloads": "Maximum number of active downloads",
+	"Some error has occurred. Hover to see details": "Произошла ошибка. Чтобы увидеть подробности, наведите курсор",
+	"Some error has occurred. Check your network and use correct URL": "Произошла ошибка. Проверьте свою сеть и используйте правильный URL"
 }

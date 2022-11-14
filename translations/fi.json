@@ -23,14 +23,12 @@
 	"Source Code is available ": "Lähdekoodi on saatavilla ",
 	"here": "täällä",
 	"Processing": "Käsitellään",
-	"Some error has occured. Check your network and use correct URL": "Ilmeni jokin virhe. Tarkista verkkoyhteytesi ja käytä kelvollista URL-osoitetta",
 	"Failed to download necessary files. Please check your network and try again": "Tarvittavia tiedostoja ei saatu ladattua. Tarkista verkkoyhteytesi ja koeta uudelleen",
 	"Try again": "Yritä uudelleen",
 	"Unknown size": "Tuntematon koko",
 	"MB": "Mt",
 	"Unknown quality": "Tuntematon laatu",
 	"Downloading...": "Ladataan...",
-	"Some error has occured. Hover to see details": "Ilmeni jokin virhe. Ohjaa hiiri ylle nähdäksesi virheen yksityiskohdat",
 	"File saved successfully": "Tiedosto tallennettu onnistuneesti",
 	"File saved. Click to Open": "Tiedosto tallennettu. Napsauta tästä avataksesi kohdekansion",
 	"Preparing...": "Valmistellaan...",
@@ -65,5 +63,8 @@
 	"Later": "Myöhemmin",
 	"Extract Audio": "Pura Ääni",
 	"Select Video Format ": "Valitse Videon Muoto ",
-	"Select Audio Format ": "Valitse Äänen Muoto "
+	"Select Audio Format ": "Valitse Äänen Muoto ",
+	"Maximum number of active downloads": "Maximum number of active downloads",
+	"Some error has occurred. Hover to see details": "Ilmeni jokin virhe. Ohjaa hiiri ylle nähdäksesi virheen yksityiskohdat",
+	"Some error has occurred. Check your network and use correct URL": "Ilmeni jokin virhe. Tarkista verkkoyhteytesi ja käytä kelvollista URL-osoitetta"
 }
