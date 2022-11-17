@@ -72,11 +72,8 @@ a{
 }
 
 input[type="checkbox"]{
-    width:20px;
-    height:20px;
-    position: relative;
-    left:5px;
-    top: 5px;
+    width:25px;
+    height:25px;
 }
 
 #selectLocation{
@@ -106,7 +103,6 @@ select {
 	font-size: large;
 	outline: none;
     position:relative;
-    bottom:8px;
 }
 #browserInfo{
     cursor: pointer;

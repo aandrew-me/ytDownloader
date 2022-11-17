@@ -37,13 +37,7 @@ let browser = "";
 // Video and audio preferences
 let preferredVideoQuality = "";
 let preferredAudioQuality = "";
-if (localStorage.getItem("preferredVideoQuality")) {
-	preferredVideoQuality = localStorage.getItem("preferredVideoQuality");
-}
-if (localStorage.getItem("preferredAudioQuality")) {
-	preferredAudioQuality = localStorage.getItem("preferredAudioQuality");
-	getId("extractSelection").value = preferredAudioQuality;
-}
+
 
 function getId(id) {
 	return document.getElementById(id);
@@ -212,6 +206,13 @@ async function getInfo(url) {
 	getId("audioFormatSelect").innerHTML = "";
 	getId("startTime").value = "";
 	getId("endTime").value = "";
+	if (localStorage.getItem("preferredVideoQuality")) {
+		preferredVideoQuality = localStorage.getItem("preferredVideoQuality");
+	}
+	if (localStorage.getItem("preferredAudioQuality")) {
+		preferredAudioQuality = localStorage.getItem("preferredAudioQuality");
+		getId("extractSelection").value = preferredAudioQuality;
+	}
 
 	// Whether to use browser cookies or not
 	if (localStorage.getItem("browser")) {
@@ -563,10 +564,6 @@ function download(type) {
 		ext = videoValue.split("|")[1];
 		if (videoValue.split("|")[2] != "NO") {
 			preferredVideoQuality = Number(videoValue.split("|")[2]);
-			localStorage.setItem(
-				"preferredVideoQuality",
-				Number(videoValue.split("|")[2])
-			);
 		}
 	} else if (type === "audio") {
 		format_id = getId("audioFormatSelect").value.split("|")[0];
