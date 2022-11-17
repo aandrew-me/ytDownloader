@@ -46,8 +46,8 @@ let playlistId = "";
 let folderLocation;
 
 function download(type) {
-	getId("list").innerHTML = ""
-	getId("playlistName").textContent = ""
+	getId("list").innerHTML = "";
+	getId("playlistName").textContent = "";
 
 	// Whether to use browser cookies or not
 	if (localStorage.getItem("browser")) {
@@ -60,11 +60,6 @@ function download(type) {
 	}
 	let count = 0;
 	let playlistName;
-	const date = new Date();
-	const today =
-		date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
-	let playlistDirName =
-		"Playlist" + Math.random().toFixed(5).toString().slice(2) + "_" + today;
 
 	getId("options").style.display = "none";
 	getId("pasteLink").style.display = "none";
@@ -73,9 +68,10 @@ function download(type) {
 	let quality, format, downloadProcess;
 	if (type === "video") {
 		quality = getId("select").value;
-		format = `"mp4[height<=${quality}]+m4a/mp4[height<=${quality}]/bv[height<=${quality}]+ba/best[height<=${quality}]/best"`;
-		if (getId("downloadBestQualityChecked").checked) {
-			format = "bv*+ba";
+		if (quality === "best") {
+			format = "bv*+ba/best";
+		} else {
+			format = `"mp4[height<=${quality}]+m4a/mp4[height<=${quality}]/bv[height<=${quality}]+ba/best[height<=${quality}]/best"`;
 		}
 	} else {
 		format = getId("audioSelect").value;
@@ -136,14 +132,19 @@ function download(type) {
 		if (eventData.includes(playlistIdTxt)) {
 			playlistId = eventData.split(" ")[3].split(";")[0];
 			// Opening folder
-			if (type === "video"){
-				folderLocation =  path.join(downloadDir, "Playlist_vid_" + playlistId);
-			}
-			else{
-				folderLocation =  path.join(downloadDir, "Playlist_aud_" + playlistId);
+			if (type === "video") {
+				folderLocation = path.join(
+					downloadDir,
+					"Playlist_vid_" + playlistId
+				);
+			} else {
+				folderLocation = path.join(
+					downloadDir,
+					"Playlist_aud_" + playlistId
+				);
 			}
 			if (platform() == "win32") {
-				folderLocation =  folderLocation.split(path.sep).join("\\\\");
+				folderLocation = folderLocation.split(path.sep).join("\\\\");
 			}
 			console.log(folderLocation);
 		}
@@ -215,15 +216,6 @@ function download(type) {
 	});
 }
 
-// Disable the option to select
-getId("downloadBestQualityChecked").addEventListener("click", () => {
-	if (getId("downloadBestQualityChecked").checked) {
-		getId("select").disabled = true;
-		return;
-	}
-	getId("select").disabled = false;
-});
-
 // Downloading video
 getId("download").addEventListener("click", () => {
 	download("video");
@@ -281,3 +273,4 @@ getId("audioFormat").textContent = i18n.__("Select Audio Format ");
 
 getId("download").textContent = i18n.__("Download");
 getId("audioDownload").textContent = i18n.__("Download");
+getId("bestVideoOption").textContent= i18n.__("Best")
