@@ -88,7 +88,7 @@ function download(type) {
 				"-o",
 				`"${path.join(
 					downloadDir,
-					"Playlist_vid_%(playlist_id)s",
+					"%(uploader)s",
 					"%(playlist_index)s.%(title)s.%(ext)s"
 				)}"`,
 				"--ffmpeg-location",
@@ -111,7 +111,7 @@ function download(type) {
 				"-o",
 				`"${path.join(
 					downloadDir,
-					"Playlist_aud_%(playlist_id)s",
+					"%(uploader)s",
 					"%(playlist_index)s.%(title)s.%(ext)s"
 				)}"`,
 				"--ffmpeg-location",
@@ -127,20 +127,23 @@ function download(type) {
 	}
 
 	downloadProcess.on("ytDlpEvent", (eventType, eventData) => {
-		// console.log(eventData);
+		console.log("eventData", eventData);
 
-		if (eventData.includes(playlistIdTxt)) {
-			playlistId = eventData.split(" ")[3].split(";")[0];
+		if (eventData.includes(playlistTxt)) {
+			console.log('join');
+			playlistName = eventData.split(":")[1].slice(1);
+			// playlistId = eventData.split(" ")[3].split(";")[0];
+			playlistId = playlistName.split("-");
 			// Opening folder
 			if (type === "video") {
 				folderLocation = path.join(
 					downloadDir,
-					"Playlist_vid_" + playlistId
+					playlistId[0]
 				);
 			} else {
 				folderLocation = path.join(
 					downloadDir,
-					"Playlist_aud_" + playlistId
+					playlistId[0]
 				);
 			}
 			if (platform() == "win32") {
