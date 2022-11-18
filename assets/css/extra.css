@@ -27,9 +27,9 @@ input[type="text"]{
     flex-direction: row;
     justify-content: space-between;
     margin:0 15px;
-    border: 1px solid rgb(75, 75, 75);
-    padding:10px;
+    padding:15px 10px;
     border-radius: 15px;
+    background-color: rgb(60, 60, 60); 
 }
 
 #save{
@@ -78,7 +78,7 @@ input[type="checkbox"]{
 
 #selectLocation{
     padding:10px;
-    margin:0 15px;
+    margin:0 20px;
     border:none;
     border-radius: 10px;
     font-size: large;
@@ -87,6 +87,7 @@ input[type="checkbox"]{
 	border-bottom: 4px solid rgb(30, 139, 30);
     cursor: pointer;
     position: relative;
+    outline: none;
 }
 #selectLocation:active{
     border-bottom: none;
