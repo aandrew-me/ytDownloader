@@ -3,6 +3,7 @@ const { default: YTDlpWrap } = require("yt-dlp-wrap-extended");
 const path = require("path");
 const os = require("os");
 const { platform } = require("os");
+const { get } = require("http");
 let url;
 const ytDlp = localStorage.getItem("ytdlp");
 const ytdlp = new YTDlpWrap(ytDlp);
@@ -62,6 +63,7 @@ function download(type) {
 	let playlistName;
 
 	getId("options").style.display = "none";
+	getId("openDownloads").style.display = "inline-block"
 	getId("pasteLink").style.display = "none";
 	getId("playlistName").textContent = i18n.__("Processing") + "...";
 
@@ -88,7 +90,7 @@ function download(type) {
 				"-o",
 				`"${path.join(
 					downloadDir,
-					"Playlist_vid_%(playlist_id)s",
+					"%(playlist_title)s",
 					"%(playlist_index)s.%(title)s.%(ext)s"
 				)}"`,
 				"--ffmpeg-location",
@@ -111,7 +113,7 @@ function download(type) {
 				"-o",
 				`"${path.join(
 					downloadDir,
-					"Playlist_aud_%(playlist_id)s",
+					"%(playlist_title)s",
 					"%(playlist_index)s.%(title)s.%(ext)s"
 				)}"`,
 				"--ffmpeg-location",
@@ -134,13 +136,11 @@ function download(type) {
 			// Opening folder
 			if (type === "video") {
 				folderLocation = path.join(
-					downloadDir,
-					"Playlist_vid_" + playlistId
+					downloadDir
 				);
 			} else {
 				folderLocation = path.join(
-					downloadDir,
-					"Playlist_aud_" + playlistId
+					downloadDir
 				);
 			}
 			if (platform() == "win32") {
@@ -167,13 +167,13 @@ function download(type) {
 
 			if (count > 1) {
 				getId(`p${count - 1}`).textContent = i18n.__(
-					"File saved. Click to Open"
+					"File saved."
 				);
 			}
 
 			const item = `<div class="playlistItem">
 			<p class="itemTitle">${itemTitle}</p>
-			<p class="itemProgress" onclick="openFolder('${folderLocation}')" id="p${count}">${i18n.__(
+			<p class="itemProgress" id="p${count}">${i18n.__(
 				"Downloading..."
 			)}</p>
 			</div>`;
@@ -202,8 +202,10 @@ function download(type) {
 	});
 
 	downloadProcess.on("close", () => {
-		getId(`p${count}`).textContent = i18n.__("File saved. Click to Open");
+		getId(`p${count}`).textContent = i18n.__("File saved.");
 		getId("pasteLink").style.display = "inline-block";
+		getId("openDownloads").style.display = "none"
+
 
 		const notify = new Notification("ytDownloader", {
 			body: i18n.__("Playlist downloaded"),
@@ -245,6 +247,10 @@ function closeMenu() {
 		}
 	}, 50);
 }
+
+getId("openDownloads").addEventListener("click", () => {
+	openFolder(downloadDir)
+})
 
 getId("preferenceWin").addEventListener("click", () => {
 	closeMenu();
