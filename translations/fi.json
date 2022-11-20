@@ -67,6 +67,9 @@
 	"Select Video Format ": "Valitse Videon Muoto ",
 	"Select Audio Format ": "Valitse Äänen Muoto ",
 	"Maximum number of active downloads": "Maximum number of active downloads",
-	"Preferred video quality": "Preferred video quality",
-	"Preferred audio format": "Preferred audio format"
+	"Preferred video quality": "Ensisijainen videon laatu",
+	"Preferred audio format": "Haluttu ääniformaatti",
+	"Best": "Paras",
+	"File saved.": "Tiedosto tallennettu.",
+	"Open download folder": "Avaa latauskansio"
 }
