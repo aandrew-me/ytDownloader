@@ -67,6 +67,9 @@
 	"Select Video Format ": "انتخاب فرمت ویدیو ",
 	"Select Audio Format ": "انتخاب فرمت صدا ",
 	"Maximum number of active downloads": "Maximum number of active downloads",
-	"Preferred video quality": "Preferred video quality",
-	"Preferred audio format": "Preferred audio format"
+	"Preferred video quality": "کیفیت ویدیوی ترجیحی",
+	"Preferred audio format": "فرمت صوتی ترجیحی",
+	"Best": "بهترین",
+	"File saved.": "پرونده ذخیره شد",
+	"Open download folder": "بازکردن پوشهٔ بارگیری ها"
 }
