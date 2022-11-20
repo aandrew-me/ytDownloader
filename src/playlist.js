@@ -63,7 +63,7 @@ function download(type) {
 	let playlistName;
 
 	getId("options").style.display = "none";
-	getId("openDownloads").style.display = "inline-block"
+	getId("openDownloads").style.display = "inline-block";
 	getId("pasteLink").style.display = "none";
 	getId("playlistName").textContent = i18n.__("Processing") + "...";
 
@@ -135,13 +135,9 @@ function download(type) {
 			playlistId = eventData.split(" ")[3].split(";")[0];
 			// Opening folder
 			if (type === "video") {
-				folderLocation = path.join(
-					downloadDir
-				);
+				folderLocation = path.join(downloadDir);
 			} else {
-				folderLocation = path.join(
-					downloadDir
-				);
+				folderLocation = path.join(downloadDir);
 			}
 			if (platform() == "win32") {
 				folderLocation = folderLocation.split(path.sep).join("\\\\");
@@ -166,16 +162,12 @@ function download(type) {
 			}
 
 			if (count > 1) {
-				getId(`p${count - 1}`).textContent = i18n.__(
-					"File saved."
-				);
+				getId(`p${count - 1}`).textContent = i18n.__("File saved.");
 			}
 
 			const item = `<div class="playlistItem">
 			<p class="itemTitle">${itemTitle}</p>
-			<p class="itemProgress" id="p${count}">${i18n.__(
-				"Downloading..."
-			)}</p>
+			<p class="itemProgress" id="p${count}">${i18n.__("Downloading...")}</p>
 			</div>`;
 			getId("list").innerHTML += item;
 
@@ -193,6 +185,7 @@ function download(type) {
 
 	downloadProcess.on("error", (error) => {
 		getId("pasteLink").style.display = "inline-block";
+		getId("openDownloads").style.display = "none";
 		getId("options").style.display = "block";
 		getId("playlistName").textContent = "";
 		getId("incorrectMsg").textContent = i18n.__(
@@ -204,8 +197,7 @@ function download(type) {
 	downloadProcess.on("close", () => {
 		getId(`p${count}`).textContent = i18n.__("File saved.");
 		getId("pasteLink").style.display = "inline-block";
-		getId("openDownloads").style.display = "none"
-
+		getId("openDownloads").style.display = "none";
 
 		const notify = new Notification("ytDownloader", {
 			body: i18n.__("Playlist downloaded"),
@@ -249,8 +241,8 @@ function closeMenu() {
 }
 
 getId("openDownloads").addEventListener("click", () => {
-	openFolder(downloadDir)
-})
+	openFolder(downloadDir);
+});
 
 getId("preferenceWin").addEventListener("click", () => {
 	closeMenu();
@@ -279,4 +271,5 @@ getId("audioFormat").textContent = i18n.__("Select Audio Format ");
 
 getId("download").textContent = i18n.__("Download");
 getId("audioDownload").textContent = i18n.__("Download");
-getId("bestVideoOption").textContent= i18n.__("Best")
+getId("bestVideoOption").textContent = i18n.__("Best");
+getId("openDownloads").textContent = i18n.__("Open download folder");
