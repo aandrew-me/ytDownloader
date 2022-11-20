@@ -67,6 +67,9 @@
 	"Select Video Format ": "Wybierz format Wideo ",
 	"Select Audio Format ": "Wybierz format Audio ",
 	"Maximum number of active downloads": "Maximum number of active downloads",
-	"Preferred video quality": "Preferred video quality",
-	"Preferred audio format": "Preferred audio format"
+	"Preferred video quality": "Preferowana jakość wideo",
+	"Preferred audio format": "Preferowany format audio",
+	"Best": "Melhor",
+	"File saved.": "Plik zapisany.",
+	"Open download folder": "Otwórz folder pobierania"
 }

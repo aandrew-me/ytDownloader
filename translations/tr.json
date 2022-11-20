@@ -66,7 +66,10 @@
 	"Extract Audio": "Sesi çıkart",
 	"Select Video Format ": "Video Formatını Seçin ",
 	"Select Audio Format ": "Ses Formatını Seçin ",
-	"Maximum number of active downloads": "Maximum number of active downloads",
-	"Preferred video quality": "Preferred video quality",
-	"Preferred audio format": "Preferred audio format"
+	"Maximum number of active downloads": "Maksimum aktif indirme sayısı",
+	"Preferred video quality": "Tercih edilen video kalitesi",
+	"Preferred audio format": "Tercih edilen ses formatı",
+	"Best": "En iyi",
+	"File saved.": "Dosya kaydedildi.",
+	"Open download folder": "İndirme klasörünü açın"
 }
