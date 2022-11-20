@@ -21,3 +21,5 @@ getId("none").textContent = i18n.__("None")
 querySelectorAll(".autoTxt").forEach(item => {
     item.textContent = i18n.__("Automatic")
 });
+getId("preferredAudioTxt").textContent = i18n.__("Preferred audio format")
+getId("preferredVideoTxt").textContent = i18n.__("Preferred video quality")
