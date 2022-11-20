@@ -24,7 +24,6 @@ function createWindow() {
 			contextIsolation: false,
 		},
 	});
-
 	win.loadFile("html/index.html");
 	win.maximize();
 	// win.setMenu(null)
@@ -67,9 +66,13 @@ app.whenReady().then(() => {
 	}
 });
 
-ipcMain.on("restart", () => {
-	app.relaunch();
-	app.exit();
+ipcMain.on("reload", () => {
+	if (win) {
+		win.reload();
+	}
+	if (secondaryWindow) {
+		secondaryWindow.reload();
+	}
 });
 
 ipcMain.on("get-version", () => {

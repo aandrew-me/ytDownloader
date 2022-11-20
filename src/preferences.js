@@ -103,5 +103,12 @@ getId("preferredAudioQuality").addEventListener("change", ()=>{
     localStorage.setItem("preferredAudioQuality", preferredAudioQuality) = preferredAudioQuality
 })
 
+// Reload
+function reload(){
+    ipcRenderer.send("reload")
+}
+getId("restart").addEventListener("click", () =>{
+    reload()
+})
 
 require("../src/translate_preferences")
