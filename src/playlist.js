@@ -197,7 +197,6 @@ function download(type) {
 	downloadProcess.on("close", () => {
 		getId(`p${count}`).textContent = i18n.__("File saved.");
 		getId("pasteLink").style.display = "inline-block";
-		getId("openDownloads").style.display = "none";
 
 		const notify = new Notification("ytDownloader", {
 			body: i18n.__("Playlist downloaded"),
