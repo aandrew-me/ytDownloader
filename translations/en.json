@@ -71,5 +71,8 @@
 	"Preferred audio format": "Preferred audio format",
 	"Best": "Best",
 	"File saved.":"File saved.",
-	"Open download folder":"Open download folder"
+	"Open download folder":"Open download folder",
+	"Path:":"Path:",
+	"Select config file":"Select config file",
+	"Use configuration file":"Use configuration file"
 }
