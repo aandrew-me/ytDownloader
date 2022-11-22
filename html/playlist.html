@@ -20,10 +20,14 @@
             margin-top: 15px;
             font-weight: bold;
         }
-        #openDownloads{
-            display:none;
+
+        #openDownloads {
+            display: none;
             position: relative;
-            bottom:8px;
+            bottom: 8px;
+        }
+        #audioBox{
+            display:none;
         }
     </style>
 </head>
@@ -47,41 +51,50 @@
     <button class="submitBtn" id="pasteLink">Click to paste playlist link from clipboard [Ctrl + V]</button>
 
     <div id="options">
+        <div id="btnContainer">
+            <button class="toggleBtn" id="videoToggle">Video</button>
+            <button class="toggleBtn" id="audioToggle">Audio</button>
+        </div>
         <br>
         <strong id="linkTitle">Link:</strong>
         <span id="link"></span>
         <br><br>
+        <div id="videoBox">
+            <label id="videoFormat">Select Video Format </label>
+            <select id="select">
+                <option value="best" id="bestVideoOption">Best</option>
+                <option value="144">144p</option>
+                <option value="240">240p</option>
+                <option value="360">360p</option>
+                <option value="480">480p</option>
+                <option value="720">720p (HD)</option>
+                <option value="1080">1080p (FHD)</option>
+                <option value="1440">1440p</option>
+                <option value="2160">2160p (4k)</option>
+            </select>
 
-        <label id="videoFormat">Select Video Format </label>
-        <select id="select">
-            <option value="best" id="bestVideoOption">Best</option>
-            <option value="144">144p</option>
-            <option value="240">240p</option>
-            <option value="360">360p</option>
-            <option value="480">480p</option>
-            <option value="720">720p (HD)</option>
-            <option value="1080">1080p (FHD)</option>
-            <option value="1440">1440p</option>
-            <option value="2160">2160p (4k)</option>
-        </select>
+            <button class="submitBtn" id="download">Download</button>
+        </div>
 
-        <button class="submitBtn" id="download">Download</button>
+        <div id="audioBox">
 
-        <br>
-        <label id="audioFormat">Select Audio format </label>
-        <select id="audioSelect">
-            <option value="mp3">Mp3</option>
-            <option value="aac">Aac</option>
-            <option value="m4a">M4a</option>
-            <option value="opus">Opus</option>
-            <option value="wav">Wav</option>
-            <option value="alac">Alac</option>
-            <option value="flac">Flac</option>
-            <option value="vorbis">Vorbis (ogg)</option>
-        </select>
-        <button class="submitBtn" id="audioDownload">Download</button>
+            <label id="audioFormat">Select Audio format </label>
+            <select id="audioSelect">
+                <option value="mp3">Mp3</option>
+                <option value="aac">Aac</option>
+                <option value="m4a">M4a</option>
+                <option value="opus">Opus</option>
+                <option value="wav">Wav</option>
+                <option value="alac">Alac</option>
+                <option value="flac">Flac</option>
+                <option value="vorbis">Vorbis (ogg)</option>
+            </select>
+            <button class="submitBtn" id="audioDownload">Download</button>
+
+        </div>
 
         <p id="incorrectMsg"></p>
+
     </div>
 
     <h2 id="playlistName"></h2>

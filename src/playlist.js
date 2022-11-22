@@ -239,6 +239,26 @@ function closeMenu() {
 	}, 50);
 }
 
+// Video and audio toggle
+const videoToggle = getId("videoToggle");
+const audioToggle = getId("audioToggle");
+
+videoToggle.style.backgroundColor = "var(--box-toggleOn)";
+
+videoToggle.addEventListener("click", (event) => {
+	videoToggle.style.backgroundColor = "var(--box-toggleOn)";
+	audioToggle.style.backgroundColor = "var(--box-toggle)";
+	getId("audioBox").style.display = "none";
+	getId("videoBox").style.display = "block";
+});
+
+audioToggle.addEventListener("click", (event) => {
+	audioToggle.style.backgroundColor = "var(--box-toggleOn)";
+	videoToggle.style.backgroundColor = "var(--box-toggle)";
+	getId("videoBox").style.display = "none";
+	getId("audioBox").style.display = "block";
+});
+
 getId("openDownloads").addEventListener("click", () => {
 	openFolder(downloadDir);
 });
