@@ -38,7 +38,6 @@ let browser = "";
 let preferredVideoQuality = "";
 let preferredAudioQuality = "";
 
-
 function getId(id) {
 	return document.getElementById(id);
 }
@@ -229,7 +228,14 @@ async function getInfo(url) {
 
 	const infoProcess = cp.spawn(
 		ytDlp,
-		["-j", "--no-playlist", "--no-warnings", cookieArg, browser, `"${url}"`],
+		[
+			"-j",
+			"--no-playlist",
+			"--no-warnings",
+			cookieArg,
+			browser,
+			`"${url}"`,
+		],
 		{
 			shell: true,
 		}
@@ -341,7 +347,9 @@ async function getInfo(url) {
 						selectedText +
 						">" +
 						(format.height
-							? format.height + "p" + (format.fps == 60 ? "60" : "")
+							? format.height +
+							  "p" +
+							  (format.fps == 60 ? "60" : "")
 							: "" ||
 							  format.resolution ||
 							  i18n.__(format.format_note) ||

@@ -25,6 +25,7 @@ getId("back").addEventListener("click", () => {
     ipcRenderer.send("close-secondary")
 })
 
+// Selecting download directory
 getId("selectLocation").addEventListener("click", () => {
     ipcRenderer.send("select-location", "")
 })
@@ -35,6 +36,7 @@ ipcRenderer.on("downloadPath", (event, downloadPath) => {
     getId("path").textContent = downloadPath
 })
 
+
 const enabledTransparent = getId("enableTransparent")
 enabledTransparent.addEventListener("change", (event) => {
     if (enabledTransparent.checked) {
@@ -44,6 +46,40 @@ enabledTransparent.addEventListener("change", (event) => {
         localStorage.setItem("enabledTransparent", "false")
     }
 })
+
+// Selecting config directory
+
+getId("configBtn").addEventListener("click", () => {
+    ipcRenderer.send("select-config", "")
+})
+
+ipcRenderer.on("configPath", (event, configPath) => {
+    console.log(configPath);
+    localStorage.setItem("configPath", configPath)
+    getId("configPath").textContent = configPath
+})
+
+
+const configCheck = getId("configCheck")
+configCheck.addEventListener("change", (event) => {
+    if (configCheck.checked) {
+        getId("configOpts").style.display = "flex"
+    }
+    else {
+        getId("configOpts").style.display = "none"
+        localStorage.setItem("configPath", "")
+
+    }
+})
+
+const configPath = localStorage.getItem("configPath")
+if (configPath){
+    getId("configPath").textContent = configPath;
+    configCheck.checked = true
+    getId("configOpts").style.display = "flex"
+}
+
+// Language settings
 
 const localEnabledTransparent = localStorage.getItem("enabledTransparent")
 if (localEnabledTransparent == "true") {
@@ -67,6 +103,7 @@ function changeLanguage() {
     }
 }
 
+// Browser preferences
 let browser = localStorage.getItem("browser")
 if (browser) {
     getId("browser").value = browser

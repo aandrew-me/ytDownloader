@@ -22,9 +22,8 @@ input[type="text"]{
     width:60%;
 }
 
-.prefBox{
+.prefBox, #pathConfig{
     display:flex;
-    flex-direction: row;
     justify-content: space-between;
     margin:0 15px;
     padding:15px 10px;
@@ -32,6 +31,27 @@ input[type="text"]{
     background-color: rgb(60, 60, 60); 
 }
 
+.prefBox{
+    flex-direction: row;
+
+}
+#pathConfig{
+    flex-direction: column;
+}
+.configBox{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+#configBtn{
+    display:inline-block;
+}
+#configOpts{
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
 #save{
     padding:10px;
     border-radius: 8px;
@@ -76,7 +96,7 @@ input[type="checkbox"]{
     height:25px;
 }
 
-#selectLocation{
+.greenBtn{
     padding:10px;
     margin:0 20px;
     border:none;
@@ -107,4 +127,8 @@ select {
 }
 #browserInfo{
     cursor: pointer;
+}
+
+#configOpts{
+    display:none;
 }

@@ -16,7 +16,6 @@
     <div id="top">
         <a id="restart">Restart app</a>
         <a id="back">Homepage</a>
-        <!-- <a id="restart" onclick="restartApp()">Restart app</a> -->
     </div>
 
     <h1 id="preferences">Preferences</h1>
@@ -33,7 +32,7 @@
     </div>
 
     <br>
-    <button id="selectLocation">Select Download Location</button>
+    <button id="selectLocation" class="greenBtn">Select Download Location</button>
 
     <p id="msg">
     </p>
@@ -116,6 +115,23 @@
             <option value="safari">Safari</option>
             <option value="vivaldi">Vivaldi</option>
         </select>
+    </div>
+
+    <br>
+    <div id="pathConfig">
+
+        <div class="configBox">
+            <span>Use configuration file</span>
+            <input type="checkbox" id="configCheck">
+        </div>
+
+        <div id="configOpts">
+            <br>
+            <button class="greenBtn" id="configBtn">Select config file</button>
+            <br>
+            <strong id="configPathTxt">Path: </strong>
+            <span id="configPath"></span>
+        </div>
     </div>
 
 
