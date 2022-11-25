@@ -3,7 +3,7 @@
 
 [![Flathub downloads](https://img.shields.io/endpoint?url=https://flathub-stats-backend.vercel.app/badges/me.aandrew.ytdownloader/shields.io.json)](https://flatstat.mijorus.it/app/me.aandrew.ytdownloader)
 
-![GitHub all releases](https://img.shields.io/github/downloads/aandrew-me/ytdownloader/total)
+[![GitHub downloads](https://img.shields.io/github/downloads/aandrew-me/ytdownloader/total)](https://github.com/aandrew-me/ytDownloader/releases)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/aandrew-me/ytdownloader?label=latest%20release)](https://github.com/aandrew-me/ytDownloader/releases/latest)
 [![Flathub](https://img.shields.io/flathub/v/me.aandrew.ytdownloader)](https://flathub.org/apps/details/me.aandrew.ytdownloader)
 [![AUR version](https://img.shields.io/aur/version/ytdownloader-gui)](https://aur.archlinux.org/packages/ytdownloader-gui)
