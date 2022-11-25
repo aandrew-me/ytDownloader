@@ -172,5 +172,21 @@ getId("resetFoldernameFormat").addEventListener("click", () => {
 	localStorage.setItem("foldernameFormat", "%(playlist_title)s");
 });
 
+// Max active downloads
+getId("maxDownloads").addEventListener("input", ()=>{
+	const number = Number(getId("maxDownloads").value)
+
+	if (number < 1){
+		localStorage.setItem("maxActiveDownloads", 1)
+	}
+	else{
+		localStorage.setItem("maxActiveDownloads", number)
+	}
+})
+
+if (localStorage.getItem("maxActiveDownloads")){
+	getId("maxDownloads").value = localStorage.getItem("maxActiveDownloads")
+}
+
 // Translation file
 require("../src/translate_preferences");

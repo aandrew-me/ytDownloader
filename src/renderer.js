@@ -29,10 +29,21 @@ let title, onlyvideo, id, thumbnail, ytdlp, duration, extractFormat;
 let rangeCmd = "";
 let subs = "";
 let subLangs;
-// let autoSubs = ""
 let rangeOption = "--download-sections";
 let cookieArg = "";
 let browser = "";
+let maxActiveDownloads = 5;
+if (localStorage.getItem("maxActiveDownloads")){
+	const number = Number(localStorage.getItem("maxActiveDownloads"))
+	if (number < 1){
+		maxActiveDownloads = 1
+	}
+	else{
+		maxActiveDownloads = number
+	}
+}
+let currentDownloads = 0;
+let controllers = new Object;
 
 // Video and audio preferences
 let preferredVideoQuality = "";
@@ -439,13 +450,68 @@ async function getInfo(url) {
 // Video download event
 getId("videoDownload").addEventListener("click", (event) => {
 	getId("hidden").style.display = "none";
-	download("video");
+	console.log(`Current:${currentDownloads} Max:${maxActiveDownloads}`);
+
+	if (currentDownloads < maxActiveDownloads) {
+		download("video");
+		currentDownloads++;
+	} else {
+		const randId = Math.random().toFixed(10).toString().slice(2);
+		const item = `
+		<div class="item" id="${randId}">
+			<img src="${thumbnail}" alt="No thumbnail" class="itemIcon" crossorigin="anonymous">
+
+			<div class="itemBody">
+				<div class="itemTitle">${title}</div>
+				<div class="itemType">${i18n.__("Video")}</div>
+				<p>${i18n.__("Download pending")}</p>
+			</div>
+		</div>
+		`;
+		getId("list").innerHTML += item;
+		const interval = setInterval(() => {
+			if (currentDownloads < maxActiveDownloads) {
+				getId(randId).remove()
+				download("video");
+				currentDownloads++;
+				clearInterval(interval);
+			}
+		}, 2000);
+	}
+
 });
 
 // Audio download event
 getId("audioDownload").addEventListener("click", (event) => {
 	getId("hidden").style.display = "none";
-	download("audio");
+	console.log(`Current:${currentDownloads} Max:${maxActiveDownloads}`);
+
+	if (currentDownloads < maxActiveDownloads) {
+		download("audio");
+		currentDownloads++;
+	} else {
+		const randId = Math.random().toFixed(10).toString().slice(2);
+		const item = `
+		<div class="item" id="${randId}">
+			<img src="${thumbnail}" alt="No thumbnail" class="itemIcon" crossorigin="anonymous">
+
+			<div class="itemBody">
+				<div class="itemTitle">${title}</div>
+				<div class="itemType">${i18n.__("Video")}</div>
+				<p>${i18n.__("Download pending")}</p>
+			</div>
+		</div>
+		`;
+		getId("list").innerHTML += item;
+		const interval = setInterval(() => {
+			if (currentDownloads < maxActiveDownloads) {
+				getId(randId).remove()
+				download("video");
+				currentDownloads++;
+				clearInterval(interval);
+			}
+		}, 2000);
+	}
 });
 
 getId("extractBtn").addEventListener("click", () => {
@@ -557,14 +623,13 @@ function manageAdvanced(duration) {
 //////////////////////////////
 
 function download(type) {
-	let willBeSaved = true;
 	manageAdvanced(duration);
 	const url = getId("url").value;
 	let ext;
 	let extractExt;
 
 	let format_id;
-	const randomId = Math.random().toFixed(10).toString().slice(2);
+	const randomId = "a" + Math.random().toFixed(10).toString().slice(2);
 
 	if (type === "video") {
 		const videoValue = getId("videoFormatSelect").value;
@@ -658,6 +723,9 @@ function download(type) {
 	}
 
 	const controller = new AbortController();
+	controllers[randomId] = controller;
+	
+
 	console.log(rangeOption + " " + rangeCmd);
 
 	if (type === "video" && onlyvideo) {
@@ -735,7 +803,6 @@ function download(type) {
 	}
 
 	getId(randomId + ".close").addEventListener("click", () => {
-		willBeSaved = false;
 		controller.abort();
 	});
 
@@ -765,8 +832,10 @@ function download(type) {
 		.once("ytDlpEvent", (eventType, eventData) => {
 			getId(randomId + "prog").textContent = i18n.__("Downloading...");
 		})
-		.once("close", () => {
-			if (willBeSaved) {
+		.once("close", (code) => {
+			console.log("Closed with code " + code);
+			if (code == 0) {
+				currentDownloads--;
 				// const items = JSON.parse(localStorage.getItem("itemList"));
 				// // Clearing item from localstorage
 				// for (let item of items) {
@@ -801,6 +870,7 @@ function download(type) {
 			}
 		})
 		.once("error", (error) => {
+			currentDownloads--;
 			getId(randomId + "prog").textContent = i18n.__(
 				"Some error has occurred. Hover to see details"
 			);
@@ -812,6 +882,8 @@ function download(type) {
 // Removing item
 
 function fadeItem(id) {
+	controllers[id].abort()
+	currentDownloads --;
 	let count = 0;
 	let opacity = 1;
 	const fade = setInterval(() => {
