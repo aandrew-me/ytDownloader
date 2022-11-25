@@ -12,7 +12,7 @@ getId("menuIcon").addEventListener("click", (event) => {
 		let opacity = 1;
 		const fade = setInterval(() => {
 			if (count >= 10) {
-				getId("menu").style.display = "none"
+				getId("menu").style.display = "none";
 				clearInterval(fade);
 			} else {
 				opacity -= 0.1;
@@ -71,7 +71,6 @@ function toggle() {
 		root.style.setProperty("--theme-toggle", "rgb(147, 174, 185)");
 		root.style.setProperty("--item-bg", "#dddddd");
 
-
 		darkTheme = false;
 		localStorage.setItem("theme", "light");
 	}
@@ -101,18 +100,23 @@ function advancedToggle() {
 
 // Check scroll go to top
 
-window.onscroll = function() {scrollFunction()};
+window.onscroll = function () {
+	scrollFunction();
+};
 
 function scrollFunction() {
-  if (document.body.scrollTop > 50 || document.documentElement.scrollTop > 50) {
-    getId("goToTop").style.display = "block";
-  } else {
-    getId("goToTop").style.display = "none";
-  }
+	if (
+		document.body.scrollTop > 50 ||
+		document.documentElement.scrollTop > 50
+	) {
+		getId("goToTop").style.display = "block";
+	} else {
+		getId("goToTop").style.display = "none";
+	}
 }
 
 // Function to scroll go to top
 
 getId("goToTop").addEventListener("click", () => {
-	window.scrollTo({top: 0, behavior: 'smooth'});
+	window.scrollTo({ top: 0, behavior: "smooth" });
 });

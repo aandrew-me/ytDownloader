@@ -114,7 +114,7 @@ ipcMain.on("select-location", () => {
 	}
 });
 
-ipcMain.on("select-config", ()=>{
+ipcMain.on("select-config", () => {
 	const location = dialog.showOpenDialogSync(secondaryWindow, {
 		properties: ["openFile"],
 	});
@@ -122,7 +122,7 @@ ipcMain.on("select-config", ()=>{
 	if (location) {
 		secondaryWindow.webContents.send("configPath", location);
 	}
-})
+});
 
 app.on("window-all-closed", () => {
 	if (process.platform !== "darwin") {
