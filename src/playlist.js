@@ -47,6 +47,17 @@ let playlistId = "";
 let folderLocation;
 
 function download(type) {
+	// Handling folder and file names
+	let foldernameFormat = "%(playlist_title)s";
+	let filenameFormat = "%(playlist_index)s.%(title)s.%(ext)s";
+
+	if (localStorage.getItem("foldernameFormat")) {
+		foldernameFormat = localStorage.getItem("foldernameFormat");
+	}
+	if (localStorage.getItem("filenameFormat")) {
+		filenameFormat = localStorage.getItem("filenameFormat");
+	}
+
 	getId("list").innerHTML = "";
 	getId("playlistName").textContent = "";
 
@@ -88,11 +99,7 @@ function download(type) {
 				format,
 				"--yes-playlist",
 				"-o",
-				`"${path.join(
-					downloadDir,
-					"%(playlist_title)s",
-					"%(playlist_index)s.%(title)s.%(ext)s"
-				)}"`,
+				`"${path.join(downloadDir, foldernameFormat, filenameFormat)}"`,
 				"--ffmpeg-location",
 				ffmpeg,
 				cookieArg,
@@ -111,11 +118,7 @@ function download(type) {
 				"--audio-format",
 				format,
 				"-o",
-				`"${path.join(
-					downloadDir,
-					"%(playlist_title)s",
-					"%(playlist_index)s.%(title)s.%(ext)s"
-				)}"`,
+				`"${path.join(downloadDir, foldernameFormat, filenameFormat)}"`,
 				"--ffmpeg-location",
 				ffmpeg,
 				cookieArg,
