@@ -77,5 +77,6 @@
 	"Use configuration file":"Use configuration file",
 	"Filename format for playlists":"Filename format for playlists",
 	"Folder name format for playlists":"Folder name format for playlists",
-	"Reset to default":"Reset to default"
+	"Reset to default":"Reset to default",
+	"Playlist range":"Playlist range"
 }

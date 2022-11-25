@@ -58,6 +58,18 @@ function download(type) {
 		filenameFormat = localStorage.getItem("filenameFormat");
 	}
 
+	// Playlist download range
+	let playlistIndex = 1;
+	let playlistEnd = "";
+
+	if (getId("playlistIndex").value) {
+		playlistIndex = Number(getId("playlistIndex").value);
+	}
+	if (getId("playlistEnd").value) {
+		playlistEnd = Number(getId("playlistEnd").value);
+	}
+	console.log(`Range: ${playlistIndex}:${playlistEnd}`);
+
 	getId("list").innerHTML = "";
 	getId("playlistName").textContent = "";
 
@@ -100,6 +112,8 @@ function download(type) {
 				"--yes-playlist",
 				"-o",
 				`"${path.join(downloadDir, foldernameFormat, filenameFormat)}"`,
+				"-I",
+				`"${playlistIndex}:${playlistEnd}"`,
 				"--ffmpeg-location",
 				ffmpeg,
 				cookieArg,
@@ -119,6 +133,8 @@ function download(type) {
 				format,
 				"-o",
 				`"${path.join(downloadDir, foldernameFormat, filenameFormat)}"`,
+				"-I",
+				`"${playlistIndex}:${playlistEnd}"`,
 				"--ffmpeg-location",
 				ffmpeg,
 				cookieArg,
@@ -262,6 +278,20 @@ audioToggle.addEventListener("click", (event) => {
 	getId("audioBox").style.display = "block";
 });
 
+// More options
+
+let moreOptions = true;
+getId("advancedToggle").addEventListener("click", () => {
+	if (moreOptions) {
+		getId("advancedMenu").style.display = "block";
+		moreOptions = false;
+	} else {
+		getId("advancedMenu").style.display = "none";
+		moreOptions = true;
+	}
+});
+
+// Menu
 getId("openDownloads").addEventListener("click", () => {
 	openFolder(downloadDir);
 });

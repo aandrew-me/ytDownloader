@@ -259,6 +259,11 @@ input[type="checkbox"]{
 	top:4px;
 }
 
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  appearance: none; 
+}
+
 .submitBtn {
 	padding: 15px;
 	border-radius: 10px;
@@ -295,7 +300,7 @@ input[type="checkbox"]{
 	width: 100px;
 }
 
-.time {
+.time, .input {
 	padding: 8px;
 	border: none;
 	outline: none;

@@ -29,6 +29,9 @@
         #audioBox{
             display:none;
         }
+        #advancedMenu{
+            display:none;
+        }
     </style>
 </head>
 
@@ -91,6 +94,15 @@
             </select>
             <button class="submitBtn" id="audioDownload">Download</button>
 
+        </div>
+
+        <button id="advancedToggle" class="advancedToggle">More options</button>
+
+        <!-- Hidden -->
+        <div id="advancedMenu">
+            <span>Playlist range</span>
+            <input type="number" id="playlistIndex" class="input" placeholder="Start">:
+            <input type="number" id="playlistEnd" class="input" placeholder="End">
         </div>
 
         <p id="incorrectMsg"></p>
