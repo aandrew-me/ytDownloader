@@ -74,5 +74,8 @@
 	"Open download folder":"Open download folder",
 	"Path:":"Path:",
 	"Select config file":"Select config file",
-	"Use configuration file":"Use configuration file"
+	"Use configuration file":"Use configuration file",
+	"Filename format for playlists":"Filename format for playlists",
+	"Folder name format for playlists":"Folder name format for playlists",
+	"Reset to default":"Reset to default"
 }
