@@ -2,7 +2,7 @@ const cp = require("child_process");
 const os = require("os");
 let ffmpeg;
 if (os.platform() === "win32") {
-	ffmpeg = `"${__dirname}\\..\\ffmpeg.exe"`;
+	ffmpeg = `"${__dirname}\\..\\ffmpeg.exe"`; 
 } else {
 	ffmpeg = `"${__dirname}/../ffmpeg"`;
 }
@@ -33,15 +33,20 @@ let rangeOption = "--download-sections";
 let cookieArg = "";
 let browser = "";
 let maxActiveDownloads = 5;
-if (localStorage.getItem("maxActiveDownloads")){
-	const number = Number(localStorage.getItem("maxActiveDownloads"))
-	if (number < 1){
-		maxActiveDownloads = 1
-	}
-	else{
-		maxActiveDownloads = number
+function checkMaxDownloads(){
+	if (localStorage.getItem("maxActiveDownloads")){
+		const number = Number(localStorage.getItem("maxActiveDownloads"))
+		if (number < 1){
+			maxActiveDownloads = 1
+		}
+		else{
+			maxActiveDownloads = number
+		}
 	}
 }
+checkMaxDownloads()
+
+
 let currentDownloads = 0;
 let controllers = new Object;
 
@@ -449,6 +454,7 @@ async function getInfo(url) {
 
 // Video download event
 getId("videoDownload").addEventListener("click", (event) => {
+	checkMaxDownloads()
 	getId("hidden").style.display = "none";
 	console.log(`Current:${currentDownloads} Max:${maxActiveDownloads}`);
 
@@ -483,6 +489,7 @@ getId("videoDownload").addEventListener("click", (event) => {
 
 // Audio download event
 getId("audioDownload").addEventListener("click", (event) => {
+	checkMaxDownloads()
 	getId("hidden").style.display = "none";
 	console.log(`Current:${currentDownloads} Max:${maxActiveDownloads}`);
 
@@ -515,12 +522,38 @@ getId("audioDownload").addEventListener("click", (event) => {
 });
 
 getId("extractBtn").addEventListener("click", () => {
-	const value = getId("extractSelection").value;
-	extractFormat = value;
-	preferredAudioQuality = value;
-	localStorage.setItem("preferredAudioQuality", value);
+	checkMaxDownloads()
 	getId("hidden").style.display = "none";
-	download("extract");
+	extractFormat = getId("extractSelection").value;
+
+	console.log(`Current:${currentDownloads} Max:${maxActiveDownloads}`);
+
+	if (currentDownloads < maxActiveDownloads) {
+		download("extract");
+		currentDownloads++;
+	} else {
+		const randId = Math.random().toFixed(10).toString().slice(2);
+		const item = `
+		<div class="item" id="${randId}">
+			<img src="${thumbnail}" alt="No thumbnail" class="itemIcon" crossorigin="anonymous">
+
+			<div class="itemBody">
+				<div class="itemTitle">${title}</div>
+				<div class="itemType">${i18n.__("Video")}</div>
+				<p>${i18n.__("Download pending")}</p>
+			</div>
+		</div>
+		`;
+		getId("list").innerHTML += item;
+		const interval = setInterval(() => {
+			if (currentDownloads < maxActiveDownloads) {
+				getId(randId).remove()
+				download("extract");
+				currentDownloads++;
+				clearInterval(interval);
+			}
+		}, 2000);
+	}
 });
 
 // Restore previous uncompleted downloads
@@ -624,6 +657,15 @@ function manageAdvanced(duration) {
 
 function download(type) {
 	manageAdvanced(duration);
+
+	// Config file
+	let configArg = ""
+	let configTxt = ""
+	if (localStorage.getItem("configPath")){
+		configArg = "--config-location"
+		configTxt = localStorage.getItem("configPath")
+	}
+
 	const url = getId("url").value;
 	let ext;
 	let extractExt;
@@ -745,6 +787,8 @@ function download(type) {
 				subs,
 				subLangs,
 				"--no-playlist",
+				configArg,
+				`"${configTxt}"`,
 				cookieArg,
 				browser,
 				`"${url}"`,
@@ -772,6 +816,8 @@ function download(type) {
 				"--no-playlist",
 				cookieArg,
 				browser,
+				configArg,
+				`"${configTxt}"`,
 				`"${url}"`,
 			],
 			{ shell: true, detached: false },
@@ -795,6 +841,8 @@ function download(type) {
 				"--no-playlist",
 				cookieArg,
 				browser,
+				configArg,
+				`"${configTxt}"`,
 				`"${url}"`,
 			],
 			{ shell: true, detached: false },
@@ -833,9 +881,9 @@ function download(type) {
 			getId(randomId + "prog").textContent = i18n.__("Downloading...");
 		})
 		.once("close", (code) => {
+			currentDownloads--;
 			console.log("Closed with code " + code);
 			if (code == 0) {
-				currentDownloads--;
 				// const items = JSON.parse(localStorage.getItem("itemList"));
 				// // Clearing item from localstorage
 				// for (let item of items) {
@@ -883,7 +931,6 @@ function download(type) {
 
 function fadeItem(id) {
 	controllers[id].abort()
-	currentDownloads --;
 	let count = 0;
 	let opacity = 1;
 	const fade = setInterval(() => {
@@ -940,6 +987,7 @@ function closeMenu() {
 	const fade = setInterval(() => {
 		if (count >= 10) {
 			clearInterval(fade);
+			getId("menu").style.display = "none"
 		} else {
 			opacity -= 0.1;
 			getId("menu").style.opacity = opacity;

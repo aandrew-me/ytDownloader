@@ -47,6 +47,13 @@ let playlistId = "";
 let folderLocation;
 
 function download(type) {
+	// Config file
+	let configArg = "";
+	let configTxt = "";
+	if (localStorage.getItem("configPath")) {
+		configArg = "--config-location";
+		configTxt = localStorage.getItem("configPath");
+	}
 	// Handling folder and file names
 	let foldernameFormat = "%(playlist_title)s";
 	let filenameFormat = "%(playlist_index)s.%(title)s.%(ext)s";
@@ -118,7 +125,8 @@ function download(type) {
 				ffmpeg,
 				cookieArg,
 				browser,
-
+				configArg,
+				configTxt,
 				`"${url}"`,
 			],
 			{ shell: true, detached: false },
@@ -139,7 +147,8 @@ function download(type) {
 				ffmpeg,
 				cookieArg,
 				browser,
-
+				configArg,
+				configTxt,
 				`"${url}"`,
 			],
 			{ shell: true, detached: false },
@@ -171,7 +180,7 @@ function download(type) {
 			console.log(playlistName);
 		}
 
-		if (eventData.includes(videoIndex)) {
+		if (eventData.includes(videoIndex) && !eventData.includes("thumbnail")) {
 			count += 1;
 			let itemTitle;
 			if (type === "video") {
@@ -325,3 +334,9 @@ getId("download").textContent = i18n.__("Download");
 getId("audioDownload").textContent = i18n.__("Download");
 getId("bestVideoOption").textContent = i18n.__("Best");
 getId("openDownloads").textContent = i18n.__("Open download folder");
+getId("videoToggle").textContent = i18n.__("Video");
+getId("audioToggle").textContent = i18n.__("Audio");
+getId("advancedToggle").textContent = i18n.__("More options");
+getId("rangeTxt").textContent = i18n.__("Playlist range");
+getId("playlistIndex").placeholder = i18n.__("Start");
+getId("playlistEnd").placeholder = i18n.__("End");

@@ -121,7 +121,7 @@
     <div id="pathConfig">
 
         <div class="configBox">
-            <span>Use configuration file</span>
+            <span id="configTxt">Use configuration file</span>
             <input type="checkbox" id="configCheck">
         </div>
 
@@ -129,14 +129,14 @@
             <br>
             <button class="greenBtn" id="configBtn">Select config file</button>
             <br>
-            <strong id="configPathTxt">Path: </strong>
+            <strong id="configPathTxt">Path:</strong>
             <span id="configPath"></span>
         </div>
     </div>
 
     <br>
     <div class="prefBox">
-        <span>Filename format for playlists</span>
+        <span id="fileFormatTxt">Filename format for playlists</span>
         <input type="text" id="filenameFormat" placeholder="yt-dlp format style"
             value="%(playlist_index)s.%(title)s.%(ext)s">
         <button class="redBtn" id="resetFilenameFormat">Reset to default</button>
@@ -144,7 +144,7 @@
 
     <br>
     <div class="prefBox">
-        <span>Folder name format for playlists</span>
+        <span id="dirFormatTxt">Folder name format for playlists</span>
         <input type="text" id="foldernameFormat" value="%(playlist_title)s" placeholder="yt-dlp format style">
         <button class="redBtn" id="resetFoldernameFormat">Reset to default</button>
     </div>
