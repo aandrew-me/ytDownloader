@@ -9,6 +9,10 @@ if (os.platform() === "win32") {
 
 const fs = require("fs");
 
+/////////////////////////////////////
+// Do not change the lines at the top
+/////////////////////////////////////
+
 const path = require("path");
 const { shell, ipcRenderer, clipboard } = require("electron");
 const { default: YTDlpWrap } = require("yt-dlp-wrap-extended");

@@ -2,8 +2,6 @@ const { clipboard, shell, ipcRenderer } = require("electron");
 const { default: YTDlpWrap } = require("yt-dlp-wrap-extended");
 const path = require("path");
 const os = require("os");
-const { platform } = require("os");
-const { get } = require("http");
 let url;
 const ytDlp = localStorage.getItem("ytdlp");
 const ytdlp = new YTDlpWrap(ytDlp);
@@ -17,6 +15,8 @@ if (os.platform() === "win32") {
 } else {
 	ffmpeg = `"${__dirname}/../ffmpeg"`;
 }
+let foldernameFormat = "%(playlist_title)s";
+let filenameFormat = "%(playlist_index)s.%(title)s.%(ext)s";
 
 function getId(id) {
 	return document.getElementById(id);
@@ -41,10 +41,7 @@ document.addEventListener("keydown", (event) => {
 
 // Patterns
 const playlistTxt = "Downloading playlist: ";
-const playlistIdTxt = " Downloading playlist ";
 const videoIndex = "Downloading video ";
-let playlistId = "";
-let folderLocation;
 
 function download(type) {
 	// Config file
@@ -54,16 +51,7 @@ function download(type) {
 		configArg = "--config-location";
 		configTxt = localStorage.getItem("configPath");
 	}
-	// Handling folder and file names
-	let foldernameFormat = "%(playlist_title)s";
-	let filenameFormat = "%(playlist_index)s.%(title)s.%(ext)s";
-
-	if (localStorage.getItem("foldernameFormat")) {
-		foldernameFormat = localStorage.getItem("foldernameFormat");
-	}
-	if (localStorage.getItem("filenameFormat")) {
-		filenameFormat = localStorage.getItem("filenameFormat");
-	}
+	nameFormatting();
 
 	// Playlist download range
 	let playlistIndex = 1;
@@ -77,9 +65,6 @@ function download(type) {
 	}
 	console.log(`Range: ${playlistIndex}:${playlistEnd}`);
 
-	getId("list").innerHTML = "";
-	getId("playlistName").textContent = "";
-
 	// Whether to use browser cookies or not
 	if (localStorage.getItem("browser")) {
 		browser = localStorage.getItem("browser");
@@ -92,10 +77,7 @@ function download(type) {
 	let count = 0;
 	let playlistName;
 
-	getId("options").style.display = "none";
-	getId("openDownloads").style.display = "inline-block";
-	getId("pasteLink").style.display = "none";
-	getId("playlistName").textContent = i18n.__("Processing") + "...";
+	hideOptions();
 
 	let quality, format, downloadProcess;
 	if (type === "video") {
@@ -136,6 +118,7 @@ function download(type) {
 		downloadProcess = ytdlp.exec(
 			[
 				"--yes-playlist",
+				"--no-warnings",
 				"-x",
 				"--audio-format",
 				format,
@@ -159,20 +142,6 @@ function download(type) {
 	downloadProcess.on("ytDlpEvent", (eventType, eventData) => {
 		// console.log(eventData);
 
-		if (eventData.includes(playlistIdTxt)) {
-			playlistId = eventData.split(" ")[3].split(";")[0];
-			// Opening folder
-			if (type === "video") {
-				folderLocation = path.join(downloadDir);
-			} else {
-				folderLocation = path.join(downloadDir);
-			}
-			if (platform() == "win32") {
-				folderLocation = folderLocation.split(path.sep).join("\\\\");
-			}
-			console.log(folderLocation);
-		}
-
 		if (eventData.includes(playlistTxt)) {
 			playlistName = eventData.split(":")[1].slice(1);
 			getId("playlistName").textContent =
@@ -180,7 +149,10 @@ function download(type) {
 			console.log(playlistName);
 		}
 
-		if (eventData.includes(videoIndex) && !eventData.includes("thumbnail")) {
+		if (
+			eventData.includes(videoIndex) &&
+			!eventData.includes("thumbnail")
+		) {
 			count += 1;
 			let itemTitle;
 			if (type === "video") {
@@ -212,28 +184,178 @@ function download(type) {
 	});
 
 	downloadProcess.on("error", (error) => {
-		getId("pasteLink").style.display = "inline-block";
-		getId("openDownloads").style.display = "none";
-		getId("options").style.display = "block";
-		getId("playlistName").textContent = "";
-		getId("incorrectMsg").textContent = i18n.__(
-			"Some error has occurred. Check your network and use correct URL"
-		);
-		getId("incorrectMsg").title = error;
+		showErrorTxt(error);
 	});
 
 	downloadProcess.on("close", () => {
-		getId(`p${count}`).textContent = i18n.__("File saved.");
-		getId("pasteLink").style.display = "inline-block";
+		afterClose(count);
+	});
+}
 
-		const notify = new Notification("ytDownloader", {
-			body: i18n.__("Playlist downloaded"),
-			icon: "../assets/images/icon.png",
-		});
+function afterClose(count) {
+	getId(`p${count}`).textContent = i18n.__("File saved.");
+	getId("pasteLink").style.display = "inline-block";
 
-		notify.onclick = () => {
-			openFolder(folderLocation);
-		};
+	const notify = new Notification("ytDownloader", {
+		body: i18n.__("Playlist downloaded"),
+		icon: "../assets/images/icon.png",
+	});
+
+	notify.onclick = () => {
+		openFolder(downloadDir);
+	};
+}
+// Error handling
+function showErrorTxt(error) {
+	console.log("Error " + error);
+	getId("pasteLink").style.display = "inline-block";
+	getId("openDownloads").style.display = "none";
+	getId("options").style.display = "block";
+	getId("playlistName").textContent = "";
+	getId("incorrectMsg").textContent = i18n.__(
+		"Some error has occurred. Check your network and use correct URL"
+	);
+	getId("incorrectMsg").title = error;
+}
+
+// File and folder name patterns
+function nameFormatting() {
+	// Handling folder and file names
+	if (localStorage.getItem("foldernameFormat")) {
+		foldernameFormat = localStorage.getItem("foldernameFormat");
+	}
+	if (localStorage.getItem("filenameFormat")) {
+		filenameFormat = localStorage.getItem("filenameFormat");
+	}
+}
+
+function hideOptions() {
+	getId("options").style.display = "none";
+	getId("openDownloads").style.display = "inline-block";
+	getId("pasteLink").style.display = "none";
+	getId("playlistName").textContent = i18n.__("Processing") + "...";
+	getId("list").innerHTML = "";
+}
+
+function downloadThumbnails() {
+	let count = 0;
+	hideOptions();
+	nameFormatting();
+	const downloadProcess = ytdlp.exec(
+		[
+			"--yes-playlist",
+			"--no-warnings",
+			"-o",
+			`"${path.join(downloadDir, foldernameFormat, filenameFormat)}"`,
+			cookieArg,
+			browser,
+			"--write-thumbnail",
+			"--convert-thumbnails png",
+			"--skip-download",
+			`"${url}"`,
+		],
+		{ shell: true, detached: false }
+	);
+
+	downloadProcess.on("ytDlpEvent", (eventType, eventData) => {
+		// console.log(eventData);
+
+		if (eventData.includes(playlistTxt)) {
+			playlistName = eventData.split(":")[1].slice(1);
+			getId("playlistName").textContent =
+				i18n.__("Downloading playlist:") + " " + playlistName;
+			console.log(playlistName);
+		}
+
+		if (
+			eventData.includes(videoIndex) &&
+			!eventData.includes("thumbnail")
+		) {
+			count += 1;
+			let itemTitle;
+			itemTitle = i18n.__("Thumbnail") + " " + eventData.split(" ")[3];
+
+			if (count > 1) {
+				getId(`p${count - 1}`).textContent = i18n.__("File saved.");
+			}
+
+			const item = `<div class="playlistItem">
+			<p class="itemTitle">${itemTitle}</p>
+			<p class="itemProgress" id="p${count}">${i18n.__("Downloading...")}</p>
+			</div>`;
+			getId("list").innerHTML += item;
+
+			window.scrollTo(0, document.body.scrollHeight);
+		}
+	});
+
+	downloadProcess.on("error", (error) => {
+		showErrorTxt(error);
+	});
+	downloadProcess.on("close", () => {
+		afterClose(count);
+	});
+}
+
+// Download video links
+function saveLinks() {
+	let count = 0;
+	hideOptions();
+	nameFormatting();
+	const downloadProcess = ytdlp.exec(
+		[
+			"--yes-playlist",
+			"--no-warnings",
+			cookieArg,
+			browser,
+			"--skip-download",
+			"--print-to-file",
+			"webpage_url",
+			`"${path.join(downloadDir, foldernameFormat, "links.txt")}"`,
+			"--skip-download",
+			`"${url}"`,
+		],
+		{ shell: true, detached: false }
+	);
+
+	downloadProcess.on("ytDlpEvent", (eventType, eventData) => {
+		// console.log(eventData);
+
+		if (eventData.includes(playlistTxt)) {
+			playlistName = eventData.split(":")[1].slice(1);
+			getId("playlistName").textContent =
+				i18n.__("Downloading playlist:") + " " + playlistName;
+			console.log(playlistName);
+		}
+
+		if (
+			eventData.includes(videoIndex) &&
+			!eventData.includes("thumbnail")
+		) {
+			count += 1;
+			let itemTitle;
+			itemTitle = i18n.__("Link") + " " + eventData.split(" ")[3];
+
+			if (count > 1) {
+				getId(`p${count - 1}`).textContent = i18n.__("Link added");
+			}
+
+			const item = `<div class="playlistItem">
+			<p class="itemTitle">${itemTitle}</p>
+			<p class="itemProgress" id="p${count}">${i18n.__("Downloading...")}</p>
+			</div>`;
+			getId("list").innerHTML += item;
+
+			window.scrollTo(0, document.body.scrollHeight);
+		}
+	});
+
+	downloadProcess.on("close", () => {
+		afterClose(count);
+	});
+
+	downloadProcess.on("error", (error) => {
+		showErrorTxt(error);
 	});
 }
 
@@ -245,6 +367,16 @@ getId("download").addEventListener("click", () => {
 // Downloading audio
 getId("audioDownload").addEventListener("click", () => {
 	download("audio");
+});
+
+// Downloading thumbnails
+getId("downloadThumbnails").addEventListener("click", () => {
+	downloadThumbnails();
+});
+
+// Saving video links to a text file
+getId("saveLinks").addEventListener("click", () => {
+	saveLinks();
 });
 
 function openFolder(location) {
@@ -340,3 +472,5 @@ getId("advancedToggle").textContent = i18n.__("More options");
 getId("rangeTxt").textContent = i18n.__("Playlist range");
 getId("playlistIndex").placeholder = i18n.__("Start");
 getId("playlistEnd").placeholder = i18n.__("End");
+getId("downloadThumbnails").placeholder = i18n.__("Download thumbnails");
+getId("saveLinks").placeholder = i18n.__("Save video links");
