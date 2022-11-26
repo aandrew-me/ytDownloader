@@ -71,5 +71,14 @@
 	"Preferred audio format": "Tercih edilen ses formatı",
 	"Best": "En iyi",
 	"File saved.": "Dosya kaydedildi.",
-	"Open download folder": "İndirme klasörünü açın"
+	"Open download folder": "İndirme klasörünü açın",
+	"Path:": "Dizin:",
+	"Select config file": "Konfigürasyon dosyasını seç",
+	"Use configuration file": "Konfigürasyon dosyasını kullan",
+	"Filename format for playlists": "Oynatma listesi için dosya adı",
+	"Folder name format for playlists": "Oynatma listesi için klasör ismi",
+	"Reset to default": "Varsayılana sıfırla",
+	"Playlist range": "Oynatma listesi aralığı",
+	"Thumbnail": "Thumbnail",
+	"Link added": "Link added"
 }

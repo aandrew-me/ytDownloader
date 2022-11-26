@@ -71,5 +71,14 @@
 	"Preferred audio format": "Formato de áudio predileto",
 	"Best": "Melhor",
 	"File saved.": "Arquivo salvo.",
-	"Open download folder": "Abrir pasta de download"
+	"Open download folder": "Abrir pasta de download",
+	"Path:": "Path:",
+	"Select config file": "Select config file",
+	"Use configuration file": "Use configuration file",
+	"Filename format for playlists": "Filename format for playlists",
+	"Folder name format for playlists": "Folder name format for playlists",
+	"Reset to default": "Reset to default",
+	"Playlist range": "Playlist range",
+	"Thumbnail": "Thumbnail",
+	"Link added": "Link added"
 }
