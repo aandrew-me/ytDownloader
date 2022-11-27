@@ -78,6 +78,9 @@ function download(type) {
 		if (quality === "best") {
 			format = "-f bv*+ba/best";
 		} 
+		if (quality === "worst") {
+			format = "-f wv+wa/worst";
+		} 
 		else if (quality === "useConfig"){
 			format = ""
 		}
