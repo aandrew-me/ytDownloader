@@ -80,5 +80,8 @@
 	"Reset to default":"Reset to default",
 	"Playlist range":"Playlist range",
 	"Thumbnail": "Thumbnail",
-	"Link added":"Link added"
+	"Link added":"Link added",
+	"Download thumbnails":"Download thumbnails",
+	"Save video links to a file": "Save video links to a file"
+
 }

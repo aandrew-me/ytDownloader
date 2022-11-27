@@ -481,5 +481,5 @@ getId("advancedToggle").textContent = i18n.__("More options");
 getId("rangeTxt").textContent = i18n.__("Playlist range");
 getId("playlistIndex").placeholder = i18n.__("Start");
 getId("playlistEnd").placeholder = i18n.__("End");
-getId("downloadThumbnails").placeholder = i18n.__("Download thumbnails");
-getId("saveLinks").placeholder = i18n.__("Save video links");
+getId("downloadThumbnails").textContent = i18n.__("Download thumbnails");
+getId("saveLinks").textContent = i18n.__("Save video links to a file");
