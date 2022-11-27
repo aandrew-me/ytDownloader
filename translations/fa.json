@@ -72,13 +72,13 @@
 	"Best": "بهترین",
 	"File saved.": "پرونده ذخیره شد",
 	"Open download folder": "بازکردن پوشهٔ بارگیری ها",
-	"Path:": "Path:",
+	"Path:": "مسیر",
 	"Select config file": "Select config file",
 	"Use configuration file": "Use configuration file",
 	"Filename format for playlists": "Filename format for playlists",
 	"Folder name format for playlists": "Folder name format for playlists",
-	"Reset to default": "Reset to default",
+	"Reset to default": "بازگردانی به حالت پیش فرض",
 	"Playlist range": "Playlist range",
-	"Thumbnail": "Thumbnail",
+	"Thumbnail": "تصویر بند انگشتی",
 	"Link added": "Link added"
 }

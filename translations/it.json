@@ -72,13 +72,13 @@
 	"Best": "Migliore",
 	"File saved.": "File salvato.",
 	"Open download folder": "Apri cartella di download",
-	"Path:": "Path:",
-	"Select config file": "Select config file",
-	"Use configuration file": "Use configuration file",
-	"Filename format for playlists": "Filename format for playlists",
-	"Folder name format for playlists": "Folder name format for playlists",
-	"Reset to default": "Reset to default",
-	"Playlist range": "Playlist range",
-	"Thumbnail": "Thumbnail",
-	"Link added": "Link added"
+	"Path:": "Percorso:",
+	"Select config file": "File di configurazione",
+	"Use configuration file": "Usa il file di configurazione",
+	"Filename format for playlists": "Formato nome file per scalette",
+	"Folder name format for playlists": "Formato nome cartella per le scalette",
+	"Reset to default": "Ripristina predefinito",
+	"Playlist range": "Intervallo di playlist",
+	"Thumbnail": "Miniatura",
+	"Link added": "Link aggiunto"
 }

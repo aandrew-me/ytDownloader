@@ -72,13 +72,13 @@
 	"Best": "Найкращий",
 	"File saved.": "Файл збережено.",
 	"Open download folder": "Відкрити папку завантажень",
-	"Path:": "Path:",
-	"Select config file": "Select config file",
-	"Use configuration file": "Use configuration file",
-	"Filename format for playlists": "Filename format for playlists",
-	"Folder name format for playlists": "Folder name format for playlists",
-	"Reset to default": "Reset to default",
-	"Playlist range": "Playlist range",
-	"Thumbnail": "Thumbnail",
-	"Link added": "Link added"
+	"Path:": "Шлях:",
+	"Select config file": "Виберіть файл конфігурації",
+	"Use configuration file": "Використовувати файл конфігурації",
+	"Filename format for playlists": "Формат назви файлів у списках відтворення",
+	"Folder name format for playlists": "Формат імен папок для списків відтворення",
+	"Reset to default": "Скинути до типових",
+	"Playlist range": "Діапазон плейлиста",
+	"Thumbnail": "Мініатюра",
+	"Link added": "Посилання додано"
 }
