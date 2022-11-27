@@ -80,5 +80,7 @@
 	"Reset to default": "Przywróć domyślne",
 	"Playlist range": "Zakres listy odtwarzania",
 	"Thumbnail": "Miniaturka",
-	"Link added": "Link dodany"
+	"Link added": "Link dodany",
+	"Download thumbnails": "Pobierz miniaturki",
+	"Save video links to a file": "Zapisz odnośniki wideo do pliku"
 }

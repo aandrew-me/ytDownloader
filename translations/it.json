@@ -80,5 +80,7 @@
 	"Reset to default": "Ripristina predefinito",
 	"Playlist range": "Intervallo di playlist",
 	"Thumbnail": "Miniatura",
-	"Link added": "Link aggiunto"
+	"Link added": "Link aggiunto",
+	"Download thumbnails": "Scarica miniature",
+	"Save video links to a file": "Salva link video su un file"
 }
