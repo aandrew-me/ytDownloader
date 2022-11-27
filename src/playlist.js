@@ -17,6 +17,8 @@ if (os.platform() === "win32") {
 }
 let foldernameFormat = "%(playlist_title)s";
 let filenameFormat = "%(playlist_index)s.%(title)s.%(ext)s";
+let playlistIndex = 1;
+let playlistEnd = "";
 
 function getId(id) {
 	return document.getElementById(id);
@@ -54,16 +56,7 @@ function download(type) {
 	nameFormatting();
 
 	// Playlist download range
-	let playlistIndex = 1;
-	let playlistEnd = "";
-
-	if (getId("playlistIndex").value) {
-		playlistIndex = Number(getId("playlistIndex").value);
-	}
-	if (getId("playlistEnd").value) {
-		playlistEnd = Number(getId("playlistEnd").value);
-	}
-	console.log(`Range: ${playlistIndex}:${playlistEnd}`);
+	managePlaylistRange()
 
 	// Whether to use browser cookies or not
 	if (localStorage.getItem("browser")) {
@@ -192,6 +185,16 @@ function download(type) {
 	});
 }
 
+function managePlaylistRange(){
+	if (getId("playlistIndex").value) {
+		playlistIndex = Number(getId("playlistIndex").value);
+	}
+	if (getId("playlistEnd").value) {
+		playlistEnd = Number(getId("playlistEnd").value);
+	}
+	console.log(`Range: ${playlistIndex}:${playlistEnd}`);
+}
+
 function afterClose(count) {
 	getId(`p${count}`).textContent = i18n.__("File saved.");
 	getId("pasteLink").style.display = "inline-block";
@@ -241,6 +244,7 @@ function downloadThumbnails() {
 	let count = 0;
 	hideOptions();
 	nameFormatting();
+	managePlaylistRange()
 	const downloadProcess = ytdlp.exec(
 		[
 			"--yes-playlist",
@@ -252,6 +256,8 @@ function downloadThumbnails() {
 			"--write-thumbnail",
 			"--convert-thumbnails png",
 			"--skip-download",
+			"-I",
+			`"${playlistIndex}:${playlistEnd}"`,
 			`"${url}"`,
 		],
 		{ shell: true, detached: false }
@@ -302,6 +308,7 @@ function saveLinks() {
 	let count = 0;
 	hideOptions();
 	nameFormatting();
+	managePlaylistRange()
 	const downloadProcess = ytdlp.exec(
 		[
 			"--yes-playlist",
@@ -313,6 +320,8 @@ function saveLinks() {
 			"webpage_url",
 			`"${path.join(downloadDir, foldernameFormat, "links.txt")}"`,
 			"--skip-download",
+			"-I",
+			`"${playlistIndex}:${playlistEnd}"`,
 			`"${url}"`,
 		],
 		{ shell: true, detached: false }
