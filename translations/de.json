@@ -80,5 +80,7 @@
 	"Reset to default": "Auf Standard zurücksetzen",
 	"Playlist range": "Playlist-Bereich",
 	"Thumbnail": "Miniaturansicht",
-	"Link added": "Verlinkung hinzugefügt"
+	"Link added": "Verlinkung hinzugefügt",
+	"Download thumbnails": "Download thumbnails",
+	"Save video links to a file": "Save video links to a file"
 }
