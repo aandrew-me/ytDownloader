@@ -44,6 +44,11 @@ enabledTransparent.addEventListener("change", (event) => {
 	}
 });
 
+const localEnabledTransparent = localStorage.getItem("enabledTransparent");
+if (localEnabledTransparent == "true") {
+	enabledTransparent.checked = true;
+}
+
 // Selecting config directory
 
 getId("configBtn").addEventListener("click", () => {
@@ -75,10 +80,6 @@ if (configPath) {
 
 // Language settings
 
-const localEnabledTransparent = localStorage.getItem("enabledTransparent");
-if (localEnabledTransparent == "true") {
-	enabledTransparent.checked = true;
-}
 const language = localStorage.getItem("language");
 
 if (language) {

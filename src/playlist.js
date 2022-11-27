@@ -76,9 +76,13 @@ function download(type) {
 	if (type === "video") {
 		quality = getId("select").value;
 		if (quality === "best") {
-			format = "bv*+ba/best";
-		} else {
-			format = `"mp4[height<=${quality}]+m4a/mp4[height<=${quality}]/bv[height<=${quality}]+ba/best[height<=${quality}]/best"`;
+			format = "-f bv*+ba/best";
+		} 
+		else if (quality === "useConfig"){
+			format = ""
+		}
+		else {
+			format = `-f "mp4[height<=${quality}]+m4a/mp4[height<=${quality}]/bv[height<=${quality}]+ba/best[height<=${quality}]/best"`;
 		}
 	} else {
 		format = getId("audioSelect").value;
@@ -89,7 +93,6 @@ function download(type) {
 	if (type === "video") {
 		downloadProcess = ytdlp.exec(
 			[
-				"-f",
 				format,
 				"--yes-playlist",
 				"-o",
