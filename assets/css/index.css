@@ -270,7 +270,7 @@ input[type=number]::-webkit-outer-spin-button {
 	background-color: rgb(4, 207, 21);
 	color: white;
 	border: none;
-	border-bottom: 5.5px solid rgb(13, 133, 13);
+	border-bottom: 5.5px solid rgb(11, 158, 11);
 	font-size: large;
 	cursor: pointer;
 	display: inline-block;

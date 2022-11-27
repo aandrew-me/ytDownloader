@@ -47,9 +47,9 @@ function download(type) {
 	// Config file
 	let configArg = "";
 	let configTxt = "";
-	if (localStorage.getItem("configPath")) {
-		configArg = "--config-location";
-		configTxt = localStorage.getItem("configPath");
+	if (localStorage.getItem("configPath")){
+		configArg = "--config-location"
+		configTxt = `"${localStorage.getItem("configPath")}"`
 	}
 	nameFormatting();
 

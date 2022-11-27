@@ -26,6 +26,7 @@ input[type="text"], .input{
 .input{
     width:70px;
     font-size: larger;
+    padding:5px;
 }
 
 .prefBox, #pathConfig{

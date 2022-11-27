@@ -667,7 +667,7 @@ function download(type) {
 	let configTxt = ""
 	if (localStorage.getItem("configPath")){
 		configArg = "--config-location"
-		configTxt = localStorage.getItem("configPath")
+		configTxt = `"${localStorage.getItem("configPath")}"`
 	}
 
 	const url = getId("url").value;
@@ -792,7 +792,7 @@ function download(type) {
 				subLangs,
 				"--no-playlist",
 				configArg,
-				`"${configTxt}"`,
+				configTxt,
 				cookieArg,
 				browser,
 				`"${url}"`,
@@ -821,7 +821,7 @@ function download(type) {
 				cookieArg,
 				browser,
 				configArg,
-				`"${configTxt}"`,
+				configTxt,
 				`"${url}"`,
 			],
 			{ shell: true, detached: false },
@@ -846,7 +846,7 @@ function download(type) {
 				cookieArg,
 				browser,
 				configArg,
-				`"${configTxt}"`,
+				configTxt,
 				`"${url}"`,
 			],
 			{ shell: true, detached: false },
@@ -999,6 +999,8 @@ function closeMenu() {
 		}
 	}, 50);
 }
+
+// Menu
 
 getId("preferenceWin").addEventListener("click", () => {
 	closeMenu();
