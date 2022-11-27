@@ -80,5 +80,7 @@
 	"Reset to default": "Palauta oletusasetukset",
 	"Playlist range": "Soittolistan alue",
 	"Thumbnail": "Pikkukuva",
-	"Link added": "Linkki lisätty"
+	"Link added": "Linkki lisätty",
+	"Download thumbnails": "Lataa pikkukuvat",
+	"Save video links to a file": "Tallenna videolinkit tiedostoon"
 }
