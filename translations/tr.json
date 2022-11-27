@@ -80,5 +80,7 @@
 	"Reset to default": "Varsayılana sıfırla",
 	"Playlist range": "Oynatma listesi aralığı",
 	"Thumbnail": "Küçük resim",
-	"Link added": "Bağlantı eklendi"
+	"Link added": "Bağlantı eklendi",
+	"Download thumbnails": "Küçük Resimleri İndir",
+	"Save video links to a file": "Video bağlantılarını bir dosyaya kaydet"
 }
