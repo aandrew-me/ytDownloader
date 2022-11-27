@@ -80,5 +80,7 @@
 	"Reset to default": "Сбросить по умолчанию",
 	"Playlist range": "Диапазон плейлиста",
 	"Thumbnail": "Миниатюра",
-	"Link added": "Ссылка добавлена"
+	"Link added": "Ссылка добавлена",
+	"Download thumbnails": "Скачать миниатюры",
+	"Save video links to a file": "Сохранить ссылки на видео в файл"
 }
