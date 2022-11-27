@@ -75,26 +75,27 @@ Since the app is not signed, when you will try to open the app, macOS will not a
 2. Choose **Security & Privacy**
 3. The app will be shown there. Click on **Open**
 
-## Internationalization 🌍
+## Internationalization (Localization) 🌍
 Translations into other languages would be highly appreciated. If you want to help translating the app to other languages, you can join from [here](https://crwd.in/ytdownloader). Open a new issue and that language will be added to Crowdin.
 
+[![Crowdin](https://badges.crowdin.net/ytdownloader/localized.svg)](https://crowdin.com/project/ytdownloader)
 ### ✅ Available languages
 
 |Name |Status (Credits)  |
 |--|--|
 |English  | ✔️ |
-|Finnish | ✔️ [LINUX-SAUNA](https://t.me/linuxsauna)|
-|German | ✔️ [Proxycon](https://github.com/proxycon)|
-|Italian  | ✔️ [albanobattistella](https://github.com/albanobattistella)|
-|Persian | ✔️ [TheBlueQuasar](https://github.com/TheBlueQuasar)|
-|Polish | ✔️ [MrQuerter](https://github.com/MrQuerter)|
-|Portuguese (Brazil) | ✔️ [André](https://github.com/andre1828)|
+|Finnish | ✔️ |
+|German | ✔️ |
+|Italian  | ✔️ |
+|Persian | ✔️ |
+|Polish | ✔️ |
+|Portuguese (Brazil) | ✔️ |
 |Russian | ✔️ |
-|Spanish | ✔️ [haggen88](https://github.com/haggen88)|
-| Turkish | ✔️ [nxjosephofficial](https://github.com/nxjosephofficial) |
-| Ukrainian | ✔️ [KotoWhiskas](https://github.com/KotoWhiskas) |
+|Spanish | ✔️ |
+| Turkish | ✔️ |
+| Ukrainian | ✔️ |
 
-Thanks to all of the translators 💙
+Thanks to [nxjosephofficial](https://github.com/nxjosephofficial), [LINUX-SAUNA](https://t.me/linuxsauna), [Proxycon](https://github.com/proxycon), [albanobattistella](https://github.com/albanobattistella), [TheBlueQuasar](https://github.com/TheBlueQuasar), [MrQuerter](https://github.com/MrQuerter), [KotoWhiskas](https://github.com/KotoWhiskas), [André](https://github.com/andre1828), [haggen88](https://github.com/haggen88), [XfedeX](https://github.com/XfedeX) and others for helping.
 ## Used technologies
 - [yt-dlp](https://github.com/yt-dlp/yt-dlp)
 - [Electron](https://www.electronjs.org/)
