@@ -189,5 +189,23 @@ if (localStorage.getItem("maxActiveDownloads")){
 	getId("maxDownloads").value = localStorage.getItem("maxActiveDownloads")
 }
 
+// Closing app to system tray
+const closeToTray = getId("closeToTray");
+closeToTray.addEventListener("change", (event) => {
+	if (closeToTray.checked) {
+		localStorage.setItem("closeToTray", "true");
+		ipcRenderer.send("useTray", true)
+	} else {
+		localStorage.setItem("closeToTray", "false");
+		ipcRenderer.send("useTray", false)
+
+	}
+});
+const trayEnabled = localStorage.getItem("closeToTray")
+if(trayEnabled == "true"){
+	closeToTray.checked = true;
+	ipcRenderer.send("useTray", true)
+}
+
 // Translation file
 require("../src/translate_preferences");

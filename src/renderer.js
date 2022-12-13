@@ -25,6 +25,13 @@ const i18n = new (require("../translations/i18n"))();
 
 fs.mkdir(hiddenDir, { recursive: true }, () => {});
 
+// System tray
+const trayEnabled = localStorage.getItem("closeToTray")
+if(trayEnabled == "true"){
+	console.log("Tray is Enabled");
+	ipcRenderer.send("useTray", true)
+}
+
 // Download directory
 let downloadDir = "";
 
@@ -197,6 +204,14 @@ function pasteUrl() {
 	getId("loadingWrapper").style.display = "flex";
 	getId("incorrectMsg").textContent = "";
 	const url = clipboard.readText();
+	getInfo(url);
+}
+
+function pasteFromTray(url){
+	defaultVideoToggle();
+	getId("hidden").style.display = "none";
+	getId("loadingWrapper").style.display = "flex";
+	getId("incorrectMsg").textContent = "";
 	getInfo(url);
 }
 
@@ -1016,3 +1031,7 @@ getId("playlistWin").addEventListener("click", () => {
 	closeMenu();
 	ipcRenderer.send("load-win", __dirname + "/playlist.html");
 });
+
+ipcRenderer.on("link", (event, text) => {
+	pasteFromTray(text)
+})

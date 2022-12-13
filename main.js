@@ -1,12 +1,70 @@
-const { app, BrowserWindow, dialog, ipcMain, shell } = require("electron");
+const {
+	app,
+	BrowserWindow,
+	dialog,
+	ipcMain,
+	shell,
+	Tray,
+	Menu,
+	clipboard
+} = require("electron");
 const { autoUpdater } = require("electron-updater");
 const fs = require("fs");
 const path = require("path");
 
 autoUpdater.autoDownload = false;
 let win, secondaryWindow;
+let tray = null;
+let isQuiting = false;
+let indexIsOpen = true;
+let trayEnabled = false;
 
 app.commandLine.appendSwitch("--enable-features", "Metal");
+
+const contextMenu = Menu.buildFromTemplate([
+	{
+		label: "Open app",
+		click() {
+			win.show();
+		},
+	},
+	{
+		label:"Paste video link",
+		click(){
+			const text = clipboard.readText()
+			if (indexIsOpen){
+				win.show()
+				win.webContents.send("link", text);
+			}
+			else{
+				win.loadFile("html/index.html")
+				win.show()
+				indexIsOpen = true;
+				setTimeout(() => {
+					win.webContents.send("link", text);
+				}, 1200);
+			}
+			
+			
+	
+		}
+	},
+	{
+		label:"Download playlist",
+		click(){
+			indexIsOpen = false;
+			win.loadFile("html/playlist.html")
+			win.show()
+		}
+	},
+	{
+		label: "Quit",
+		click() {
+			isQuiting = true;
+			app.quit();
+		},
+	},
+]);
 
 function createWindow() {
 	let isTransparent = false;
@@ -16,7 +74,7 @@ function createWindow() {
 
 	win = new BrowserWindow({
 		show: false,
-		icon: __dirname + "/public/icon.png",
+		icon: __dirname + "/assets/images/icon.png",
 		spellcheck: false,
 		transparent: isTransparent,
 		webPreferences: {
@@ -24,6 +82,13 @@ function createWindow() {
 			contextIsolation: false,
 		},
 	});
+	win.on("close", (event)=>{
+        if(!isQuiting && trayEnabled){
+			event.preventDefault();
+			win.hide();
+		}
+		return false
+	})
 	win.loadFile("html/index.html");
 	win.maximize();
 	// win.setMenu(null)
@@ -81,6 +146,12 @@ ipcMain.on("get-version", () => {
 });
 
 ipcMain.on("load-win", (event, file) => {
+	if (file.includes("playlist.html")){
+		indexIsOpen = false;
+	}
+	else{
+		indexIsOpen = true;
+	}
 	win.loadFile(file);
 });
 ipcMain.on("load-page", (event, file) => {
@@ -123,13 +194,21 @@ ipcMain.on("select-config", () => {
 		secondaryWindow.webContents.send("configPath", location);
 	}
 });
-
-app.on("window-all-closed", () => {
-	if (process.platform !== "darwin") {
-		app.quit();
+let trayInUse = false;
+ipcMain.on("useTray", (_, enabled)=>{
+	if (enabled && !trayInUse){
+		console.log("Using tray");
+		trayEnabled = true;
+		trayInUse = true;
+		tray = new Tray(__dirname + "/assets/images/icon.png");
+		tray.setToolTip("ytDownloader");
+		tray.setContextMenu(contextMenu);
 	}
-});
+	else{
+		trayEnabled = false;
+	}
 
+})
 // Auto updater events
 autoUpdater.on("update-available", (_event, releaseNotes, releaseName) => {
 	// For macOS

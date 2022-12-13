@@ -36,3 +36,4 @@ getId("dirFormatTxt").textContent = i18n.__("Folder name format for playlists");
 getId("resetFilenameFormat").textContent = i18n.__("Reset to default");
 getId("resetFoldernameFormat").textContent = i18n.__("Reset to default");
 getId("maxTxt").textContent = i18n.__("Maximum number of active downloads");
+getId("trayTxt").textContent = i18n.__("Close to system tray");
