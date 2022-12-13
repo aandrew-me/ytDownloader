@@ -23,13 +23,13 @@ app.commandLine.appendSwitch("--enable-features", "Metal");
 
 const contextMenu = Menu.buildFromTemplate([
 	{
-		label: "Open app",
+		label: i18n("Open app"),
 		click() {
 			win.show();
 		},
 	},
 	{
-		label:"Paste video link",
+		label: i18n("Paste video link"),
 		click(){
 			const text = clipboard.readText()
 			if (indexIsOpen){
@@ -50,7 +50,7 @@ const contextMenu = Menu.buildFromTemplate([
 		}
 	},
 	{
-		label:"Download playlist",
+		label: i18n("Download playlist"),
 		click(){
 			indexIsOpen = false;
 			win.loadFile("html/playlist.html")
