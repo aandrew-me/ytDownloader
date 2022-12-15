@@ -6,7 +6,7 @@ const {
 	shell,
 	Tray,
 	Menu,
-	clipboard
+	clipboard,
 } = require("electron");
 const { autoUpdater } = require("electron-updater");
 const fs = require("fs");
@@ -20,51 +20,6 @@ let indexIsOpen = true;
 let trayEnabled = false;
 
 app.commandLine.appendSwitch("--enable-features", "Metal");
-
-const contextMenu = Menu.buildFromTemplate([
-	{
-		label: i18n("Open app"),
-		click() {
-			win.show();
-		},
-	},
-	{
-		label: i18n("Paste video link"),
-		click(){
-			const text = clipboard.readText()
-			if (indexIsOpen){
-				win.show()
-				win.webContents.send("link", text);
-			}
-			else{
-				win.loadFile("html/index.html")
-				win.show()
-				indexIsOpen = true;
-				setTimeout(() => {
-					win.webContents.send("link", text);
-				}, 1200);
-			}
-			
-			
-	
-		}
-	},
-	{
-		label: i18n("Download playlist"),
-		click(){
-			indexIsOpen = false;
-			win.loadFile("html/playlist.html")
-			win.show()
-		}
-	},
-	{
-		label: "Quit",
-		click() {
-			isQuiting = true;
-			app.quit();
-		},
-	},
-]);
 
 function createWindow() {
 	let isTransparent = false;
@@ -82,13 +37,13 @@ function createWindow() {
 			contextIsolation: false,
 		},
 	});
-	win.on("close", (event)=>{
-        if(!isQuiting && trayEnabled){
+	win.on("close", (event) => {
+		if (!isQuiting && trayEnabled) {
 			event.preventDefault();
 			win.hide();
 		}
-		return false
-	})
+		return false;
+	});
 	win.loadFile("html/index.html");
 	win.maximize();
 	// win.setMenu(null)
@@ -120,6 +75,65 @@ app.whenReady().then(() => {
 		);
 	}
 
+	// Tray context menu
+	const contextMenu = Menu.buildFromTemplate([
+		{
+			label: i18n("Open app"),
+			click() {
+				win.show();
+			},
+		},
+		{
+			label: i18n("Paste video link"),
+			click() {
+				const text = clipboard.readText();
+				if (indexIsOpen) {
+					win.show();
+					win.webContents.send("link", text);
+				} else {
+					win.loadFile("html/index.html");
+					win.show();
+					indexIsOpen = true;
+					setTimeout(() => {
+						win.webContents.send("link", text);
+					}, 1200);
+				}
+			},
+		},
+		{
+			label: i18n("Download playlist"),
+			click() {
+				indexIsOpen = false;
+				win.loadFile("html/playlist.html");
+				win.show();
+			},
+		},
+		{
+			label: i18n("Quit"),
+			click() {
+				isQuiting = true;
+				app.quit();
+			},
+		},
+	]);
+
+	let trayInUse = false;
+	ipcMain.on("useTray", (_, enabled) => {
+		if (enabled && !trayInUse) {
+			console.log("Using tray");
+			trayEnabled = true;
+			trayInUse = true;
+			tray = new Tray(__dirname + "/assets/images/icon.png");
+			tray.setToolTip("ytDownloader");
+			tray.setContextMenu(contextMenu);
+		} else if (!enabled) {
+			trayEnabled = false;
+			console.log("Disabled tray");
+		} else {
+			console.log("Tray already in use");
+		}
+	});
+
 	createWindow();
 	app.on("activate", () => {
 		if (BrowserWindow.getAllWindows().length === 0) {
@@ -146,10 +160,9 @@ ipcMain.on("get-version", () => {
 });
 
 ipcMain.on("load-win", (event, file) => {
-	if (file.includes("playlist.html")){
+	if (file.includes("playlist.html")) {
 		indexIsOpen = false;
-	}
-	else{
+	} else {
 		indexIsOpen = true;
 	}
 	win.loadFile(file);
@@ -194,21 +207,7 @@ ipcMain.on("select-config", () => {
 		secondaryWindow.webContents.send("configPath", location);
 	}
 });
-let trayInUse = false;
-ipcMain.on("useTray", (_, enabled)=>{
-	if (enabled && !trayInUse){
-		console.log("Using tray");
-		trayEnabled = true;
-		trayInUse = true;
-		tray = new Tray(__dirname + "/assets/images/icon.png");
-		tray.setToolTip("ytDownloader");
-		tray.setContextMenu(contextMenu);
-	}
-	else{
-		trayEnabled = false;
-	}
 
-})
 // Auto updater events
 autoUpdater.on("update-available", (_event, releaseNotes, releaseName) => {
 	// For macOS
