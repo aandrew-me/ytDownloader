@@ -82,5 +82,10 @@
 	"Thumbnail": "Мініатюра",
 	"Link added": "Посилання додано",
 	"Download thumbnails": "Завантажити мініатюри",
-	"Save video links to a file": "Зберегти відео посилання в файл"
+	"Save video links to a file": "Зберегти відео посилання в файл",
+	"Close app to system tray": "Close app to system tray",
+	"Use config file": "Use config file",
+	"Open app": "Open app",
+	"Paste video link": "Paste video link",
+	"Quit": "Quit"
 }
