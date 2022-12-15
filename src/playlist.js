@@ -489,3 +489,4 @@ getId("playlistIndex").placeholder = i18n.__("Start");
 getId("playlistEnd").placeholder = i18n.__("End");
 getId("downloadThumbnails").textContent = i18n.__("Download thumbnails");
 getId("saveLinks").textContent = i18n.__("Save video links to a file");
+getId("useConfigTxt").textContent = i18n.__("Use config file");
