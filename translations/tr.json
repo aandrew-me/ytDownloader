@@ -82,5 +82,10 @@
 	"Thumbnail": "Küçük resim",
 	"Link added": "Bağlantı eklendi",
 	"Download thumbnails": "Küçük Resimleri İndir",
-	"Save video links to a file": "Video bağlantılarını bir dosyaya kaydet"
+	"Save video links to a file": "Video bağlantılarını bir dosyaya kaydet",
+	"Close app to system tray": "Sistem tepsisine kapat",
+	"Use config file": "Konfigürasyon dosyası kullan",
+	"Open app": "Open app",
+	"Paste video link": "Paste video link",
+	"Quit": "Quit"
 }

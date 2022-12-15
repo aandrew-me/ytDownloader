@@ -82,5 +82,10 @@
 	"Thumbnail": "تصویر بند انگشتی",
 	"Link added": "Link added",
 	"Download thumbnails": "Download thumbnails",
-	"Save video links to a file": "Save video links to a file"
+	"Save video links to a file": "Save video links to a file",
+	"Close app to system tray": "Close app to system tray",
+	"Use config file": "Use config file",
+	"Open app": "Open app",
+	"Paste video link": "Paste video link",
+	"Quit": "Quit"
 }

@@ -82,5 +82,10 @@
 	"Thumbnail": "Pikkukuva",
 	"Link added": "Linkki lisätty",
 	"Download thumbnails": "Lataa pikkukuvat",
-	"Save video links to a file": "Tallenna videolinkit tiedostoon"
+	"Save video links to a file": "Tallenna videolinkit tiedostoon",
+	"Close app to system tray": "Close app to system tray",
+	"Use config file": "Use config file",
+	"Open app": "Open app",
+	"Paste video link": "Paste video link",
+	"Quit": "Quit"
 }

@@ -82,5 +82,10 @@
 	"Thumbnail": "Миниатюра",
 	"Link added": "Ссылка добавлена",
 	"Download thumbnails": "Скачать миниатюры",
-	"Save video links to a file": "Сохранить ссылки на видео в файл"
+	"Save video links to a file": "Сохранить ссылки на видео в файл",
+	"Close app to system tray": "Закрыть приложение в трей системы",
+	"Use config file": "Использовать файл конфигурации",
+	"Open app": "Открыть приложение",
+	"Paste video link": "Вставить ссылку на видео",
+	"Quit": "Закрыть"
 }

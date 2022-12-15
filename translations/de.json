@@ -82,5 +82,10 @@
 	"Thumbnail": "Miniaturansicht",
 	"Link added": "Verlinkung hinzugefügt",
 	"Download thumbnails": "Thumbnails herunterladen",
-	"Save video links to a file": "Videolinks in einer Datei speichern"
+	"Save video links to a file": "Videolinks in einer Datei speichern",
+	"Close app to system tray": "Close app to system tray",
+	"Use config file": "Use config file",
+	"Open app": "Open app",
+	"Paste video link": "Paste video link",
+	"Quit": "Quit"
 }
