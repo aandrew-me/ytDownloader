@@ -31,8 +31,8 @@
 	"license": "GPL-3.0",
 	"description": "Download videos and audios from YouTube and many other sites",
 	"devDependencies": {
-		"electron": "20.0.3",
-		"electron-builder": "^23.3.3"
+		"electron": "^20.0.3",
+		"electron-builder": "^23.6.0"
 	},
 	"build": {
 		"productName": "YTDownloader",
