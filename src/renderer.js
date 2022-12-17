@@ -177,6 +177,8 @@ cp.exec("yt-dlp --version", (error, stdout, stderr) => {
 				);
 				getId("pasteUrl").style.display = "inline-block";
 				console.log("yt-dlp bin Path: " + ytDlp);
+				
+				ipcRenderer.send("ready-for-links")
 			}
 		});
 	} else {
@@ -186,6 +188,7 @@ cp.exec("yt-dlp --version", (error, stdout, stderr) => {
 		localStorage.setItem("ytdlp", ytDlp);
 		getId("pasteUrl").style.display = "inline-block";
 		console.log("yt-dlp bin Path: " + ytDlp);
+		ipcRenderer.send("ready-for-links")
 	}
 });
 

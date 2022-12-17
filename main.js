@@ -94,9 +94,13 @@ app.whenReady().then(() => {
 					win.loadFile("html/index.html");
 					win.show();
 					indexIsOpen = true;
-					setTimeout(() => {
-						win.webContents.send("link", text);
-					}, 1200);
+					let sent = false;
+					ipcMain.on("ready-for-links", () => {
+						if (!sent) {
+							win.webContents.send("link", text);
+							sent = true;
+						}
+					});
 				}
 			},
 		},
