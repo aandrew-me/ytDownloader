@@ -45,29 +45,47 @@ A modern GUI video and audio downloader supporting [hundreds of sites](https://g
 
 # Installation
 ## Windows 🪟
-Download and install the exe file. Windows defender may create problems as usual.
+- **Traditional way**
+
+    Download and install the exe file. Windows defender may create problems as usual.
+
+- **Chocolatey**
+    
+    App can be installed from [Chocolatey](https://community.chocolatey.org/packages/ytdownloader) using the following command
+    ```
+    choco install ytdownloader
+    ```
+
 
 ## Linux 🐧
 
 Linux has several options available - Flatpak, AppImage, Snap and AUR.
 Flatpak is recommended.
-### AppImage
+- ### AppImage
 
-**AppImage** format is supported on most Linux distros and has Auto-Update support.
-It just needs to be executed after downloading. See more about [AppImages here](https://appimage.org/).
+    **AppImage** format is supported on most Linux distros and has Auto-Update support.
+    It just needs to be executed after downloading. See more about [AppImages here](https://appimage.org/).
 
-[AppImageLauncher](https://github.com/TheAssassin/AppImageLauncher) is recommended for integrating AppImages.
+    [AppImageLauncher](https://github.com/TheAssassin/AppImageLauncher) is recommended for integrating AppImages.
 
-### AUR package
-The app is available in [AUR](https://aur.archlinux.org/packages/ytdownloader-gui) with the name `ytdownloader-gui`. To build with pamac the required command is -
-```
-pamac install ytdownloader-gui
-```
-Using yay
-```
-yay -S ytdownloader-gui
-```
+- ### AUR package
+    The app is available in [AUR](https://aur.archlinux.org/packages/ytdownloader-gui) with the name `ytdownloader-gui`. To build with pamac the required command is -
+    ```
+    pamac install ytdownloader-gui
+    ```
+    Using yay
+    ```
+    yay -S ytdownloader-gui
+    ```
 
+- ### Flatpak
+    ```
+    flatpak install flathub me.aandrew.ytdownloader
+    ```
+- ### Snapcraft
+    ```
+    sudo snap install ytdownloader
+    ```
 ## macOS 🍎
 Since the app is not signed, when you will try to open the app, macOS will not allow you to open it. So you will need to follow some steps to open it.
 
