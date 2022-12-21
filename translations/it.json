@@ -83,9 +83,9 @@
 	"Link added": "Link aggiunto",
 	"Download thumbnails": "Scarica miniature",
 	"Save video links to a file": "Salva link video su un file",
-	"Close app to system tray": "Close app to system tray",
-	"Use config file": "Use config file",
-	"Open app": "Open app",
-	"Paste video link": "Paste video link",
-	"Quit": "Quit"
+	"Close app to system tray": "Chiudi app nel vassoio di sistema",
+	"Use config file": "Usa file di configurazione",
+	"Open app": "Apri app",
+	"Paste video link": "Incolla link video",
+	"Quit": "Esci"
 }
