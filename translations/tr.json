@@ -85,7 +85,7 @@
 	"Save video links to a file": "Video bağlantılarını bir dosyaya kaydet",
 	"Close app to system tray": "Sistem tepsisine kapat",
 	"Use config file": "Konfigürasyon dosyası kullan",
-	"Open app": "Open app",
-	"Paste video link": "Paste video link",
-	"Quit": "Quit"
+	"Open app": "Uygulamayı aç",
+	"Paste video link": "Video bağlantısını yapıştırın",
+	"Quit": "Çıkış"
 }
