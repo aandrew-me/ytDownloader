@@ -31,6 +31,8 @@ if(trayEnabled == "true"){
 	console.log("Tray is Enabled");
 	ipcRenderer.send("useTray", true)
 }
+// Ignore Python warnings
+process.env.PYTHONWARNINGS = "error"
 
 // Download directory
 let downloadDir = "";
