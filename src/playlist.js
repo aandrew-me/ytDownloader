@@ -1,5 +1,5 @@
 const { clipboard, shell, ipcRenderer } = require("electron");
-const { default: YTDlpWrap } = require("yt-dlp-wrap-extended");
+const { default: YTDlpWrap } = require("yt-dlp-wrap-plus");
 const path = require("path");
 const os = require("os");
 let url;

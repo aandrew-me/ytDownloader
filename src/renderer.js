@@ -15,7 +15,7 @@ const fs = require("fs");
 
 const path = require("path");
 const { shell, ipcRenderer, clipboard } = require("electron");
-const { default: YTDlpWrap } = require("yt-dlp-wrap-extended");
+const { default: YTDlpWrap } = require("yt-dlp-wrap-plus");
 
 // Directories
 const homedir = os.homedir();

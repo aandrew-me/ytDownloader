@@ -1,7 +1,7 @@
 {
 	"dependencies": {
 		"electron-updater": "^5.3.0",
-		"yt-dlp-wrap-extended": "^2.3.15"
+		"yt-dlp-wrap-plus": "^2.3.16"
 	},
 	"name": "ytdownloader",
 	"version": "3.10.0",
