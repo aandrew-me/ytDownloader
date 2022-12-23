@@ -41,6 +41,7 @@ function createWindow() {
 		if (!isQuiting && trayEnabled) {
 			event.preventDefault();
 			win.hide();
+			if (app.dock) app.dock.hide();
 		}
 		return false;
 	});
@@ -81,6 +82,7 @@ app.whenReady().then(() => {
 			label: i18n("Open app"),
 			click() {
 				win.show();
+				if (app.dock) app.dock.show()
 			},
 		},
 		{
@@ -122,12 +124,20 @@ app.whenReady().then(() => {
 	]);
 
 	let trayInUse = false;
+	let icon;
+	if (process.platform == "win32") {
+		icon = __dirname + "/resources/icon.ico";
+	} else if (process.platform == "darwin") {
+		icon = __dirname + "/resources/icons/16x16.png";
+	} else {
+		icon = __dirname + "/resources/icon.png";
+	}
 	ipcMain.on("useTray", (_, enabled) => {
 		if (enabled && !trayInUse) {
 			console.log("Using tray");
 			trayEnabled = true;
 			trayInUse = true;
-			tray = new Tray(__dirname + "/assets/images/icon.png");
+			tray = new Tray(icon);
 			tray.setToolTip("ytDownloader");
 			tray.setContextMenu(contextMenu);
 		} else if (!enabled) {
