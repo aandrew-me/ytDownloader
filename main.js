@@ -128,15 +128,14 @@ app.whenReady().then(() => {
 	let trayInUse = false;
 	let icon;
 	if (process.platform == "win32") {
-		icon = __dirname + "/resources/icon.ico";
+		icon = path.join(__dirname,"resources/icon.ico")
 	} else if (process.platform == "darwin") {
-		icon = __dirname + "/resources/icons/16x16.png";
+		icon = path.join(__dirname, "resources/icons/16x16.png")
 	} else {
-		icon = __dirname + "/resources/icon.png";
+		icon = path.join(__dirname, "resources/icons/256x256.png")
 	}
 	ipcMain.on("useTray", (_, enabled) => {
 		if (enabled && !trayInUse) {
-			console.log("Using tray");
 			trayEnabled = true;
 			trayInUse = true;
 			tray = new Tray(icon);
@@ -144,9 +143,6 @@ app.whenReady().then(() => {
 			tray.setContextMenu(contextMenu);
 		} else if (!enabled) {
 			trayEnabled = false;
-			console.log("Disabled tray");
-		} else {
-			console.log("Tray already in use");
 		}
 	});
 
