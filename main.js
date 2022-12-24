@@ -91,6 +91,7 @@ app.whenReady().then(() => {
 				const text = clipboard.readText();
 				if (indexIsOpen) {
 					win.show();
+					if (app.dock) app.dock.show()
 					win.webContents.send("link", text);
 				} else {
 					win.loadFile("html/index.html");
@@ -112,6 +113,7 @@ app.whenReady().then(() => {
 				indexIsOpen = false;
 				win.loadFile("html/playlist.html");
 				win.show();
+				if (app.dock) app.dock.show()
 			},
 		},
 		{
