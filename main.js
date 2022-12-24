@@ -13,7 +13,8 @@ const fs = require("fs");
 const path = require("path");
 
 autoUpdater.autoDownload = false;
-let win, secondaryWindow;
+let win = null;
+let secondaryWindow = null;
 let tray = null;
 let isQuiting = false;
 let indexIsOpen = true;
@@ -53,6 +54,20 @@ function createWindow() {
 	autoUpdater.checkForUpdates();
 }
 let loadedLanguage;
+
+const gotTheLock = app.requestSingleInstanceLock();
+
+if (!gotTheLock) {
+	app.quit();
+} else {
+	app.on("second-instance", (event, commandLine, workingDirectory) => {
+		// Someone tried to run a second instance, we should focus our window.
+		if (win) {
+			win.show();
+		}
+	});
+}
+
 app.whenReady().then(() => {
 	// Logging
 	console.log("Locale:" + app.getLocale());
@@ -82,7 +97,7 @@ app.whenReady().then(() => {
 			label: i18n("Open app"),
 			click() {
 				win.show();
-				if (app.dock) app.dock.show()
+				if (app.dock) app.dock.show();
 			},
 		},
 		{
@@ -91,7 +106,7 @@ app.whenReady().then(() => {
 				const text = clipboard.readText();
 				if (indexIsOpen) {
 					win.show();
-					if (app.dock) app.dock.show()
+					if (app.dock) app.dock.show();
 					win.webContents.send("link", text);
 				} else {
 					win.loadFile("html/index.html");
@@ -113,7 +128,7 @@ app.whenReady().then(() => {
 				indexIsOpen = false;
 				win.loadFile("html/playlist.html");
 				win.show();
-				if (app.dock) app.dock.show()
+				if (app.dock) app.dock.show();
 			},
 		},
 		{
@@ -128,11 +143,11 @@ app.whenReady().then(() => {
 	let trayInUse = false;
 	let icon;
 	if (process.platform == "win32") {
-		icon = path.join(__dirname,"resources/icon.ico")
+		icon = path.join(__dirname, "resources/icon.ico");
 	} else if (process.platform == "darwin") {
-		icon = path.join(__dirname, "resources/icons/16x16.png")
+		icon = path.join(__dirname, "resources/icons/16x16.png");
 	} else {
-		icon = path.join(__dirname, "resources/icons/256x256.png")
+		icon = path.join(__dirname, "resources/icons/256x256.png");
 	}
 	ipcMain.on("useTray", (_, enabled) => {
 		if (enabled && !trayInUse) {
