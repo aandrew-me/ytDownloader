@@ -43,7 +43,8 @@ document.addEventListener("keydown", (event) => {
 
 // Patterns
 const playlistTxt = "Downloading playlist: ";
-const videoIndex = "Downloading video ";
+const videoIndex = "Downloading item ";
+const oldVideoIndex = "Downloading video "
 
 function download(type) {
 	// Config file
@@ -149,7 +150,7 @@ function download(type) {
 		}
 
 		if (
-			eventData.includes(videoIndex) &&
+			(eventData.includes(videoIndex) || eventData.includes(oldVideoIndex)) &&
 			!eventData.includes("thumbnail")
 		) {
 			count += 1;
@@ -280,7 +281,7 @@ function downloadThumbnails() {
 		}
 
 		if (
-			eventData.includes(videoIndex) &&
+			(eventData.includes(videoIndex) || eventData.includes(oldVideoIndex))&&
 			!eventData.includes("thumbnail")
 		) {
 			count += 1;
@@ -344,7 +345,7 @@ function saveLinks() {
 		}
 
 		if (
-			eventData.includes(videoIndex) &&
+			(eventData.includes(videoIndex) || eventData.includes(oldVideoIndex)) &&
 			!eventData.includes("thumbnail")
 		) {
 			count += 1;
