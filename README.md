@@ -135,7 +135,7 @@ To run with [Electron](https://www.electronjs.org/) :
 ```
 npm start
 ```
-To build for Linux (It will create packages as specified in package.json). The builds are stored in **release** folder.
+To build for Linux (It will create packages as specified in package.json). The builds are stored in **release** folder. You need to be in a Linux environment to execute those scripts. Otherwise you can download the ffmpeg binary for the respective platform and put it in the root directory of the app and build with electron-builder.
 ```
 npm run linux
 ```
