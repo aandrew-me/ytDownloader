@@ -86,7 +86,7 @@ function download(type) {
 			format = ""
 		}
 		else {
-			format = `-f "mp4[height<=${quality}]+m4a/mp4[height<=${quality}]/bv[height<=${quality}]+ba/best[height<=${quality}]/best"`;
+			format = `-f "bv*[height<=${quality}]+ba/best"`;
 		}
 	} else {
 		format = getId("audioSelect").value;
