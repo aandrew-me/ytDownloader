@@ -99,11 +99,12 @@ Translations into other languages would be highly appreciated. If you want to he
 [![Crowdin](https://badges.crowdin.net/ytdownloader/localized.svg)](https://crowdin.com/project/ytdownloader)
 ### ✅ Available languages
 
-|Name |Status (Credits)  |
+|Name |Status |
 |--|--|
 |English  | ✔️ |
 |Finnish | ✔️ |
 |German | ✔️ |
+|Greek | ✔️ |
 |Italian  | ✔️ |
 |Persian | ✔️ |
 |Polish | ✔️ |
@@ -113,7 +114,7 @@ Translations into other languages would be highly appreciated. If you want to he
 | Turkish | ✔️ |
 | Ukrainian | ✔️ |
 
-Thanks to [nxjosephofficial](https://github.com/nxjosephofficial), [LINUX-SAUNA](https://t.me/linuxsauna), [Proxycon](https://github.com/proxycon), [albanobattistella](https://github.com/albanobattistella), [TheBlueQuasar](https://github.com/TheBlueQuasar), [MrQuerter](https://github.com/MrQuerter), [KotoWhiskas](https://github.com/KotoWhiskas), [André](https://github.com/andre1828), [haggen88](https://github.com/haggen88), [XfedeX](https://github.com/XfedeX) and others for helping.
+Thanks to [nxjosephofficial](https://github.com/nxjosephofficial), [LINUX-SAUNA](https://t.me/linuxsauna), [Proxycon](https://github.com/proxycon), [albanobattistella](https://github.com/albanobattistella), [TheBlueQuasar](https://github.com/TheBlueQuasar), [MrQuerter](https://github.com/MrQuerter), [KotoWhiskas](https://github.com/KotoWhiskas), [André](https://github.com/andre1828), [haggen88](https://github.com/haggen88), [XfedeX](https://github.com/XfedeX), [Jok3r](https://github.com/th3knv) and others for helping.
 ## Used technologies
 - [yt-dlp](https://github.com/yt-dlp/yt-dlp)
 - [Electron](https://www.electronjs.org/)
