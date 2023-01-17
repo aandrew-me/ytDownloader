@@ -83,8 +83,8 @@
 	"Link added": "Посилання додано",
 	"Download thumbnails": "Завантажити мініатюри",
 	"Save video links to a file": "Зберегти відео посилання в файл",
-	"Close app to system tray": "Закрити програму в області сповіщень",
-	"Use config file": "Використовувати файл конфігурації",
+	"Close app to system tray": "При закритті згортати до системного трею",
+	"Use config file": "Використовувати файл налаштувань",
 	"Open app": "Відкрити програму",
 	"Paste video link": "Вставити відео посилання",
 	"Quit": "Вийти"
