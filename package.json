@@ -4,7 +4,7 @@
 		"yt-dlp-wrap-plus": "^2.3.16"
 	},
 	"name": "ytdownloader",
-	"version": "3.10.3",
+	"version": "3.10.4",
 	"main": "main.js",
 	"scripts": {
 		"start": "electron .",
@@ -31,7 +31,7 @@
 	"license": "GPL-3.0",
 	"description": "Download videos and audios from YouTube and many other sites",
 	"devDependencies": {
-		"electron": "^20.0.3",
+		"electron": "^22.0.3",
 		"electron-builder": "^23.6.0"
 	},
 	"build": {
