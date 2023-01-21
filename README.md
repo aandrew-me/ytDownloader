@@ -120,6 +120,7 @@ Thanks to [nxjosephofficial](https://github.com/nxjosephofficial), [LINUX-SAUNA]
 - [Electron](https://www.electronjs.org/)
 - [ffmpeg](https://ffmpeg.org/)
 - [nodeJS](https://nodejs.org/en/)
+- [flaticon](https://www.flaticon.com/)
 
 ## For building or running from source code
 
