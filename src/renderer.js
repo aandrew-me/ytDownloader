@@ -2,7 +2,7 @@ const cp = require("child_process");
 const os = require("os");
 let ffmpeg;
 if (os.platform() === "win32") {
-	ffmpeg = `"${__dirname}\\..\\ffmpeg.exe"`; 
+	ffmpeg = `"${__dirname}\\..\\ffmpeg.exe"`;
 } else {
 	ffmpeg = `"${__dirname}/../ffmpeg"`;
 }
@@ -26,13 +26,13 @@ const i18n = new (require("../translations/i18n"))();
 fs.mkdir(hiddenDir, { recursive: true }, () => {});
 
 // System tray
-const trayEnabled = localStorage.getItem("closeToTray")
-if(trayEnabled == "true"){
+const trayEnabled = localStorage.getItem("closeToTray");
+if (trayEnabled == "true") {
 	console.log("Tray is Enabled");
-	ipcRenderer.send("useTray", true)
+	ipcRenderer.send("useTray", true);
 }
 // Ignore Python warnings
-process.env.PYTHONWARNINGS = "error"
+process.env.PYTHONWARNINGS = "error";
 
 // Download directory
 let downloadDir = "";
@@ -46,22 +46,20 @@ let rangeOption = "--download-sections";
 let cookieArg = "";
 let browser = "";
 let maxActiveDownloads = 5;
-function checkMaxDownloads(){
-	if (localStorage.getItem("maxActiveDownloads")){
-		const number = Number(localStorage.getItem("maxActiveDownloads"))
-		if (number < 1){
-			maxActiveDownloads = 1
-		}
-		else{
-			maxActiveDownloads = number
+function checkMaxDownloads() {
+	if (localStorage.getItem("maxActiveDownloads")) {
+		const number = Number(localStorage.getItem("maxActiveDownloads"));
+		if (number < 1) {
+			maxActiveDownloads = 1;
+		} else {
+			maxActiveDownloads = number;
 		}
 	}
 }
-checkMaxDownloads()
-
+checkMaxDownloads();
 
 let currentDownloads = 0;
-let controllers = new Object;
+let controllers = new Object();
 
 // Video and audio preferences
 let preferredVideoQuality = "";
@@ -179,8 +177,8 @@ cp.exec("yt-dlp --version", (error, stdout, stderr) => {
 				);
 				getId("pasteUrl").style.display = "inline-block";
 				console.log("yt-dlp bin Path: " + ytDlp);
-				
-				ipcRenderer.send("ready-for-links")
+
+				ipcRenderer.send("ready-for-links");
 			}
 		});
 	} else {
@@ -190,7 +188,7 @@ cp.exec("yt-dlp --version", (error, stdout, stderr) => {
 		localStorage.setItem("ytdlp", ytDlp);
 		getId("pasteUrl").style.display = "inline-block";
 		console.log("yt-dlp bin Path: " + ytDlp);
-		ipcRenderer.send("ready-for-links")
+		ipcRenderer.send("ready-for-links");
 	}
 });
 
@@ -212,7 +210,7 @@ function pasteUrl() {
 	getInfo(url);
 }
 
-function pasteFromTray(url){
+function pasteFromTray(url) {
 	defaultVideoToggle();
 	getId("hidden").style.display = "none";
 	getId("loadingWrapper").style.display = "flex";
@@ -478,14 +476,25 @@ async function getInfo(url) {
 
 // Video download event
 getId("videoDownload").addEventListener("click", (event) => {
-	checkMaxDownloads()
+	checkMaxDownloads();
 	getId("hidden").style.display = "none";
 	console.log(`Current:${currentDownloads} Max:${maxActiveDownloads}`);
 
 	if (currentDownloads < maxActiveDownloads) {
+		manageAdvanced(duration);
 		download("video");
 		currentDownloads++;
 	} else {
+		// Handling active downloads for video
+		manageAdvanced(duration);
+		const range1 = rangeOption;
+		const range2 = rangeCmd;
+		const subs1 = subs;
+		const subs2 = subLangs;
+		const url1 = getId("url").value;
+		const thumb1 = thumbnail
+		const title1 = title
+
 		const randId = Math.random().toFixed(10).toString().slice(2);
 		const item = `
 		<div class="item" id="${randId}">
@@ -501,28 +510,41 @@ getId("videoDownload").addEventListener("click", (event) => {
 		getId("list").innerHTML += item;
 		const interval = setInterval(() => {
 			if (currentDownloads < maxActiveDownloads) {
-				getId(randId).remove()
-				download("video");
+				getId(randId).remove();
+				download("video", url1, range1, range2, subs1, subs2, thumb1, title1);
 				currentDownloads++;
 				clearInterval(interval);
 			}
 		}, 2000);
 	}
-
 });
 
 // Audio download event
 getId("audioDownload").addEventListener("click", (event) => {
-	checkMaxDownloads()
+	checkMaxDownloads();
 	getId("hidden").style.display = "none";
 	console.log(`Current:${currentDownloads} Max:${maxActiveDownloads}`);
 
 	if (currentDownloads < maxActiveDownloads) {
+		manageAdvanced();
 		download("audio");
 		currentDownloads++;
 	} else {
+		manageAdvanced();
+		// Handling active downloads for audio
+		manageAdvanced(duration);
+		const range1 = rangeOption;
+		const range2 = rangeCmd;
+		const subs1 = subs;
+		const subs2 = subLangs;
+		const url1 = getId("url").value;
+		const thumb1 = thumbnail
+		const title1 = title
+
 		const randId = Math.random().toFixed(10).toString().slice(2);
+
 		const item = `
+		
 		<div class="item" id="${randId}">
 			<img src="${thumbnail}" alt="No thumbnail" class="itemIcon" crossorigin="anonymous">
 
@@ -536,8 +558,8 @@ getId("audioDownload").addEventListener("click", (event) => {
 		getId("list").innerHTML += item;
 		const interval = setInterval(() => {
 			if (currentDownloads < maxActiveDownloads) {
-				getId(randId).remove()
-				download("video");
+				getId(randId).remove();
+				download("audio", url1, range1, range2, subs1, subs2, thumb1, title1);
 				currentDownloads++;
 				clearInterval(interval);
 			}
@@ -546,17 +568,29 @@ getId("audioDownload").addEventListener("click", (event) => {
 });
 
 getId("extractBtn").addEventListener("click", () => {
-	checkMaxDownloads()
+	checkMaxDownloads();
 	getId("hidden").style.display = "none";
 	extractFormat = getId("extractSelection").value;
 
 	console.log(`Current:${currentDownloads} Max:${maxActiveDownloads}`);
 
 	if (currentDownloads < maxActiveDownloads) {
+		manageAdvanced();
 		download("extract");
 		currentDownloads++;
 	} else {
+		manageAdvanced();
+		// Handling active downloads for extracting audio
+		manageAdvanced(duration);
+		const range1 = rangeOption;
+		const range2 = rangeCmd;
+		const subs1 = subs;
+		const subs2 = subLangs;
+		const url1 = getId("url").value;
 		const randId = Math.random().toFixed(10).toString().slice(2);
+		const thumb1 = thumbnail
+		const title1 = title
+
 		const item = `
 		<div class="item" id="${randId}">
 			<img src="${thumbnail}" alt="No thumbnail" class="itemIcon" crossorigin="anonymous">
@@ -571,8 +605,8 @@ getId("extractBtn").addEventListener("click", () => {
 		getId("list").innerHTML += item;
 		const interval = setInterval(() => {
 			if (currentDownloads < maxActiveDownloads) {
-				getId(randId).remove()
-				download("extract");
+				getId(randId).remove();
+				download("extract", url1, range1, range2, subs1, subs2, thumb1, title1);
 				currentDownloads++;
 				clearInterval(interval);
 			}
@@ -664,14 +698,6 @@ function manageAdvanced(duration) {
 		subLangs = "";
 	}
 
-	// // If autosubs are checked
-	// if (getId("autoSubChecked").checked){
-	// 	autoSubs = "--write-auto-subs"
-	// }
-	// else{
-	// 	autoSubs = ""
-	// }
-
 	console.log("Range option: " + rangeOption);
 	console.log("rangeCmd:" + rangeCmd);
 }
@@ -679,18 +705,27 @@ function manageAdvanced(duration) {
 // Downloading with yt-dlp
 //////////////////////////////
 
-function download(type) {
-	manageAdvanced(duration);
-
+function download(
+	type,
+	url1 = "",
+	range1 = "",
+	range2 = "",
+	subs1 = "",
+	subs2 = "",
+	thumb1 = "",
+	title1 = ""
+) {
 	// Config file
-	let configArg = ""
-	let configTxt = ""
-	if (localStorage.getItem("configPath")){
-		configArg = "--config-location"
-		configTxt = `"${localStorage.getItem("configPath")}"`
+	const newTitle = title1 || title
+	let configArg = "";
+	let configTxt = "";
+	if (localStorage.getItem("configPath")) {
+		configArg = "--config-location";
+		configTxt = `"${localStorage.getItem("configPath")}"`;
 	}
 
-	const url = getId("url").value;
+	const url = url1 || getId("url").value;
+	console.log("URL", url)
 	let ext;
 	let extractExt;
 
@@ -735,10 +770,10 @@ function download(type) {
 		<img src="../assets/images/close.png" onClick="fadeItem('${randomId}')" class="itemClose"}" id="${
 		randomId + ".close"
 	}">
-		<img src="${thumbnail}" alt="No thumbnail" class="itemIcon" crossorigin="anonymous">
+		<img src="${thumb1 || thumbnail}" alt="No thumbnail" class="itemIcon" crossorigin="anonymous">
 
 		<div class="itemBody">
-			<div class="itemTitle">${title}</div>
+			<div class="itemTitle">${newTitle}</div>
 			<div class="itemType">${
 				type === "video" ? i18n.__("Video") : i18n.__("Audio")
 			}</div>
@@ -760,25 +795,24 @@ function download(type) {
 	let filename = "";
 
 	// Filtering characters for Unix platforms
-	let pattern = ["/", '"', "`"];
+	let pattern = ["/", '"', "`", "#"];
 
 	if (process.platform === "win32") {
-		pattern = ["[", "]", "*", "<", ">", "|", "\\", "/", "?", '"', "`"];
+		pattern = ["[", "]", "*", "<", ">", "|", "\\", "/", "?", '"', "`", "#"];
 	}
 
 	// Trying to remove ambiguous characters
-	for (let i = 0; i < title.length; i++) {
+	for (let i = 0; i < newTitle.length; i++) {
 		let letter = "";
-		if (pattern.includes(title[i])) {
+		if (pattern.includes(newTitle[i])) {
 			letter = "";
 		} else {
-			letter = title[i];
+			letter = newTitle[i];
 		}
 		filename += letter;
 	}
 	filename = filename.slice(0, 100);
-	console.log(filename);
-	// + Math.random().toFixed(3).toString().slice(2);
+	console.log("Filename:", filename);
 
 	let audioFormat;
 
@@ -790,7 +824,6 @@ function download(type) {
 
 	const controller = new AbortController();
 	controllers[randomId] = controller;
-	
 
 	console.log(rangeOption + " " + rangeCmd);
 
@@ -800,16 +833,16 @@ function download(type) {
 
 		downloadProcess = ytdlp.exec(
 			[
-				rangeOption,
-				rangeCmd,
+				range1 || rangeOption,
+				range2 || rangeCmd,
 				"-f",
 				`${format_id}+${audioFormat}`,
 				"-o",
 				`"${path.join(downloadDir, filename + `.${ext}`)}"`,
 				"--ffmpeg-location",
 				ffmpeg,
-				subs,
-				subLangs,
+				subs1 || subs,
+				subs2 || subLangs,
 				"--no-playlist",
 				configArg,
 				configTxt,
@@ -852,16 +885,16 @@ function download(type) {
 	else {
 		downloadProcess = ytdlp.exec(
 			[
-				rangeOption,
-				rangeCmd,
+				range1 || rangeOption,
+				range2 || rangeCmd,
 				"-f",
 				format_id,
 				"-o",
 				`"${path.join(downloadDir, filename + `.${ext}`)}"`,
 				"--ffmpeg-location",
 				ffmpeg,
-				subs,
-				subLangs,
+				subs1 || subs,
+				subs2 || subLangs,
 				"--no-playlist",
 				cookieArg,
 				browser,
@@ -954,7 +987,7 @@ function download(type) {
 // Removing item
 
 function fadeItem(id) {
-	controllers[id].abort()
+	controllers[id].abort();
 	let count = 0;
 	let opacity = 1;
 	const fade = setInterval(() => {
@@ -1011,7 +1044,7 @@ function closeMenu() {
 	const fade = setInterval(() => {
 		if (count >= 10) {
 			clearInterval(fade);
-			getId("menu").style.display = "none"
+			getId("menu").style.display = "none";
 		} else {
 			opacity -= 0.1;
 			getId("menu").style.opacity = opacity;
@@ -1038,5 +1071,5 @@ getId("playlistWin").addEventListener("click", () => {
 });
 
 ipcRenderer.on("link", (event, text) => {
-	pasteFromTray(text)
-})
+	pasteFromTray(text);
+});

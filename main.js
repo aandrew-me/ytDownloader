@@ -156,6 +156,10 @@ app.whenReady().then(() => {
 			tray = new Tray(icon);
 			tray.setToolTip("ytDownloader");
 			tray.setContextMenu(contextMenu);
+			tray.on("click", ()=>{
+				win.show();
+				if (app.dock) app.dock.show();
+			})
 		} else if (!enabled) {
 			trayEnabled = false;
 		}
