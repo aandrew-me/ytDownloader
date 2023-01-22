@@ -492,8 +492,8 @@ getId("videoDownload").addEventListener("click", (event) => {
 		const subs1 = subs;
 		const subs2 = subLangs;
 		const url1 = getId("url").value;
-		const thumb1 = thumbnail
-		const title1 = title
+		const thumb1 = thumbnail;
+		const title1 = title;
 
 		const randId = Math.random().toFixed(10).toString().slice(2);
 		const item = `
@@ -511,7 +511,16 @@ getId("videoDownload").addEventListener("click", (event) => {
 		const interval = setInterval(() => {
 			if (currentDownloads < maxActiveDownloads) {
 				getId(randId).remove();
-				download("video", url1, range1, range2, subs1, subs2, thumb1, title1);
+				download(
+					"video",
+					url1,
+					range1,
+					range2,
+					subs1,
+					subs2,
+					thumb1,
+					title1
+				);
 				currentDownloads++;
 				clearInterval(interval);
 			}
@@ -526,11 +535,10 @@ getId("audioDownload").addEventListener("click", (event) => {
 	console.log(`Current:${currentDownloads} Max:${maxActiveDownloads}`);
 
 	if (currentDownloads < maxActiveDownloads) {
-		manageAdvanced();
+		manageAdvanced(duration);
 		download("audio");
 		currentDownloads++;
 	} else {
-		manageAdvanced();
 		// Handling active downloads for audio
 		manageAdvanced(duration);
 		const range1 = rangeOption;
@@ -538,8 +546,8 @@ getId("audioDownload").addEventListener("click", (event) => {
 		const subs1 = subs;
 		const subs2 = subLangs;
 		const url1 = getId("url").value;
-		const thumb1 = thumbnail
-		const title1 = title
+		const thumb1 = thumbnail;
+		const title1 = title;
 
 		const randId = Math.random().toFixed(10).toString().slice(2);
 
@@ -559,7 +567,16 @@ getId("audioDownload").addEventListener("click", (event) => {
 		const interval = setInterval(() => {
 			if (currentDownloads < maxActiveDownloads) {
 				getId(randId).remove();
-				download("audio", url1, range1, range2, subs1, subs2, thumb1, title1);
+				download(
+					"audio",
+					url1,
+					range1,
+					range2,
+					subs1,
+					subs2,
+					thumb1,
+					title1
+				);
 				currentDownloads++;
 				clearInterval(interval);
 			}
@@ -575,11 +592,10 @@ getId("extractBtn").addEventListener("click", () => {
 	console.log(`Current:${currentDownloads} Max:${maxActiveDownloads}`);
 
 	if (currentDownloads < maxActiveDownloads) {
-		manageAdvanced();
+		manageAdvanced(duration);
 		download("extract");
 		currentDownloads++;
 	} else {
-		manageAdvanced();
 		// Handling active downloads for extracting audio
 		manageAdvanced(duration);
 		const range1 = rangeOption;
@@ -588,8 +604,8 @@ getId("extractBtn").addEventListener("click", () => {
 		const subs2 = subLangs;
 		const url1 = getId("url").value;
 		const randId = Math.random().toFixed(10).toString().slice(2);
-		const thumb1 = thumbnail
-		const title1 = title
+		const thumb1 = thumbnail;
+		const title1 = title;
 
 		const item = `
 		<div class="item" id="${randId}">
@@ -606,7 +622,16 @@ getId("extractBtn").addEventListener("click", () => {
 		const interval = setInterval(() => {
 			if (currentDownloads < maxActiveDownloads) {
 				getId(randId).remove();
-				download("extract", url1, range1, range2, subs1, subs2, thumb1, title1);
+				download(
+					"extract",
+					url1,
+					range1,
+					range2,
+					subs1,
+					subs2,
+					thumb1,
+					title1
+				);
 				currentDownloads++;
 				clearInterval(interval);
 			}
@@ -716,7 +741,7 @@ function download(
 	title1 = ""
 ) {
 	// Config file
-	const newTitle = title1 || title
+	const newTitle = title1 || title;
 	let configArg = "";
 	let configTxt = "";
 	if (localStorage.getItem("configPath")) {
@@ -725,7 +750,7 @@ function download(
 	}
 
 	const url = url1 || getId("url").value;
-	console.log("URL", url)
+	console.log("URL", url);
 	let ext;
 	let extractExt;
 
@@ -770,7 +795,9 @@ function download(
 		<img src="../assets/images/close.png" onClick="fadeItem('${randomId}')" class="itemClose"}" id="${
 		randomId + ".close"
 	}">
-		<img src="${thumb1 || thumbnail}" alt="No thumbnail" class="itemIcon" crossorigin="anonymous">
+		<img src="${
+			thumb1 || thumbnail
+		}" alt="No thumbnail" class="itemIcon" crossorigin="anonymous">
 
 		<div class="itemBody">
 			<div class="itemTitle">${newTitle}</div>
