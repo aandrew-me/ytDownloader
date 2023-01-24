@@ -10,6 +10,17 @@ const downloadDir = localStorage.getItem("downloadPath");
 const i18n = new (require("../translations/i18n"))();
 let cookieArg = "";
 let browser = "";
+const formats = {
+	144:160,
+	240:133,
+	360:134,
+	480:135,
+	720:136,
+	1080:137,
+	1440:400,
+	2160:401,
+	4320:571
+}
 let ffmpeg;
 try {
 	ffmpeg = execSync("which ffmpeg", {encoding:"utf8"})
@@ -84,7 +95,8 @@ function download(type) {
 
 	let quality, format, downloadProcess;
 	if (type === "video") {
-		quality = getId("select").value;
+		quality = Number(getId("select").value);
+		const formatId = formats[quality]
 		if (quality === "best") {
 			format = "-f bv*+ba/best";
 		} 
@@ -95,11 +107,12 @@ function download(type) {
 			format = ""
 		}
 		else {
-			format = `-f "bv*[height<=${quality}]+ba/best"`;
+			format = `-f "${formatId}+m4a/mp4[height<=${quality}]+m4a/bv*[height<=${quality}]+ba/best"`;
 		}
 	} else {
 		format = getId("audioSelect").value;
 	}
+	console.log("Format:", format)
 
 	const controller = new AbortController();
 
