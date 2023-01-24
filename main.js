@@ -9,6 +9,7 @@ const {
 	clipboard,
 } = require("electron");
 const { autoUpdater } = require("electron-updater");
+process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true
 const fs = require("fs");
 const path = require("path");
 

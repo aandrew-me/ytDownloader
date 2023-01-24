@@ -2,6 +2,7 @@ const { clipboard, shell, ipcRenderer } = require("electron");
 const { default: YTDlpWrap } = require("yt-dlp-wrap-plus");
 const path = require("path");
 const os = require("os");
+const { execSync } = require("child_process");
 let url;
 const ytDlp = localStorage.getItem("ytdlp");
 const ytdlp = new YTDlpWrap(ytDlp);
@@ -10,11 +11,19 @@ const i18n = new (require("../translations/i18n"))();
 let cookieArg = "";
 let browser = "";
 let ffmpeg;
-if (os.platform() === "win32") {
-	ffmpeg = `"${__dirname}\\..\\ffmpeg.exe"`;
-} else {
-	ffmpeg = `"${__dirname}/../ffmpeg"`;
+try {
+	ffmpeg = execSync("which ffmpeg", {encoding:"utf8"})
+	ffmpeg = `"${ffmpeg.trimEnd()}"`
+} catch (error) {
+	if (os.platform() === "win32") {
+		ffmpeg = `"${__dirname}\\..\\ffmpeg.exe"`;
+	} else {
+		ffmpeg = `"${__dirname}/../ffmpeg"`;
+	}
 }
+
+console.log("ffmpeg:", ffmpeg)
+
 let foldernameFormat = "%(playlist_title)s";
 let filenameFormat = "%(playlist_index)s.%(title)s.%(ext)s";
 let playlistIndex = 1;
