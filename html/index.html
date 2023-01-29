@@ -37,6 +37,8 @@
 </div>
 
 <body>
+    <!-- Popup message -->
+    <span id="popupText">Text copied</span>
 
     <!-- Theme toggle -->
     <div id="themeToggle" onclick="toggle()">
@@ -71,6 +73,8 @@
         </svg>
     </div>
     <p id="incorrectMsg"></p>
+    <button class="advancedToggle" id="errorBtn" onclick="toggleErrorDetails()">Error Details ▼</button>
+    <div id="errorDetails" onclick="copyErrorToClipboard()"></div>
     <br>
 
     <div id="hidden">
@@ -134,7 +138,7 @@
             </select>
             <button id="extractBtn">Extract</button>
         </div>
-       
+
         <!-- Extraction options end -->
 
 
@@ -142,7 +146,7 @@
     <!-- Downloads list -->
     <div id="list"></div>
 
-    <div id="goToTop"></div> 
+    <div id="goToTop"></div>
 
     <script>
         require("../src/translate_index")

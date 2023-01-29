@@ -10,7 +10,7 @@
 }
 
 body {
-	font-family:sans-serif;
+	font-family: sans-serif;
 	text-align: center;
 	padding: 10px;
 	background-color: var(--background);
@@ -95,9 +95,9 @@ body {
 	color: white;
 }
 
-#pasteUrl{
-	display:none;
-	margin-top:15px;
+#pasteUrl {
+	display: none;
+	margin-top: 15px;
 	font-weight: bold;
 }
 
@@ -113,18 +113,17 @@ body {
 	align-items: center;
 	justify-content: space-between;
 }
-.playlistItem{
+.playlistItem {
 	display: flex;
 	position: relative;
 	width: 86%;
 	background-color: var(--item-bg);
 	color: var(--text);
-    padding:10px 25px;
-    border-radius: 25px;
+	padding: 10px 25px;
+	border-radius: 25px;
 	align-items: center;
 	justify-content: space-between;
 	margin: 10px auto;
-
 }
 
 @media screen and (max-width: 650px) {
@@ -153,7 +152,7 @@ body {
 .itemProgress {
 	font-weight: bold;
 	cursor: pointer;
-	margin-top:10px;
+	margin-top: 10px;
 	font-family: sans-serif;
 }
 .itemClose {
@@ -165,7 +164,7 @@ body {
 	width: 15px;
 	height: 15px;
 }
-.itemType{
+.itemType {
 	font-style: italic;
 	margin-top: 5px;
 }
@@ -196,17 +195,17 @@ body {
 	color: var(--text);
 }
 
-#audioExtract{
-	margin:10px;
-	padding:10px;
+#audioExtract {
+	margin: 10px;
+	padding: 10px;
 	background-color: var(--box-toggle);
 	border-radius: 10px;
 }
 
-#options{
-	display:none;
-	position:relative;
-	top:20px;
+#options {
+	display: none;
+	position: relative;
+	top: 20px;
 	background-color: var(--box-main);
 	border-radius: 10px;
 	padding: 10px;
@@ -251,17 +250,17 @@ label {
 	display: none;
 }
 
-input[type="checkbox"]{
-    width:20px;
-    height:20px;
-    position: relative;
-    left:5px;
-	top:4px;
+input[type="checkbox"] {
+	width: 20px;
+	height: 20px;
+	position: relative;
+	left: 5px;
+	top: 4px;
 }
 
-input[type=number]::-webkit-inner-spin-button, 
-input[type=number]::-webkit-outer-spin-button { 
-  appearance: none; 
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+	appearance: none;
 }
 
 .submitBtn {
@@ -300,7 +299,8 @@ input[type=number]::-webkit-outer-spin-button {
 	width: 100px;
 }
 
-.time, .input {
+.time,
+.input {
 	padding: 8px;
 	border: none;
 	outline: none;
@@ -311,9 +311,22 @@ input[type=number]::-webkit-outer-spin-button {
 }
 
 #incorrectMsg {
-	color: rgb(250, 59, 59);
+	color: rgb(237, 67, 67);
 }
 
+#errorBtn {
+	display: none;
+}
+#errorDetails {
+	cursor: pointer;
+	font-family: monospace;
+	padding:15px;
+	margin: 10px 0;
+	border: 2px solid rgb(189, 0, 0);
+	border-radius: 8px;
+	display: none;
+	transition: .5s all;
+}
 #loadingWrapper {
 	/* Default is flex */
 	display: none;
@@ -366,11 +379,11 @@ svg {
 #savedMsg {
 	cursor: pointer;
 }
-button{
-	outline:none;
+button {
+	outline: none;
 }
 
-#extractBtn{
+#extractBtn {
 	color: white;
 	background-color: rgb(80, 128, 230);
 	border: none;
@@ -383,7 +396,7 @@ button{
 	font-size: large;
 }
 
-#extractBtn:active{
+#extractBtn:active {
 	top: 4px;
 	margin-bottom: 12px;
 	border: none;
@@ -442,4 +455,17 @@ body::-webkit-scrollbar-thumb {
 	cursor: pointer;
 	color: white;
 	cursor: pointer;
-}  
+}
+
+#popupText{
+	display: none;
+	position:absolute;
+	right:30px;
+	bottom: 20px;
+	padding:10px;
+	border-radius: 2px;
+	color:white;
+	background-color: rgb(80, 80, 224);
+	cursor: pointer;
+	transition: .5s all;
+}

@@ -37,3 +37,4 @@ getId("subHeader").textContent = i18n.__("Subtitles");
 getId("subTxt").textContent = i18n.__("Download subtitles if available");
 getId("extractHeader").textContent = i18n.__("Extract Audio");
 getId("extractBtn").textContent = i18n.__("Extract");
+getId("errorBtn").textContent = i18n.__("Error Details")+" ▼"

@@ -239,10 +239,15 @@ async function getInfo(url) {
 	onlyvideo = false;
 	let audioIsPresent = false;
 	downloadPathSelection();
+	// Cleaning text
 	getId("videoFormatSelect").innerHTML = "";
 	getId("audioFormatSelect").innerHTML = "";
 	getId("startTime").value = "";
 	getId("endTime").value = "";
+	getId("errorBtn").style.display = "none";
+	getId("errorDetails").style.display = "none";
+	getId("errorDetails").textContent = "";
+
 	if (localStorage.getItem("preferredVideoQuality")) {
 		preferredVideoQuality = localStorage.getItem("preferredVideoQuality");
 	}
@@ -285,11 +290,19 @@ async function getInfo(url) {
 
 	infoProcess.stderr.on("data", (error) => {
 		validInfo = false;
+		// Error message handling
 		console.log(error.toString("utf8"));
 		getId("loadingWrapper").style.display = "none";
 		getId("incorrectMsg").textContent = i18n.__(
 			"Some error has occurred. Check your network and use correct URL"
 		);
+		getId("errorBtn").style.display = "inline-block";
+		getId("errorDetails").innerHTML = `
+		<strong>URL: ${url}</strong>
+		<br><br>
+		${error.toString("utf8")}
+		`;
+		getId("errorDetails").title = i18n.__("Click to copy");
 	});
 
 	infoProcess.on("close", () => {
@@ -1031,6 +1044,26 @@ function fadeItem(id) {
 	}, 50);
 }
 
+// Showing and hiding error details
+function toggleErrorDetails() {
+	const status = getId("errorDetails").style.display;
+	if (status === "none") {
+		getId("errorDetails").style.display = "block";
+		getId("errorBtn").textContent = i18n.__("Error Details") + " ▲";
+	} else {
+		getId("errorDetails").style.display = "none";
+		getId("errorBtn").textContent = i18n.__("Error Details") + " ▼";
+	}
+}
+
+// Copying error txt
+
+function copyErrorToClipboard() {
+	const error = getId("errorDetails").textContent;
+	clipboard.writeText(error);
+	showPopup(i18n.__("Copied text"))
+}
+
 // After saving video
 
 function afterSave(location, filename, progressId) {
@@ -1078,6 +1111,15 @@ function closeMenu() {
 			count++;
 		}
 	}, 50);
+}
+
+// Popup message
+function showPopup(text) {
+	getId("popupText").textContent = text
+	getId("popupText").style.display = "inline-block";
+	setTimeout(() => {
+		getId("popupText").style.display = "none"
+	}, 2000);
 }
 
 // Menu
