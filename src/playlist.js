@@ -2,6 +2,7 @@ const { clipboard, shell, ipcRenderer } = require("electron");
 const { default: YTDlpWrap } = require("yt-dlp-wrap-plus");
 const path = require("path");
 const os = require("os");
+const fs = require('fs');
 const { execSync } = require("child_process");
 let url;
 const ytDlp = localStorage.getItem("ytdlp");
@@ -22,17 +23,23 @@ const formats = {
 	4320:571
 }
 let ffmpeg;
-try {
-	ffmpeg = execSync("which ffmpeg", {encoding:"utf8"})
-	ffmpeg = `"${ffmpeg.trimEnd()}"`
-} catch (error) {
-	if (os.platform() === "win32") {
-		ffmpeg = `"${__dirname}\\..\\ffmpeg.exe"`;
-	} else {
-		ffmpeg = `"${__dirname}/../ffmpeg"`;
-	}
+let ffmpegPath;
+if (os.platform() === "win32") {
+	ffmpeg = `"${__dirname}\\..\\ffmpeg.exe"`;
+	ffmpegPath= `${__dirname}\\..\\ffmpeg.exe`;
+} else {
+	ffmpeg = `"${__dirname}/../ffmpeg"`;
+	ffmpegPath = `${__dirname}/../ffmpeg`;
 }
 
+if (!fs.existsSync(ffmpegPath)){
+	try {
+		ffmpeg = execSync("which ffmpeg", {encoding:"utf8"})
+		ffmpeg = `"${ffmpeg.trimEnd()}"`
+	} catch (error) {
+		console.log(error)
+	}
+}
 console.log("ffmpeg:", ffmpeg)
 
 let foldernameFormat = "%(playlist_title)s";
