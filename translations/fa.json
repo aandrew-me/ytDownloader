@@ -87,5 +87,8 @@
 	"Use config file": "از فایل کانفیگ استفاده کنید",
 	"Open app": "اپلیکیشن را باز کن",
 	"Paste video link": "پیوند ویدیو را بچسبانید",
-	"Quit": "ترک کنید"
+	"Quit": "ترک کنید",
+	"Error Details": "Error Details",
+	"Click to copy": "Click to copy",
+	"Copied text": "Copied text"
 }
