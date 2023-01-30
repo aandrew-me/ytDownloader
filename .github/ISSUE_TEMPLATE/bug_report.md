@@ -20,3 +20,4 @@ If applicable, add screenshots to help explain your problem.
 **Info (please complete the following information):**
  - Operating system:
  - App version:
+ - Package version (flatpak/snap/other):
