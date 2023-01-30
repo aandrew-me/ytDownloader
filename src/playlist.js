@@ -56,6 +56,7 @@ function pasteLink() {
 	getId("link").textContent = " " + url;
 	getId("options").style.display = "block";
 	getId("incorrectMsg").textContent = "";
+	getId("errorBtn").style.display = "none";
 }
 
 getId("pasteLink").addEventListener("click", () => {
@@ -102,7 +103,7 @@ function download(type) {
 
 	let quality, format, downloadProcess;
 	if (type === "video") {
-		quality = Number(getId("select").value);
+		quality = getId("select").value;
 		const formatId = formats[quality]
 		if (quality === "best") {
 			format = "-f bv*+ba/best";
@@ -255,6 +256,13 @@ function showErrorTxt(error) {
 		"Some error has occurred. Check your network and use correct URL"
 	);
 	getId("incorrectMsg").title = error;
+	getId("errorBtn").style.display = "inline-block";
+	getId("errorDetails").innerHTML = `
+	<strong>URL: ${url}</strong>
+	<br><br>
+	${error}
+	`;
+	getId("errorDetails").title = i18n.__("Click to copy");
 }
 
 // File and folder name patterns
@@ -274,6 +282,9 @@ function hideOptions() {
 	getId("pasteLink").style.display = "none";
 	getId("playlistName").textContent = i18n.__("Processing") + "...";
 	getId("list").innerHTML = "";
+	getId("errorBtn").style.display = "none";
+	getId("errorDetails").style.display = "none";
+	getId("errorDetails").textContent = "";
 }
 
 function downloadThumbnails() {
@@ -520,3 +531,4 @@ getId("playlistEnd").placeholder = i18n.__("End");
 getId("downloadThumbnails").textContent = i18n.__("Download thumbnails");
 getId("saveLinks").textContent = i18n.__("Save video links to a file");
 getId("useConfigTxt").textContent = i18n.__("Use config file");
+getId("errorBtn").textContent = i18n.__("Error Details")+" ▼"

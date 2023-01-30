@@ -1044,26 +1044,6 @@ function fadeItem(id) {
 	}, 50);
 }
 
-// Showing and hiding error details
-function toggleErrorDetails() {
-	const status = getId("errorDetails").style.display;
-	if (status === "none") {
-		getId("errorDetails").style.display = "block";
-		getId("errorBtn").textContent = i18n.__("Error Details") + " ▲";
-	} else {
-		getId("errorDetails").style.display = "none";
-		getId("errorBtn").textContent = i18n.__("Error Details") + " ▼";
-	}
-}
-
-// Copying error txt
-
-function copyErrorToClipboard() {
-	const error = getId("errorDetails").textContent;
-	clipboard.writeText(error);
-	showPopup(i18n.__("Copied text"))
-}
-
 // After saving video
 
 function afterSave(location, filename, progressId) {
@@ -1111,15 +1091,6 @@ function closeMenu() {
 			count++;
 		}
 	}, 50);
-}
-
-// Popup message
-function showPopup(text) {
-	getId("popupText").textContent = text
-	getId("popupText").style.display = "inline-block";
-	setTimeout(() => {
-		getId("popupText").style.display = "none"
-	}, 2000);
 }
 
 // Menu

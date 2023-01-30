@@ -445,7 +445,7 @@ body::-webkit-scrollbar-thumb {
 	position: fixed;
 	bottom: 10px;
 	right: 10px;
-	z-index: 99;
+	z-index: 2;
 	border: none;
 	outline: none;
 	background-image: url(../images/up-arrow.png);
@@ -459,8 +459,8 @@ body::-webkit-scrollbar-thumb {
 
 #popupText{
 	display: none;
-	position:absolute;
-	right:30px;
+	position:fixed;
+	left:25px;
 	bottom: 20px;
 	padding:10px;
 	border-radius: 2px;
@@ -468,4 +468,5 @@ body::-webkit-scrollbar-thumb {
 	background-color: rgb(80, 80, 224);
 	cursor: pointer;
 	transition: .5s all;
+	z-index: 2;
 }

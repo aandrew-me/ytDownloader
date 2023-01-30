@@ -26,16 +26,21 @@
             position: relative;
             bottom: 8px;
         }
-        #audioBox{
-            display:none;
+
+        #audioBox {
+            display: none;
         }
-        #advancedMenu{
-            display:none;
+
+        #advancedMenu {
+            display: none;
         }
     </style>
 </head>
 
 <body>
+    <!-- Popup message -->
+    <span id="popupText">Text copied</span>
+        
     <!-- Theme toggle -->
     <div id="themeToggle" onclick="toggle()">
         <div id="themeToggleInside"></div>
@@ -113,6 +118,9 @@
         </div>
 
         <p id="incorrectMsg"></p>
+        <!-- Error button -->
+        <button class="advancedToggle" id="errorBtn" onclick="toggleErrorDetails()">Error Details ▼</button>
+        <div id="errorDetails" onclick="copyErrorToClipboard()"></div>
 
     </div>
 
