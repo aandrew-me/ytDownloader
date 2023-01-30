@@ -87,5 +87,8 @@
 	"Use config file": "Käytä asetustiedostoa",
 	"Open app": "Avaa sovellus",
 	"Paste video link": "Liitä video linkki",
-	"Quit": "Lopeta"
+	"Quit": "Lopeta",
+	"Error Details": "Virheen tiedot",
+	"Click to copy": "Klikkaa kopioidaksesi",
+	"Copied text": "Teksti kopioitu"
 }
