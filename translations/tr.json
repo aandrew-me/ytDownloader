@@ -87,5 +87,8 @@
 	"Use config file": "Konfigürasyon dosyası kullan",
 	"Open app": "Uygulamayı aç",
 	"Paste video link": "Video bağlantısını yapıştırın",
-	"Quit": "Çıkış"
+	"Quit": "Çıkış",
+	"Error Details": "Hata Ayrıntıları",
+	"Click to copy": "Kopyalamak için tıkla",
+	"Copied text": "Kopyalanan metin"
 }
