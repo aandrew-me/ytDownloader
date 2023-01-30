@@ -87,5 +87,8 @@
 	"Use config file": "Utilizar arquivo de configuração",
 	"Open app": "Abrir app",
 	"Paste video link": "Colar link do vídeo",
-	"Quit": "Sair"
+	"Quit": "Sair",
+	"Error Details": "Detalhes do erro",
+	"Click to copy": "Clique para copiar",
+	"Copied text": "Texto copiado"
 }
