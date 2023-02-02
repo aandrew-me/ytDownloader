@@ -39,6 +39,7 @@ let downloadDir = "";
 
 // Global variables
 let title, onlyvideo, id, thumbnail, ytdlp, duration, extractFormat;
+let audioExtensionList = [];
 let rangeCmd = "";
 let subs = "";
 let subLangs;
@@ -235,6 +236,7 @@ getId("pasteUrl").addEventListener("click", () => {
 
 // Getting video info
 async function getInfo(url) {
+	audioExtensionList = [];
 	let selected = false;
 	onlyvideo = false;
 	let audioIsPresent = false;
@@ -343,6 +345,7 @@ async function getInfo(url) {
 					defaultVideoFormat = format.height;
 				}
 
+				// Going through audio list
 				if (
 					format.audio_ext !== "none" ||
 					(format.acodec !== "none" && format.video_ext === "none")
@@ -352,6 +355,9 @@ async function getInfo(url) {
 					audioSize =
 						Number(format.filesize || format.filesize_approx) /
 						1000000;
+					if (!audioExtensionList.includes(format.audio_ext)) {
+						audioExtensionList.push(format.audio_ext);
+					}
 				}
 			}
 			for (let format of formats) {
@@ -511,7 +517,7 @@ getId("videoDownload").addEventListener("click", (event) => {
 		const randId = Math.random().toFixed(10).toString().slice(2);
 		const item = `
 		<div class="item" id="${randId}">
-			<img src="${thumbnail}" alt="No thumbnail" class="itemIcon" crossorigin="anonymous">
+			<img src="${thumbnail || "../assets/images/thumb.png"}" alt="No thumbnail" class="itemIcon" crossorigin="anonymous">
 
 			<div class="itemBody">
 				<div class="itemTitle">${title}</div>
@@ -785,6 +791,7 @@ function download(
 			ext = getId("audioFormatSelect").value.split("|")[1];
 		}
 	}
+	console.log("video extension:", ext);
 
 	// localStorage.setItem("itemList", "");
 	// let itemList = [];
@@ -809,7 +816,7 @@ function download(
 		randomId + ".close"
 	}">
 		<img src="${
-			thumb1 || thumbnail
+			thumb1 || thumbnail || "../assets/images/thumb.png"
 		}" alt="No thumbnail" class="itemIcon" crossorigin="anonymous">
 
 		<div class="itemBody">
@@ -852,20 +859,32 @@ function download(
 		filename += letter;
 	}
 	filename = filename.slice(0, 100);
+	if (filename[0] === ".") {
+		filename = filename.slice(1, 100);
+	}
 	console.log("Filename:", filename);
 
 	let audioFormat;
 
 	if (ext === "mp4") {
-		audioFormat = "m4a";
+		if (!audioExtensionList.length == 0) {
+			if (audioExtensionList.includes("m4a")) {
+				audioFormat = "+m4a";
+			} else {
+				audioFormat = "+ba";
+			}
+		} else {
+			audioFormat = "";
+		}
 	} else {
-		audioFormat = "ba";
+		audioFormat = "+ba";
 	}
 
 	const controller = new AbortController();
 	controllers[randomId] = controller;
 
 	console.log(rangeOption + " " + rangeCmd);
+	console.log(`-f ${format_id}${audioFormat}`);
 
 	if (type === "video" && onlyvideo) {
 		// If video has no sound, audio needs to be downloaded
@@ -876,11 +895,13 @@ function download(
 				range1 || rangeOption,
 				range2 || rangeCmd,
 				"-f",
-				`${format_id}+${audioFormat}`,
+				`${format_id}${audioFormat}`,
 				"-o",
 				`"${path.join(downloadDir, filename + `.${ext}`)}"`,
 				"--ffmpeg-location",
 				ffmpeg,
+				"--downloader",
+				`'m3u8:${ffmpeg}'`,
 				subs1 || subs,
 				subs2 || subLangs,
 				"--no-playlist",
@@ -910,6 +931,8 @@ function download(
 				`"${path.join(downloadDir, filename + `.${extractExt}`)}"`,
 				"--ffmpeg-location",
 				ffmpeg,
+				"--downloader",
+				`'m3u8:${ffmpeg}'`,
 				"--no-playlist",
 				cookieArg,
 				browser,
@@ -923,6 +946,8 @@ function download(
 	}
 	// If downloading only audio or video with audio
 	else {
+		console.log("downloading only audio or video with audio");
+
 		downloadProcess = ytdlp.exec(
 			[
 				range1 || rangeOption,
@@ -933,6 +958,8 @@ function download(
 				`"${path.join(downloadDir, filename + `.${ext}`)}"`,
 				"--ffmpeg-location",
 				ffmpeg,
+				"--downloader",
+				`'m3u8:${ffmpeg}'`,
 				subs1 || subs,
 				subs2 || subLangs,
 				"--no-playlist",
