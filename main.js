@@ -9,7 +9,7 @@ const {
 	clipboard,
 } = require("electron");
 const { autoUpdater } = require("electron-updater");
-process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true
+process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true;
 const fs = require("fs");
 const path = require("path");
 
@@ -157,10 +157,10 @@ app.whenReady().then(() => {
 			tray = new Tray(icon);
 			tray.setToolTip("ytDownloader");
 			tray.setContextMenu(contextMenu);
-			tray.on("click", ()=>{
+			tray.on("click", () => {
 				win.show();
 				if (app.dock) app.dock.show();
-			})
+			});
 		} else if (!enabled) {
 			trayEnabled = false;
 		}
@@ -240,41 +240,59 @@ ipcMain.on("select-config", () => {
 	}
 });
 
-// Auto updater events
-autoUpdater.on("update-available", (_event, releaseNotes, releaseName) => {
-	// For macOS
-	if (process.platform === "darwin") {
-		const dialogOpts = {
-			type: "info",
-			buttons: [i18n("Download"), i18n("No")],
-			title: "Update Available",
-			detail: releaseName,
-			message: i18n(
-				"A new version is available, do you want to download it?"
-			),
-		};
-		dialog.showMessageBox(dialogOpts).then((returnValue) => {
-			if (returnValue.response === 0) {
-				shell.openExternal(
-					"https://github.com/aandrew-me/ytDownloader/releases/latest/download/YTDownloader_Mac.zip"
-				);
+// Auto update
+let autoUpdate = false;
+
+ipcMain.on("autoUpdate", (event, status) => {
+	autoUpdate = status;
+	console.log("Auto update:", status);
+
+	if (autoUpdate === true) {
+		// Auto updater events
+		autoUpdater.on(
+			"update-available",
+			(_event, releaseNotes, releaseName) => {
+				// For macOS
+				if (process.platform === "darwin") {
+					const dialogOpts = {
+						type: "info",
+						buttons: [i18n("Download"), i18n("No")],
+						title: "Update Available",
+						detail: releaseName,
+						message: i18n(
+							"A new version is available, do you want to download it?"
+						),
+					};
+					dialog.showMessageBox(dialogOpts).then((returnValue) => {
+						if (returnValue.response === 0) {
+							shell.openExternal(
+								"https://github.com/aandrew-me/ytDownloader/releases/latest/download/YTDownloader_Mac.zip"
+							);
+						}
+					});
+				}
+				// For Windows and Linux
+				else {
+					const dialogOpts = {
+						type: "info",
+						buttons: [i18n("Update"), i18n("No")],
+						title: "Update Available",
+						detail:
+							process.platform === "win32"
+								? releaseNotes
+								: releaseName,
+						message: i18n(
+							"A new version is available, do you want to update?"
+						),
+					};
+					dialog.showMessageBox(dialogOpts).then((returnValue) => {
+						if (returnValue.response === 0) {
+							autoUpdater.downloadUpdate();
+						}
+					});
+				}
 			}
-		});
-	}
-	// For Windows and Linux
-	else {
-		const dialogOpts = {
-			type: "info",
-			buttons: [i18n("Update"), i18n("No")],
-			title: "Update Available",
-			detail: process.platform === "win32" ? releaseNotes : releaseName,
-			message: i18n("A new version is available, do you want to update?"),
-		};
-		dialog.showMessageBox(dialogOpts).then((returnValue) => {
-			if (returnValue.response === 0) {
-				autoUpdater.downloadUpdate();
-			}
-		});
+		);
 	}
 });
 

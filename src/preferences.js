@@ -207,5 +207,20 @@ if(trayEnabled == "true"){
 	ipcRenderer.send("useTray", true)
 }
 
+// Auto updates
+const autoUpdateDisabled = getId("autoUpdateDisabled");
+autoUpdateDisabled.addEventListener("change", (event) => {
+	if (autoUpdateDisabled.checked) {
+		localStorage.setItem("autoUpdate", "false");
+	} else {
+		localStorage.setItem("autoUpdate", "true");
+
+	}
+});
+const autoUpdate = localStorage.getItem("autoUpdate")
+if (autoUpdate == "false"){
+	autoUpdateDisabled.checked = true;
+}
+
 // Translation file
 require("../src/translate_preferences");

@@ -59,6 +59,16 @@ function checkMaxDownloads() {
 }
 checkMaxDownloads();
 
+// Check for auto updates
+let autoUpdate = true;
+const autoUpdateStatus = localStorage.getItem("autoUpdate")
+if (autoUpdateStatus){
+	if (autoUpdateStatus == "false"){
+		autoUpdate = false
+	}
+}
+ipcRenderer.send("autoUpdate", autoUpdate);
+
 let currentDownloads = 0;
 let controllers = new Object();
 

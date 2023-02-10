@@ -95,5 +95,6 @@
 	"Good":"Good",
 	"Bad":"Bad",
 	"Worst":"Worst",
-	"Select Quality":"Select Quality"
+	"Select Quality":"Select Quality",
+	"Disable auto updates":"Disable auto updates"
 }
