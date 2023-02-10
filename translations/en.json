@@ -90,5 +90,10 @@
 	"Quit":"Quit",
 	"Error Details":"Error Details",
 	"Click to copy":"Click to copy",
-	"Copied text":"Copied text"
+	"Copied text":"Copied text",
+	"Normal":"Normal",
+	"Good":"Good",
+	"Bad":"Bad",
+	"Worst":"Worst",
+	"Select Quality":"Select Quality"
 }
