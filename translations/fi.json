@@ -90,5 +90,11 @@
 	"Quit": "Lopeta",
 	"Error Details": "Virheen tiedot",
 	"Click to copy": "Klikkaa kopioidaksesi",
-	"Copied text": "Teksti kopioitu"
+	"Copied text": "Teksti kopioitu",
+	"Normal": "Normaali",
+	"Good": "Hyvä",
+	"Bad": "Huono",
+	"Worst": "Huonoin",
+	"Select Quality": "Valitse Laatu",
+	"Disable auto updates": "Poista automaattiset päivitykset käytöstä"
 }
