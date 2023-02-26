@@ -90,5 +90,11 @@
 	"Quit": "Çıkış",
 	"Error Details": "Hata Ayrıntıları",
 	"Click to copy": "Kopyalamak için tıkla",
-	"Copied text": "Kopyalanan metin"
+	"Copied text": "Kopyalanan metin",
+	"Normal": "Normal",
+	"Good": "İyi",
+	"Bad": "Kötü",
+	"Worst": "En kötü",
+	"Select Quality": "Kalite Seç",
+	"Disable auto updates": "Otomatik güncellemeleri devre dışı bırak"
 }
