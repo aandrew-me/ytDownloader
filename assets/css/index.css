@@ -228,6 +228,9 @@ body {
 	padding: 8px;
 	color: var(--text);
 }
+#videoToggle{
+	background-color: var(--box-toggleOn);
+}
 
 select {
 	padding: 15px;

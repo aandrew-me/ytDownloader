@@ -339,7 +339,6 @@ async function getInfo(url) {
 			getId("hidden").style.display = "inline-block";
 			getId("title").innerHTML = `<b>${i18n.__("Title ")}</b>: ` + title;
 			getId("videoList").style.display = "block";
-			videoToggle.style.backgroundColor = "rgb(67, 212, 164)";
 
 			let audioSize = 0;
 			let defaultVideoFormat = 0;

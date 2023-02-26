@@ -208,6 +208,7 @@ ipcMain.on("load-page", (event, file) => {
 		parent: win,
 		modal: true,
 		show: false,
+		transparent: true
 	});
 	secondaryWindow.loadFile(file);
 	secondaryWindow.setMenu(null);
