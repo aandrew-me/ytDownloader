@@ -88,7 +88,13 @@
 	"Open app": "اپلیکیشن را باز کن",
 	"Paste video link": "پیوند ویدیو را بچسبانید",
 	"Quit": "ترک کنید",
-	"Error Details": "Error Details",
-	"Click to copy": "Click to copy",
-	"Copied text": "Copied text"
+	"Error Details": "جزئیات خطا",
+	"Click to copy": "برای کپی کلیک کنید",
+	"Copied text": "پیوند کپی شده",
+	"Normal": "عادی",
+	"Good": "درست",
+	"Bad": "بد",
+	"Worst": "بدترین",
+	"Select Quality": "کیفیت را انتخاب کنید",
+	"Disable auto updates": "به روز رسانی خودکار را غیرفعال کنید"
 }
