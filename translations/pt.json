@@ -90,5 +90,11 @@
 	"Quit": "Sair",
 	"Error Details": "Detalhes do erro",
 	"Click to copy": "Clique para copiar",
-	"Copied text": "Texto copiado"
+	"Copied text": "Texto copiado",
+	"Normal": "Standard",
+	"Good": "Boa",
+	"Bad": "Ruim",
+	"Worst": "Pior",
+	"Select Quality": "Escolha a qualidade",
+	"Disable auto updates": "Desativar atualizações automáticas"
 }
