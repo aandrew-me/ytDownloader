@@ -61,10 +61,10 @@ checkMaxDownloads();
 
 // Check for auto updates
 let autoUpdate = true;
-const autoUpdateStatus = localStorage.getItem("autoUpdate")
-if (autoUpdateStatus){
-	if (autoUpdateStatus == "false"){
-		autoUpdate = false
+const autoUpdateStatus = localStorage.getItem("autoUpdate");
+if (autoUpdateStatus) {
+	if (autoUpdateStatus == "false") {
+		autoUpdate = false;
 	}
 }
 ipcRenderer.send("autoUpdate", autoUpdate);
@@ -204,10 +204,15 @@ cp.exec("yt-dlp --version", (error, stdout, stderr) => {
 });
 
 function defaultVideoToggle() {
-	videoToggle.style.backgroundColor = "var(--box-toggleOn)";
-	audioToggle.style.backgroundColor = "var(--box-toggle)";
-	getId("audioList").style.display = "none";
-	getId("videoList").style.display = "block";
+	let defaultWindow = "video";
+	if (localStorage.getItem("defaultWindow")) {
+		defaultWindow = localStorage.getItem("defaultWindow");
+	}
+	if (defaultWindow == "video") {
+		selectVideo()
+	} else {
+		selectAudio()
+	}
 }
 
 // Pasting url from clipboard
@@ -338,7 +343,6 @@ async function getInfo(url) {
 			getId("loadingWrapper").style.display = "none";
 			getId("hidden").style.display = "inline-block";
 			getId("title").innerHTML = `<b>${i18n.__("Title ")}</b>: ` + title;
-			getId("videoList").style.display = "block";
 
 			let audioSize = 0;
 			let defaultVideoFormat = 0;
@@ -526,7 +530,9 @@ getId("videoDownload").addEventListener("click", (event) => {
 		const randId = Math.random().toFixed(10).toString().slice(2);
 		const item = `
 		<div class="item" id="${randId}">
-			<img src="${thumbnail || "../assets/images/thumb.png"}" alt="No thumbnail" class="itemIcon" crossorigin="anonymous">
+			<img src="${
+				thumbnail || "../assets/images/thumb.png"
+			}" alt="No thumbnail" class="itemIcon" crossorigin="anonymous">
 
 			<div class="itemBody">
 				<div class="itemTitle">${title}</div>

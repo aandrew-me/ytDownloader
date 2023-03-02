@@ -32,7 +32,7 @@
 	"description": "Download videos and audios from YouTube and many other sites",
 	"devDependencies": {
 		"electron": "^22.0.3",
-		"electron-builder": "^23.6.0"
+		"electron-builder": "^24.0.0-alpha.13"
 	},
 	"build": {
 		"productName": "YTDownloader",
@@ -84,6 +84,11 @@
 				"rpm"
 			],
 			"category": "Utility"
+		},
+		"snap": {
+			"grade": "stable",
+			"base": "core22"
+			
 		},
 		"win": {
 			"target": "nsis",
