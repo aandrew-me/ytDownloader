@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop">
-  <id>me.aandrew.ytdownloader</id>
+  <id>io.github.aandrew_me.ytdn</id>
   <name>Youtube Downloader Plus</name>
   <developer_name>Andrew</developer_name>
   <url type="bugtracker">https://github.com/aandrew-me/ytDownloader/issues</url>

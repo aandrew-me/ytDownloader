@@ -22,6 +22,7 @@ const formats = {
 	2160:401,
 	4320:571
 }
+let originalCount = 0;
 let ffmpeg;
 let ffmpegPath;
 if (os.platform() === "win32") {
@@ -83,6 +84,7 @@ function download(type) {
 		configTxt = `"${localStorage.getItem("configPath")}"`
 	}
 	nameFormatting();
+	originalCount = 0;
 
 	// Playlist download range
 	managePlaylistRange()
@@ -173,7 +175,7 @@ function download(type) {
 		// console.log(eventData);
 
 		if (eventData.includes(playlistTxt)) {
-			playlistName = eventData.split(":")[1].slice(1);
+			playlistName = eventData.split("playlist:")[1].slice(1);
 			getId("playlistName").textContent =
 				i18n.__("Downloading playlist:") + " " + playlistName;
 			console.log(playlistName);
@@ -184,11 +186,12 @@ function download(type) {
 			!eventData.includes("thumbnail")
 		) {
 			count += 1;
+			originalCount += 1;
 			let itemTitle;
 			if (type === "video") {
-				itemTitle = i18n.__("Video") + " " + eventData.split(" ")[3];
+				itemTitle = i18n.__("Video") + " " + originalCount;
 			} else {
-				itemTitle = i18n.__("Audio") + " " + eventData.split(" ")[3];
+				itemTitle = i18n.__("Audio") + " " + originalCount;
 			}
 
 			if (count > 1) {
@@ -230,6 +233,10 @@ function managePlaylistRange(){
 		playlistEnd = Number(getId("playlistEnd").value);
 	}
 	console.log(`Range: ${playlistIndex}:${playlistEnd}`);
+	if (playlistIndex > 0){
+		originalCount = playlistIndex - 1
+		console.log(`Starting download from ${originalCount + 1}`)
+	}
 }
 
 function afterClose(count) {
@@ -314,7 +321,7 @@ function downloadThumbnails() {
 		// console.log(eventData);
 
 		if (eventData.includes(playlistTxt)) {
-			playlistName = eventData.split(":")[1].slice(1);
+			playlistName = eventData.split("playlist:")[1].slice(1);
 			getId("playlistName").textContent =
 				i18n.__("Downloading playlist:") + " " + playlistName;
 			console.log(playlistName);
@@ -326,7 +333,7 @@ function downloadThumbnails() {
 		) {
 			count += 1;
 			let itemTitle;
-			itemTitle = i18n.__("Thumbnail") + " " + eventData.split(" ")[3];
+			itemTitle = i18n.__("Thumbnail") + " " + originalCount;
 
 			if (count > 1) {
 				getId(`p${count - 1}`).textContent = i18n.__("File saved.");
@@ -378,7 +385,7 @@ function saveLinks() {
 		// console.log(eventData);
 
 		if (eventData.includes(playlistTxt)) {
-			playlistName = eventData.split(":")[1].slice(1);
+			playlistName = eventData.split("playlist:")[1].slice(1);
 			getId("playlistName").textContent =
 				i18n.__("Downloading playlist:") + " " + playlistName;
 			console.log(playlistName);
@@ -390,7 +397,7 @@ function saveLinks() {
 		) {
 			count += 1;
 			let itemTitle;
-			itemTitle = i18n.__("Link") + " " + eventData.split(" ")[3];
+			itemTitle = i18n.__("Link") + " " + originalCount;
 
 			if (count > 1) {
 				getId(`p${count - 1}`).textContent = i18n.__("Link added");

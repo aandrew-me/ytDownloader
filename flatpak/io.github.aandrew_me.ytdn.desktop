@@ -3,5 +3,5 @@ Name=Youtube Downloader Plus
 Comment=Download videos and audios from YouTube and other sites
 Exec=run.sh
 Type=Application
-Icon=me.aandrew.ytdownloader
+Icon=io.github.aandrew_me.ytdn
 Categories=Utility;
