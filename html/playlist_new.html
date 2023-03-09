@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playlist download</title>
+    <link rel="stylesheet" href="../assets/css/index.css">
+    <script src="../src/playlist_new.js" defer></script>
+    <script src="../src/common.js" defer></script>
+    <!-- Translating -->
+    <script>window.i18n = new (require('../translations/i18n'));</script>
+    <style>
+        .playlistCheck {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            width: 25px;
+            height: 25px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Theme toggle -->
+    <div id="themeToggle" onclick="toggle()">
+        <div id="themeToggleInside"></div>
+    </div>
+    <!-- Menu icon -->
+    <img src="../assets/images/menu.png" alt="menu" id="menuIcon">
+
+    <!-- Menu -->
+    <div id="menu">
+        <a id="homeWin" class="menuItem">Homepage</a>
+        <a id="preferenceWin" class="menuItem">Preferences</a>
+        <a id="aboutWin" class="menuItem">About</a>
+    </div>
+
+    <button class="submitBtn" id="pasteLink">Click to paste playlist link from clipboard [Ctrl + V]</button>
+
+    <div id="data">
+
+    </div>
+    <div id="goToTop"></div>
+</body>
+
+</html>

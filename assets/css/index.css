@@ -253,7 +253,7 @@ label {
 	display: none;
 }
 
-input[type="checkbox"] {
+.cb {
 	width: 20px;
 	height: 20px;
 	position: relative;

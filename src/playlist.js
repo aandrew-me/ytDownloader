@@ -117,7 +117,7 @@ function download(type) {
 			format = ""
 		}
 		else {
-			format = `-f "${formatId}+m4a/mp4[height<=${quality}]+m4a/bv*[height<=${quality}]+ba/best"`;
+			format = `-f "${formatId}+m4a/mp4[height=${quality}]+m4a/bv*[height<=${quality}]+ba/best"`;
 		}
 	} else {
 		format = getId("audioSelect").value;

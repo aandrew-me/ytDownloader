@@ -4,7 +4,7 @@
 		"yt-dlp-wrap-plus": "^2.3.16"
 	},
 	"name": "ytdownloader",
-	"version": "3.12.1",
+	"version": "3.13.0",
 	"main": "main.js",
 	"scripts": {
 		"start": "electron .",
@@ -86,8 +86,7 @@
 			"category": "Utility"
 		},
 		"snap": {
-			"grade": "stable",
-			"base": "core22"
+			"grade": "stable"
 		},
 		"win": {
 			"target": "nsis",
