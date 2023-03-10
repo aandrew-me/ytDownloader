@@ -3,7 +3,7 @@ const { default: YTDlpWrap } = require("yt-dlp-wrap-plus");
 const path = require("path");
 const os = require("os");
 const fs = require("fs");
-const { execSync } = require("child_process");
+const { execSync, exec, spawnSync } = require("child_process");
 let url;
 const ytDlp = localStorage.getItem("ytdlp");
 const ytdlp = new YTDlpWrap(ytDlp);
@@ -54,43 +54,60 @@ function getId(id) {
 
 function pasteLink() {
 	const clipboardText = clipboard.readText();
-	const data = execSync(
+	getId("loadingWrapper").style.display = "flex";
+	getId("incorrectMsg").textContent = "";
+	getId("errorBtn").style.display = "none";
+	getId("errorDetails").style.display = "none";
+	getId("errorDetails").textContent = "";
+
+	exec(
 		`yt-dlp --yes-playlist --no-warnings -J --flat-playlist "${clipboardText}"`,
-		{
-			encoding: "utf8",
+		(error, stdout, stderr) => {
+			if (error) {
+				getId("loadingWrapper").style.display = "none";
+				getId("incorrectMsg").textContent = i18n.__(
+					"Some error has occurred. Check your network and use correct URL"
+				);
+				getId("errorDetails").innerHTML = `
+			<strong>URL: ${clipboardText}</strong>
+			<br><br>
+			${error}
+			`;
+				getId("errorDetails").title = i18n.__("Click to copy");
+				getId("errorBtn").style.display = "inline-block";
+			} else {
+				const parsed = JSON.parse(stdout);
+				console.log(parsed);
+				let items = "";
+				parsed.entries.forEach((entry) => {
+					const randId = Math.random().toFixed(10).toString().slice(2);
+		
+					if (entry.channel) {
+						items += `
+					<div class="item" id="${randId}">
+					<img src="${
+						entry.thumbnails[3].url
+					}" alt="No thumbnail" class="itemIcon" crossorigin="anonymous">
+		
+					<div class="itemBody">
+						<div class="itemTitle">${entry.title}</div>
+						<div>${formatTime(entry.duration)}</div>
+						<input type="checkbox" class="playlistCheck" id="c${randId}">
+					</div>
+				</div>
+					`;
+					}
+				});
+				getId("data").innerHTML = items;
+				getId("loadingWrapper").style.display = "none";
+			}
 		}
 	);
-	const parsed = JSON.parse(data);
-	console.log(parsed);
-	let items = "";
-	parsed.entries.forEach((entry) => {
-		const randId = Math.random().toFixed(10).toString().slice(2);
 
-		if (entry.channel) {
-			items += `
-            <div class="item" id="${randId}">
-			<img src="${
-				entry.thumbnails[3].url
-			}" alt="No thumbnail" class="itemIcon" crossorigin="anonymous">
-
-			<div class="itemBody">
-				<div class="itemTitle">${entry.title}</div>
-				<div>${formatTime(entry.duration)}</div>
-                <input type="checkbox" class="playlistCheck" id="c${randId}">
-			</div>
-		</div>
-            `;
-		}
-	});
-	getId("data").innerHTML = items;
 }
 
 getId("pasteLink").addEventListener("click", (e) => {
-	try {
-		pasteLink();
-	} catch (error) {
-		console.log(error);
-	}
+	pasteLink();
 });
 
 document.addEventListener("keydown", (event) => {
