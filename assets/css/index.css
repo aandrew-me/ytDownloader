@@ -109,7 +109,7 @@ body {
 	color: var(--text);
 	margin: 10px auto;
 	border-radius: 10px;
-	padding: 20px 10px;
+	padding: 10px;
 	align-items: center;
 	justify-content: space-between;
 }
@@ -131,7 +131,10 @@ body {
 		width: 90%;
 	}
 }
-
+.itemIconBox{
+	display:flex;
+	flex-direction: column;
+}
 .itemIcon {
 	max-width: 160px;
 	max-height: 90px;
@@ -141,6 +144,7 @@ body {
 
 .itemTitle {
 	font-family: sans-serif;
+	padding:5px;
 }
 .itemBody {
 	height: 90%;
@@ -155,6 +159,12 @@ body {
 	margin-top: 10px;
 	font-family: sans-serif;
 }
+.progressBar{
+	width:90%;
+}
+.itemSpeed{
+	padding:10px 5px 5px 5px;
+}
 .itemClose {
 	position: absolute;
 	top: 5px;
@@ -167,6 +177,7 @@ body {
 .itemType {
 	font-style: italic;
 	margin-top: 5px;
+	margin: top 8px;
 }
 
 #closeHidden {

@@ -79,31 +79,50 @@ function pasteLink() {
 				const parsed = JSON.parse(stdout);
 				console.log(parsed);
 				let items = "";
-				parsed.entries.forEach((entry) => {
-					const randId = Math.random().toFixed(10).toString().slice(2);
-		
-					if (entry.channel) {
-						items += `
-					<div class="item" id="${randId}">
-					<img src="${
-						entry.thumbnails[3].url
-					}" alt="No thumbnail" class="itemIcon" crossorigin="anonymous">
-		
-					<div class="itemBody">
-						<div class="itemTitle">${entry.title}</div>
-						<div>${formatTime(entry.duration)}</div>
-						<input type="checkbox" class="playlistCheck" id="c${randId}">
+				// If correct playlist url is used
+				if (parsed.entries) {
+					parsed.entries.forEach((entry) => {
+						const randId = Math.random()
+							.toFixed(10)
+							.toString()
+							.slice(2);
+
+						if (entry.channel) {
+							items += `
+						<div class="item" id="${randId}">
+						<img src="${
+							entry.thumbnails[3].url
+						}" alt="No thumbnail" class="itemIcon" crossorigin="anonymous">
+			
+						<div class="itemBody">
+							<div class="itemTitle">${entry.title}</div>
+							<div>${formatTime(entry.duration)}</div>
+							<input type="checkbox" class="playlistCheck" id="c${randId}">
+						</div>
 					</div>
-				</div>
-					`;
-					}
-				});
-				getId("data").innerHTML = items;
-				getId("loadingWrapper").style.display = "none";
+						`;
+						}
+					});
+					getId("data").innerHTML = items;
+					getId("loadingWrapper").style.display = "none";
+				}
+				// If correct playlist url is not used
+				else {
+					getId("loadingWrapper").style.display = "none";
+					getId("incorrectMsg").textContent = i18n.__(
+						"Incompatible URL. Please provide a playlist URL"
+					);
+					getId("errorDetails").innerHTML = `
+			<strong>URL: ${clipboardText}</strong>
+			<br><br>
+			${error}
+			`;
+					getId("errorDetails").title = i18n.__("Click to copy");
+					getId("errorBtn").style.display = "inline-block";
+				}
 			}
 		}
 	);
-
 }
 
 getId("pasteLink").addEventListener("click", (e) => {

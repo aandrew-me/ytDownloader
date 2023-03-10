@@ -209,9 +209,9 @@ function defaultVideoToggle() {
 		defaultWindow = localStorage.getItem("defaultWindow");
 	}
 	if (defaultWindow == "video") {
-		selectVideo()
+		selectVideo();
 	} else {
-		selectAudio()
+		selectAudio();
 	}
 }
 
@@ -530,13 +530,14 @@ getId("videoDownload").addEventListener("click", (event) => {
 		const randId = Math.random().toFixed(10).toString().slice(2);
 		const item = `
 		<div class="item" id="${randId}">
+			<div class="itemIconBox">
 			<img src="${
 				thumbnail || "../assets/images/thumb.png"
 			}" alt="No thumbnail" class="itemIcon" crossorigin="anonymous">
-
+			<span class="itemType">${i18n.__("Video")}</span>
+			</div>
 			<div class="itemBody">
 				<div class="itemTitle">${title}</div>
-				<div class="itemType">${i18n.__("Video")}</div>
 				<p>${i18n.__("Download pending")}</p>
 			</div>
 		</div>
@@ -588,11 +589,12 @@ getId("audioDownload").addEventListener("click", (event) => {
 		const item = `
 		
 		<div class="item" id="${randId}">
+			<div class="itemIconBox">
 			<img src="${thumbnail}" alt="No thumbnail" class="itemIcon" crossorigin="anonymous">
-
+			<span class="itemType">${i18n.__("Video")}</span>
+			</div>
 			<div class="itemBody">
 				<div class="itemTitle">${title}</div>
-				<div class="itemType">${i18n.__("Video")}</div>
 				<p>${i18n.__("Download pending")}</p>
 			</div>
 		</div>
@@ -643,11 +645,12 @@ getId("extractBtn").addEventListener("click", () => {
 
 		const item = `
 		<div class="item" id="${randId}">
+			<div class="itemIconBox">
 			<img src="${thumbnail}" alt="No thumbnail" class="itemIcon" crossorigin="anonymous">
-
+			<span class="itemType">${i18n.__("Video")}</span>
+		</div>
 			<div class="itemBody">
 				<div class="itemTitle">${title}</div>
-				<div class="itemType">${i18n.__("Video")}</div>
 				<p>${i18n.__("Download pending")}</p>
 			</div>
 		</div>
@@ -827,18 +830,22 @@ function download(
 
 	const newItem = `
 		<div class="item" id="${randomId}">
+		<div class="itemIconBox">
+			<img src="${
+				thumb1 || thumbnail || "../assets/images/thumb.png"
+			}" alt="No thumbnail" class="itemIcon" crossorigin="anonymous">
+			<span class="itemType">${
+				type === "video" ? i18n.__("Video") : i18n.__("Audio")
+			}</span>
+		</div>
 		<img src="../assets/images/close.png" onClick="fadeItem('${randomId}')" class="itemClose"}" id="${
 		randomId + ".close"
 	}">
-		<img src="${
-			thumb1 || thumbnail || "../assets/images/thumb.png"
-		}" alt="No thumbnail" class="itemIcon" crossorigin="anonymous">
+
 
 		<div class="itemBody">
 			<div class="itemTitle">${newTitle}</div>
-			<div class="itemType">${
-				type === "video" ? i18n.__("Video") : i18n.__("Audio")
-			}</div>
+			<strong class="itemSpeed" id="${randomId + "speed"}"></strong>
 			<div id="${randomId + "prog"}" class="itemProgress"></div>
 		</div>
 	</div>
@@ -999,11 +1006,12 @@ function download(
 				getId(randomId + "prog").textContent =
 					i18n.__("Processing") + "...";
 			} else {
-				getId(randomId + "prog").textContent = `${i18n.__(
-					"Progress"
-				)}: ${progress.percent}%  ${i18n.__("Speed")}: ${
+				getId(randomId + "speed").textContent = `${i18n.__("Speed")}: ${
 					progress.currentSpeed || 0
 				}`;
+				getId(
+					randomId + "prog"
+				).innerHTML = `<progress class="progressBar" min=0 max=100 value=${progress.percent}>`;
 			}
 
 			// const items = JSON.parse(localStorage.getItem("itemList"));
@@ -1020,6 +1028,7 @@ function download(
 			getId(randomId + "prog").textContent = i18n.__("Downloading...");
 		})
 		.once("close", (code) => {
+			getId(randomId + "speed").textContent = ""
 			currentDownloads--;
 			console.log("Closed with code " + code);
 			if (code == 0) {
