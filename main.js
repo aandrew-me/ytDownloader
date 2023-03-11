@@ -227,7 +227,13 @@ ipcMain.on("select-location", () => {
 	});
 
 	if (location) {
-		secondaryWindow.webContents.send("downloadPath", location);
+		if (secondaryWindow){
+			secondaryWindow.webContents.send("downloadPath", location);
+		}
+		else{
+			win.webContents.send("downloadPath", location);
+		}
+		
 	}
 });
 

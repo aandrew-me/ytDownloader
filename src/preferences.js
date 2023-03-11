@@ -30,9 +30,9 @@ getId("selectLocation").addEventListener("click", () => {
 });
 
 ipcRenderer.on("downloadPath", (event, downloadPath) => {
-	console.log(downloadPath);
-	localStorage.setItem("downloadPath", downloadPath);
-	getId("path").textContent = downloadPath;
+	console.log(downloadPath[0]);
+	localStorage.setItem("downloadPath", downloadPath[0]);
+	getId("path").textContent = downloadPath[0];
 });
 
 const enabledTransparent = getId("enableTransparent");

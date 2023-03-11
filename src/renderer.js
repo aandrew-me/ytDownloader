@@ -89,6 +89,7 @@ function downloadPathSelection() {
 		downloadDir = appdir;
 		localStorage.setItem("downloadPath", appdir);
 	}
+	getId("path").textContent = downloadDir;
 	fs.mkdir(downloadDir, { recursive: true }, () => {});
 }
 
@@ -1167,4 +1168,15 @@ getId("newPlaylistWin").addEventListener("click", () => {
 
 ipcRenderer.on("link", (event, text) => {
 	pasteFromTray(text);
+});
+
+// Selecting download directory
+getId("selectLocation").addEventListener("click", () => {
+	ipcRenderer.send("select-location", "");
+});
+
+ipcRenderer.on("downloadPath", (event, downloadPath) => {
+	console.log(downloadPath);
+	getId("path").textContent = downloadPath;
+	downloadDir = downloadPath[0]
 });

@@ -37,6 +37,7 @@
 </div>
 <!-- Popup message -->
 <span id="popupText">Text copied</span>
+
 <body>
     <!-- Theme toggle -->
     <div id="themeToggle" onclick="toggle()">
@@ -114,6 +115,13 @@
             <input type="text" id="endTime" class="time" placeholder="10:00"
                 title="If kept empty, it will be downloaded to the end">
             <label id="end">End</label>
+
+            <br><br>
+
+            <div><span id="clText">Current download location - </span><span id="path"></span></div>
+
+            <br><br>
+            <button id="selectLocation" class="submitBtn">Select Download Location</button>
 
             <br><br>
             <h3 id="subHeader">Subtitles</h3>
