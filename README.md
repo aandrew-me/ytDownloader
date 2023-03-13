@@ -1,18 +1,18 @@
 # ytDownloader 
 
 
-[![Flathub downloads](https://img.shields.io/endpoint?url=https://flathub-stats-backend.vercel.app/badges/me.aandrew.ytdownloader/shields.io.json)](https://flatstat.mijorus.it/app/me.aandrew.ytdownloader)
+<!-- [![Flathub downloads](https://img.shields.io/endpoint?url=https://flathub-stats-backend.vercel.app/badges/me.aandrew.ytdownloader/shields.io.json)](https://flatstat.mijorus.it/app/me.aandrew.ytdownloader) -->
 
 [![GitHub downloads](https://img.shields.io/github/downloads/aandrew-me/ytdownloader/total)](https://github.com/aandrew-me/ytDownloader/releases)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/aandrew-me/ytdownloader?label=latest%20release)](https://github.com/aandrew-me/ytDownloader/releases/latest)
-[![Flathub](https://img.shields.io/flathub/v/me.aandrew.ytdownloader)](https://flathub.org/apps/details/me.aandrew.ytdownloader)
+[![Flathub](https://img.shields.io/flathub/v/io.github.aandrew_me.ytdn)](https://beta.flathub.org/apps/io.github.aandrew_me.ytdn)
 [![AUR version](https://img.shields.io/aur/version/ytdownloader-gui)](https://aur.archlinux.org/packages/ytdownloader-gui)
 [![Snapcraft](https://badgen.net/snapcraft/v/ytdownloader)](https://snapcraft.io/ytdownloader)
 ![Chocolatey Version](https://img.shields.io/chocolatey/v/ytdownloader)
 
 A modern GUI video and audio downloader supporting [hundreds of sites](https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md)
 
-<a href="https://flathub.org/apps/details/me.aandrew.ytdownloader"><img src="https://flathub.org/assets/badges/flathub-badge-en.svg" style="width:180px;"></a>
+<a href="https://beta.flathub.org/apps/io.github.aandrew_me.ytdn"><img src="https://flathub.org/assets/badges/flathub-badge-en.svg" style="width:180px;"></a>
 [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/ytdownloader)
 
 [![Get AppImage](https://raw.githubusercontent.com/srevinsaju/get-appimage/master/static/badges/get-appimage-branding-blue.png)](https://github.com/aandrew-me/ytDownloader/releases/latest/download/YTDownloader.AppImage)
@@ -81,7 +81,7 @@ Flatpak is recommended.
 
 - ### Flatpak
     ```
-    flatpak install flathub me.aandrew.ytdownloader
+    flatpak install flathub io.github.aandrew_me.ytdn
     ```
 - ### Snapcraft
     ```
