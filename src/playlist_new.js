@@ -59,7 +59,6 @@ function pasteLink() {
 	getId("errorBtn").style.display = "none";
 	getId("errorDetails").style.display = "none";
 	getId("errorDetails").textContent = "";
-
 	exec(
 		`yt-dlp --yes-playlist --no-warnings -J --flat-playlist "${clipboardText}"`,
 		(error, stdout, stderr) => {
