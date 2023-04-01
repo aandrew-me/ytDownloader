@@ -1029,7 +1029,7 @@ function download(
 			getId(randomId + "prog").textContent = i18n.__("Downloading...");
 		})
 		.once("close", (code) => {
-			getId(randomId + "speed").textContent = ""
+			getId(randomId + "speed").textContent = "";
 			currentDownloads--;
 			console.log("Closed with code " + code);
 			if (code == 0) {
@@ -1178,5 +1178,5 @@ getId("selectLocation").addEventListener("click", () => {
 ipcRenderer.on("downloadPath", (event, downloadPath) => {
 	console.log(downloadPath);
 	getId("path").textContent = downloadPath;
-	downloadDir = downloadPath[0]
+	downloadDir = downloadPath[0];
 });
