@@ -138,12 +138,13 @@ body {
 }
 
 .title {
-	padding: 10px;
+	padding: 12px 10px;
 	border-radius: 8px;
 	border: none;
 	outline: none;
 	width: 45%;
 	text-align: center;
+	background-color: rgb(127, 253, 127);
 }
 
 .itemTitle {
