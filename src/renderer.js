@@ -343,7 +343,7 @@ async function getInfo(url) {
 
 			getId("loadingWrapper").style.display = "none";
 			getId("hidden").style.display = "inline-block";
-			getId("title").innerHTML = `<b>${i18n.__("Title ")}</b>: ` + title;
+			getId("title").innerHTML = `<b>${i18n.__("Title ")}</b>: ` + `<input class="title" id="titleName" type="text" value="${title}" onchange="renameTitle()">`;
 
 			let audioSize = 0;
 			let defaultVideoFormat = 0;
@@ -932,6 +932,7 @@ function download(
 				configTxt,
 				cookieArg,
 				browser,
+				"--no-mtime",
 				`"${url}"`,
 			],
 			{ shell: true, detached: false },
@@ -961,6 +962,7 @@ function download(
 				browser,
 				configArg,
 				configTxt,
+				"--no-mtime",
 				`"${url}"`,
 			],
 			{ shell: true, detached: false },
@@ -990,6 +992,7 @@ function download(
 				browser,
 				configArg,
 				configTxt,
+				"--no-mtime",
 				`"${url}"`,
 			],
 			{ shell: true, detached: false },
@@ -1125,6 +1128,13 @@ function afterSave(location, filename, progressId) {
 
 function showItem(location, filename) {
 	shell.showItemInFolder(`${path.join(location, filename)}`);
+}
+
+// Rename title
+
+function renameTitle(){
+	title = getId("titleName").value
+	console.log(title)
 }
 
 // Opening windows

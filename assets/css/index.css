@@ -126,13 +126,8 @@ body {
 	margin: 10px auto;
 }
 
-@media screen and (max-width: 650px) {
-	.item {
-		width: 90%;
-	}
-}
-.itemIconBox{
-	display:flex;
+.itemIconBox {
+	display: flex;
 	flex-direction: column;
 }
 .itemIcon {
@@ -142,9 +137,18 @@ body {
 	margin: 0 10px 0 0;
 }
 
+.title {
+	padding: 10px;
+	border-radius: 8px;
+	border: none;
+	outline: none;
+	width: 45%;
+	text-align: center;
+}
+
 .itemTitle {
 	font-family: sans-serif;
-	padding:5px;
+	padding: 5px;
 }
 .itemBody {
 	height: 90%;
@@ -159,11 +163,11 @@ body {
 	margin-top: 10px;
 	font-family: sans-serif;
 }
-.progressBar{
-	width:90%;
+.progressBar {
+	width: 90%;
 }
-.itemSpeed{
-	padding:10px 5px 5px 5px;
+.itemSpeed {
+	padding: 10px 5px 5px 5px;
 }
 .itemClose {
 	position: absolute;
@@ -239,7 +243,7 @@ body {
 	padding: 8px;
 	color: var(--text);
 }
-#videoToggle{
+#videoToggle {
 	background-color: var(--box-toggleOn);
 }
 
@@ -334,12 +338,12 @@ input[type="number"]::-webkit-outer-spin-button {
 #errorDetails {
 	cursor: pointer;
 	font-family: monospace;
-	padding:15px;
+	padding: 15px;
 	margin: 10px 0;
 	border: 2px solid rgb(189, 0, 0);
 	border-radius: 8px;
 	display: none;
-	transition: .5s all;
+	transition: 0.5s all;
 }
 #loadingWrapper {
 	/* Default is flex */
@@ -471,16 +475,25 @@ body::-webkit-scrollbar-thumb {
 	cursor: pointer;
 }
 
-#popupText{
+#popupText {
 	display: none;
-	position:fixed;
-	left:25px;
+	position: fixed;
+	left: 25px;
 	bottom: 20px;
-	padding:10px;
+	padding: 10px;
 	border-radius: 2px;
-	color:white;
+	color: white;
 	background-color: rgb(80, 80, 224);
 	cursor: pointer;
-	transition: .5s all;
+	transition: 0.5s all;
 	z-index: 2;
+}
+
+@media screen and (max-width: 650px) {
+	.item {
+		width: 90%;
+	}
+	.title {
+		width: 80%;
+	}
 }
