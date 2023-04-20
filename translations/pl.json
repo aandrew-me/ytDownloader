@@ -96,5 +96,6 @@
 	"Bad": "Kiepski",
 	"Worst": "Najgorsze",
 	"Select Quality": "Wybierz jakość",
-	"Disable auto updates": "Wyłącz automatyczne aktualizacje"
+	"Disable auto updates": "Wyłącz automatyczne aktualizacje",
+	"ultralow": "bardzo niski"
 }

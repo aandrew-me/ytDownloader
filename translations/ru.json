@@ -96,5 +96,6 @@
 	"Bad": "Плохое",
 	"Worst": "Худшее",
 	"Select Quality": "Выберите Качество",
-	"Disable auto updates": "Отключить автообновления"
+	"Disable auto updates": "Отключить автообновления",
+	"ultralow": "сверхнизкий"
 }

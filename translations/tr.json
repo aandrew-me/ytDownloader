@@ -96,5 +96,6 @@
 	"Bad": "Kötü",
 	"Worst": "En kötü",
 	"Select Quality": "Kalite Seç",
-	"Disable auto updates": "Otomatik güncellemeleri devre dışı bırak"
+	"Disable auto updates": "Otomatik güncellemeleri devre dışı bırak",
+	"ultralow": "Çok düşük"
 }
