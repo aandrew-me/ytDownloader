@@ -96,5 +96,6 @@
 	"Bad": "Huono",
 	"Worst": "Huonoin",
 	"Select Quality": "Valitse Laatu",
-	"Disable auto updates": "Poista automaattiset päivitykset käytöstä"
+	"Disable auto updates": "Poista automaattiset päivitykset käytöstä",
+	"ultralow": "erittäin matala"
 }
