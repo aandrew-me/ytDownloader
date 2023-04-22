@@ -2,7 +2,7 @@ const { clipboard, shell, ipcRenderer } = require("electron");
 const { default: YTDlpWrap } = require("yt-dlp-wrap-plus");
 const path = require("path");
 const os = require("os");
-const fs = require('fs');
+const fs = require("fs");
 const { execSync } = require("child_process");
 let url;
 const ytDlp = localStorage.getItem("ytdlp");
@@ -12,36 +12,36 @@ const i18n = new (require("../translations/i18n"))();
 let cookieArg = "";
 let browser = "";
 const formats = {
-	144:160,
-	240:133,
-	360:134,
-	480:135,
-	720:136,
-	1080:137,
-	1440:400,
-	2160:401,
-	4320:571
-}
+	144: 160,
+	240: 133,
+	360: 134,
+	480: 135,
+	720: 136,
+	1080: 137,
+	1440: 400,
+	2160: 401,
+	4320: 571,
+};
 let originalCount = 0;
 let ffmpeg;
 let ffmpegPath;
 if (os.platform() === "win32") {
 	ffmpeg = `"${__dirname}\\..\\ffmpeg.exe"`;
-	ffmpegPath= `${__dirname}\\..\\ffmpeg.exe`;
+	ffmpegPath = `${__dirname}\\..\\ffmpeg.exe`;
 } else {
 	ffmpeg = `"${__dirname}/../ffmpeg"`;
 	ffmpegPath = `${__dirname}/../ffmpeg`;
 }
 
-if (!fs.existsSync(ffmpegPath)){
+if (!fs.existsSync(ffmpegPath)) {
 	try {
-		ffmpeg = execSync("which ffmpeg", {encoding:"utf8"})
-		ffmpeg = `"${ffmpeg.trimEnd()}"`
+		ffmpeg = execSync("which ffmpeg", { encoding: "utf8" });
+		ffmpeg = `"${ffmpeg.trimEnd()}"`;
 	} catch (error) {
-		console.log(error)
+		console.log(error);
 	}
 }
-console.log("ffmpeg:", ffmpeg)
+console.log("ffmpeg:", ffmpeg);
 
 let foldernameFormat = "%(playlist_title)s";
 let filenameFormat = "%(playlist_index)s.%(title)s.%(ext)s";
@@ -73,21 +73,21 @@ document.addEventListener("keydown", (event) => {
 // Patterns
 const playlistTxt = "Downloading playlist: ";
 const videoIndex = "Downloading item ";
-const oldVideoIndex = "Downloading video "
+const oldVideoIndex = "Downloading video ";
 
 function download(type) {
 	// Config file
 	let configArg = "";
 	let configTxt = "";
-	if (localStorage.getItem("configPath")){
-		configArg = "--config-location"
-		configTxt = `"${localStorage.getItem("configPath")}"`
+	if (localStorage.getItem("configPath")) {
+		configArg = "--config-location";
+		configTxt = `"${localStorage.getItem("configPath")}"`;
 	}
 	nameFormatting();
 	originalCount = 0;
 
 	// Playlist download range
-	managePlaylistRange()
+	managePlaylistRange();
 
 	// Whether to use browser cookies or not
 	if (localStorage.getItem("browser")) {
@@ -106,23 +106,20 @@ function download(type) {
 	let quality, format, downloadProcess;
 	if (type === "video") {
 		quality = getId("select").value;
-		const formatId = formats[quality]
+		const formatId = formats[quality];
 		if (quality === "best") {
 			format = "-f bv*+ba/best";
-		} 
-		else if (quality === "worst") {
+		} else if (quality === "worst") {
 			format = "-f wv+wa/worst";
-		} 
-		else if (quality === "useConfig"){
-			format = ""
-		}
-		else {
+		} else if (quality === "useConfig") {
+			format = "";
+		} else {
 			format = `-f "${formatId}+m4a/mp4[height=${quality}]+m4a/bv*[height<=${quality}]+ba/best"`;
 		}
 	} else {
 		format = getId("audioSelect").value;
 	}
-	console.log("Format:", format)
+	console.log("Format:", format);
 
 	const controller = new AbortController();
 
@@ -182,7 +179,8 @@ function download(type) {
 		}
 
 		if (
-			(eventData.includes(videoIndex) || eventData.includes(oldVideoIndex)) &&
+			(eventData.includes(videoIndex) ||
+				eventData.includes(oldVideoIndex)) &&
 			!eventData.includes("thumbnail")
 		) {
 			count += 1;
@@ -209,10 +207,16 @@ function download(type) {
 	});
 
 	downloadProcess.on("progress", (progress) => {
-		if (getId(`p${count}`)) {
-			getId(`p${count}`).textContent = `${i18n.__("Progress")} ${
-				progress.percent
-			}% | ${i18n.__("Speed")} ${progress.currentSpeed || 0}`;
+		if (progress.percent == 100) {
+			if (getId(`p${count}`)) {
+				getId(`p${count}`).textContent = i18n.__("Processing") + "...";
+			}
+		} else {
+			if (getId(`p${count}`)) {
+				getId(`p${count}`).textContent = `${i18n.__("Progress")} ${
+					progress.percent
+				}% | ${i18n.__("Speed")} ${progress.currentSpeed || 0}`;
+			}
 		}
 	});
 
@@ -225,7 +229,7 @@ function download(type) {
 	});
 }
 
-function managePlaylistRange(){
+function managePlaylistRange() {
 	if (getId("playlistIndex").value) {
 		playlistIndex = Number(getId("playlistIndex").value);
 	}
@@ -233,9 +237,9 @@ function managePlaylistRange(){
 		playlistEnd = Number(getId("playlistEnd").value);
 	}
 	console.log(`Range: ${playlistIndex}:${playlistEnd}`);
-	if (playlistIndex > 0){
-		originalCount = playlistIndex - 1
-		console.log(`Starting download from ${originalCount + 1}`)
+	if (playlistIndex > 0) {
+		originalCount = playlistIndex - 1;
+		console.log(`Starting download from ${originalCount + 1}`);
 	}
 }
 
@@ -298,7 +302,7 @@ function downloadThumbnails() {
 	let count = 0;
 	hideOptions();
 	nameFormatting();
-	managePlaylistRange()
+	managePlaylistRange();
 	const downloadProcess = ytdlp.exec(
 		[
 			"--yes-playlist",
@@ -328,7 +332,8 @@ function downloadThumbnails() {
 		}
 
 		if (
-			(eventData.includes(videoIndex) || eventData.includes(oldVideoIndex))&&
+			(eventData.includes(videoIndex) ||
+				eventData.includes(oldVideoIndex)) &&
 			!eventData.includes("thumbnail")
 		) {
 			count += 1;
@@ -362,7 +367,7 @@ function saveLinks() {
 	let count = 0;
 	hideOptions();
 	nameFormatting();
-	managePlaylistRange()
+	managePlaylistRange();
 	const downloadProcess = ytdlp.exec(
 		[
 			"--yes-playlist",
@@ -392,7 +397,8 @@ function saveLinks() {
 		}
 
 		if (
-			(eventData.includes(videoIndex) || eventData.includes(oldVideoIndex)) &&
+			(eventData.includes(videoIndex) ||
+				eventData.includes(oldVideoIndex)) &&
 			!eventData.includes("thumbnail")
 		) {
 			count += 1;
@@ -538,4 +544,4 @@ getId("playlistEnd").placeholder = i18n.__("End");
 getId("downloadThumbnails").textContent = i18n.__("Download thumbnails");
 getId("saveLinks").textContent = i18n.__("Save video links to a file");
 getId("useConfigTxt").textContent = i18n.__("Use config file");
-getId("errorBtn").textContent = i18n.__("Error Details")+" ▼"
+getId("errorBtn").textContent = i18n.__("Error Details") + " ▼";
