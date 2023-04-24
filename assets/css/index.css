@@ -443,14 +443,14 @@ button {
 #advanced {
 	display: none;
 }
-.advancedItem{
+.advancedItem {
 	border: 1.5px solid gray;
 	border-radius: 10px;
-	padding:20px;
+	padding: 20px;
 	margin: 10px;
 }
 
-#subHeader{
+#subHeader {
 	font-weight: bold;
 	margin-top: 0;
 }
@@ -499,6 +499,21 @@ body::-webkit-scrollbar-thumb {
 	cursor: pointer;
 	transition: 0.5s all;
 	z-index: 2;
+	scale: 100%;
+}
+.scale {
+	animation-name: scale;
+	animation-duration: 0.5s;
+	animation-fill-mode: forwards;
+}
+
+@keyframes scale {
+	0% {
+		scale: 1;
+	}
+	100% {
+		scale: 0;
+	}
 }
 
 @media screen and (max-width: 650px) {

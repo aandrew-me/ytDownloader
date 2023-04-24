@@ -38,7 +38,7 @@ process.env.PYTHONWARNINGS = "error";
 let downloadDir = "";
 
 // Global variables
-let title, onlyvideo, id, thumbnail, ytdlp, duration, extractFormat;
+let title, onlyvideo, id, thumbnail, ytdlp, duration;
 let audioExtensionList = [];
 let rangeCmd = "";
 let subs = "";
@@ -343,7 +343,9 @@ async function getInfo(url) {
 
 			getId("loadingWrapper").style.display = "none";
 			getId("hidden").style.display = "inline-block";
-			getId("title").innerHTML = `<b>${i18n.__("Title ")}</b>: ` + `<input class="title" id="titleName" type="text" value="${title}" onchange="renameTitle()">`;
+			getId("title").innerHTML =
+				`<b>${i18n.__("Title ")}</b>: ` +
+				`<input class="title" id="titleName" type="text" value="${title}" onchange="renameTitle()">`;
 
 			let audioSize = 0;
 			let defaultVideoFormat = 0;
@@ -592,7 +594,7 @@ getId("audioDownload").addEventListener("click", (event) => {
 		<div class="item" id="${randId}">
 			<div class="itemIconBox">
 			<img src="${thumbnail}" alt="No thumbnail" class="itemIcon" crossorigin="anonymous">
-			<span class="itemType">${i18n.__("Video")}</span>
+			<span class="itemType">${i18n.__("Audio")}</span>
 			</div>
 			<div class="itemBody">
 				<div class="itemTitle">${title}</div>
@@ -624,7 +626,6 @@ getId("audioDownload").addEventListener("click", (event) => {
 getId("extractBtn").addEventListener("click", () => {
 	checkMaxDownloads();
 	getId("hidden").style.display = "none";
-	extractFormat = getId("extractSelection").value;
 
 	console.log(`Current:${currentDownloads} Max:${maxActiveDownloads}`);
 
@@ -643,12 +644,14 @@ getId("extractBtn").addEventListener("click", () => {
 		const randId = Math.random().toFixed(10).toString().slice(2);
 		const thumb1 = thumbnail;
 		const title1 = title;
+		const extractFormat = getId("extractSelection").value;
+		const extractQuality = getId("extractQualitySelect").value;
 
 		const item = `
 		<div class="item" id="${randId}">
 			<div class="itemIconBox">
 			<img src="${thumbnail}" alt="No thumbnail" class="itemIcon" crossorigin="anonymous">
-			<span class="itemType">${i18n.__("Video")}</span>
+			<span class="itemType">${i18n.__("Audio")}</span>
 		</div>
 			<div class="itemBody">
 				<div class="itemTitle">${title}</div>
@@ -668,7 +671,9 @@ getId("extractBtn").addEventListener("click", () => {
 					subs1,
 					subs2,
 					thumb1,
-					title1
+					title1,
+					extractFormat,
+					extractQuality
 				);
 				currentDownloads++;
 				clearInterval(interval);
@@ -738,7 +743,9 @@ function download(
 	subs1 = "",
 	subs2 = "",
 	thumb1 = "",
-	title1 = ""
+	title1 = "",
+	extractFormat = "",
+	extractQuality = ""
 ) {
 	// Config file
 	const newTitle = title1 || title;
@@ -751,14 +758,13 @@ function download(
 
 	const url = url1 || getId("url").value;
 	console.log("URL", url);
-	let ext;
-	let extractExt;
+	let ext, extractExt, extractFormat1, extractQuality1;
 
 	let format_id;
 	const randomId = "a" + Math.random().toFixed(10).toString().slice(2);
 
 	// Whether to close app
-	let quit = Boolean(getId("quitChecked").checked)
+	let quit = Boolean(getId("quitChecked").checked);
 
 	if (type === "video") {
 		const videoValue = getId("videoFormatSelect").value;
@@ -890,13 +896,21 @@ function download(
 		} else if (extractFormat == "vorbis") {
 			extractExt = "ogg";
 		} else {
-			extractExt = extractFormat;
+			extractExt = extractFormat || getId("extractSelection").value;
 		}
+		extractFormat1 = extractFormat || getId("extractSelection").value
+		extractQuality1 = extractQuality || getId("extractQualitySelect").value
+
+		console.log(extractFormat1)
+		console.log(extractQuality1)
+
 		downloadProcess = ytdlp.exec(
 			[
 				"-x",
 				"--audio-format",
-				extractFormat,
+				extractFormat1,
+				"--audio-quality",
+				extractQuality1,
 				"-o",
 				`"${path.join(downloadDir, filename + `.${extractExt}`)}"`,
 				"--ffmpeg-location",
@@ -991,8 +1005,8 @@ function download(
 				}
 			}
 			if (quit) {
-				console.log("Quitting app")
-				quitApp()
+				console.log("Quitting app");
+				quitApp();
 			}
 		})
 		.once("error", (error) => {
@@ -1005,28 +1019,20 @@ function download(
 		});
 }
 
-function quitApp(){
-	ipcRenderer.send("quit","quit")
+function quitApp() {
+	ipcRenderer.send("quit", "quit");
 }
 
 // Removing item
 
 function fadeItem(id) {
 	controllers[id].abort();
-	let count = 0;
-	let opacity = 1;
-	const fade = setInterval(() => {
-		if (count >= 10) {
-			clearInterval(fade);
-			if (getId(id)) {
-				getId(id).remove();
-			}
-		} else {
-			opacity -= 0.1;
-			getId(id).style.opacity = opacity;
-			count++;
+	getId(id).classList.add("scale");
+	setTimeout(() => {
+		if (getId(id)) {
+			getId(id).remove();
 		}
-	}, 50);
+	}, 500);
 }
 
 // After saving video
@@ -1062,9 +1068,9 @@ function showItem(location, filename) {
 
 // Rename title
 
-function renameTitle(){
-	title = getId("titleName").value
-	console.log(title)
+function renameTitle() {
+	title = getId("titleName").value;
+	console.log(title);
 }
 
 // Opening windows
