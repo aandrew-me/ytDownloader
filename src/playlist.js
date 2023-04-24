@@ -106,6 +106,7 @@ function download(type) {
 	let quality, format, downloadProcess;
 	if (type === "video") {
 		quality = getId("select").value;
+		videoType = getId("videoTypeSelect").value;
 		const formatId = formats[quality];
 		if (quality === "best") {
 			format = "-f bv*+ba/best";
@@ -114,7 +115,12 @@ function download(type) {
 		} else if (quality === "useConfig") {
 			format = "";
 		} else {
-			format = `-f "${formatId}+m4a/mp4[height=${quality}]+m4a/bv*[height<=${quality}]+ba/best"`;
+			if (videoType === "mp4"){
+				format = `-f "${formatId}+m4a/mp4[height=${quality}]+m4a/bv*[height<=${quality}]+ba/best"`;
+			}
+			else{
+				format = `-f "webm[height<=${quality}]+opus/bv*[height<=${quality}]+ba/${formatId}+m4a/mp4[height=${quality}]+m4a/best"`;
+			}
 		}
 	} else {
 		format = getId("audioSelect").value;
@@ -487,6 +493,16 @@ audioToggle.addEventListener("click", (event) => {
 	getId("videoBox").style.display = "none";
 	getId("audioBox").style.display = "block";
 });
+
+getId("select").addEventListener("change", () => {
+	value = getId("select").value
+	if (value == "best" || value == "worst" || value == "useConfig"){
+		getId("typeSelectBox").style.display = "none"
+	}
+	else {
+		getId("typeSelectBox").style.display = "block"
+	}
+})
 
 // More options
 

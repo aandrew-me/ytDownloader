@@ -248,6 +248,7 @@ ipcMain.on("select-config", () => {
 });
 
 ipcMain.on("quit", ()=>{
+	isQuiting = true;
 	app.quit()
 })
 

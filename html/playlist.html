@@ -34,13 +34,15 @@
         #advancedMenu {
             display: none;
         }
+        #typeSelectBox{
+            display: none;
+        }
     </style>
 </head>
 
 <body>
     <!-- Popup message -->
     <span id="popupText">Text copied</span>
-        
     <!-- Theme toggle -->
     <div id="themeToggle" onclick="toggle()">
         <div id="themeToggleInside"></div>
@@ -82,7 +84,15 @@
                 <option value="1440">1440p</option>
                 <option value="2160">2160p (4k)</option>
             </select>
-
+            <br>
+            <div id="typeSelectBox">
+                <label>Select video type</label>
+                <select id="videoTypeSelect">
+                    <option value="mp4">Mp4</option>
+                    <option value="webm">WebM</option>
+                </select>
+            </div>
+            <br>
             <button class="submitBtn" id="download">Download</button>
         </div>
 
