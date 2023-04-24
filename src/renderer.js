@@ -677,44 +677,6 @@ getId("extractBtn").addEventListener("click", () => {
 	}
 });
 
-// Restore previous uncompleted downloads
-
-// function restorePrevious() {
-// 	if (!localStorage.getItem("itemList")) return;
-// 	const items = JSON.parse(localStorage.getItem("itemList"));
-// 	if (items) {
-// 		console.log(items);
-// 		items.forEach((item) => {
-// 			const newItem = `
-// 			<div class="item" id="${item.id}">
-// 			<img src="../assets/images/close.png" onClick="fadeItem('${
-// 				item.id
-// 			}')" class="itemClose"}" id="${item.id + ".close"}">
-// 			<img src="${item.thumbnail}" alt="thumbnail" class="itemIcon">
-
-// 			<div class="itemBody">
-// 				<div class="itemTitle">${item.title}</div>
-// 				<div class="itemType">${item.type}</div>
-// 				<input disabled type="range" value="0" class="hiddenVideoProgress" id="${
-// 					item.id + "vid"
-// 				}"></input>
-// 				<input disabled type="range" value="0" class="hiddenAudioProgress" id="${
-// 					item.id + "aud"
-// 				}"></input>
-// 				<div id="${item.id + "prog"}" class="itemProgress">Progress: ${
-// 				item.progress
-// 			}%</div>
-// 				<button class="resumeBtn">Resume</button>
-// 			</div>
-// 		</div>
-// 		`;
-// 			getId("list").innerHTML += newItem;
-// 		});
-// 	}
-// }
-
-// restorePrevious()
-
 // Time formatting
 
 function timeFormat(duration) {
@@ -795,6 +757,9 @@ function download(
 	let format_id;
 	const randomId = "a" + Math.random().toFixed(10).toString().slice(2);
 
+	// Whether to close app
+	let quit = Boolean(getId("quitChecked").checked)
+
 	if (type === "video") {
 		const videoValue = getId("videoFormatSelect").value;
 		format_id = videoValue.split("|")[0];
@@ -811,23 +776,6 @@ function download(
 		}
 	}
 	console.log("video extension:", ext);
-
-	// localStorage.setItem("itemList", "");
-	// let itemList = [];
-	// if (localStorage.getItem("itemList")) {
-	// 	itemList = JSON.parse(localStorage.getItem("itemList"));
-	// }
-	// const itemInfo = {
-	// 	id: randomId,
-	// 	format_id: format_id,
-	// 	title: title,
-	// 	url: url,
-	// 	ext: ext,
-	// 	type: type,
-	// 	thumbnail: thumbnail,
-	// };
-	// itemList.push(itemInfo);
-	// localStorage.setItem("itemList", JSON.stringify(itemList));
 
 	const newItem = `
 		<div class="item" id="${randomId}">
@@ -923,8 +871,6 @@ function download(
 				`"${path.join(downloadDir, filename + `.${ext}`)}"`,
 				"--ffmpeg-location",
 				ffmpeg,
-				// "--downloader",
-				// `'m3u8,dash:${ffmpeg}'`,
 				subs1 || subs,
 				subs2 || subLangs,
 				"--no-playlist",
@@ -955,8 +901,6 @@ function download(
 				`"${path.join(downloadDir, filename + `.${extractExt}`)}"`,
 				"--ffmpeg-location",
 				ffmpeg,
-				// "--downloader",
-				// `'m3u8,dash:${ffmpeg}'`,
 				"--no-playlist",
 				cookieArg,
 				browser,
@@ -983,8 +927,6 @@ function download(
 				`"${path.join(downloadDir, filename + `.${ext}`)}"`,
 				"--ffmpeg-location",
 				ffmpeg,
-				// "--downloader",
-				// `'m3u8:${ffmpeg}'`,
 				subs1 || subs,
 				subs2 || subLangs,
 				"--no-playlist",
@@ -1017,16 +959,6 @@ function download(
 					randomId + "prog"
 				).innerHTML = `<progress class="progressBar" min=0 max=100 value=${progress.percent}>`;
 			}
-
-			// const items = JSON.parse(localStorage.getItem("itemList"));
-			// // Clearing item from localstorage
-			// for (let item of items) {
-			// 	if (item.id == randomId) {
-			// 		item.progress = progress.percent;
-			// 		break;
-			// 	}
-			// }
-			// localStorage.setItem("itemList", JSON.stringify(items));
 		})
 		.once("ytDlpEvent", (eventType, eventData) => {
 			getId(randomId + "prog").textContent = i18n.__("Downloading...");
@@ -1036,16 +968,6 @@ function download(
 			currentDownloads--;
 			console.log("Closed with code " + code);
 			if (code == 0) {
-				// const items = JSON.parse(localStorage.getItem("itemList"));
-				// // Clearing item from localstorage
-				// for (let item of items) {
-				// 	if (item.id == randomId) {
-				// 		items.splice(items.indexOf(item), 1);
-				// 		break;
-				// 	}
-				// }
-				// localStorage.setItem("itemList", JSON.stringify(items));
-
 				// If extration is done
 				if (type === "extract") {
 					console.log(
@@ -1068,6 +990,10 @@ function download(
 					);
 				}
 			}
+			if (quit) {
+				console.log("Quitting app")
+				quitApp()
+			}
 		})
 		.once("error", (error) => {
 			currentDownloads--;
@@ -1077,6 +1003,10 @@ function download(
 			getId(randomId + "prog").title = error.message;
 			console.log(error.message);
 		});
+}
+
+function quitApp(){
+	ipcRenderer.send("quit","quit")
 }
 
 // Removing item

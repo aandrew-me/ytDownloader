@@ -443,6 +443,17 @@ button {
 #advanced {
 	display: none;
 }
+.advancedItem{
+	border: 1.5px solid gray;
+	border-radius: 10px;
+	padding:20px;
+	margin: 10px;
+}
+
+#subHeader{
+	font-weight: bold;
+	margin-top: 0;
+}
 
 /* Scrollbar */
 

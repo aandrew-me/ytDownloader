@@ -247,6 +247,10 @@ ipcMain.on("select-config", () => {
 	}
 });
 
+ipcMain.on("quit", ()=>{
+	app.quit()
+})
+
 // Auto update
 let autoUpdate = false;
 

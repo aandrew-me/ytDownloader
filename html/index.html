@@ -107,26 +107,39 @@
             </div>
         </div>
         <div id="advanced">
-            <p id="rangeText" title="DASH Webm not supported">Download particular time-range</p>
-            <label id="start">Start</label>
-            <input type="text" id="startTime" class="time" placeholder="00:00"
-                title="If kept empty, it will start from the beginning">
-            :
-            <input type="text" id="endTime" class="time" placeholder="10:00"
-                title="If kept empty, it will be downloaded to the end">
-            <label id="end">End</label>
+            <div class="advancedItem">
+                <span id="quitTxt">Close app when download finishes</span>
+                <input type="checkbox" id="quitChecked" class="cb">
+            </div>
 
-            <br><br>
+            <div class="advancedItem">
+                <strong id="rangeText" title="DASH Webm not supported">Download particular time-range</strong>
+                <br><br>
+                <label id="start">Start</label>
+                <input type="text" id="startTime" class="time" placeholder="00:00"
+                    title="If kept empty, it will start from the beginning">
+                :
+                <input type="text" id="endTime" class="time" placeholder="10:00"
+                    title="If kept empty, it will be downloaded to the end">
+                <label id="end">End</label>
+            </div>
 
-            <div><span id="clText">Current download location - </span><span id="path"></span></div>
 
-            <br><br>
-            <button id="selectLocation" class="submitBtn">Select Download Location</button>
+            <div class="advancedItem">
+                <div><span id="clText">Current download location - </span><span id="path"></span></div>
+                <br>
+                <button id="selectLocation" class="submitBtn">Select Download Location</button>
+            </div>
 
-            <br><br>
-            <h3 id="subHeader">Subtitles</h3>
-            <span id="subTxt">Download subtitles if available</span>
-            <input id="subChecked" class="cb" type="checkbox">
+            <div class="advancedItem">
+                <p id="subHeader">Subtitles</p>
+                <span id="subTxt">Download subtitles if available</span>
+                <input id="subChecked" class="cb" type="checkbox">
+            </div>
+
+
+
+
         </div>
 
         <!-- Extraction options start -->
