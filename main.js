@@ -200,6 +200,10 @@ ipcMain.on("load-win", (event, file) => {
 	win.loadFile(file);
 });
 ipcMain.on("load-page", (event, file) => {
+	let isTransparent = false;
+	if (process.platform == "linux") {
+		isTransparent = true;
+	}
 	secondaryWindow = new BrowserWindow({
 		webPreferences: {
 			nodeIntegration: true,
@@ -208,7 +212,7 @@ ipcMain.on("load-page", (event, file) => {
 		parent: win,
 		modal: true,
 		show: false,
-		transparent: true
+		transparent: isTransparent
 	});
 	secondaryWindow.loadFile(file);
 	secondaryWindow.setMenu(null);
