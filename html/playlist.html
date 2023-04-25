@@ -34,7 +34,8 @@
         #advancedMenu {
             display: none;
         }
-        #typeSelectBox{
+
+        #typeSelectBox {
             display: none;
         }
     </style>
@@ -118,10 +119,18 @@
 
         <!-- Hidden -->
         <div id="advancedMenu">
-            <span id="rangeTxt">Playlist range</span>
-            <input type="number" id="playlistIndex" class="input" placeholder="Start">:
-            <input type="number" id="playlistEnd" class="input" placeholder="End">
-            <br><br>
+            <div class="advancedItem">
+                <span id="rangeTxt">Playlist range</span>
+                <input type="number" id="playlistIndex" class="input" placeholder="Start">:
+                <input type="number" id="playlistEnd" class="input" placeholder="End">
+                <br><br>
+            </div>
+
+            <div class="advancedItem">
+                <div><span id="clText">Current download location - </span><span id="path"></span></div>
+                <br>
+                <button id="selectLocation" class="submitBtn">Select Download Location</button>
+            </div>
 
             <button class="submitBtn" id="downloadThumbnails">Download thumbnails</button>
             <button class="submitBtn" id="saveLinks">Save video links</button>

@@ -220,7 +220,7 @@ function defaultVideoToggle() {
 
 function pasteUrl() {
 	defaultVideoToggle();
-	getId("hidden").style.display = "none";
+	hideHidden()
 	getId("loadingWrapper").style.display = "flex";
 	getId("incorrectMsg").textContent = "";
 	const url = clipboard.readText();
@@ -229,14 +229,14 @@ function pasteUrl() {
 
 function pasteFromTray(url) {
 	defaultVideoToggle();
-	getId("hidden").style.display = "none";
+	hideHidden()
 	getId("loadingWrapper").style.display = "flex";
 	getId("incorrectMsg").textContent = "";
 	getInfo(url);
 }
 
 getId("closeHidden").addEventListener("click", () => {
-	getId("hidden").style.display = "none";
+	hideHidden()
 	getId("loadingWrapper").style.display = "none";
 });
 
@@ -342,7 +342,10 @@ async function getInfo(url) {
 			});
 
 			getId("loadingWrapper").style.display = "none";
+
 			getId("hidden").style.display = "inline-block";
+			getId("hidden").classList.add("scaleUp")
+
 			getId("title").innerHTML =
 				`<b>${i18n.__("Title ")}</b>: ` +
 				`<input class="title" id="titleName" type="text" value="${title}" onchange="renameTitle()">`;
@@ -512,7 +515,7 @@ async function getInfo(url) {
 // Video download event
 getId("videoDownload").addEventListener("click", (event) => {
 	checkMaxDownloads();
-	getId("hidden").style.display = "none";
+	hideHidden()
 	console.log(`Current:${currentDownloads} Max:${maxActiveDownloads}`);
 
 	if (currentDownloads < maxActiveDownloads) {
@@ -569,7 +572,7 @@ getId("videoDownload").addEventListener("click", (event) => {
 // Audio download event
 getId("audioDownload").addEventListener("click", (event) => {
 	checkMaxDownloads();
-	getId("hidden").style.display = "none";
+	hideHidden()
 	console.log(`Current:${currentDownloads} Max:${maxActiveDownloads}`);
 
 	if (currentDownloads < maxActiveDownloads) {
@@ -625,7 +628,7 @@ getId("audioDownload").addEventListener("click", (event) => {
 
 getId("extractBtn").addEventListener("click", () => {
 	checkMaxDownloads();
-	getId("hidden").style.display = "none";
+	hideHidden()
 
 	console.log(`Current:${currentDownloads} Max:${maxActiveDownloads}`);
 
@@ -898,11 +901,11 @@ function download(
 		} else {
 			extractExt = extractFormat || getId("extractSelection").value;
 		}
-		extractFormat1 = extractFormat || getId("extractSelection").value
-		extractQuality1 = extractQuality || getId("extractQualitySelect").value
+		extractFormat1 = extractFormat || getId("extractSelection").value;
+		extractQuality1 = extractQuality || getId("extractQualitySelect").value;
 
-		console.log(extractFormat1)
-		console.log(extractQuality1)
+		console.log(extractFormat1);
+		console.log(extractQuality1);
 
 		downloadProcess = ytdlp.exec(
 			[
@@ -1091,6 +1094,15 @@ function closeMenu() {
 	}, 50);
 }
 
+function hideHidden(){
+	getId("hidden").classList.remove("scaleUp")
+	getId("hidden").classList.add("scale");
+	setTimeout(() => {
+		getId("hidden").style.display = "none";
+		getId("hidden").classList.remove("scale");
+	}, 400);
+}
+
 // Menu
 
 getId("preferenceWin").addEventListener("click", () => {
@@ -1123,6 +1135,6 @@ getId("selectLocation").addEventListener("click", () => {
 
 ipcRenderer.on("downloadPath", (event, downloadPath) => {
 	console.log(downloadPath);
-	getId("path").textContent = downloadPath;
+	getId("path").textContent = downloadPath[0];
 	downloadDir = downloadPath[0];
 });

@@ -7,7 +7,8 @@ const { execSync } = require("child_process");
 let url;
 const ytDlp = localStorage.getItem("ytdlp");
 const ytdlp = new YTDlpWrap(ytDlp);
-const downloadDir = localStorage.getItem("downloadPath");
+let downloadDir = localStorage.getItem("downloadPath");
+getId("path").textContent = downloadDir;
 const i18n = new (require("../translations/i18n"))();
 let cookieArg = "";
 let browser = "";
@@ -452,6 +453,17 @@ getId("downloadThumbnails").addEventListener("click", () => {
 // Saving video links to a text file
 getId("saveLinks").addEventListener("click", () => {
 	saveLinks();
+});
+
+// Selecting download directory
+getId("selectLocation").addEventListener("click", () => {
+	ipcRenderer.send("select-location", "");
+});
+
+ipcRenderer.on("downloadPath", (event, downloadPath) => {
+	console.log(downloadPath);
+	getId("path").textContent = downloadPath[0];
+	downloadDir = downloadPath[0];
 });
 
 function openFolder(location) {
