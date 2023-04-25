@@ -97,5 +97,6 @@
 	"Worst": "Pire",
 	"Select Quality": "Sélectionner la qualité",
 	"Disable auto updates": "Désactiver les mises à jour automatiques",
-	"ultralow": "extrêmement bas"
+	"ultralow": "extrêmement bas",
+	"Close app when download finishes": "Fermer l'application à la fin du téléchargement"
 }
