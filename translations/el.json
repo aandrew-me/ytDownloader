@@ -97,5 +97,6 @@
 	"Worst": "Χειρότερο",
 	"Select Quality": "Επιλογή Ποιότητας",
 	"Disable auto updates": "Απενεργοποίηση αυτόματων ενημερώσεων",
-	"ultralow": "υπερβολικά χαμηλό"
+	"ultralow": "υπερβολικά χαμηλό",
+	"Close app when download finishes": "Κλείσιμο εφαρμογής όταν ολοκληρωθεί η λήψη"
 }
