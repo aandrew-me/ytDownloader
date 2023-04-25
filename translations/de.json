@@ -97,5 +97,6 @@
 	"Worst": "Schlechteste",
 	"Select Quality": "Qualität auswählen",
 	"Disable auto updates": "Automatische Updates deaktivieren",
-	"ultralow": "Sehr niedrig"
+	"ultralow": "Sehr niedrig",
+	"Close app when download finishes": "App schließen, wenn der Download beendet ist"
 }
