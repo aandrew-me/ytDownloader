@@ -97,5 +97,6 @@
 	"Worst": "Huonoin",
 	"Select Quality": "Valitse Laatu",
 	"Disable auto updates": "Poista automaattiset päivitykset käytöstä",
-	"ultralow": "erittäin matala"
+	"ultralow": "erittäin matala",
+	"Close app when download finishes": "Sulje sovellus latauksen valmistuttua"
 }

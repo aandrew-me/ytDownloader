@@ -97,5 +97,6 @@
 	"Worst": "En kötü",
 	"Select Quality": "Kalite Seç",
 	"Disable auto updates": "Otomatik güncellemeleri devre dışı bırak",
-	"ultralow": "Çok düşük"
+	"ultralow": "Çok düşük",
+	"Close app when download finishes": "İndirme bittiğinde uygulamayı kapat"
 }

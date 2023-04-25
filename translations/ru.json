@@ -97,5 +97,6 @@
 	"Worst": "Худшее",
 	"Select Quality": "Выберите Качество",
 	"Disable auto updates": "Отключить автообновления",
-	"ultralow": "сверхнизкий"
+	"ultralow": "сверхнизкий",
+	"Close app when download finishes": "Закройте приложение по завершении скачивания"
 }

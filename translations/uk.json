@@ -97,5 +97,6 @@
 	"Worst": "Найгірші",
 	"Select Quality": "Виберіть якість",
 	"Disable auto updates": "Вимкнути автоматичне оновлення",
-	"ultralow": "ультранизький"
+	"ultralow": "ультранизький",
+	"Close app when download finishes": "Закрити програму після завершення завантаження"
 }
