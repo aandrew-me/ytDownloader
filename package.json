@@ -31,7 +31,7 @@
 	"license": "GPL-3.0",
 	"description": "Download videos and audios from YouTube and many other sites",
 	"devDependencies": {
-		"electron": "^24.1.2",
+		"electron": "^22.0.3",
 		"electron-builder": "^23.6.0"
 	},
 	"build": {
