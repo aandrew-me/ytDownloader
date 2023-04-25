@@ -8,7 +8,9 @@
   <url type="donation">https://www.buymeacoffee.com/aandrew</url>
   <summary>Download videos and audios from hundreds of sites</summary>
   <description>
-    <p>ytDownloader lets you download videos and audios of different qualities from hundreds of sites including the popular ones but not limited to Youtube,  Facebook, Instagram, Tiktok, Twitter, Twitch and so on.</p>
+    <p>ytDownloader lets you download videos and audios of different qualities from hundreds of
+      sites including the popular ones but not limited to Youtube, Facebook, Instagram, Tiktok,
+      Twitter, Twitch and so on.</p>
     <p>✅ Supports Light/Dark/Transparent mode</p>
     <p>✅ Supports high quality video resolutions</p>
     <p>✅ Supports audio extraction in multiple formats</p>
@@ -22,58 +24,61 @@
   <metadata_license>CC0-1.0</metadata_license>
   <screenshots>
     <screenshot type="default">
-      <image>https://user-images.githubusercontent.com/66430340/196022794-885e5b90-40d2-4b58-a8fa-74f10c6e470e.png</image>
+      <image>
+        https://user-images.githubusercontent.com/66430340/196022794-885e5b90-40d2-4b58-a8fa-74f10c6e470e.png</image>
     </screenshot>
     <screenshot>
-      <image>https://user-images.githubusercontent.com/66430340/196022796-1215038d-bafb-4450-82b1-7baddd60c0e8.png</image>
+      <image>
+        https://user-images.githubusercontent.com/66430340/196022796-1215038d-bafb-4450-82b1-7baddd60c0e8.png</image>
     </screenshot>
   </screenshots>
   <url type="homepage">https://github.com/aandrew-me/ytDownloader</url>
-  
-  <content_rating type="oars-1.1"/>
- 
- <releases>
-  <release version="3.12.2" date="2023-4-8"/>
-  <release version="3.12.1" date="2023-3-24"/>
-  <release version="3.12.0" date="2023-2-26"/>
-  <release version="3.11.0" date="2023-1-30"/>
-  <release version="3.10.6" date="2023-1-24"/>
-  <release version="3.10.5" date="2023-1-22"/>
-  <release version="3.10.4" date="2023-1-19"/>
-  <release version="3.10.3" date="2023-1-16"/>
-  <release version="3.10.2" date="2023-1-3"/>
-  <release version="3.10.1" date="2022-12-26"/>
-  <release version="3.10.0" date="2022-12-24"/>
-  <release version="3.9.0" date="2022-11-27"/>
-  <release version="3.8.1" date="2022-11-20"/>
-  <release version="3.8.0" date="2022-11-12"/>
-  <release version="3.7.2" date="2022-11-10"/>
-  <release version="3.7.1" date="2022-11-1"/>
-  <release version="3.7.0" date="2022-11-1"/>
-  <release version="3.6.3" date="2022-10-27"/>
-  <release version="3.6.2" date="2022-10-13"/>
-  <release version="3.6.1" date="2022-10-03"/>
-  <release version="3.6.0" date="2022-10-03"/>
-  <release version="3.5.3" date="2022-09-23"/>
-  <release version="3.5.2" date="2022-09-22"/>
-  <release version="3.5.1" date="2022-09-18"/>
-  <release version="3.5.0" date="2022-09-18"/>
-  <release version="3.4.0" date="2022-09-14"/>
-  <release version="3.3.3" date="2022-09-14"/>
-  <release version="3.3.2" date="2022-09-13"/>
-  <release version="3.3.1" date="2022-09-10"/>
-  <release version="3.3.0" date="2022-09-8"/>
-  <release version="3.2.2" date="2022-09-7"/>
-  <release version="3.2.1" date="2022-09-6"/>
-  <release version="3.2.0" date="2022-09-5"/>
-  <release version="3.1.0" date="2022-08-31"/>
-  <release version="3.0.0" date="2022-08-29"/>
-  <release version="2.1.2" date="2022-08-28"/>
-  <release version="2.1.1" date="2022-08-27"/>
-  <release version="2.1.0" date="2022-08-27"/>
-  <release version="2.0.4" date="2022-08-26"/>
-  <release version="2.0.3" date="2022-08-23"/>
-  <release version="2.0.1" date="2022-08-10"/>
-  <release version="2.0" date="2022-08-05"/>
- </releases>
-  </component>
+
+  <content_rating type="oars-1.1" />
+
+  <releases>
+    <release version="3.13.0" date="2023-4-25" />
+    <release version="3.12.2" date="2023-4-8" />
+    <release version="3.12.1" date="2023-3-24" />
+    <release version="3.12.0" date="2023-2-26" />
+    <release version="3.11.0" date="2023-1-30" />
+    <release version="3.10.6" date="2023-1-24" />
+    <release version="3.10.5" date="2023-1-22" />
+    <release version="3.10.4" date="2023-1-19" />
+    <release version="3.10.3" date="2023-1-16" />
+    <release version="3.10.2" date="2023-1-3" />
+    <release version="3.10.1" date="2022-12-26" />
+    <release version="3.10.0" date="2022-12-24" />
+    <release version="3.9.0" date="2022-11-27" />
+    <release version="3.8.1" date="2022-11-20" />
+    <release version="3.8.0" date="2022-11-12" />
+    <release version="3.7.2" date="2022-11-10" />
+    <release version="3.7.1" date="2022-11-1" />
+    <release version="3.7.0" date="2022-11-1" />
+    <release version="3.6.3" date="2022-10-27" />
+    <release version="3.6.2" date="2022-10-13" />
+    <release version="3.6.1" date="2022-10-03" />
+    <release version="3.6.0" date="2022-10-03" />
+    <release version="3.5.3" date="2022-09-23" />
+    <release version="3.5.2" date="2022-09-22" />
+    <release version="3.5.1" date="2022-09-18" />
+    <release version="3.5.0" date="2022-09-18" />
+    <release version="3.4.0" date="2022-09-14" />
+    <release version="3.3.3" date="2022-09-14" />
+    <release version="3.3.2" date="2022-09-13" />
+    <release version="3.3.1" date="2022-09-10" />
+    <release version="3.3.0" date="2022-09-8" />
+    <release version="3.2.2" date="2022-09-7" />
+    <release version="3.2.1" date="2022-09-6" />
+    <release version="3.2.0" date="2022-09-5" />
+    <release version="3.1.0" date="2022-08-31" />
+    <release version="3.0.0" date="2022-08-29" />
+    <release version="2.1.2" date="2022-08-28" />
+    <release version="2.1.1" date="2022-08-27" />
+    <release version="2.1.0" date="2022-08-27" />
+    <release version="2.0.4" date="2022-08-26" />
+    <release version="2.0.3" date="2022-08-23" />
+    <release version="2.0.1" date="2022-08-10" />
+    <release version="2.0" date="2022-08-05" />
+  </releases>
+</component>

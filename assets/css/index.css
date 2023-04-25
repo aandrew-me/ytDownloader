@@ -220,9 +220,14 @@ body {
 
 #options {
 	display: none;
-	position: relative;
-	top: 20px;
+	position: absolute;
+	z-index: 1;
+	left: 0;
+	right: 0;
+	margin: auto;
+	top: 20%;
 	background-color: var(--box-main);
+	width: 80%;
 	border-radius: 10px;
 	padding: 10px;
 	color: var(--text);
