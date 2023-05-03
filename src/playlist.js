@@ -117,10 +117,12 @@ function download(type) {
 			format = "";
 		} else {
 			if (videoType === "mp4"){
-				format = `-f "${formatId}+m4a/mp4[height=${quality}]+m4a/bv*[height<=${quality}]+ba/best"`;
+				format = `-f "${formatId}+m4a/mp4[height=${quality}]+m4a/bv*[height<=${quality}]+ba/best[height<=${quality}]"`;
 			}
-			else{
-				format = `-f "webm[height<=${quality}]+opus/bv*[height<=${quality}]+ba/${formatId}+m4a/mp4[height=${quality}]+m4a/best"`;
+			else if (videoType === "webm"){
+				format = `-f "webm[height<=${quality}]+opus/bv*[height<=${quality}]+ba/${formatId}+m4a/mp4[height=${quality}]+m4a/best[height<=${quality}]"`;
+			} else {
+				format = `-f "bv*[height=${quality}]+ba/best[height=${quality}]/best[height<=${quality}]"`
 			}
 		}
 	} else {
