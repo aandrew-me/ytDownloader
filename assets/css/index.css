@@ -176,8 +176,8 @@ body {
 	right: 5px;
 	cursor: pointer;
 	cursor: pointer;
-	width: 15px;
-	height: 15px;
+	width: 20px;
+	height: 20px;
 }
 .itemType {
 	font-style: italic;
@@ -191,8 +191,8 @@ body {
 	right: 5px;
 	cursor: pointer;
 	cursor: pointer;
-	width: 15px;
-	height: 15px;
+	width: 20px;
+	height: 20px;
 }
 
 #hidden {
