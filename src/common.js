@@ -32,12 +32,6 @@ getId("menuIcon").addEventListener("click", (event) => {
 		}, 150);
 	}
 });
-
-// Toggle theme
-let circle = getId("themeToggleInside");
-let darkTheme = true;
-circle.style.left = "25px";
-
 const root = document.querySelector(":root");
 
 let enabledTransparent = localStorage.getItem("enabledTransparent");
@@ -48,45 +42,18 @@ if (enabledTransparent == "true") {
 	bgColor = "rgb(40,40,40)";
 }
 
-function toggle() {
-	if (darkTheme == false) {
-		// Switching to dark theme
-		circle.style.left = "25px";
 
-		root.style.setProperty("--background", bgColor);
-		root.style.setProperty("--text", "white");
-		root.style.setProperty("--box-main", "rgb(80,80,80)");
-		root.style.setProperty("--box-toggle", "rgb(70,70,70)");
-		root.style.setProperty("--theme-toggle", "rgb(80, 193, 238)");
-		root.style.setProperty("--item-bg", "rgb(75, 75, 75)");
-
-		darkTheme = true;
-		localStorage.setItem("theme", "dark");
-	} else {
-		// Switching to light theme
-		circle.style.left = "0px";
-
-		root.style.setProperty("--background", "white");
-		root.style.setProperty("--text", "rgb(45, 45, 45)");
-		root.style.setProperty("--box-main", "#eef4f3");
-		root.style.setProperty("--box-toggle", "rgb(215 238 233)");
-		root.style.setProperty("--theme-toggle", "rgb(147, 174, 185)");
-		root.style.setProperty("--item-bg", "#dddddd");
-
-		darkTheme = false;
-		localStorage.setItem("theme", "light");
-	}
-}
+getId("themeToggle").addEventListener("change", ()=>{
+	document.documentElement.setAttribute("theme", getId("themeToggle").value)
+	localStorage.setItem("theme", getId("themeToggle").value)
+})
 
 const storageTheme = localStorage.getItem("theme");
-
-if (storageTheme == "dark") {
-	darkTheme = false;
-	toggle();
-} else if (storageTheme == "light") {
-	darkTheme = true;
-	toggle();
+if (storageTheme){
+	document.documentElement.setAttribute("theme", storageTheme)
+	getId("themeToggle").value = storageTheme
 }
+
 ////
 let advancedHidden = true;
 

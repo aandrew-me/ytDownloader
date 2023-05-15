@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" theme="dark">
 
 <head>
     <header></header>
@@ -39,10 +39,6 @@
 <span id="popupText">Text copied</span>
 
 <body>
-    <!-- Theme toggle -->
-    <div id="themeToggle" onclick="toggle()">
-        <div id="themeToggleInside"></div>
-    </div>
 
     <!-- Menu icon -->
     <img src="../assets/images/menu.png" alt="menu" id="menuIcon">
@@ -53,6 +49,14 @@
         <!-- <a id="newPlaylistWin" class="menuItem">New Playlist</a> -->
         <a id="preferenceWin" class="menuItem">Preferences</a>
         <a id="aboutWin" class="menuItem">About</a>
+        <span class="menuItem">Theme:</span>
+        <select name="themeToggle" id="themeToggle">
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+            <option value="frappe">Frappé</option>
+            <option value="onedark">One dark</option>
+            <option value="matrix">Matrix</option>
+        </select>
     </div>
 
     <button id="pasteUrl" class="submitBtn">Click to paste video URL or ID [Ctrl + V]</button>
@@ -87,7 +91,7 @@
 
         <div id="videoList">
             <label class="formatSelect">Select Format </label>
-            <select id="videoFormatSelect">
+            <select id="videoFormatSelect" class="select">
             </select>
             <br>
             <input type="hidden" name="url" class="url" id="url">
@@ -98,7 +102,7 @@
         <div id="audioList">
             <div id="audioPresent">
                 <label class="formatSelect">Select Format </label>
-                <select id="audioFormatSelect">
+                <select id="audioFormatSelect" class="select">
                 </select>
                 <br>
                 <input type="hidden" name="url" class="url">
@@ -137,16 +141,13 @@
                 <input id="subChecked" class="cb" type="checkbox">
             </div>
 
-
-
-
         </div>
 
         <!-- Extraction options start -->
         <div id="audioExtract">
             <h2 id="extractHeader">Extract Audio</h2>
             <label class="formatSelect">Select Format </label>
-            <select id="extractSelection">
+            <select id="extractSelection" class="select">
                 <option value="mp3">Mp3</option>
                 <option value="aac">Aac</option>
                 <option value="m4a">M4a</option>
@@ -157,7 +158,7 @@
                 <option value="vorbis">Vorbis (ogg)</option>
             </select>
             <label class="extractQualitySelect" id="extractQualitySelectTxt">Select Quality</label>
-            <select id="extractQualitySelect">
+            <select id="extractQualitySelect" class="select">
                 <option id="extractQualityNormal" value="5">Normal</option>
                 <option id="extractQualityBest" value="0">Best</option>
                 <option id="extractQualityGood" value="2">Good</option>

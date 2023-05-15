@@ -1,6 +1,86 @@
+:root[theme="light"] {
+	--background: #fff;
+	--text: rgb(45, 45, 45);
+	--box-main: #eef4f3;
+	--box-toggle: rgb(215 238 233);
+	--box-toggleOn: rgb(28 232 138);
+	--item-bg: #dddddd;
+	--box-shadow: none;
+	--select: rgb(127, 253, 127);
+	--greenBtn: #6ade1d;
+	--greenBtn-bottom: #54a31f;
+	--redBtn: #d64d4f;
+	--redBtn-bottom: #854243;
+	--blueBtn: rgb(80, 128, 230);
+	--blueBtn-bottom: rgb(44, 78, 180);
+}
+
+:root[theme="dark"] {
+	--background: rgb(40, 40, 40);
+	--text: white;
+	--box-main: rgb(80, 80, 80);
+	--box-toggle: rgb(70, 70, 70);
+	--box-toggleOn: rgb(28 232 138);
+	--item-bg: rgb(75, 75, 75);
+	--box-shadow: none;
+	--select: rgb(127, 253, 127);
+	--greenBtn: #6acd29;
+	--greenBtn-bottom: #4c8824;
+	--redBtn: #d64d4f;
+	--redBtn-bottom: #854243;
+	--blueBtn: rgb(80, 128, 230);
+	--blueBtn-bottom: rgb(44, 78, 180);
+}
+
+:root[theme="frappe"] {
+	--background: #232634;
+	--text: #c6d0f5;
+	--box-main: #303446;
+	--box-toggle: #414559;
+	--box-toggleOn: #607dc1;
+	--item-bg: #414559;
+	--select: #8caaee;
+	--greenBtn: #78c346;
+	--greenBtn-bottom: #597844;
+	--redBtn: #d64d4f;
+	--redBtn-bottom: #854243;
+	--blueBtn: rgb(80, 128, 230);
+	--blueBtn-bottom: rgb(44, 78, 180);
+}
+:root[theme="onedark"] {
+	--background: #282C34	;
+	--text: #d2d6df;
+	--box-main: #4D515D;
+	--box-toggle: #2F333D;
+	--box-toggleOn: #13a3b7;
+	--item-bg: #4D515D;
+	--select: #57b6c2;
+	--greenBtn: #85cf50;
+	--greenBtn-bottom: #406923;
+	--redBtn: #be2d39;
+	--redBtn-bottom: #791a22;
+	--blueBtn: rgb(80, 128, 230);
+	--blueBtn-bottom: rgb(44, 78, 180);
+}
+:root[theme="matrix"] {
+	--background: #0D0208;
+	--text: #00FF41;
+	--box-main: #0c2216;
+	--box-toggle: #214338;
+	--box-toggleOn: #24782e;
+	--item-bg: #214338;
+	--select: #00FF41;
+	--greenBtn: #19b42b;
+	--greenBtn-bottom: #10701c;
+	--redBtn: #19b42b;
+	--redBtn-bottom: #10701c;
+	--blueBtn: #19b42b;
+	--blueBtn-bottom: #10701c;
+}
+
 body {
-	background-color: rgba(33, 33, 39, 0.95);
-	color: whitesmoke;
+	background-color: var(--background);
+	color: var(--text);
 	padding: 20px;
 	font-size: x-large;
 	text-align: left;
@@ -40,7 +120,7 @@ input[type="text"],
 	margin: 0 15px;
 	padding: 20px 15px;
 	border-radius: 15px;
-	background-color: rgb(61, 62, 63);
+	background-color: var(--box-main);
 }
 
 .prefBox {
@@ -90,16 +170,16 @@ input[type="text"],
 	cursor: pointer;
 }
 #back {
-	background-color: rgb(51, 177, 219);
+	background-color: var(--blueBtn);
 	color: white;
 }
 
 #restart {
-	background-color: rgb(210 69 27);
+	background-color: var(--redBtn);
 	color: white;
 }
 .redBtn {
-	background-color: rgb(210 69 27);
+	background-color: var(--redBtn);
 	color: white;
 	text-decoration: none;
 	border: none;
@@ -109,7 +189,7 @@ input[type="text"],
 	font-size: medium;
 }
 a {
-	color: rgb(34, 136, 199);
+	color: rgb(29, 140, 209);
 	cursor: pointer;
 }
 
@@ -125,8 +205,8 @@ input[type="checkbox"] {
 	border-radius: 10px;
 	font-size: large;
 	color: white;
-	background-color: rgb(35, 190, 35);
-	border-bottom: 4px solid rgb(30, 139, 30);
+	background-color: var(--greenBtn);
+	border-bottom: 4px solid var(--greenBtn-bottom);
 	cursor: pointer;
 	position: relative;
 	outline: none;
@@ -138,7 +218,7 @@ input[type="checkbox"] {
 }
 select {
 	padding: 15px;
-	background-color: rgb(88, 232, 88);
+	background-color: var(--select);
 	border: none;
 	border-radius: 8px;
 	cursor: pointer;

@@ -24,16 +24,10 @@ let trayEnabled = false;
 app.commandLine.appendSwitch("--enable-features", "Metal");
 
 function createWindow() {
-	let isTransparent = false;
-	if (process.platform == "linux") {
-		isTransparent = true;
-	}
-
 	win = new BrowserWindow({
 		show: false,
 		icon: __dirname + "/assets/images/icon.png",
 		spellcheck: false,
-		transparent: isTransparent,
 		webPreferences: {
 			nodeIntegration: true,
 			contextIsolation: false,
@@ -200,10 +194,6 @@ ipcMain.on("load-win", (event, file) => {
 	win.loadFile(file);
 });
 ipcMain.on("load-page", (event, file) => {
-	let isTransparent = false;
-	if (process.platform == "linux") {
-		isTransparent = true;
-	}
 	secondaryWindow = new BrowserWindow({
 		webPreferences: {
 			nodeIntegration: true,
@@ -212,7 +202,6 @@ ipcMain.on("load-page", (event, file) => {
 		parent: win,
 		modal: true,
 		show: false,
-		transparent: isTransparent
 	});
 	secondaryWindow.loadFile(file);
 	secondaryWindow.setMenu(null);

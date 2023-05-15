@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" theme="dark">
 
 <head>
     <meta charset="UTF-8">
@@ -44,10 +44,6 @@
 <body>
     <!-- Popup message -->
     <span id="popupText">Text copied</span>
-    <!-- Theme toggle -->
-    <div id="themeToggle" onclick="toggle()">
-        <div id="themeToggleInside"></div>
-    </div>
 
     <!-- Menu icon -->
     <img src="../assets/images/menu.png" alt="menu" id="menuIcon">
@@ -57,6 +53,12 @@
         <a id="homeWin" class="menuItem">Homepage</a>
         <a id="preferenceWin" class="menuItem">Preferences</a>
         <a id="aboutWin" class="menuItem">About</a>
+        <span class="menuItem">Theme:</span>
+        <select name="themeToggle" id="themeToggle">
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+            <option value="frappe">Frappé</option>
+        </select>
     </div>
 
     <button class="submitBtn" id="pasteLink">Click to paste playlist link from clipboard [Ctrl + V]</button>
@@ -72,7 +74,7 @@
         <br><br>
         <div id="videoBox">
             <label id="videoFormat">Select Video Format </label>
-            <select id="select">
+            <select id="select" class="select">
                 <option value="best" id="bestVideoOption">Best</option>
                 <option value="worst" id="worstVideoOption">Worst</option>
                 <option value="useConfig" id="useConfigTxt">Use config file</option>

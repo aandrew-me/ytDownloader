@@ -1,3 +1,8 @@
+const storageTheme = localStorage.getItem("theme");
+if (storageTheme){
+	document.documentElement.setAttribute("theme", storageTheme)
+}
+
 let rightToLeft = false;
 if (localStorage.getItem("rightToLeft")) {
 	rightToLeft = localStorage.getItem("rightToLeft");
@@ -35,19 +40,6 @@ ipcRenderer.on("downloadPath", (event, downloadPath) => {
 	getId("path").textContent = downloadPath[0];
 });
 
-const enabledTransparent = getId("enableTransparent");
-enabledTransparent.addEventListener("change", (event) => {
-	if (enabledTransparent.checked) {
-		localStorage.setItem("enabledTransparent", "true");
-	} else {
-		localStorage.setItem("enabledTransparent", "false");
-	}
-});
-
-const localEnabledTransparent = localStorage.getItem("enabledTransparent");
-if (localEnabledTransparent == "true") {
-	enabledTransparent.checked = true;
-}
 
 // Selecting config directory
 

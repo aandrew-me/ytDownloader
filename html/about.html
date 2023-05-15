@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" theme="dark">
 
 <head>
     <meta charset="UTF-8">
@@ -18,7 +18,8 @@
     </div>
     <h1>ytDownloader </h1><span id="version"></span>
 
-    <p id="txt1">ytDownloader lets you download videos and audios from hundreds of sites like Youtube, Facebook, Instagram, Tiktok, Twitter and so on</p>
+    <p id="txt1">ytDownloader lets you download videos and audios from hundreds of sites like Youtube, Facebook,
+        Instagram, Tiktok, Twitter and so on</p>
 
     <p id="txt2">It's a Free and Open Source app built on top of Node.js and Electron. yt-dlp has been used for
         downloading</p>
@@ -30,6 +31,10 @@
 
         const { ipcRenderer, shell } = require("electron")
 
+        const storageTheme = localStorage.getItem("theme");
+        if (storageTheme) {
+            document.documentElement.setAttribute("theme", storageTheme)
+        }
         ipcRenderer.send("get-version")
         ipcRenderer.once("version", (event, version) => {
             document.getElementById("version").textContent = version;
