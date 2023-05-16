@@ -34,7 +34,7 @@
 
 :root[theme="frappe"] {
 	--background: #232634;
-	--text: #c6d0f5;
+	--text: #e2e8ff;
 	--box-main: #303446;
 	--box-toggle: #414559;
 	--box-toggleOn: #607dc1;
@@ -76,6 +76,54 @@
 	--redBtn-bottom: #10701c;
 	--blueBtn: #19b42b;
 	--blueBtn-bottom: #10701c;
+}
+
+:root[theme="github"] {
+	--background: #F6F8FA;
+	--text: #292D31;
+	--box-main: #FFFFFF;
+	--box-toggle: #F3f3f3;
+	--box-toggleOn: #cce5ff;
+	--item-bg: #3A66D150;
+	--select: #cce5ff;
+	--greenBtn: #0a9431;
+	--greenBtn-bottom: #0c6826;
+	--redBtn: #d73a49;
+	--redBtn-bottom: #9b2733;
+	--blueBtn: #005CC5;
+	--blueBtn-bottom: #00428e;
+}
+
+:root[theme="latte"] {
+	--background: #dce0e8	;
+	--text: #4c4f69;
+	--box-main: #eff1f5;
+	--box-toggle: #e6e9ef;
+	--box-toggleOn: #cce5ff;
+	--item-bg: #bcc0cc;
+	--select: #cce5ff;
+	--greenBtn: #40a02b;
+	--greenBtn-bottom: #2e711f;
+	--redBtn: #d20f39;
+	--redBtn-bottom: #9c0c2b;
+	--blueBtn: #1e66f5;
+	--blueBtn-bottom: rgb(3, 49, 101);
+}
+
+:root[theme="solarized-dark"] {
+	--background: #002B36;
+	--text: #a4b1b3;
+	--box-main: #003745;
+	--box-toggle: #2E4C52;
+	--box-toggleOn: #005a6f;
+	--item-bg: #003745;
+	--select: #2aa198;
+	--greenBtn: #859900;
+	--greenBtn-bottom: rgb(73, 84, 1);
+	--redBtn: #dc322f;
+	--redBtn-bottom: #af2523;
+	--blueBtn: #268bd2;
+	--blueBtn-bottom:#2074b1;
 }
 
 body {
