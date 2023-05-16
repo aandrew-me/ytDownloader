@@ -9,6 +9,8 @@ permissions:
 jobs:
     build_and_release:
         runs-on: ${{ matrix.os }}
+        env: 
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_TOKEN }}
         strategy:
             matrix:
                 os: [macos-latest, ubuntu-latest, windows-latest]
@@ -23,13 +25,16 @@ jobs:
                   node-version: 18
             - name: Linux Build
               if: matrix.os == 'ubuntu-latest'
+
               run: |
+                sudo snap install snapcraft --classic
                 wget "https://github.com/yt-dlp/FFmpeg-Builds/releases/latest/download/ffmpeg-n6.0-latest-linux64-gpl-6.0.tar.xz"
                 tar xvf ffmpeg-n6.0-latest-linux64-gpl-6.0.tar.xz
                 cp ffmpeg-n6.0-latest-linux64-gpl-6.0/bin/ffmpeg ffmpeg
                 chmod +x ffmpeg
                 rm -rf ffmpeg-n6.0-latest-linux64-gpl-6.0
                 rm ffmpeg-n6.0-latest-linux64-gpl-6.0.tar.xz
+                electron-builder -l --publish=always
             
             - name: Macos Build
               if: matrix.os == 'macos-latest'
@@ -40,23 +45,17 @@ jobs:
                 chmod +x ffmpeg
                 rm -rf ffmpeg-n6.0-latest-linux64-gpl-6.0
                 rm ffmpeg-n6.0-latest-linux64-gpl-6.0.tar.xz
+                electron-builder -m --publish=always
             
             - name: Windows Build
               if: matrix.os == 'windows-latest'
               run: |
                 curl -LOk "https://github.com/yt-dlp/FFmpeg-Builds/releases/download/latest/ffmpeg-n6.0-latest-win64-gpl-6.0.zip"
                 Expand-Archive ffmpeg-n6.0-latest-win64-gpl-6.0.zip
-                Copy-Item ffmpeg-n6.0-latest-win64-gpl-6.0/bin/ffmpeg.exe ffmpeg.exe
-                icacls .\ffmpeg.exe /grant:r Users:F
+                Copy-Item ffmpeg-n6.0-latest-win64-gpl-6.0\bin\ffmpeg.exe ffmpeg.exe
                 Remove-Item -Recurse -Force ffmpeg-n6.0-latest-win64-gpl-6.0
                 Remove-Item -Force ffmpeg-n6.0-latest-win64-gpl-6.0.zip
-
-            - name: Build/release Electron app
-              uses: samuelmeuli/action-electron-builder@v1
-              with:
-                github_token: ${{ secrets.github_token }}
-                release: ${{ startsWith(github.ref, 'refs/tags/v') }}
-
+                npx electron-builder -w --publish=always
             # - name: Upload Artifacts
             #   id: upload-artifacts
             #   uses: softprops/action-gh-release@v1
