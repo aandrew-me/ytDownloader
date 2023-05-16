@@ -11,6 +11,7 @@ jobs:
         runs-on: ${{ matrix.os }}
         env: 
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         strategy:
             matrix:
                 os: [macos-latest, ubuntu-latest, windows-latest]
@@ -34,7 +35,7 @@ jobs:
                 chmod +x ffmpeg
                 rm -rf ffmpeg-n6.0-latest-linux64-gpl-6.0
                 rm ffmpeg-n6.0-latest-linux64-gpl-6.0.tar.xz
-                electron-builder -l --publish=always
+                npx electron-builder -l --publish=always
             
             - name: Macos Build
               if: matrix.os == 'macos-latest'
@@ -45,7 +46,7 @@ jobs:
                 chmod +x ffmpeg
                 rm -rf ffmpeg-n6.0-latest-linux64-gpl-6.0
                 rm ffmpeg-n6.0-latest-linux64-gpl-6.0.tar.xz
-                electron-builder -m --publish=always
+                npx electron-builder -m --publish=always
             
             - name: Windows Build
               if: matrix.os == 'windows-latest'
