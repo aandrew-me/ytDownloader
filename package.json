@@ -17,9 +17,9 @@
 		"publish-linux": "cp ../ffmpeg-bin/ffmpeg . && electron-builder -l --publish=always",
 		"publish-windows": "cp ../ffmpeg-bin/ffmpeg.exe . && electron-builder -w --publish=always",
 		"publish-mac": "cp ../ffmpeg-bin/mac/ffmpeg . && electron-builder -m --publish=always",
-		"gh-windows":"electron-builder -w --publish=always",
-		"gh-linux":"electron-builder -l --publish=always",
-		"gh-mac":"electron-builder -m --publish=always"
+		"gh-windows": "electron-builder -w --publish=always",
+		"gh-linux": "electron-builder -l --publish=always",
+		"gh-mac": "electron-builder -m --publish=always"
 	},
 	"author": {
 		"name": "Andrew",
@@ -56,7 +56,8 @@
 		"mac": {
 			"category": "Utility",
 			"target": [
-				"zip"
+				"zip",
+				"dmg"
 			],
 			"artifactName": "${productName}_Mac.${ext}"
 		},
@@ -84,20 +85,30 @@
 			"target": [
 				"Appimage",
 				"snap",
-				"rpm"
+				"rpm",
+				"zip"
 			],
-			"category": "Utility"
+			"category": "Utility",
+			"artifactName": "${productName}_Linux.${ext}"
 		},
 		"snap": {
 			"grade": "stable"
 		},
 		"win": {
-			"target": "nsis",
+			"target": [
+				"nsis",
+				"msi"
+			],
 			"artifactName": "${productName}_Win.${ext}"
 		},
 		"nsis": {
 			"allowToChangeInstallationDirectory": true,
 			"oneClick": false
+		},
+		"msi":{
+			"oneClick": true,
+			"createDesktopShortcut": true,
+			"createStartMenuShortcut": true
 		}
 	}
 }
