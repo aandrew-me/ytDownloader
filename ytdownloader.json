@@ -1,0 +1,18 @@
+{
+	"homepage": "https://github.com/aandrew-me/tgpt",
+	"version": "3.14.0",
+	"description": "ChatGPT in terminal without needing API keys",
+	"license": "GPL-3",
+	"url": "https://github.com/aandrew-me/ytDownloader/releases/download/v3.14.0/YTDownloader_Win.msi",
+
+	"bin": ["YTDownloader_Win.msi", ["YTDownloader_Win.msi", "ytdownloader"]],
+	"checkver": {
+		"github": "https://github.com/aandrew-me/tgpt"
+	},
+	"autoupdate": {
+		"url": "https://github.com/aandrew-me/ytDownloader/releases/download/v$version/YTDownloader_Win.msi",
+		"hash": {
+			"url": "$url.sha256"
+		}
+	}
+}

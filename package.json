@@ -108,7 +108,8 @@
 		"msi":{
 			"oneClick": true,
 			"createDesktopShortcut": true,
-			"createStartMenuShortcut": true
+			"createStartMenuShortcut": true,
+			"shortcutName":"YTDownloader"
 		}
 	}
 }

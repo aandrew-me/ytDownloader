@@ -20,8 +20,6 @@ A modern GUI video and audio downloader supporting [hundreds of sites](https://g
 
 <a href="https://github.com/aandrew-me/ytDownloader/releases/latest/download/YTDownloader_Mac.zip"><img src="https://user-images.githubusercontent.com/66430340/189808142-0a4725c6-b167-4afd-98f1-dfcb16bfbd43.png" style="width:200px;"></a>
 
- README in [other languages](READMES/list.md)
-
 ## Features 🚀
 
 ✅ Light/Dark mode
