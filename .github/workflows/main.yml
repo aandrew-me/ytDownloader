@@ -35,7 +35,9 @@ jobs:
                 chmod +x ffmpeg
                 rm -rf ffmpeg-n6.0-latest-linux64-gpl-6.0
                 rm ffmpeg-n6.0-latest-linux64-gpl-6.0.tar.xz
+                npm i
                 npx electron-builder -l --publish=always
+                npm run gh-linux
             
             - name: Macos Build
               if: matrix.os == 'macos-latest'
@@ -46,7 +48,8 @@ jobs:
                 chmod +x ffmpeg
                 rm -rf ffmpeg-n6.0-latest-linux64-gpl-6.0
                 rm ffmpeg-n6.0-latest-linux64-gpl-6.0.tar.xz
-                npx electron-builder -m --publish=always
+                npm i
+                npm run gh-mac
             
             - name: Windows Build
               if: matrix.os == 'windows-latest'
@@ -56,7 +59,8 @@ jobs:
                 Copy-Item ffmpeg-n6.0-latest-win64-gpl-6.0\bin\ffmpeg.exe ffmpeg.exe
                 Remove-Item -Recurse -Force ffmpeg-n6.0-latest-win64-gpl-6.0
                 Remove-Item -Force ffmpeg-n6.0-latest-win64-gpl-6.0.zip
-                npx electron-builder -w --publish=always
+                npm i
+                npm run gh-windows
             # - name: Upload Artifacts
             #   id: upload-artifacts
             #   uses: softprops/action-gh-release@v1
