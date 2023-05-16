@@ -52,14 +52,10 @@ jobs:
             - name: Windows Build
               if: matrix.os == 'windows-latest'
               run: |
-                Invoke-WebRequest -Uri "https://github.com/yt-dlp/FFmpeg-Builds/releases/download/latest/ffmpeg-n6.0-latest-win64-gpl-6.0.zip" -OutFile ffmpeg.zip
-                Expand-Archive -Path ".\ffmpeg.zip" -DestinationPath ".\ffmpeg"
-                pwd
-                cp "D:\a\ytDownloader\ffmpeg\bin\ffmpeg.exe" .\ffmpeg.exe
-                Remove-Item -Recurse -Force ffmpeg
-                Remove-Item -Force ffmpeg.zip
+                Invoke-WebRequest -Uri "https://github.com/aandrew-me/ffmpeg-builds/releases/download/v6/ffmpeg.exe" -OutFile ffmpeg.exe
                 npm i
                 npm run gh-windows
+
             # - name: Upload Artifacts
             #   id: upload-artifacts
             #   uses: softprops/action-gh-release@v1
@@ -76,3 +72,11 @@ jobs:
             #       draft: true
             #       tag_name: v
             #       name: tgpt
+
+#Windows
+                # Invoke-WebRequest -Uri "https://github.com/yt-dlp/FFmpeg-Builds/releases/download/latest/ffmpeg-n6.0-latest-win64-gpl-6.0.zip" -OutFile ffmpeg.zip
+                # Expand-Archive -Path ".\ffmpeg.zip" -DestinationPath ".\ffmpeg"
+                # pwd
+                # cp "D:\a\ytDownloader\ffmpeg\bin\ffmpeg.exe" .\ffmpeg.exe
+                # Remove-Item -Recurse -Force ffmpeg
+                # Remove-Item -Force ffmpeg.zip
