@@ -29,7 +29,7 @@ jobs:
 
               run: |
                 sudo snap install snapcraft --classic
-                wget "https://github.com/yt-dlp/FFmpeg-Builds/releases/latest/download/ffmpeg-n6.0-latest-linux64-gpl-6.0.tar.xz"
+                wget "https://github.com/yt-dlp/FFmpeg-Builds/releases/download/latest/ffmpeg-n6.0-latest-linux64-gpl-6.0.tar.xz"
                 tar xvf ffmpeg-n6.0-latest-linux64-gpl-6.0.tar.xz
                 cp ffmpeg-n6.0-latest-linux64-gpl-6.0/bin/ffmpeg ffmpeg
                 chmod +x ffmpeg
@@ -42,12 +42,10 @@ jobs:
             - name: Macos Build
               if: matrix.os == 'macos-latest'
               run: |
-                wget "https://github.com/yt-dlp/FFmpeg-Builds/releases/latest/download/ffmpeg-n6.0-latest-linux64-gpl-6.0.tar.xz"
-                tar xvf ffmpeg-n6.0-latest-linux64-gpl-6.0.tar.xz
-                cp ffmpeg-n6.0-latest-linux64-gpl-6.0/bin/ffmpeg ffmpeg
+                curl https://evermeet.cx/ffmpeg/ffmpeg-6.0.zip -o ffmpeg.zip
+                unzip ffmpeg.zip
                 chmod +x ffmpeg
-                rm -rf ffmpeg-n6.0-latest-linux64-gpl-6.0
-                rm ffmpeg-n6.0-latest-linux64-gpl-6.0.tar.xz
+                rm ffmpeg.zip
                 npm i
                 npm run gh-mac
             
@@ -57,8 +55,8 @@ jobs:
                 curl --version
                 Invoke-WebRequest -Uri "https://github.com/yt-dlp/FFmpeg-Builds/releases/download/latest/ffmpeg-n6.0-latest-win64-gpl-6.0.zip" -OutFile ffmpeg.zip
                 Expand-Archive ffmpeg.zip
-                Copy-Item ffmpeg-n6.0-latest-win64-gpl-6.0\bin\ffmpeg.exe ffmpeg.exe
-                Remove-Item -Recurse -Force ffmpeg-n6.0-latest-win64-gpl-6.0
+                Copy-Item ffmpeg\bin\ffmpeg.exe ffmpeg.exe
+                Remove-Item -Recurse -Force ffmpeg
                 Remove-Item -Force ffmpeg.zip
                 npm i
                 npm run gh-windows
