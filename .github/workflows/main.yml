@@ -54,7 +54,8 @@ jobs:
               run: |
                 Invoke-WebRequest -Uri "https://github.com/yt-dlp/FFmpeg-Builds/releases/download/latest/ffmpeg-n6.0-latest-win64-gpl-6.0.zip" -OutFile ffmpeg.zip
                 Expand-Archive ffmpeg.zip
-                ls
+                ls ffmpeg
+                ls ffmpeg\bin
                 Copy-Item .\ffmpeg\bin\ffmpeg.exe ffmpeg.exe
                 Remove-Item -Recurse -Force ffmpeg
                 Remove-Item -Force ffmpeg.zip
