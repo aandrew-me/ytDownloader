@@ -47,4 +47,14 @@ getId("extractQualityWorst").textContent = i18n.__("Worst")
 getId("quitTxt").textContent = i18n.__("Close app when download finishes")
 getId("clText").textContent = i18n.__("Current download location - ")
 getId("selectLocation").textContent = i18n.__("Select Download Location");
+getId("themeTxt").textContent = i18n.__("Theme");
+
+getId("lightTxt").textContent = i18n.__("Light");
+getId("darkTxt").textContent = i18n.__("Dark");
+getId("frappeTxt").textContent = i18n.__("Frappé");
+getId("onedarkTxt").textContent = i18n.__("One Dark");
+getId("matrixTxt").textContent = i18n.__("Matrix");
+getId("githubTxt").textContent = i18n.__("Github");
+getId("latteTxt").textContent = i18n.__("Latte");
+getId("solarizedDarkTxt").textContent = i18n.__("Solarized Dark");
 
