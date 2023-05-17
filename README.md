@@ -47,7 +47,7 @@ A modern GUI video and audio downloader supporting [hundreds of sites](https://g
 ## Windows 🪟
 - **Traditional way**
 
-    Download and install the exe file. Windows defender may create problems as usual.
+    Download and install the exe or msi file. Exe file lets you choose custom download location, msi file doesn't ask for location. Windows defender may show a popup saying **Windows Protected Your PC**. Just click on __More info__ and click on **Run Anyway**
 
 - **Chocolatey**
     
