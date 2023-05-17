@@ -3,17 +3,15 @@
 	"version": "3.14.0",
 	"description": "A modern GUI App for downloading Videos and Audios from hundreds of sites",
 	"license": "GPL-3",
-	"url": "https://github.com/aandrew-me/ytDownloader/releases/download/v3.14.0/YTDownloader_Win.msi",
-
-	"bin": ["YTDownloader.exe"],
+	"url": "https://github.com/aandrew-me/ytDownloader/releases/download/v3.14.0/YTDownloader_Win.zip",
 	"checkver": {
 		"github": "https://github.com/aandrew-me/ytDownloader"
 	},
-	"architecture": [
-		"x64"
-	],
+	"bin": ["YTDownloader.exe", ["YTDownloader.exe", "ytdownloader"]],
+	"shortcuts": [["YTDownloader.exe", "YTDownloader"]],
+	"architecture": ["x64"],
 	"autoupdate": {
-		"url": "https://github.com/aandrew-me/ytDownloader/releases/download/v$version/YTDownloader_Win.msi",
+		"url": "https://github.com/aandrew-me/ytDownloader/releases/download/v$version/YTDownloader_Win.zip",
 		"hash": {
 			"url": "$url.sha256"
 		}
