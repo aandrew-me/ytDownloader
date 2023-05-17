@@ -558,7 +558,7 @@ getId("preferenceWin").textContent = i18n.__("Preferences");
 getId("aboutWin").textContent = i18n.__("About");
 getId("homeWin").textContent = i18n.__("Homepage");
 getId("linkTitle").textContent = i18n.__("Link:");
-getId("videoFormat").textContent = i18n.__("Select Video Format ");
+getId("videoFormat").textContent = i18n.__("Select Quality");
 getId("audioFormat").textContent = i18n.__("Select Audio Format ");
 
 getId("download").textContent = i18n.__("Download");
@@ -579,6 +579,8 @@ getId("errorBtn").textContent = i18n.__("Error Details") + " ▼";
 getId("clText").textContent = i18n.__("Current download location - ")
 getId("selectLocation").textContent = i18n.__("Select Download Location");
 getId("themeTxt").textContent = i18n.__("Theme");
+getId("autoTxt").textContent = i18n.__("Auto");
+getId("videoQualityTxt").textContent = i18n.__("Select Video Format ");
 
 getId("lightTxt").textContent = i18n.__("Light");
 getId("darkTxt").textContent = i18n.__("Dark");

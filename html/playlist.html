@@ -94,9 +94,9 @@
             </select>
             <br>
             <div id="typeSelectBox">
-                <label>Select video type</label>
-                <select id="videoTypeSelect">
-                    <option value="auto">Auto</option>
+                <label id="videoQualityTxt">Select video quality</label>
+                <select id="videoTypeSelect" class="select">
+                    <option value="auto" id="autoTxt">Auto</option>
                     <option value="mp4">Mp4</option>
                     <option value="webm">WebM</option>
                 </select>
@@ -108,7 +108,7 @@
         <div id="audioBox">
 
             <label id="audioFormat">Select Audio format </label>
-            <select id="audioSelect">
+            <select id="audioSelect" class="select">
                 <option value="mp3">Mp3</option>
                 <option value="aac">Aac</option>
                 <option value="m4a">M4a</option>
