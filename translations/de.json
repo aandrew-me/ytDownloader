@@ -101,9 +101,10 @@
 	"Close app when download finishes": "App schließen, wenn der Download beendet ist",
 	"Auto": "Auto",
 	"Theme": "Thema",
-	"Light": "Dunkel",
+	"Light": "Licht",
+	"Dark": "Dunkel",
 	"Frappé": "Frappé",
 	"One Dark": "Ein Dunkler",
 	"Matrix": "Matrizen",
-	"Solarized Dark": "Solarized Dark"
+	"Solarized Dark": "Solarized dunkel"
 }
