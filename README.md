@@ -92,7 +92,7 @@ Since the app is not signed, when you will try to open the app, macOS will not a
 3. The app will be shown there. Click on **Open**
 
 ## Internationalization (Localization) 🌍
-Translations into other languages would be highly appreciated. If you want to help translating the app to other languages, you can join from [here](https://crwd.in/ytdownloader). Open a new issue and that language will be added to Crowdin.
+Translations into other languages would be highly appreciated. If you want to help translating the app to other languages, you can join from [here](https://crwd.in/ytdownloader). Open a new issue and that language will be added to Crowdin. Please don't make pull requests with json files, instead use Crowdin.
 
 [![Crowdin](https://badges.crowdin.net/ytdownloader/localized.svg)](https://crowdin.com/project/ytdownloader)
 ### ✅ Available languages
