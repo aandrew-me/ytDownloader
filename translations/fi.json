@@ -98,5 +98,12 @@
 	"Select Quality": "Valitse Laatu",
 	"Disable auto updates": "Poista automaattiset päivitykset käytöstä",
 	"ultralow": "erittäin matala",
-	"Close app when download finishes": "Sulje sovellus latauksen valmistuttua"
+	"Close app when download finishes": "Sulje sovellus latauksen valmistuttua",
+	"Auto": "Automaattinen",
+	"Theme": "Teema",
+	"Light": "Tumma",
+	"Frappé": "Frappé",
+	"One Dark": "Yksi Tumma",
+	"Matrix": "Matriisi",
+	"Solarized Dark": "Solarized, tumma"
 }

@@ -98,5 +98,12 @@
 	"Select Quality": "Επιλογή Ποιότητας",
 	"Disable auto updates": "Απενεργοποίηση αυτόματων ενημερώσεων",
 	"ultralow": "υπερβολικά χαμηλό",
-	"Close app when download finishes": "Κλείσιμο εφαρμογής όταν ολοκληρωθεί η λήψη"
+	"Close app when download finishes": "Κλείσιμο εφαρμογής όταν ολοκληρωθεί η λήψη",
+	"Auto": "Αυτόματο",
+	"Theme": "Θέμα",
+	"Light": "Σκοτεινό",
+	"Frappé": "Frappé",
+	"One Dark": "Ένα Σκοτεινό",
+	"Matrix": "Matrix",
+	"Solarized Dark": "Solarized Dark"
 }
