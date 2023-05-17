@@ -1130,7 +1130,7 @@ ipcRenderer.on("link", (event, text) => {
 
 // Selecting download directory
 getId("selectLocation").addEventListener("click", () => {
-	ipcRenderer.send("select-location", "");
+	ipcRenderer.send("select-location-main", "");
 });
 
 ipcRenderer.on("downloadPath", (event, downloadPath) => {

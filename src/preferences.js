@@ -31,7 +31,7 @@ getId("back").addEventListener("click", () => {
 
 // Selecting download directory
 getId("selectLocation").addEventListener("click", () => {
-	ipcRenderer.send("select-location", "");
+	ipcRenderer.send("select-location-secondary", "");
 });
 
 ipcRenderer.on("downloadPath", (event, downloadPath) => {

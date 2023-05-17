@@ -214,24 +214,28 @@ ipcMain.on("close-secondary", () => {
 	secondaryWindow = null;
 });
 
-ipcMain.on("select-location", () => {
-	const location = dialog.showOpenDialogSync(secondaryWindow, {
+ipcMain.on("select-location-main", () => {
+	const location = dialog.showOpenDialogSync({
 		properties: ["openDirectory"],
 	});
 
 	if (location) {
-		if (secondaryWindow){
-			secondaryWindow.webContents.send("downloadPath", location);
-		}
-		else{
-			win.webContents.send("downloadPath", location);
-		}
-		
+		win.webContents.send("downloadPath", location);
+	}
+});
+
+ipcMain.on("select-location-secondary", () => {
+	const location = dialog.showOpenDialogSync({
+		properties: ["openDirectory"],
+	});
+
+	if (location) {
+		secondaryWindow.webContents.send("downloadPath", location);
 	}
 });
 
 ipcMain.on("select-config", () => {
-	const location = dialog.showOpenDialogSync(secondaryWindow, {
+	const location = dialog.showOpenDialogSync( {
 		properties: ["openFile"],
 	});
 
@@ -240,10 +244,10 @@ ipcMain.on("select-config", () => {
 	}
 });
 
-ipcMain.on("quit", ()=>{
+ipcMain.on("quit", () => {
 	isQuiting = true;
-	app.quit()
-})
+	app.quit();
+});
 
 // Auto update
 let autoUpdate = false;
