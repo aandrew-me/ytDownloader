@@ -98,5 +98,12 @@
 	"Select Quality": "Escolha a qualidade",
 	"Disable auto updates": "Desativar atualizações automáticas",
 	"ultralow": "ultra Baixo",
-	"Close app when download finishes": "Fechar aplicativo quando o download terminar"
+	"Close app when download finishes": "Fechar aplicativo quando o download terminar",
+	"Auto": "Automático",
+	"Theme": "Tema",
+	"Light": "Escuro",
+	"Frappé": "Frappé",
+	"One Dark": "Um Escuro",
+	"Matrix": "Matriz",
+	"Solarized Dark": "Escuro Solarizado"
 }
