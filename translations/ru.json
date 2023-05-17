@@ -98,5 +98,12 @@
 	"Select Quality": "Выберите Качество",
 	"Disable auto updates": "Отключить автообновления",
 	"ultralow": "сверхнизкий",
-	"Close app when download finishes": "Закройте приложение по завершении скачивания"
+	"Close app when download finishes": "Закройте приложение по завершении скачивания",
+	"Auto": "Авто",
+	"Theme": "Тема",
+	"Light": "Тёмная",
+	"Frappé": "Frappé",
+	"One Dark": "One Dark",
+	"Matrix": "Матрица",
+	"Solarized Dark": "Солнечная темная"
 }
