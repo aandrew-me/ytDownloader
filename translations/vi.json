@@ -98,5 +98,12 @@
 	"Select Quality": "Chọn Chất lượng",
 	"Disable auto updates": "Tắt tự động cập nhật",
 	"ultralow": "rất thấp",
-	"Close app when download finishes": "Đóng ứng dụng khi quá trình tải xuống kết thúc"
+	"Close app when download finishes": "Đóng ứng dụng khi quá trình tải xuống kết thúc",
+	"Auto": "Tự động",
+	"Theme": "Giao diện",
+	"Light": "Tối",
+	"Frappé": "Frappé",
+	"One Dark": "One Dark",
+	"Matrix": "Matrix",
+	"Solarized Dark": "Solarized Dark"
 }
