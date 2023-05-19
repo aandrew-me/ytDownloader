@@ -8,7 +8,7 @@
 [![Flathub](https://img.shields.io/flathub/v/io.github.aandrew_me.ytdn)](https://flathub.org/apps/io.github.aandrew_me.ytdn)
 [![AUR version](https://img.shields.io/aur/version/ytdownloader-gui)](https://aur.archlinux.org/packages/ytdownloader-gui)
 [![Snapcraft](https://badgen.net/snapcraft/v/ytdownloader)](https://snapcraft.io/ytdownloader)
-[![Chocolatey Version](https://img.shields.io/chocolatey/v/ytdownloader)](https://aur.archlinux.org/packages/ytdownloader-gui)
+![Chocolatey Version](https://img.shields.io/chocolatey/v/ytdownloader)
 
 A modern GUI video and audio downloader supporting [hundreds of sites](https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md)
 
@@ -19,8 +19,8 @@ A modern GUI video and audio downloader supporting [hundreds of sites](https://g
 "><img src="https://user-images.githubusercontent.com/66430340/187172806-a8edd12a-ef58-4a05-96a3-99d7490b42f6.png" style="width:190px;"></a>
 
 <a href="https://github.com/aandrew-me/ytDownloader/releases/latest/download/YTDownloader_Mac.dmg"><img src="https://user-images.githubusercontent.com/66430340/189808142-0a4725c6-b167-4afd-98f1-dfcb16bfbd43.png" style="width:200px;"></a>
-<a target="_blank" href="https://aur.archlinux.org/packages/ytdownloader-gui"><img class="badge" src="https://github.com/aandrew-me/ytDownloader/assets/66430340/de1880ec-ebb9-40b1-bd0f-d98d0ddeedd9" alt="AUR" style="width:200px;"></a>
-<a target="blank" href="https://community.chocolatey.org/packages/ytdownloader"><img style="width:200px;" src="https://github.com/aandrew-me/ytDownloader/assets/66430340/7b2769fe-bd62-4921-a0eb-edf2eb06216d" class="badge" alt="Chocolatey"></a>
+<a href="https://aur.archlinux.org/packages/ytdownloader-gui"><img src="https://github.com/aandrew-me/ytDownloader/assets/66430340/de1880ec-ebb9-40b1-bd0f-d98d0ddeedd9" alt="AUR" style="width:200px;"></a>
+<a href="https://community.chocolatey.org/packages/ytdownloader"><img style="width:200px;" src="https://github.com/aandrew-me/ytDownloader/assets/66430340/7b2769fe-bd62-4921-a0eb-edf2eb06216d" alt="Chocolatey"></a>
 
 ## Features 🚀
 
