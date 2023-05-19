@@ -12,15 +12,15 @@
 
 A modern GUI video and audio downloader supporting [hundreds of sites](https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md)
 
-<a href="https://beta.flathub.org/apps/io.github.aandrew_me.ytdn"><img src="https://flathub.org/assets/badges/flathub-badge-en.svg" style="width:180px;"></a>
+
 [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/ytdownloader)
 [![Get AppImage](https://raw.githubusercontent.com/srevinsaju/get-appimage/master/static/badges/get-appimage-branding-blue.png)](https://github.com/aandrew-me/ytDownloader/releases/latest/download/YTDownloader_Linux.AppImage)
+<a href="https://beta.flathub.org/apps/io.github.aandrew_me.ytdn"><img src="https://flathub.org/assets/badges/flathub-badge-en.svg" style="width:180px;"></a>
 <a href="https://github.com/aandrew-me/ytDownloader/releases/latest/download/YTDownloader_Win.exe
 "><img src="https://user-images.githubusercontent.com/66430340/187172806-a8edd12a-ef58-4a05-96a3-99d7490b42f6.png" style="width:190px;"></a>
-
 <a href="https://github.com/aandrew-me/ytDownloader/releases/latest/download/YTDownloader_Mac.dmg"><img src="https://user-images.githubusercontent.com/66430340/189808142-0a4725c6-b167-4afd-98f1-dfcb16bfbd43.png" style="width:200px;"></a>
-<a href="https://aur.archlinux.org/packages/ytdownloader-gui"><img src="https://github.com/aandrew-me/ytDownloader/assets/66430340/de1880ec-ebb9-40b1-bd0f-d98d0ddeedd9" alt="AUR" style="width:200px;"></a>
-<a href="https://community.chocolatey.org/packages/ytdownloader"><img style="width:200px;" src="https://github.com/aandrew-me/ytDownloader/assets/66430340/7b2769fe-bd62-4921-a0eb-edf2eb06216d" alt="Chocolatey"></a>
+<a href="https://aur.archlinux.org/packages/ytdownloader-gui"><img src="https://github-production-user-asset-6210df.s3.amazonaws.com/66430340/238885924-de1880ec-ebb9-40b1-bd0f-d98d0ddeedd9.png" alt="AUR" style="width:200px;"></a>
+<a href="https://community.chocolatey.org/packages/ytdownloader"><img style="width:200px;" src="https://github-production-user-asset-6210df.s3.amazonaws.com/66430340/238886537-7b2769fe-bd62-4921-a0eb-edf2eb06216d.png" alt="Chocolatey"></a>
 
 ## Features 🚀
 
