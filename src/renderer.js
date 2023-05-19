@@ -47,6 +47,7 @@ let rangeOption = "--download-sections";
 let cookieArg = "";
 let browser = "";
 let maxActiveDownloads = 5;
+let showVcodec = false
 function checkMaxDownloads() {
 	if (localStorage.getItem("maxActiveDownloads")) {
 		const number = Number(localStorage.getItem("maxActiveDownloads"));
@@ -220,7 +221,7 @@ function defaultVideoToggle() {
 
 function pasteUrl() {
 	defaultVideoToggle();
-	hideHidden()
+	hideHidden();
 	getId("loadingWrapper").style.display = "flex";
 	getId("incorrectMsg").textContent = "";
 	const url = clipboard.readText();
@@ -229,14 +230,14 @@ function pasteUrl() {
 
 function pasteFromTray(url) {
 	defaultVideoToggle();
-	hideHidden()
+	hideHidden();
 	getId("loadingWrapper").style.display = "flex";
 	getId("incorrectMsg").textContent = "";
 	getInfo(url);
 }
 
 getId("closeHidden").addEventListener("click", () => {
-	hideHidden()
+	hideHidden();
 	getId("loadingWrapper").style.display = "none";
 });
 
@@ -344,7 +345,7 @@ async function getInfo(url) {
 			getId("loadingWrapper").style.display = "none";
 
 			getId("hidden").style.display = "inline-block";
-			getId("hidden").classList.add("scaleUp")
+			getId("hidden").classList.add("scaleUp");
 
 			getId("title").innerHTML =
 				`<b>${i18n.__("Title ")}</b>: ` +
@@ -416,24 +417,33 @@ async function getInfo(url) {
 						"|" +
 						(format.height || "NO");
 
+					// Video codec
+
+					const vcodec = format.vcodec && showVcodec? format.vcodec.split(".")[0] + "|  "  : ""
+					const spaceAfterVcodec = showVcodec ? "&#160".repeat(5 - vcodec.length) : ""
+
+					// Quality
+					const quality = format.height	? format.height + "p" + (format.fps == 60 ? "60" : "")
+						: "" ||format.resolution || i18n.__(format.format_note) || format.format_id ||"Unknown quality";
+					const spaceAfterQuality = "&#160".repeat(8 - quality.length)
+
+					// Extension
+					const extension = format.ext
+					const spaceAfterExtension = "&#160".repeat(5 - extension.length)
+					// Format and Quality Options
 					const element =
 						"<option value='" +
 						format_id +
 						"'" +
 						selectedText +
 						">" +
-						(format.height
-							? format.height +
-							  "p" +
-							  (format.fps == 60 ? "60" : "")
-							: "" ||
-							  format.resolution ||
-							  i18n.__(format.format_note) ||
-							  format.format_id ||
-							  "Unknown quality") +
-						"  |  " +
-						format.ext +
-						"  |  " +
+						quality +
+						spaceAfterQuality +
+						"| " +
+						extension + spaceAfterExtension +
+						"|  " +
+						vcodec +
+						spaceAfterVcodec+
 						size +
 						"</option>";
 					getId("videoFormatSelect").innerHTML += element;
@@ -515,7 +525,7 @@ async function getInfo(url) {
 // Video download event
 getId("videoDownload").addEventListener("click", (event) => {
 	checkMaxDownloads();
-	hideHidden()
+	hideHidden();
 	console.log(`Current:${currentDownloads} Max:${maxActiveDownloads}`);
 
 	if (currentDownloads < maxActiveDownloads) {
@@ -572,7 +582,7 @@ getId("videoDownload").addEventListener("click", (event) => {
 // Audio download event
 getId("audioDownload").addEventListener("click", (event) => {
 	checkMaxDownloads();
-	hideHidden()
+	hideHidden();
 	console.log(`Current:${currentDownloads} Max:${maxActiveDownloads}`);
 
 	if (currentDownloads < maxActiveDownloads) {
@@ -628,7 +638,7 @@ getId("audioDownload").addEventListener("click", (event) => {
 
 getId("extractBtn").addEventListener("click", () => {
 	checkMaxDownloads();
-	hideHidden()
+	hideHidden();
 
 	console.log(`Current:${currentDownloads} Max:${maxActiveDownloads}`);
 
@@ -1094,8 +1104,8 @@ function closeMenu() {
 	}, 50);
 }
 
-function hideHidden(){
-	getId("hidden").classList.remove("scaleUp")
+function hideHidden() {
+	getId("hidden").classList.remove("scaleUp");
 	getId("hidden").classList.add("scale");
 	setTimeout(() => {
 		getId("hidden").style.display = "none";

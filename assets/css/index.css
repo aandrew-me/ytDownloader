@@ -1,3 +1,9 @@
+@font-face {
+	font-family: 'JetBrains';
+	src: url('../fonts/JetBrainsMono-Regular.ttf') format('truetype');
+  }
+
+  
 :root[theme="light"] {
 	--background: #fff;
 	--text: rgb(45, 45, 45);
@@ -48,12 +54,12 @@
 	--blueBtn-bottom: rgb(44, 78, 180);
 }
 :root[theme="onedark"] {
-	--background: #282C34	;
+	--background: #282c34;
 	--text: #d2d6df;
-	--box-main: #4D515D;
-	--box-toggle: #2F333D;
+	--box-main: #4d515d;
+	--box-toggle: #2f333d;
 	--box-toggleOn: #13a3b7;
-	--item-bg: #4D515D;
+	--item-bg: #4d515d;
 	--select: #57b6c2;
 	--greenBtn: #85cf50;
 	--greenBtn-bottom: #406923;
@@ -63,13 +69,13 @@
 	--blueBtn-bottom: rgb(44, 78, 180);
 }
 :root[theme="matrix"] {
-	--background: #0D0208;
-	--text: #00FF41;
+	--background: #0d0208;
+	--text: #00ff41;
 	--box-main: #0c2216;
 	--box-toggle: #214338;
 	--box-toggleOn: #24782e;
 	--item-bg: #214338;
-	--select: #00FF41;
+	--select: #00ff41;
 	--greenBtn: #19b42b;
 	--greenBtn-bottom: #10701c;
 	--redBtn: #19b42b;
@@ -79,23 +85,23 @@
 }
 
 :root[theme="github"] {
-	--background: #F6F8FA;
-	--text: #292D31;
-	--box-main: #FFFFFF;
-	--box-toggle: #F3f3f3;
+	--background: #f6f8fa;
+	--text: #292d31;
+	--box-main: #ffffff;
+	--box-toggle: #f3f3f3;
 	--box-toggleOn: #cce5ff;
-	--item-bg: #3A66D150;
+	--item-bg: #3a66d150;
 	--select: #cce5ff;
 	--greenBtn: #0a9431;
 	--greenBtn-bottom: #0c6826;
 	--redBtn: #d73a49;
 	--redBtn-bottom: #9b2733;
-	--blueBtn: #005CC5;
+	--blueBtn: #005cc5;
 	--blueBtn-bottom: #00428e;
 }
 
 :root[theme="latte"] {
-	--background: #dce0e8	;
+	--background: #dce0e8;
 	--text: #4c4f69;
 	--box-main: #eff1f5;
 	--box-toggle: #e6e9ef;
@@ -111,10 +117,10 @@
 }
 
 :root[theme="solarized-dark"] {
-	--background: #002B36;
+	--background: #002b36;
 	--text: #a4b1b3;
 	--box-main: #003745;
-	--box-toggle: #2E4C52;
+	--box-toggle: #2e4c52;
 	--box-toggleOn: #005a6f;
 	--item-bg: #003745;
 	--select: #2aa198;
@@ -123,7 +129,7 @@
 	--redBtn: #dc322f;
 	--redBtn-bottom: #af2523;
 	--blueBtn: #268bd2;
-	--blueBtn-bottom:#2074b1;
+	--blueBtn-bottom: #2074b1;
 }
 
 body {
@@ -206,11 +212,11 @@ body {
 	backdrop-filter: blur(16px) saturate(160%);
 	-webkit-backdrop-filter: blur(16px) saturate(160%);
 	background-color: rgb(17, 25, 40);
-	color:white;
-	padding:10px;
+	color: white;
+	padding: 10px;
 	border-radius: 5px;
 	outline: none;
-	border:none;
+	border: none;
 	font-size: large;
 }
 .menuItem {
@@ -352,7 +358,7 @@ body {
 #options {
 	display: none;
 	position: absolute;
-	overflow:hidden;
+	overflow: hidden;
 	z-index: 1;
 	left: 0;
 	right: 0;
@@ -394,6 +400,11 @@ body {
 	font-size: large;
 	margin: 8px;
 	outline: none;
+}
+
+#videoFormatSelect {
+	font-family: JetBrains, monospace;
+	font-size:medium;
 }
 
 label {
