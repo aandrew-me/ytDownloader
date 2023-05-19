@@ -8,7 +8,7 @@
 [![Flathub](https://img.shields.io/flathub/v/io.github.aandrew_me.ytdn)](https://flathub.org/apps/io.github.aandrew_me.ytdn)
 [![AUR version](https://img.shields.io/aur/version/ytdownloader-gui)](https://aur.archlinux.org/packages/ytdownloader-gui)
 [![Snapcraft](https://badgen.net/snapcraft/v/ytdownloader)](https://snapcraft.io/ytdownloader)
-![Chocolatey Version](https://img.shields.io/chocolatey/v/ytdownloader)
+[![Chocolatey Version](https://img.shields.io/chocolatey/v/ytdownloader)](https://aur.archlinux.org/packages/ytdownloader-gui)
 
 A modern GUI video and audio downloader supporting [hundreds of sites](https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md)
 
