@@ -47,7 +47,7 @@ let rangeOption = "--download-sections";
 let cookieArg = "";
 let browser = "";
 let maxActiveDownloads = 5;
-let showVcodec = false
+let showVcodec = true;
 function checkMaxDownloads() {
 	if (localStorage.getItem("maxActiveDownloads")) {
 		const number = Number(localStorage.getItem("maxActiveDownloads"));
@@ -419,17 +419,34 @@ async function getInfo(url) {
 
 					// Video codec
 
-					const vcodec = format.vcodec && showVcodec? format.vcodec.split(".")[0] + "|  "  : ""
-					const spaceAfterVcodec = showVcodec ? "&#160".repeat(5 - vcodec.length) : ""
+					const vcodec =
+						format.vcodec && showVcodec
+							? format.vcodec.split(".")[0]
+							: "";
+					let spaceAfterVcodec = showVcodec
+						? "&#160".repeat(5 - vcodec.length)
+						: "";
+					showVcodec
+						? (spaceAfterVcodec += "|  ")
+						: (spaceAfterVcodec += "");
 
 					// Quality
-					const quality = format.height	? format.height + "p" + (format.fps == 60 ? "60" : "")
-						: "" ||format.resolution || i18n.__(format.format_note) || format.format_id ||"Unknown quality";
-					const spaceAfterQuality = "&#160".repeat(8 - quality.length)
+					const quality = format.height
+						? format.height + "p" + (format.fps == 60 ? "60" : "")
+						: "" ||
+						  format.resolution ||
+						  i18n.__(format.format_note) ||
+						  format.format_id ||
+						  "Unknown quality";
+					const spaceAfterQuality = "&#160".repeat(
+						8 - quality.length
+					);
 
 					// Extension
-					const extension = format.ext
-					const spaceAfterExtension = "&#160".repeat(5 - extension.length)
+					const extension = format.ext;
+					const spaceAfterExtension = "&#160".repeat(
+						5 - extension.length
+					);
 					// Format and Quality Options
 					const element =
 						"<option value='" +
@@ -440,10 +457,11 @@ async function getInfo(url) {
 						quality +
 						spaceAfterQuality +
 						"| " +
-						extension + spaceAfterExtension +
+						extension +
+						spaceAfterExtension +
 						"|  " +
 						vcodec +
-						spaceAfterVcodec+
+						spaceAfterVcodec +
 						size +
 						"</option>";
 					getId("videoFormatSelect").innerHTML += element;
@@ -835,7 +853,22 @@ function download(
 	let pattern = ["/", '"', "`", "#"];
 
 	if (process.platform === "win32") {
-		pattern = ["[", "]", "*", "<", ">", "|", "\\", "/", "?", '"', "`", "#"];
+		pattern = [
+			"[",
+			"]",
+			"*",
+			"<",
+			">",
+			"|",
+			"\\",
+			"/",
+			"?",
+			'"',
+			"`",
+			"#",
+			"：",
+			":",
+		];
 	}
 
 	// Trying to remove ambiguous characters

@@ -34,14 +34,6 @@ getId("menuIcon").addEventListener("click", (event) => {
 });
 const root = document.querySelector(":root");
 
-let enabledTransparent = localStorage.getItem("enabledTransparent");
-let bgColor = "";
-if (enabledTransparent == "true") {
-	bgColor = "rgba(40,40,40, .9)";
-} else {
-	bgColor = "rgb(40,40,40)";
-}
-
 
 getId("themeToggle").addEventListener("change", ()=>{
 	document.documentElement.setAttribute("theme", getId("themeToggle").value)
