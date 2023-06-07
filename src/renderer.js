@@ -1037,7 +1037,8 @@ function download(
 					afterSave(
 						downloadDir,
 						filename + `.${extractExt}`,
-						randomId + "prog"
+						randomId + "prog",
+						thumb1 || thumbnail
 					);
 				}
 				// If download is done
@@ -1046,7 +1047,8 @@ function download(
 					afterSave(
 						downloadDir,
 						filename + `.${ext}`,
-						randomId + "prog"
+						randomId + "prog",
+						thumb1 || thumbnail
 					);
 				}
 			}
@@ -1083,10 +1085,10 @@ function fadeItem(id) {
 
 // After saving video
 
-function afterSave(location, filename, progressId) {
+function afterSave(location, filename, progressId, thumbnail) {
 	const notify = new Notification("ytDownloader", {
-		body: i18n.__("File saved. Click to Open"),
-		icon: "../assets/images/icon.png",
+		body: filename,
+		icon: thumbnail,
 	});
 
 	notify.onclick = () => {
