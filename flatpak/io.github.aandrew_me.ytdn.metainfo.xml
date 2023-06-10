@@ -25,11 +25,11 @@
   <screenshots>
     <screenshot type="default">
       <image>
-        https://user-images.githubusercontent.com/66430340/196022794-885e5b90-40d2-4b58-a8fa-74f10c6e470e.png</image>
+        https://user-images.githubusercontent.com/66430340/238856286-62efbca0-28b8-4016-bcf2-1a14bcaa782c.jpg</image>
     </screenshot>
     <screenshot>
       <image>
-        https://user-images.githubusercontent.com/66430340/196022796-1215038d-bafb-4450-82b1-7baddd60c0e8.png</image>
+        https://user-images.githubusercontent.com/66430340/238856317-34f5270f-bdea-460e-8622-6459cd147b73.jpg</image>
     </screenshot>
   </screenshots>
   <url type="homepage">https://github.com/aandrew-me/ytDownloader</url>
@@ -37,6 +37,7 @@
   <content_rating type="oars-1.1" />
 
   <releases>
+    <release version="3.14.1" date="2023-6-11" />
     <release version="3.14.0" date="2023-5-17" />
     <release version="3.13.0" date="2023-4-25" />
     <release version="3.12.2" date="2023-4-8" />
