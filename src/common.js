@@ -6,7 +6,7 @@ function getId(id) {
 
 let menuIsOpen = false;
 
-getId("menuIcon").addEventListener("click", (event) => {
+getId("menuIcon").addEventListener("click", () => {
 	if (menuIsOpen) {
 		getId("menuIcon").style.transform = "rotate(0deg)";
 		menuIsOpen = false;
@@ -32,7 +32,6 @@ getId("menuIcon").addEventListener("click", (event) => {
 		}, 150);
 	}
 });
-const root = document.querySelector(":root");
 
 
 getId("themeToggle").addEventListener("change", ()=>{

@@ -281,3 +281,11 @@ select {
 #configOpts {
 	display: none;
 }
+
+body::-webkit-scrollbar {
+	width: 10px;
+}
+body::-webkit-scrollbar-thumb {
+	background:linear-gradient(rgb(110, 110, 110), rgb(77, 77, 77));
+	border-radius: 8px;
+}

@@ -4,7 +4,7 @@
 		"yt-dlp-wrap-plus": "^2.3.16"
 	},
 	"name": "ytdownloader",
-	"version": "3.14.1",
+	"version": "3.15.0",
 	"main": "main.js",
 	"scripts": {
 		"start": "electron .",
@@ -35,11 +35,11 @@
 	"description": "Download videos and audios from YouTube and many other sites",
 	"devDependencies": {
 		"electron": "^22.0.3",
-		"electron-builder": "^23.6.0"
+		"electron-builder": "^24.4.0"
 	},
 	"build": {
 		"productName": "YTDownloader",
-		"appId": "org.aandrew.ytdownloader",
+		"appId": "io.github.aandrew_me.ytdn",
 		"artifactName": "${productName}.${ext}",
 		"files": [
 			"./resources/**/*",
@@ -106,11 +106,11 @@
 			"allowToChangeInstallationDirectory": true,
 			"oneClick": false
 		},
-		"msi":{
+		"msi": {
 			"oneClick": true,
 			"createDesktopShortcut": true,
 			"createStartMenuShortcut": true,
-			"shortcutName":"YTDownloader"
+			"shortcutName": "YTDownloader"
 		}
 	}
 }

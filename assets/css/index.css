@@ -1,9 +1,8 @@
 @font-face {
-	font-family: 'JetBrains';
-	src: url('../fonts/JetBrainsMono-Regular.ttf') format('truetype');
-  }
+	font-family: "JetBrains";
+	src: url("../fonts/JetBrainsMono-Regular.ttf") format("truetype");
+}
 
-  
 :root[theme="light"] {
 	--background: #fff;
 	--text: rgb(45, 45, 45);
@@ -404,7 +403,7 @@ body {
 
 #videoFormatSelect {
 	font-family: JetBrains, monospace;
-	font-size:medium;
+	font-size: medium;
 }
 
 label {
@@ -636,6 +635,14 @@ body::-webkit-scrollbar-thumb {
 	animation-name: scaleUp;
 	animation-duration: 0.4s;
 	animation-fill-mode: forwards;
+}
+
+body::-webkit-scrollbar {
+	width: 10px;
+}
+body::-webkit-scrollbar-thumb {
+	background:linear-gradient(rgb(110, 110, 110), rgb(77, 77, 77));
+	border-radius: 8px;
 }
 
 @keyframes scale {
