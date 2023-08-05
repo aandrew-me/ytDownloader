@@ -116,13 +116,12 @@ function download(type) {
 		} else if (quality === "useConfig") {
 			format = "";
 		} else {
-			if (videoType === "mp4"){
+			if (videoType === "mp4") {
 				format = `-f "${formatId}+m4a/mp4[height=${quality}]+m4a/bv*[height<=${quality}]+ba/best[height<=${quality}]"`;
-			}
-			else if (videoType === "webm"){
+			} else if (videoType === "webm") {
 				format = `-f "webm[height<=${quality}]+opus/bv*[height<=${quality}]+ba/${formatId}+m4a/mp4[height=${quality}]+m4a/best[height<=${quality}]"`;
 			} else {
-				format = `-f "bv*[height=${quality}]+ba/best[height=${quality}]/best[height<=${quality}]"`
+				format = `-f "bv*[height=${quality}]+ba/best[height=${quality}]/best[height<=${quality}]"`;
 			}
 		}
 	} else {
@@ -153,28 +152,64 @@ function download(type) {
 			controller.signal
 		);
 	} else {
-		downloadProcess = ytdlp.exec(
-			[
-				"--yes-playlist",
-				"--no-warnings",
-				"-x",
-				"--audio-format",
-				format,
-				"-o",
-				`"${path.join(downloadDir, foldernameFormat, filenameFormat)}"`,
-				"-I",
-				`"${playlistIndex}:${playlistEnd}"`,
-				"--ffmpeg-location",
-				ffmpeg,
-				cookieArg,
-				browser,
-				configArg,
-				configTxt,
-				`"${url}"`,
-			],
-			{ shell: true, detached: false },
-			controller.signal
-		);
+		// Youtube provides m4a as audio, so no need to convert
+		if (
+			(url.includes("youtube.com/") || url.includes("youtu.be/")) &&
+			format == "m4a"
+		) {
+			downloadProcess = ytdlp.exec(
+				[
+					"--yes-playlist",
+					"--no-warnings",
+					"-f",
+					`ba[ext=${format}]/ba`,
+					"-o",
+					`"${path.join(
+						downloadDir,
+						foldernameFormat,
+						filenameFormat
+					)}"`,
+					"-I",
+					`"${playlistIndex}:${playlistEnd}"`,
+					"--ffmpeg-location",
+					ffmpeg,
+					cookieArg,
+					browser,
+					configArg,
+					configTxt,
+					`"${url}"`,
+				],
+				{ shell: true, detached: false },
+				controller.signal
+			);
+		} else {
+			downloadProcess = ytdlp.exec(
+				[
+					"--yes-playlist",
+					"--no-warnings",
+					"-x",
+					"--audio-format",
+					format,
+					"-o",
+					`"${path.join(
+						downloadDir,
+						foldernameFormat,
+						filenameFormat
+					)}"`,
+					"-I",
+					`"${playlistIndex}:${playlistEnd}"`,
+					"--ffmpeg-location",
+					ffmpeg,
+					cookieArg,
+					browser,
+					configArg,
+					configTxt,
+					`"${url}"`,
+				],
+				{ shell: true, detached: false },
+				controller.signal
+			);
+		}
 	}
 
 	downloadProcess.on("ytDlpEvent", (eventType, eventData) => {
@@ -509,14 +544,13 @@ audioToggle.addEventListener("click", (event) => {
 });
 
 getId("select").addEventListener("change", () => {
-	value = getId("select").value
-	if (value == "best" || value == "worst" || value == "useConfig"){
-		getId("typeSelectBox").style.display = "none"
+	value = getId("select").value;
+	if (value == "best" || value == "worst" || value == "useConfig") {
+		getId("typeSelectBox").style.display = "none";
+	} else {
+		getId("typeSelectBox").style.display = "block";
 	}
-	else {
-		getId("typeSelectBox").style.display = "block"
-	}
-})
+});
 
 // More options
 
@@ -576,7 +610,7 @@ getId("downloadThumbnails").textContent = i18n.__("Download thumbnails");
 getId("saveLinks").textContent = i18n.__("Save video links to a file");
 getId("useConfigTxt").textContent = i18n.__("Use config file");
 getId("errorBtn").textContent = i18n.__("Error Details") + " ▼";
-getId("clText").textContent = i18n.__("Current download location - ")
+getId("clText").textContent = i18n.__("Current download location - ");
 getId("selectLocation").textContent = i18n.__("Select Download Location");
 getId("themeTxt").textContent = i18n.__("Theme");
 getId("autoTxt").textContent = i18n.__("Auto");
