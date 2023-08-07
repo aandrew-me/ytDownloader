@@ -104,7 +104,7 @@ function download(type) {
 
 	hideOptions();
 
-	let quality, format, downloadProcess;
+	let quality, format, downloadProcess, videoType;
 	if (type === "video") {
 		quality = getId("select").value;
 		videoType = getId("videoTypeSelect").value;
@@ -146,6 +146,8 @@ function download(type) {
 				browser,
 				configArg,
 				configTxt,
+				"--embed-metadata",
+				videoType == "mp4" ? "--embed-thumbnail": "",
 				`"${url}"`,
 			],
 			{ shell: true, detached: false },
@@ -177,6 +179,8 @@ function download(type) {
 					browser,
 					configArg,
 					configTxt,
+					"--embed-metadata",
+					"--embed-thumbnail",
 					`"${url}"`,
 				],
 				{ shell: true, detached: false },
@@ -204,6 +208,8 @@ function download(type) {
 					browser,
 					configArg,
 					configTxt,
+					"--embed-metadata",
+					format === "mp3" ?  "--embed-thumbnail" : "",
 					`"${url}"`,
 				],
 				{ shell: true, detached: false },

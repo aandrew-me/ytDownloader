@@ -926,6 +926,8 @@ function download(
 				subs1 || subs,
 				subs2 || subLangs,
 				"--no-playlist",
+				"--embed-metadata",
+				ext == "mp4" ? "--embed-thumbnail": "",
 				configArg,
 				configTxt,
 				cookieArg,
@@ -962,6 +964,8 @@ function download(
 				"--ffmpeg-location",
 				ffmpeg,
 				"--no-playlist",
+				"--embed-metadata",
+				extractFormat1 == "m4a" || extractFormat1 == "mp3" ? "--embed-thumbnail": "",
 				cookieArg,
 				browser,
 				configArg,
@@ -990,6 +994,8 @@ function download(
 				subs1 || subs,
 				subs2 || subLangs,
 				"--no-playlist",
+				"--embed-metadata",
+				ext == "m4a" || ext == "mp4" ? "--embed-thumbnail": "",
 				cookieArg,
 				browser,
 				configArg,
@@ -1031,7 +1037,7 @@ function download(
 				// If extration is done
 				if (type === "extract") {
 					console.log(
-						path.join(downloadDir, filename + `.${extractFormat}`)
+						path.join(downloadDir, filename + `.${extractFormat1}`)
 					);
 
 					afterSave(
