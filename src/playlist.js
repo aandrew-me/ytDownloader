@@ -1,9 +1,9 @@
-const { clipboard, shell, ipcRenderer } = require("electron");
-const { default: YTDlpWrap } = require("yt-dlp-wrap-plus");
+const {clipboard, shell, ipcRenderer} = require("electron");
+const {default: YTDlpWrap} = require("yt-dlp-wrap-plus");
 const path = require("path");
 const os = require("os");
 const fs = require("fs");
-const { execSync } = require("child_process");
+const {execSync} = require("child_process");
 let url;
 const ytDlp = localStorage.getItem("ytdlp");
 const ytdlp = new YTDlpWrap(ytDlp);
@@ -36,7 +36,7 @@ if (os.platform() === "win32") {
 
 if (!fs.existsSync(ffmpegPath)) {
 	try {
-		ffmpeg = execSync("which ffmpeg", { encoding: "utf8" });
+		ffmpeg = execSync("which ffmpeg", {encoding: "utf8"});
 		ffmpeg = `"${ffmpeg.trimEnd()}"`;
 	} catch (error) {
 		console.log(error);
@@ -150,7 +150,7 @@ function download(type) {
 				// videoType == "mp4" ? "--embed-thumbnail": "",
 				`"${url}"`,
 			],
-			{ shell: true, detached: false },
+			{shell: true, detached: false},
 			controller.signal
 		);
 	} else {
@@ -183,7 +183,7 @@ function download(type) {
 					// "--embed-thumbnail",
 					`"${url}"`,
 				],
-				{ shell: true, detached: false },
+				{shell: true, detached: false},
 				controller.signal
 			);
 		} else {
@@ -209,10 +209,10 @@ function download(type) {
 					configArg,
 					configTxt,
 					"--embed-metadata",
-					format === "mp3" ?  "--embed-thumbnail" : "",
+					format === "mp3" ? "--embed-thumbnail" : "",
 					`"${url}"`,
 				],
-				{ shell: true, detached: false },
+				{shell: true, detached: false},
 				controller.signal
 			);
 		}
@@ -366,9 +366,11 @@ function downloadThumbnails() {
 			"--skip-download",
 			"-I",
 			`"${playlistIndex}:${playlistEnd}"`,
+			"--ffmpeg-location",
+			ffmpeg,
 			`"${url}"`,
 		],
-		{ shell: true, detached: false }
+		{shell: true, detached: false}
 	);
 
 	downloadProcess.on("ytDlpEvent", (eventType, eventData) => {
@@ -387,6 +389,8 @@ function downloadThumbnails() {
 			!eventData.includes("thumbnail")
 		) {
 			count += 1;
+			originalCount++;
+
 			let itemTitle;
 			itemTitle = i18n.__("Thumbnail") + " " + originalCount;
 
@@ -433,7 +437,7 @@ function saveLinks() {
 			`"${playlistIndex}:${playlistEnd}"`,
 			`"${url}"`,
 		],
-		{ shell: true, detached: false }
+		{shell: true, detached: false}
 	);
 
 	downloadProcess.on("ytDlpEvent", (eventType, eventData) => {
