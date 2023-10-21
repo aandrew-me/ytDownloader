@@ -354,6 +354,10 @@ async function getInfo(url) {
 			let audioSize = 0;
 			let defaultVideoFormat = 0;
 
+			let preferredAudioFormatLength = 0;
+			let preferredAudioFormatCount = 0;
+
+			// Initially going through all formats
 			// Getting approx size of audio file and checking if audio is present
 			for (let format of formats) {
 				// Find the item with the preferred video format
@@ -379,10 +383,16 @@ async function getInfo(url) {
 						audioExtensionList.push(format.audio_ext);
 					}
 				}
+
+				if (format.audio_ext === preferredAudioQuality || format.acodec === preferredAudioQuality){
+					preferredAudioFormatLength ++;
+				}
 			}
 			for (let format of formats) {
 				let size;
 				let selectedText = "";
+				let audioSelectedText = "";
+
 				if (format.height == defaultVideoFormat && !selected) {
 					selectedText = " selected ";
 					selected = true;
@@ -466,7 +476,6 @@ async function getInfo(url) {
 						"</option>";
 					getId("videoFormatSelect").innerHTML += element;
 				}
-
 				// For audios
 				else if (
 					format.audio_ext !== "none" ||
@@ -480,13 +489,21 @@ async function getInfo(url) {
 					} else {
 						audio_ext = format.audio_ext;
 					}
+					if (format.audio_ext === preferredAudioQuality || format.acodec === preferredAudioQuality) {
+						preferredAudioFormatCount += 1;
+						if (preferredAudioFormatCount  === preferredAudioFormatLength){
+							audioSelectedText = " selected ";
+						}
+					}
 
 					const format_id = format.format_id + "|" + audio_ext;
 
 					const element =
 						"<option value='" +
 						format_id +
-						"'>" +
+						"'" +
+						audioSelectedText +
+						">" +
 						i18n.__("Quality") +
 						": " +
 						(i18n.__(format.format_note) ||
