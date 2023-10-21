@@ -37,6 +37,7 @@
   <content_rating type="oars-1.1" />
 
   <releases>
+    <release version="3.14.3" date="2023-10-21" />
     <release version="3.14.2" date="2023-8-8" />
     <release version="3.14.1" date="2023-6-11" />
     <release version="3.14.0" date="2023-5-17" />
