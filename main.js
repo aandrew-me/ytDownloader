@@ -25,6 +25,7 @@ app.commandLine.appendSwitch("--enable-features", "Metal");
 
 function createWindow() {
 	win = new BrowserWindow({
+		autoHideMenuBar: true,
 		show: false,
 		icon: __dirname + "/assets/images/icon.png",
 		spellcheck: false,
