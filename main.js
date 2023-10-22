@@ -276,7 +276,7 @@ ipcMain.on("autoUpdate", (event, status) => {
 					dialog.showMessageBox(dialogOpts).then((returnValue) => {
 						if (returnValue.response === 0) {
 							shell.openExternal(
-								"https://github.com/aandrew-me/ytDownloader/releases/latest/download/YTDownloader_Mac.zip"
+								"https://github.com/aandrew-me/ytDownloader/releases/latest/download/YTDownloader_Mac.dmg"
 							);
 						}
 					});
