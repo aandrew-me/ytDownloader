@@ -8,7 +8,7 @@ const {
 	Menu,
 	clipboard,
 } = require("electron");
-const { autoUpdater } = require("electron-updater");
+const {autoUpdater} = require("electron-updater");
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true;
 const fs = require("fs");
 const path = require("path");
@@ -236,7 +236,7 @@ ipcMain.on("select-location-secondary", () => {
 });
 
 ipcMain.on("select-config", () => {
-	const location = dialog.showOpenDialogSync( {
+	const location = dialog.showOpenDialogSync({
 		properties: ["openFile"],
 	});
 

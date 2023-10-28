@@ -14,8 +14,8 @@ const fs = require("fs");
 /////////////////////////////////////
 
 const path = require("path");
-const { shell, ipcRenderer, clipboard } = require("electron");
-const { default: YTDlpWrap } = require("yt-dlp-wrap-plus");
+const {shell, ipcRenderer, clipboard} = require("electron");
+const {default: YTDlpWrap} = require("yt-dlp-wrap-plus");
 
 // Directories
 const homedir = os.homedir();
@@ -23,7 +23,7 @@ const appdir = path.join(homedir, "Downloads");
 const hiddenDir = path.join(homedir, ".ytDownloader");
 const i18n = new (require("../translations/i18n"))();
 
-fs.mkdir(hiddenDir, { recursive: true }, () => {});
+fs.mkdir(hiddenDir, {recursive: true}, () => {});
 
 // System tray
 const trayEnabled = localStorage.getItem("closeToTray");
@@ -91,7 +91,7 @@ function downloadPathSelection() {
 		localStorage.setItem("downloadPath", appdir);
 	}
 	getId("path").textContent = downloadDir;
-	fs.mkdir(downloadDir, { recursive: true }, () => {});
+	fs.mkdir(downloadDir, {recursive: true}, () => {});
 }
 
 downloadPathSelection();
@@ -117,35 +117,18 @@ async function downloadYtdlp() {
 
 	// Downloading appropriate version of yt-dlp
 	if (os.platform() == "linux") {
-		// Checking python version
-		try {
-			const result = cp.execSync("python3 --version", {
-				encoding: "utf-8",
-			});
-			const minorVersion = Number(result.split(" ")[1].split(".")[1]);
-			if (minorVersion >= 7) {
-				await YTDlpWrap.downloadFromGithub(ytdlpDownloadPath);
-			} else {
-				// Downloading full binary if python version is less than 3.7
-				await YTDlpWrap.downloadFromGithub(
-					ytdlpDownloadPath,
-					"",
-					"linux",
-					true
-				);
-			}
-		} catch (error) {
-			// Downloading full binary of python3 is not there
 			await YTDlpWrap.downloadFromGithub(
 				ytdlpDownloadPath,
 				"",
 				"linux",
 				true
 			);
-		}
+			localStorage.setItem("fullYtdlpBinPresent", "true");
+
 	} else {
 		// In case of windows/mac
-		await YTDlpWrap.downloadFromGithub(ytdlpDownloadPath);
+			await YTDlpWrap.downloadFromGithub(ytdlpDownloadPath);
+			localStorage.setItem("fullYtdlpBinPresent", "true");
 	}
 
 	getId("popupBox").style.display = "none";
@@ -157,71 +140,44 @@ async function downloadYtdlp() {
 }
 
 // Checking if yt-dlp has been installed by user
-cp.exec("yt-dlp --version", (error, stdout, stderr) => {
-	if (error) {
-		// Checking if yt-dlp has been installed by program
-		cp.exec(`${ytdlpPath} --version`, (error, stdout, stderr) => {
-			if (error) {
-				getId("popupBox").style.display = "block";
-				process.on("uncaughtException", (reason, promise) => {
-					document.querySelector("#popupBox p").textContent = i18n.__(
-						"Failed to download necessary files. Please check your network and try again"
-					);
-					getId("popupSvg").style.display = "none";
-					getId("popup").innerHTML += `<button id="tryBtn">${i18n.__(
-						"Try again"
-					)}</button>`;
-					console.log("Failed to download yt-dlp");
 
-					getId("tryBtn").addEventListener("click", () => {
-						getId("popup").removeChild(getId("popup").lastChild);
-						downloadYtdlp();
-					});
-				});
+const fullYtdlpBinIsPresent = !!localStorage.getItem("fullYtdlpBinPresent");
 
+cp.exec(`${ytdlpPath} --version`, (error, stdout, stderr) => {
+	if (error || !fullYtdlpBinIsPresent) {
+		getId("popupBox").style.display = "block";
+		process.on("uncaughtException", (reason, promise) => {
+			document.querySelector("#popupBox p").textContent = i18n.__(
+				"Failed to download necessary files. Please check your network and try again"
+			);
+			getId("popupSvg").style.display = "none";
+			getId("popup").innerHTML += `<button id="tryBtn">${i18n.__(
+				"Try again"
+			)}</button>`;
+			console.log("Failed to download yt-dlp");
+
+			getId("tryBtn").addEventListener("click", () => {
+				getId("popup").removeChild(getId("popup").lastChild);
 				downloadYtdlp();
-			} else {
-				console.log("yt-dlp binary is present in PATH");
-				ytDlp = ytdlpPath;
-				ytdlp = new YTDlpWrap(ytDlp);
-				localStorage.setItem("ytdlp", ytDlp);
-				cp.spawn(`${ytDlp}`, ["-U"]).stdout.on("data", (data) =>
-					console.log(data.toString("utf8"))
-				);
-				getId("pasteUrl").style.display = "inline-block";
-				console.log("yt-dlp bin Path: " + ytDlp);
-
-				ipcRenderer.send("ready-for-links");
-			}
+			});
 		});
+		downloadYtdlp();
 	} else {
 		console.log("yt-dlp binary is present in PATH");
-		ytDlp = "yt-dlp";
+		ytDlp = ytdlpPath;
 		ytdlp = new YTDlpWrap(ytDlp);
 		localStorage.setItem("ytdlp", ytDlp);
+		cp.spawn(`${ytDlp}`, ["-U"]).stdout.on("data", (data) =>
+			console.log(data.toString("utf8"))
+		);
 		getId("pasteUrl").style.display = "inline-block";
 		console.log("yt-dlp bin Path: " + ytDlp);
+
 		ipcRenderer.send("ready-for-links");
 	}
 });
 
-// Check for thumbnail embed support
-let embedThumbnail = false;
-if (os.platform() === "win32" || os.platform() === "darwin"){
-	embedThumbnail = true;
-} else {
-	try {
-		cp.execSync("ffprobe -version", {
-			encoding: "utf-8",
-		});
-		console.log("ffprobe found")
-		embedThumbnail = true
-
-		
-	} catch (error) {
-		console.log("ffprobe not found")
-	}
-}
+let embedThumbnail = true;
 
 function defaultVideoToggle() {
 	let defaultWindow = "video";
@@ -402,8 +358,11 @@ async function getInfo(url) {
 					}
 				}
 
-				if (format.audio_ext === preferredAudioQuality || format.acodec === preferredAudioQuality){
-					preferredAudioFormatLength ++;
+				if (
+					format.audio_ext === preferredAudioQuality ||
+					format.acodec === preferredAudioQuality
+				) {
+					preferredAudioFormatLength++;
 				}
 			}
 			for (let format of formats) {
@@ -423,7 +382,10 @@ async function getInfo(url) {
 					).toFixed(2);
 				} else {
 					if (format.tbr) {
-						size = ((format.tbr * 128 * duration) / 1000000).toFixed(2)
+						size = (
+							(format.tbr * 128 * duration) /
+							1000000
+						).toFixed(2);
 					} else {
 						size = i18n.__("Unknown size");
 					}
@@ -511,9 +473,15 @@ async function getInfo(url) {
 					} else {
 						audio_ext = format.audio_ext;
 					}
-					if (format.audio_ext === preferredAudioQuality || format.acodec === preferredAudioQuality) {
+					if (
+						format.audio_ext === preferredAudioQuality ||
+						format.acodec === preferredAudioQuality
+					) {
 						preferredAudioFormatCount += 1;
-						if (preferredAudioFormatCount  === preferredAudioFormatLength){
+						if (
+							preferredAudioFormatCount ===
+							preferredAudioFormatLength
+						) {
 							audioSelectedText = " selected ";
 						}
 					}
@@ -966,7 +934,7 @@ function download(
 				subs2 || subLangs,
 				"--no-playlist",
 				"--embed-metadata",
-				ext == "mp4" && embedThumbnail ? "--embed-thumbnail": "",
+				ext == "mp4" && embedThumbnail ? "--embed-thumbnail" : "",
 				configArg,
 				configTxt,
 				cookieArg,
@@ -974,7 +942,7 @@ function download(
 				"--no-mtime",
 				`"${url}"`,
 			],
-			{ shell: true, detached: false },
+			{shell: true, detached: false},
 			controller.signal
 		);
 	} else if (type === "extract") {
@@ -1004,7 +972,10 @@ function download(
 				ffmpeg,
 				"--no-playlist",
 				"--embed-metadata",
-				(extractFormat1 == "m4a" || embedThumbnail) && extractFormat1 == "mp3" ? "--embed-thumbnail": "",
+				(extractFormat1 == "m4a" || embedThumbnail) &&
+				extractFormat1 == "mp3"
+					? "--embed-thumbnail"
+					: "",
 				cookieArg,
 				browser,
 				configArg,
@@ -1012,7 +983,7 @@ function download(
 				"--no-mtime",
 				`"${url}"`,
 			],
-			{ shell: true, detached: false },
+			{shell: true, detached: false},
 			controller.signal
 		);
 	}
@@ -1034,7 +1005,9 @@ function download(
 				subs2 || subLangs,
 				"--no-playlist",
 				"--embed-metadata",
-				(ext == "m4a" || ext == "mp4") && embedThumbnail ? "--embed-thumbnail": "",
+				(ext == "m4a" || ext == "mp4") && embedThumbnail
+					? "--embed-thumbnail"
+					: "",
 				cookieArg,
 				browser,
 				configArg,
@@ -1042,7 +1015,7 @@ function download(
 				"--no-mtime",
 				`"${url}"`,
 			],
-			{ shell: true, detached: false },
+			{shell: true, detached: false},
 			controller.signal
 		);
 	}
