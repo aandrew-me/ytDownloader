@@ -21,8 +21,6 @@ let isQuiting = false;
 let indexIsOpen = true;
 let trayEnabled = false;
 
-app.commandLine.appendSwitch("--enable-features", "Metal");
-
 function createWindow() {
 	win = new BrowserWindow({
 		autoHideMenuBar: true,
