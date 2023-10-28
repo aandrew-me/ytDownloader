@@ -205,6 +205,24 @@ cp.exec("yt-dlp --version", (error, stdout, stderr) => {
 	}
 });
 
+// Check for thumbnail embed support
+let embedThumbnail = false;
+if (os.platform() === "win32" || os.platform() === "darwin"){
+	embedThumbnail = true;
+} else {
+	try {
+		cp.execSync("ffprobe -version", {
+			encoding: "utf-8",
+		});
+		console.log("ffprobe found")
+		embedThumbnail = true
+
+		
+	} catch (error) {
+		console.log("ffprobe not found")
+	}
+}
+
 function defaultVideoToggle() {
 	let defaultWindow = "video";
 	if (localStorage.getItem("defaultWindow")) {
@@ -404,7 +422,11 @@ async function getInfo(url) {
 						1000000
 					).toFixed(2);
 				} else {
-					size = i18n.__("Unknown size");
+					if (format.tbr) {
+						size = ((format.tbr * 128 * duration) / 1000000).toFixed(2)
+					} else {
+						size = i18n.__("Unknown size");
+					}
 				}
 
 				// For videos
@@ -415,7 +437,7 @@ async function getInfo(url) {
 				) {
 					if (size !== "Unknown size") {
 						size = (Number(size) + 0 || Number(audioSize)).toFixed(
-							2
+							1
 						);
 						size = size + " " + i18n.__("MB");
 					}
@@ -944,7 +966,7 @@ function download(
 				subs2 || subLangs,
 				"--no-playlist",
 				"--embed-metadata",
-				// ext == "mp4" ? "--embed-thumbnail": "",
+				ext == "mp4" && embedThumbnail ? "--embed-thumbnail": "",
 				configArg,
 				configTxt,
 				cookieArg,
@@ -982,7 +1004,7 @@ function download(
 				ffmpeg,
 				"--no-playlist",
 				"--embed-metadata",
-				// extractFormat1 == "m4a" || extractFormat1 == "mp3" ? "--embed-thumbnail": "",
+				(extractFormat1 == "m4a" || embedThumbnail) && extractFormat1 == "mp3" ? "--embed-thumbnail": "",
 				cookieArg,
 				browser,
 				configArg,
@@ -1012,7 +1034,7 @@ function download(
 				subs2 || subLangs,
 				"--no-playlist",
 				"--embed-metadata",
-				// ext == "m4a" || ext == "mp4" ? "--embed-thumbnail": "",
+				(ext == "m4a" || ext == "mp4") && embedThumbnail ? "--embed-thumbnail": "",
 				cookieArg,
 				browser,
 				configArg,

@@ -44,6 +44,24 @@ if (!fs.existsSync(ffmpegPath)) {
 }
 console.log("ffmpeg:", ffmpeg);
 
+// Check for thumbnail embed support
+let embedThumbnail = false;
+if (os.platform() === "win32" || os.platform() === "darwin"){
+	embedThumbnail = true;
+} else {
+	try {
+		cp.execSync("ffprobe -version", {
+			encoding: "utf-8",
+		});
+		console.log("ffprobe found")
+		embedThumbnail = true
+
+		
+	} catch (error) {
+		console.log("ffprobe not found")
+	}
+}
+
 let foldernameFormat = "%(playlist_title)s";
 let filenameFormat = "%(playlist_index)s.%(title)s.%(ext)s";
 let playlistIndex = 1;
@@ -147,7 +165,7 @@ function download(type) {
 				configArg,
 				configTxt,
 				"--embed-metadata",
-				// videoType == "mp4" ? "--embed-thumbnail": "",
+				videoType == "mp4" && embedThumbnail ? "--embed-thumbnail": "",
 				`"${url}"`,
 			],
 			{shell: true, detached: false},
@@ -180,7 +198,7 @@ function download(type) {
 					configArg,
 					configTxt,
 					"--embed-metadata",
-					// "--embed-thumbnail",
+					embedThumbnail ? "--embed-thumbnail": "",
 					`"${url}"`,
 				],
 				{shell: true, detached: false},
