@@ -35,7 +35,7 @@
 	"description": "Download videos and audios from YouTube and many other sites",
 	"devDependencies": {
 		"electron": "^27.0.2",
-		"electron-builder": "^23.6.0"
+		"electron-builder": "^24.6.4"
 	},
 	"build": {
 		"productName": "YTDownloader",
