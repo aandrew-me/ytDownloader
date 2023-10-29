@@ -117,18 +117,17 @@ async function downloadYtdlp() {
 
 	// Downloading appropriate version of yt-dlp
 	if (os.platform() == "linux") {
-			await YTDlpWrap.downloadFromGithub(
-				ytdlpDownloadPath,
-				"",
-				"linux",
-				true
-			);
-			localStorage.setItem("fullYtdlpBinPresent", "true");
-
+		await YTDlpWrap.downloadFromGithub(
+			ytdlpDownloadPath,
+			"",
+			"linux",
+			true
+		);
+		localStorage.setItem("fullYtdlpBinPresent", "true");
 	} else {
 		// In case of windows/mac
-			await YTDlpWrap.downloadFromGithub(ytdlpDownloadPath);
-			localStorage.setItem("fullYtdlpBinPresent", "true");
+		await YTDlpWrap.downloadFromGithub(ytdlpDownloadPath);
+		localStorage.setItem("fullYtdlpBinPresent", "true");
 	}
 
 	getId("popupBox").style.display = "none";
@@ -176,8 +175,6 @@ cp.exec(`${ytdlpPath} --version`, (error, stdout, stderr) => {
 		ipcRenderer.send("ready-for-links");
 	}
 });
-
-let embedThumbnail = true;
 
 function defaultVideoToggle() {
 	let defaultWindow = "video";
@@ -727,7 +724,7 @@ function timeFormat(duration) {
 	var hrs = ~~(duration / 3600);
 	var mins = ~~((duration % 3600) / 60);
 	var secs = ~~duration % 60;
-	// Ouput like "1:01" or "4:03:59" or "123:03:59"
+	// Output like "1:01" or "4:03:59" or "123:03:59"
 	var ret = "";
 	if (hrs > 0) {
 		ret += "" + hrs + ":" + (mins < 10 ? "0" : "");
@@ -934,7 +931,7 @@ function download(
 				subs2 || subLangs,
 				"--no-playlist",
 				"--embed-metadata",
-				ext == "mp4" && embedThumbnail ? "--embed-thumbnail" : "",
+				ext == "mp4" ? "--embed-thumbnail" : "",
 				configArg,
 				configTxt,
 				cookieArg,
@@ -972,8 +969,7 @@ function download(
 				ffmpeg,
 				"--no-playlist",
 				"--embed-metadata",
-				(extractFormat1 == "m4a" || embedThumbnail) &&
-				extractFormat1 == "mp3"
+				extractFormat1 == "m4a" || extractFormat1 == "mp3"
 					? "--embed-thumbnail"
 					: "",
 				cookieArg,
@@ -1005,9 +1001,7 @@ function download(
 				subs2 || subLangs,
 				"--no-playlist",
 				"--embed-metadata",
-				(ext == "m4a" || ext == "mp4") && embedThumbnail
-					? "--embed-thumbnail"
-					: "",
+				ext == "m4a" || ext == "mp4" ? "--embed-thumbnail" : "",
 				cookieArg,
 				browser,
 				configArg,
