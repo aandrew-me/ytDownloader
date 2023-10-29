@@ -69,6 +69,7 @@
     <button class="submitBtn" id="pasteLink">Click to paste playlist link from clipboard [Ctrl + V]</button>
 
     <div id="options">
+        <img src="../assets/images/close.png" alt="close" id="closeHidden">
         <div id="btnContainer">
             <button class="toggleBtn" id="videoToggle">Video</button>
             <button class="toggleBtn" id="audioToggle">Audio</button>
@@ -117,6 +118,19 @@
                 <option value="flac">Flac</option>
                 <option value="vorbis">Vorbis (ogg)</option>
             </select>
+            <br>
+
+            <label class="audioQualitySelect" id="audioQualitySelectTxt">Select Quality</label>
+            <select id="audioQualitySelect" class="select">
+                <option id="audioQualityAuto" value="auto">Auto</option>
+                <option id="audioQualityNormal" value="5">Normal</option>
+                <option id="audioQualityBest" value="0">Best</option>
+                <option id="audioQualityGood" value="2">Good</option>
+                <option id="audioQualityBad" value="8">Bad</option>
+                <option id="audioQualityWorst" value="10">Worst</option>
+            </select>
+            <br><br>
+
             <button class="submitBtn" id="audioDownload">Download</button>
 
         </div>
@@ -138,6 +152,13 @@
                 <br>
                 <button id="selectLocation" class="submitBtn">Select Download Location</button>
             </div>
+
+            <div class="advancedItem">
+                <p id="subHeader">Subtitles</p>
+                <span id="subTxt">Download subtitles if available</span>
+                <input id="subChecked" class="cb" type="checkbox">
+            </div>
+            <br>
 
             <button class="submitBtn" id="downloadThumbnails">Download thumbnails</button>
             <button class="submitBtn" id="saveLinks">Save video links</button>

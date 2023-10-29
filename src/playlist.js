@@ -44,8 +44,6 @@ if (!fs.existsSync(ffmpegPath)) {
 }
 console.log("ffmpeg:", ffmpeg);
 
-let embedThumbnail = true;
-
 let foldernameFormat = "%(playlist_title)s";
 let filenameFormat = "%(playlist_index)s.%(title)s.%(ext)s";
 let playlistIndex = 1;
@@ -104,6 +102,16 @@ function download(type) {
 	let count = 0;
 	let playlistName;
 
+	// If subtitles are checked
+	if (getId("subChecked").checked) {
+		subs = "--write-subs";
+		subLangs = "--sub-langs all";
+		console.log("Downloading with subtitles")
+	} else {
+		subs = "";
+		subLangs = "";
+	}
+
 	hideOptions();
 
 	let quality, format, downloadProcess, videoType;
@@ -128,6 +136,8 @@ function download(type) {
 		}
 	} else {
 		format = getId("audioSelect").value;
+		audioQuality = getId("audioQualitySelect").value;
+		console.log("Quality:", audioQuality);
 	}
 	console.log("Format:", format);
 
@@ -149,7 +159,9 @@ function download(type) {
 				configArg,
 				configTxt,
 				"--embed-metadata",
-				videoType == "mp4" && embedThumbnail ? "--embed-thumbnail" : "",
+				subs,
+				subLangs,
+				videoType == "mp4" ? "--embed-thumbnail" : "",
 				`"${url}"`,
 			],
 			{shell: true, detached: false},
@@ -159,8 +171,10 @@ function download(type) {
 		// Youtube provides m4a as audio, so no need to convert
 		if (
 			(url.includes("youtube.com/") || url.includes("youtu.be/")) &&
-			format == "m4a"
+			format === "m4a" &&
+			audioQuality === "auto"
 		) {
+			console.log("Downloading m4a without extracting")
 			downloadProcess = ytdlp.exec(
 				[
 					"--yes-playlist",
@@ -182,13 +196,16 @@ function download(type) {
 					configArg,
 					configTxt,
 					"--embed-metadata",
-					embedThumbnail ? "--embed-thumbnail" : "",
+					subs,
+					subLangs,
+					"--embed-thumbnail",
 					`"${url}"`,
 				],
 				{shell: true, detached: false},
 				controller.signal
 			);
 		} else {
+			console.log("Extracting audio")
 			downloadProcess = ytdlp.exec(
 				[
 					"--yes-playlist",
@@ -196,6 +213,8 @@ function download(type) {
 					"-x",
 					"--audio-format",
 					format,
+					"--audio-quality",
+					audioQuality,
 					"-o",
 					`"${path.join(
 						downloadDir,
@@ -211,7 +230,9 @@ function download(type) {
 					configArg,
 					configTxt,
 					"--embed-metadata",
-					format === "mp3" ? "--embed-thumbnail" : "",
+					subs,
+					subLangs,
+					format === "mp3" || format === "m4a" ? "--embed-thumbnail" : "",
 					`"${url}"`,
 				],
 				{shell: true, detached: false},
@@ -339,15 +360,17 @@ function nameFormatting() {
 	}
 }
 
-function hideOptions() {
+function hideOptions(justHide = false) {
 	getId("options").style.display = "none";
-	getId("openDownloads").style.display = "inline-block";
-	getId("pasteLink").style.display = "none";
-	getId("playlistName").textContent = i18n.__("Processing") + "...";
 	getId("list").innerHTML = "";
 	getId("errorBtn").style.display = "none";
 	getId("errorDetails").style.display = "none";
 	getId("errorDetails").textContent = "";
+	if (!justHide){
+		getId("playlistName").textContent = i18n.__("Processing") + "...";
+		getId("pasteLink").style.display = "none";
+		getId("openDownloads").style.display = "inline-block";
+	}
 }
 
 function downloadThumbnails() {
@@ -562,6 +585,10 @@ getId("select").addEventListener("change", () => {
 	} else {
 		getId("typeSelectBox").style.display = "block";
 	}
+});
+
+getId("closeHidden").addEventListener("click", () => {
+	hideOptions(true);
 });
 
 // More options
