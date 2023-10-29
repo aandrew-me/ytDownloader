@@ -394,7 +394,7 @@ async function getInfo(url) {
 					format.video_ext !== "none" &&
 					format.audio_ext === "none"
 				) {
-					if (size !== "Unknown size") {
+					if (size !== i18n.__("Unknown size")) {
 						size = (Number(size) + 0 || Number(audioSize)).toFixed(
 							1
 						);
@@ -462,7 +462,7 @@ async function getInfo(url) {
 					format.audio_ext !== "none" ||
 					(format.acodec !== "none" && format.video_ext === "none")
 				) {
-					size = size + " MB";
+					size = size !== i18n.__("Unknown size") ? size + " MB" : i18n.__("Unknown size");
 					let audio_ext;
 
 					if (format.audio_ext === "webm") {

@@ -44,6 +44,15 @@ if (!fs.existsSync(ffmpegPath)) {
 }
 console.log("ffmpeg:", ffmpeg);
 
+if (localStorage.getItem("preferredVideoQuality")) {
+	preferredVideoQuality = localStorage.getItem("preferredVideoQuality");
+	getId('select').value = preferredVideoQuality
+}
+if (localStorage.getItem("preferredAudioQuality")) {
+	preferredAudioQuality = localStorage.getItem("preferredAudioQuality");
+	getId("audioSelect").value = preferredAudioQuality;
+}
+
 let foldernameFormat = "%(playlist_title)s";
 let filenameFormat = "%(playlist_index)s.%(title)s.%(ext)s";
 let playlistIndex = 1;
@@ -663,3 +672,14 @@ getId("matrixTxt").textContent = i18n.__("Matrix");
 getId("githubTxt").textContent = i18n.__("Github");
 getId("latteTxt").textContent = i18n.__("Latte");
 getId("solarizedDarkTxt").textContent = i18n.__("Solarized Dark");
+
+getId("audioQualitySelectTxt").textContent = i18n.__("Select Quality")
+getId("audioQualityAuto").textContent = i18n.__("Auto")
+getId("audioQualityNormal").textContent = i18n.__("Normal")
+getId("audioQualityBest").textContent = i18n.__("Best")
+getId("audioQualityGood").textContent = i18n.__("Good")
+getId("audioQualityBad").textContent = i18n.__("Bad")
+getId("audioQualityWorst").textContent = i18n.__("Worst")
+
+getId("subHeader").textContent = i18n.__("Subtitles");
+getId("subTxt").textContent = i18n.__("Download subtitles if available");
