@@ -64,6 +64,11 @@ A modern GUI video and audio downloader supporting [hundreds of sites](https://g
     ```
     scoop install https://raw.githubusercontent.com/aandrew-me/ytDownloader/main/ytdownloader.json
     ```
+-   **Winget**
+    App can be installed with [Winget](https://github.com/microsoft/winget-cli) using the following command
+    ```
+    winget install aandrew-me.ytDownloader
+    ```
 ## Linux 🐧
 
 Linux has several options available - Flatpak, AppImage, Snap and AUR.
