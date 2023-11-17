@@ -538,7 +538,7 @@ getId("saveLinks").addEventListener("click", () => {
 
 // Selecting download directory
 getId("selectLocation").addEventListener("click", () => {
-	ipcRenderer.send("select-location", "");
+	ipcRenderer.send("select-location-main", "");
 });
 
 ipcRenderer.on("downloadPath", (event, downloadPath) => {
