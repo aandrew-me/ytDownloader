@@ -16,6 +16,7 @@ const fs = require("fs");
 const path = require("path");
 const {shell, ipcRenderer, clipboard} = require("electron");
 const {default: YTDlpWrap} = require("yt-dlp-wrap-plus");
+const { constants } = require("fs/promises");
 
 // Directories
 const homedir = os.homedir();
@@ -86,7 +87,16 @@ function downloadPathSelection() {
 
 	if (localPath) {
 		downloadDir = localPath;
-	} else {
+		try {
+			fs.accessSync(localPath, constants.W_OK);
+			downloadDir = localPath;
+		} catch (err) {
+			console.log("Unable to write to download directory. Switching to default one.")
+			console.log(err)
+			downloadDir = appdir;
+			localStorage.setItem("downloadPath", appdir);
+		}
+		} else {
 		downloadDir = appdir;
 		localStorage.setItem("downloadPath", appdir);
 	}

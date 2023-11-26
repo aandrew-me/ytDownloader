@@ -4,10 +4,22 @@ const path = require("path");
 const os = require("os");
 const fs = require("fs");
 const {execSync} = require("child_process");
+const { constants } = require("fs/promises");
 let url;
 const ytDlp = localStorage.getItem("ytdlp");
 const ytdlp = new YTDlpWrap(`"${ytDlp}"`);
-let downloadDir = localStorage.getItem("downloadPath");
+const downloadsDir = path.join(os.homedir(), "Downloads");
+let downloadDir = localStorage.getItem("downloadPath") || downloadsDir;
+try {
+	console.log("Trying to access", downloadDir)
+	fs.accessSync(downloadDir, constants.W_OK);
+	downloadDir = downloadsDir;
+} catch (err) {
+	console.log("Unable to write to download directory. Switching to default one.")
+	console.log("Err:", err)
+	downloadDir = downloadsDir;
+	localStorage.setItem("downloadPath", downloadsDir);
+}
 getId("path").textContent = downloadDir;
 const i18n = new (require("../translations/i18n"))();
 let cookieArg = "";
