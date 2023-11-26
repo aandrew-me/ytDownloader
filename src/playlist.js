@@ -6,7 +6,7 @@ const fs = require("fs");
 const {execSync} = require("child_process");
 let url;
 const ytDlp = localStorage.getItem("ytdlp");
-const ytdlp = new YTDlpWrap(ytDlp);
+const ytdlp = new YTDlpWrap(`"${ytDlp}"`);
 let downloadDir = localStorage.getItem("downloadPath");
 getId("path").textContent = downloadDir;
 const i18n = new (require("../translations/i18n"))();

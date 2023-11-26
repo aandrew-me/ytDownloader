@@ -132,7 +132,7 @@ async function downloadYtdlp() {
 
 	getId("popupBox").style.display = "none";
 	ytDlp = ytdlpPath;
-	ytdlp = new YTDlpWrap(ytDlp);
+	ytdlp = new YTDlpWrap(`"${ytDlp}"`);
 	localStorage.setItem("ytdlp", ytDlp);
 	getId("pasteUrl").style.display = "inline-block";
 	console.log("yt-dlp bin Path: " + ytDlp);
@@ -142,7 +142,7 @@ async function downloadYtdlp() {
 
 const fullYtdlpBinIsPresent = !!localStorage.getItem("fullYtdlpBinPresent");
 
-cp.exec(`${ytdlpPath} --version`, (error, stdout, stderr) => {
+cp.exec(`"${ytdlpPath}" --version`, (error, stdout, stderr) => {
 	if (error || !fullYtdlpBinIsPresent) {
 		getId("popupBox").style.display = "block";
 		process.on("uncaughtException", (reason, promise) => {
@@ -164,7 +164,7 @@ cp.exec(`${ytdlpPath} --version`, (error, stdout, stderr) => {
 	} else {
 		console.log("yt-dlp binary is present in PATH");
 		ytDlp = ytdlpPath;
-		ytdlp = new YTDlpWrap(ytDlp);
+		ytdlp = new YTDlpWrap(`"${ytDlp}"`);
 		localStorage.setItem("ytdlp", ytDlp);
 		cp.spawn(`${ytDlp}`, ["-U"]).stdout.on("data", (data) =>
 			console.log(data.toString("utf8"))
@@ -260,7 +260,7 @@ async function getInfo(url) {
 	let info = "";
 
 	const infoProcess = cp.spawn(
-		ytDlp,
+		`"${ytDlp}"`,
 		[
 			"-j",
 			"--no-playlist",
