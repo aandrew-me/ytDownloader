@@ -29,12 +29,9 @@ jobs:
 
               run: |
                 sudo snap install snapcraft --classic
-                wget "https://github.com/yt-dlp/FFmpeg-Builds/releases/download/latest/ffmpeg-n6.0-latest-linux64-gpl-6.0.tar.xz"
-                tar xvf ffmpeg-n6.0-latest-linux64-gpl-6.0.tar.xz
-                cp ffmpeg-n6.0-latest-linux64-gpl-6.0/bin/ffmpeg ffmpeg
+                wget "https://github.com/aandrew-me/ffmpeg-builds/releases/download/v6/ffmpeg_linux_amd64"
+                mv ffmpeg_linux_amd64 ffmpeg
                 chmod +x ffmpeg
-                rm -rf ffmpeg-n6.0-latest-linux64-gpl-6.0
-                rm ffmpeg-n6.0-latest-linux64-gpl-6.0.tar.xz
                 npm i
                 npx electron-builder -l --publish=always
                 npm run gh-linux
