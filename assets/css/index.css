@@ -401,7 +401,7 @@ body {
 	outline: none;
 }
 
-#videoFormatSelect {
+#videoFormatSelect, #audioFormatSelect {
 	font-family: JetBrains, monospace;
 	font-size: medium;
 }

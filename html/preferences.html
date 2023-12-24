@@ -39,18 +39,18 @@
 
     <br>
 
-   <!-- Language -->
+    <!-- Language -->
     <div class="prefBox">
         <label id="selectLn">Select Language (Requires reload)</label>
         <select id="select" onchange="changeLanguage()">
             <option value="en">English</option>
-
             <option value="de">Deutsch</option>
             <option value="es">Español</option>
             <option value="fa">فارسی</option>
             <option value="el">Ελληνικά</option>
             <option value="fr">Français</option>
             <option value="it">Italiano</option>
+            <option value="ja">Japanese</option>
             <option value="hu">Magyar</option>
             <option value="pl">Polski</option>
             <option value="pt">Português</option>
@@ -75,6 +75,19 @@
             <option value="1080">1080p (FHD)</option>
             <option value="1440">1440p</option>
             <option value="2160">2160p (4k)</option>
+        </select>
+
+    </div>
+    <br>
+
+    <!-- Video Codec -->
+    <div class="prefBox">
+        <span id="preferredVideoCodecTxt">Preferred video codec</span>
+        <select id="preferredVideoCodec">
+            <option value="avc1">AVC1</option>
+            <option value="av01">AV1</option>
+            <option value="vp9">VP9</option>
+            <option value="mp4v">MP4V</option>
         </select>
 
     </div>
@@ -130,8 +143,14 @@
             <span id="configPath"></span>
         </div>
     </div>
-
     <br>
+
+    <div class="prefBox">
+        <span id="showMoreFormatsTxt">Show more format options</span>
+        <input type="checkbox" class="cb" id="showMoreFormats">
+    </div>
+    <br>
+
     <div class="prefBox">
         <span id="fileFormatTxt">Filename format for playlists</span>
         <input type="text" id="filenameFormat" placeholder="yt-dlp format style"

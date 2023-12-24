@@ -17,19 +17,21 @@ const path = require("path");
 const {shell, ipcRenderer, clipboard} = require("electron");
 const {default: YTDlpWrap} = require("yt-dlp-wrap-plus");
 const {constants} = require("fs/promises");
-const { stdout } = require("process");
+const {stdout} = require("process");
 
 // Directories
 const homedir = os.homedir();
 let appdir = path.join(homedir, "Downloads");
 if (os.platform() === "linux") {
 	try {
-		const xdgDownloadDir = cp.execSync("xdg-user-dir DOWNLOAD").toString().trim()
+		const xdgDownloadDir = cp
+			.execSync("xdg-user-dir DOWNLOAD")
+			.toString()
+			.trim();
 		if (xdgDownloadDir.length > 1) {
-			appdir = xdgDownloadDir
-			console.log("xdg download dir:", xdgDownloadDir)
+			appdir = xdgDownloadDir;
+			console.log("xdg download dir:", xdgDownloadDir);
 		}
-		
 	} catch (err) {}
 }
 const hiddenDir = path.join(homedir, ".ytDownloader");
@@ -59,7 +61,8 @@ let rangeOption = "--download-sections";
 let cookieArg = "";
 let browser = "";
 let maxActiveDownloads = 5;
-let showVcodec = true;
+let showMoreFormats = false;
+
 function checkMaxDownloads() {
 	if (localStorage.getItem("maxActiveDownloads")) {
 		const number = Number(localStorage.getItem("maxActiveDownloads"));
@@ -88,6 +91,7 @@ let controllers = new Object();
 // Video and audio preferences
 let preferredVideoQuality = "";
 let preferredAudioQuality = "";
+let preferredVideoCodec = "avc1";
 
 function getId(id) {
 	return document.getElementById(id);
@@ -268,6 +272,14 @@ async function getInfo(url) {
 		preferredAudioQuality = localStorage.getItem("preferredAudioQuality");
 		getId("extractSelection").value = preferredAudioQuality;
 	}
+	if (localStorage.getItem("preferredVideoCodec")) {
+		preferredVideoCodec = localStorage.getItem("preferredVideoCodec");
+	}
+	if (localStorage.getItem("showMoreFormats") === "true") {
+		showMoreFormats = true;
+	} else {
+		showMoreFormats = false;
+	}
 
 	// Whether to use browser cookies or not
 	if (localStorage.getItem("browser")) {
@@ -347,6 +359,7 @@ async function getInfo(url) {
 
 			let audioSize = 0;
 			let defaultVideoFormat = 0;
+			let videoFormatCodecs = {};
 
 			let preferredAudioFormatLength = 0;
 			let preferredAudioFormatCount = 0;
@@ -357,10 +370,18 @@ async function getInfo(url) {
 				// Find the item with the preferred video format
 				if (
 					format.height <= preferredVideoQuality &&
-					format.height > defaultVideoFormat &&
+					format.height >= defaultVideoFormat &&
 					format.video_ext !== "none"
 				) {
 					defaultVideoFormat = format.height;
+
+					// Creating a list of available codecs for the required video height
+					if (!videoFormatCodecs[format.height]) {
+						videoFormatCodecs[format.height] = {codecs: []};
+					}
+					videoFormatCodecs[format.height].codecs.push(
+						format.vcodec.split(".")[0]
+					);
 				}
 
 				// Going through audio list
@@ -385,12 +406,25 @@ async function getInfo(url) {
 					preferredAudioFormatLength++;
 				}
 			}
+
+			const availableCodecs =
+				videoFormatCodecs[defaultVideoFormat].codecs;
+
+			if (!availableCodecs.includes(preferredVideoCodec)) {
+				preferredVideoCodec =
+					availableCodecs[availableCodecs.length - 1];
+			}
+
 			for (let format of formats) {
 				let size;
 				let selectedText = "";
 				let audioSelectedText = "";
 
-				if (format.height == defaultVideoFormat && !selected) {
+				if (
+					format.height == defaultVideoFormat &&
+					format.vcodec.split(".")[0] === preferredVideoCodec &&
+					!selected
+				) {
 					selectedText = " selected ";
 					selected = true;
 				}
@@ -434,26 +468,29 @@ async function getInfo(url) {
 					// Video codec
 
 					const vcodec =
-						format.vcodec && showVcodec
+						format.vcodec && showMoreFormats
 							? format.vcodec.split(".")[0]
 							: "";
-					let spaceAfterVcodec = showVcodec
+					let spaceAfterVcodec = showMoreFormats
 						? "&#160".repeat(5 - vcodec.length)
 						: "";
-					showVcodec
+					showMoreFormats
 						? (spaceAfterVcodec += "|  ")
 						: (spaceAfterVcodec += "");
 
 					// Quality
-					const quality = format.height
-						? format.height + "p" + (format.fps == 60 ? "60" : "")
-						: "" ||
-						  format.resolution ||
-						  i18n.__(format.format_note) ||
-						  format.format_id ||
-						  "Unknown quality";
+					const quality =
+						format.format_note ||
+						(format.height
+							? format.height +
+							  "p" +
+							  (format.fps == 60 ? "60" : "")
+							: "") ||
+						format.resolution ||
+						format.format_id ||
+						"Unknown quality";
 					const spaceAfterQuality = "&#160".repeat(
-						8 - quality.length
+						12 - quality.length
 					);
 
 					// Extension

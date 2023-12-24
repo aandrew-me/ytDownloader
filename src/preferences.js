@@ -101,7 +101,6 @@ getId("browser").addEventListener("change", () => {
 });
 
 // Handling preferred video quality
-
 let preferredVideoQuality = localStorage.getItem("preferredVideoQuality");
 if (preferredVideoQuality) {
 	getId("preferredVideoQuality").value = preferredVideoQuality;
@@ -113,7 +112,6 @@ getId("preferredVideoQuality").addEventListener("change", () => {
 });
 
 // Handling preferred audio quality
-
 let preferredAudioQuality = localStorage.getItem("preferredAudioQuality");
 if (preferredAudioQuality) {
 	getId("preferredAudioQuality").value = preferredAudioQuality;
@@ -122,6 +120,17 @@ if (preferredAudioQuality) {
 getId("preferredAudioQuality").addEventListener("change", () => {
 	preferredAudioQuality = getId("preferredAudioQuality").value;
 	localStorage.setItem("preferredAudioQuality", preferredAudioQuality);
+});
+
+// Handling preferred video codec
+let preferredVideoCodec = localStorage.getItem("preferredVideoCodec");
+if (preferredVideoCodec) {
+	getId("preferredVideoCodec").value = preferredVideoCodec;
+}
+
+getId("preferredVideoCodec").addEventListener("change", () => {
+	preferredVideoCodec = getId("preferredVideoCodec").value;
+	localStorage.setItem("preferredVideoCodec", preferredVideoCodec);
 });
 
 // Reload
@@ -214,5 +223,19 @@ if (autoUpdate == "false"){
 	autoUpdateDisabled.checked = true;
 }
 
+// Show more format options
+const showMoreFormats = getId("showMoreFormats");
+showMoreFormats.addEventListener("change", (event) => {
+	if (showMoreFormats.checked) {
+		localStorage.setItem("showMoreFormats", "true");
+	} else {
+		localStorage.setItem("showMoreFormats", "false");
+
+	}
+});
+const showMoreFormatOpts = localStorage.getItem("showMoreFormats")
+if (showMoreFormatOpts == "true"){
+	showMoreFormats.checked = true;
+}
 // Translation file
 require("../src/translate_preferences");
