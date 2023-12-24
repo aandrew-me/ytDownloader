@@ -10,6 +10,7 @@
     <p>ytDownloader lets you download videos and audios of different qualities from hundreds of
       sites including the popular ones but not limited to Youtube, Facebook, Instagram, Tiktok,
       Twitter, Twitch and so on.</p>
+    <p>If you want to use browser cookies, you need to give the app permission to access homedirectory. You can do it with flatseal by enabling 'All user files' permission.</p>
     <p>✔️ Supports Light/Dark/Transparent mode</p>
     <p>✔️ Supports high quality video resolutions</p>
     <p>✔️ Supports audio extraction in multiple formats</p>
