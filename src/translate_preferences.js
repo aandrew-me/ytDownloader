@@ -35,3 +35,5 @@ getId("resetFoldernameFormat").textContent = i18n.__("Reset to default");
 getId("maxTxt").textContent = i18n.__("Maximum number of active downloads");
 getId("trayTxt").textContent = i18n.__("Close app to system tray");
 getId("autoUpdateTxt").textContent = i18n.__("Disable auto updates");
+getId("showMoreFormatsTxt").textContent = i18n.__("Show more format options");
+getId("preferredVideoCodecTxt").textContent = i18n.__("Preferred video codec");
