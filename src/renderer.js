@@ -16,11 +16,22 @@ const fs = require("fs");
 const path = require("path");
 const {shell, ipcRenderer, clipboard} = require("electron");
 const {default: YTDlpWrap} = require("yt-dlp-wrap-plus");
-const { constants } = require("fs/promises");
+const {constants} = require("fs/promises");
+const { stdout } = require("process");
 
 // Directories
 const homedir = os.homedir();
-const appdir = path.join(homedir, "Downloads");
+let appdir = path.join(homedir, "Downloads");
+if (os.platform() === "linux") {
+	try {
+		const xdgDownloadDir = cp.execSync("xdg-user-dir DOWNLOAD").toString().trim()
+		if (xdgDownloadDir.length > 1) {
+			appdir = xdgDownloadDir
+			console.log("xdg download dir:", xdgDownloadDir)
+		}
+		
+	} catch (err) {}
+}
 const hiddenDir = path.join(homedir, ".ytDownloader");
 const i18n = new (require("../translations/i18n"))();
 
@@ -91,12 +102,14 @@ function downloadPathSelection() {
 			fs.accessSync(localPath, constants.W_OK);
 			downloadDir = localPath;
 		} catch (err) {
-			console.log("Unable to write to download directory. Switching to default one.")
-			console.log(err)
+			console.log(
+				"Unable to write to download directory. Switching to default one."
+			);
+			console.log(err);
 			downloadDir = appdir;
 			localStorage.setItem("downloadPath", appdir);
 		}
-		} else {
+	} else {
 		downloadDir = appdir;
 		localStorage.setItem("downloadPath", appdir);
 	}
@@ -472,7 +485,10 @@ async function getInfo(url) {
 					format.audio_ext !== "none" ||
 					(format.acodec !== "none" && format.video_ext === "none")
 				) {
-					size = size !== i18n.__("Unknown size") ? size + " MB" : i18n.__("Unknown size");
+					size =
+						size !== i18n.__("Unknown size")
+							? size + " MB"
+							: i18n.__("Unknown size");
 					let audio_ext;
 
 					if (format.audio_ext === "webm") {
