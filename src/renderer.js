@@ -371,7 +371,11 @@ async function getInfo(url) {
 				if (
 					format.height <= preferredVideoQuality &&
 					format.height >= defaultVideoFormat &&
-					format.video_ext !== "none"
+					format.video_ext !== "none" &&
+					!(
+						format.video_ext === "mp4" &&
+						format.vcodec.split(".")[0] === "vp09"
+					)
 				) {
 					defaultVideoFormat = format.height;
 
@@ -423,7 +427,11 @@ async function getInfo(url) {
 				if (
 					format.height == defaultVideoFormat &&
 					format.vcodec.split(".")[0] === preferredVideoCodec &&
-					!selected
+					!selected &&
+					!(
+						format.video_ext === "mp4" &&
+						format.vcodec.split(".")[0] === "vp09"
+					)
 				) {
 					selectedText = " selected ";
 					selected = true;
@@ -449,7 +457,11 @@ async function getInfo(url) {
 
 				if (
 					format.video_ext !== "none" &&
-					format.audio_ext === "none"
+					format.audio_ext === "none" &&
+					!(
+						format.video_ext === "mp4" &&
+						format.vcodec.split(".")[0] === "vp09"
+					)
 				) {
 					if (size !== i18n.__("Unknown size")) {
 						size = (Number(size) + 0 || Number(audioSize)).toFixed(
