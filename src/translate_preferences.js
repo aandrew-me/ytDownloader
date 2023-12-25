@@ -1,3 +1,5 @@
+const { shell } = require("electron");
+
 function getId(id) {
 	return document.getElementById(id);
 }
@@ -37,3 +39,12 @@ getId("trayTxt").textContent = i18n.__("Close app to system tray");
 getId("autoUpdateTxt").textContent = i18n.__("Disable auto updates");
 getId("showMoreFormatsTxt").textContent = i18n.__("Show more format options");
 getId("preferredVideoCodecTxt").textContent = i18n.__("Preferred video codec");
+
+if (process.env.FLATPAK_ID) {
+	getId("flatpakTxt").textContent = i18n.__(
+		"You need to give the app permission to access home directory to use this. You can do it with Flatseal by enabling the permission with text 'filesystem=home'"
+	);
+	getId("flatpakTxt").addEventListener("click", () => {
+		shell.openExternal("https://flathub.org/apps/com.github.tchx84.Flatseal")
+	})
+}
