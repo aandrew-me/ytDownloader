@@ -17,7 +17,6 @@ const path = require("path");
 const {shell, ipcRenderer, clipboard} = require("electron");
 const {default: YTDlpWrap} = require("yt-dlp-wrap-plus");
 const {constants} = require("fs/promises");
-const {stdout} = require("process");
 
 // Directories
 const homedir = os.homedir();
@@ -89,7 +88,7 @@ let currentDownloads = 0;
 let controllers = new Object();
 
 // Video and audio preferences
-let preferredVideoQuality = "";
+let preferredVideoQuality = 720;
 let preferredAudioQuality = "";
 let preferredVideoCodec = "avc1";
 
@@ -339,6 +338,10 @@ async function getInfo(url) {
 			id = info.id;
 			thumbnail = info.thumbnail;
 			duration = info.duration;
+			/**
+			 * @typedef {import("./types").format} format
+			 * @type {format[]}
+			 */
 			const formats = info.formats;
 			console.log(formats);
 
@@ -358,7 +361,7 @@ async function getInfo(url) {
 				`<input class="title" id="titleName" type="text" value="${title}" onchange="renameTitle()">`;
 
 			let audioSize = 0;
-			let defaultVideoFormat = 0;
+			let defaultVideoFormat = 720;
 			let videoFormatCodecs = {};
 
 			let preferredAudioFormatLength = 0;
@@ -374,6 +377,7 @@ async function getInfo(url) {
 					format.video_ext !== "none" &&
 					!(
 						format.video_ext === "mp4" &&
+						format.vcodec &&
 						format.vcodec.split(".")[0] === "vp09"
 					)
 				) {
@@ -383,9 +387,11 @@ async function getInfo(url) {
 					if (!videoFormatCodecs[format.height]) {
 						videoFormatCodecs[format.height] = {codecs: []};
 					}
-					videoFormatCodecs[format.height].codecs.push(
-						format.vcodec.split(".")[0]
-					);
+					if (format.vcodec) {
+						videoFormatCodecs[format.height].codecs.push(
+							format.vcodec.split(".")[0]
+						);
+					}
 				}
 
 				// Going through audio list
@@ -411,8 +417,9 @@ async function getInfo(url) {
 				}
 			}
 
-			const availableCodecs =
-				videoFormatCodecs[defaultVideoFormat].codecs;
+			const availableCodecs = videoFormatCodecs[defaultVideoFormat]
+				? videoFormatCodecs[defaultVideoFormat].codecs
+				: [];
 
 			if (!availableCodecs.includes(preferredVideoCodec)) {
 				preferredVideoCodec =
@@ -426,6 +433,7 @@ async function getInfo(url) {
 
 				if (
 					format.height == defaultVideoFormat &&
+					format.vcodec &&
 					format.vcodec.split(".")[0] === preferredVideoCodec &&
 					!selected &&
 					!(
@@ -460,6 +468,7 @@ async function getInfo(url) {
 					format.audio_ext === "none" &&
 					!(
 						format.video_ext === "mp4" &&
+						format.vcodec &&
 						format.vcodec.split(".")[0] === "vp09"
 					)
 				) {
@@ -492,17 +501,17 @@ async function getInfo(url) {
 
 					// Quality
 					const quality =
-						format.format_note ||
 						(format.height
 							? format.height +
 							  "p" +
 							  (format.fps == 60 ? "60" : "")
 							: "") ||
+						format.format_note ||
 						format.resolution ||
 						format.format_id ||
 						"Unknown quality";
 					const spaceAfterQuality = "&#160".repeat(
-						12 - quality.length
+						8 - quality.length
 					);
 
 					// Extension

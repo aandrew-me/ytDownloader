@@ -49,7 +49,7 @@
 			"./public/**/*",
 			"package.json",
 			"./assets/**/*",
-			"./src/**/*",
+			"./src/*.js",
 			"ffmpeg*",
 			"translations"
 		],
