@@ -12,7 +12,6 @@ const fs = require("fs");
 /////////////////////////////////////
 // Do not change the lines at the top
 /////////////////////////////////////
-
 const path = require("path");
 const {shell, ipcRenderer, clipboard} = require("electron");
 const {default: YTDlpWrap} = require("yt-dlp-wrap-plus");
@@ -91,7 +90,11 @@ let controllers = new Object();
 let preferredVideoQuality = 720;
 let preferredAudioQuality = "";
 let preferredVideoCodec = "avc1";
-
+/**
+ *
+ * @param {string} id
+ * @returns {any}
+ */
 function getId(id) {
 	return document.getElementById(id);
 }
@@ -258,14 +261,18 @@ async function getInfo(url) {
 	// Cleaning text
 	getId("videoFormatSelect").innerHTML = "";
 	getId("audioFormatSelect").innerHTML = "";
-	getId("startTime").value = "";
+
+	const startTime = getId("startTime");
+	startTime.value = "";
 	getId("endTime").value = "";
 	getId("errorBtn").style.display = "none";
 	getId("errorDetails").style.display = "none";
 	getId("errorDetails").textContent = "";
 
 	if (localStorage.getItem("preferredVideoQuality")) {
-		preferredVideoQuality = localStorage.getItem("preferredVideoQuality");
+		preferredVideoQuality = Number(
+			localStorage.getItem("preferredVideoQuality")
+		);
 	}
 	if (localStorage.getItem("preferredAudioQuality")) {
 		preferredAudioQuality = localStorage.getItem("preferredAudioQuality");
@@ -291,6 +298,7 @@ async function getInfo(url) {
 	}
 
 	let validInfo = true;
+
 	let info = "";
 
 	const infoProcess = cp.spawn(
@@ -331,22 +339,29 @@ async function getInfo(url) {
 
 	infoProcess.on("close", () => {
 		if (validInfo) {
-			info = JSON.parse(info);
-			console.log(info);
+			/**
+			 * @typedef {import("./types").info} info
+			 * @type {info}
+			 */
+			const parsedInfo = JSON.parse(info);
+			console.log(parsedInfo);
 
-			title = info.title;
-			id = info.id;
-			thumbnail = info.thumbnail;
-			duration = info.duration;
+			title = parsedInfo.title;
+			id = parsedInfo.id;
+			thumbnail = parsedInfo.thumbnail;
+			duration = parsedInfo.duration;
 			/**
 			 * @typedef {import("./types").format} format
 			 * @type {format[]}
 			 */
-			const formats = info.formats;
+			const formats = parsedInfo.formats;
 			console.log(formats);
 
+			/**
+			 * @type {HTMLInputElement[]}
+			 */
+			// @ts-ignore
 			const urlElements = document.querySelectorAll(".url");
-
 			urlElements.forEach((element) => {
 				element.value = url;
 			});
@@ -753,7 +768,6 @@ getId("extractBtn").addEventListener("click", () => {
 		download("extract");
 		currentDownloads++;
 	} else {
-		// Handling active downloads for extracting audio
 		manageAdvanced(duration);
 		const range1 = rangeOption;
 		const range2 = rangeCmd;
@@ -978,7 +992,7 @@ function download(
 	let audioFormat;
 
 	if (ext === "mp4") {
-		if (!audioExtensionList.length == 0) {
+		if (!(audioExtensionList.length == 0)) {
 			if (audioExtensionList.includes("m4a")) {
 				audioFormat = "+m4a";
 			} else {
@@ -1220,7 +1234,6 @@ function renameTitle() {
 // Opening windows
 function closeMenu() {
 	getId("menuIcon").style.transform = "rotate(0deg)";
-	menuIsOpen = false;
 	let count = 0;
 	let opacity = 1;
 	const fade = setInterval(() => {
@@ -1229,7 +1242,7 @@ function closeMenu() {
 			getId("menu").style.display = "none";
 		} else {
 			opacity -= 0.1;
-			getId("menu").style.opacity = opacity;
+			getId("menu").style.opacity = String(opacity);
 			count++;
 		}
 	}, 50);
@@ -1245,7 +1258,6 @@ function hideHidden() {
 }
 
 // Menu
-
 getId("preferenceWin").addEventListener("click", () => {
 	closeMenu();
 	ipcRenderer.send("load-page", __dirname + "/preferences.html");

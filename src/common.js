@@ -1,5 +1,9 @@
-const electron = require("electron")
-
+const electron = require("electron");
+/**
+ *
+ * @param {string} id
+ * @returns {any}
+ */
 function getId(id) {
 	return document.getElementById(id);
 }
@@ -33,16 +37,15 @@ getId("menuIcon").addEventListener("click", () => {
 	}
 });
 
-
-getId("themeToggle").addEventListener("change", ()=>{
-	document.documentElement.setAttribute("theme", getId("themeToggle").value)
-	localStorage.setItem("theme", getId("themeToggle").value)
-})
+getId("themeToggle").addEventListener("change", () => {
+	document.documentElement.setAttribute("theme", getId("themeToggle").value);
+	localStorage.setItem("theme", getId("themeToggle").value);
+});
 
 const storageTheme = localStorage.getItem("theme");
-if (storageTheme){
-	document.documentElement.setAttribute("theme", storageTheme)
-	getId("themeToggle").value = storageTheme
+if (storageTheme) {
+	document.documentElement.setAttribute("theme", storageTheme);
+	getId("themeToggle").value = storageTheme;
 }
 
 ////
@@ -78,7 +81,7 @@ function scrollFunction() {
 // Function to scroll go to top
 
 getId("goToTop").addEventListener("click", () => {
-	window.scrollTo({ top: 0, behavior: "smooth" });
+	window.scrollTo({top: 0, behavior: "smooth"});
 });
 
 // Showing and hiding error details
@@ -86,9 +89,11 @@ function toggleErrorDetails() {
 	const status = getId("errorDetails").style.display;
 	if (status === "none") {
 		getId("errorDetails").style.display = "block";
+		// @ts-ignore
 		getId("errorBtn").textContent = i18n.__("Error Details") + " ▲";
 	} else {
 		getId("errorDetails").style.display = "none";
+		// @ts-ignore
 		getId("errorBtn").textContent = i18n.__("Error Details") + " ▼";
 	}
 }
@@ -98,15 +103,16 @@ function toggleErrorDetails() {
 function copyErrorToClipboard() {
 	const error = getId("errorDetails").textContent;
 	electron.clipboard.writeText(error);
+	// @ts-ignore
 	showPopup(i18n.__("Copied text"));
 }
 
 // Popup message
 function showPopup(text) {
-	console.log("Triggered showpopup")
-	getId("popupText").textContent = text
+	console.log("Triggered showpopup");
+	getId("popupText").textContent = text;
 	getId("popupText").style.display = "inline-block";
 	setTimeout(() => {
-		getId("popupText").style.display = "none"
+		getId("popupText").style.display = "none";
 	}, 2200);
 }

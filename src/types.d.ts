@@ -10,8 +10,19 @@ type format = {
     video_ext: string,
     audio_ext: string,
     filesize_approx?: number,
+    tbr: number,
+    fps: number,
+}
+
+type info = {
+    title: string,
+    id: string,
+    thumbnail: string,
+    duration: number,
+    formats: format[],
 }
 
 export {
     format,
+    info
 }

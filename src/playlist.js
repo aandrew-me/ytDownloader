@@ -57,11 +57,11 @@ if (!fs.existsSync(ffmpegPath)) {
 console.log("ffmpeg:", ffmpeg);
 
 if (localStorage.getItem("preferredVideoQuality")) {
-	preferredVideoQuality = localStorage.getItem("preferredVideoQuality");
+	const preferredVideoQuality = localStorage.getItem("preferredVideoQuality");
 	getId('select').value = preferredVideoQuality
 }
 if (localStorage.getItem("preferredAudioQuality")) {
-	preferredAudioQuality = localStorage.getItem("preferredAudioQuality");
+	const preferredAudioQuality = localStorage.getItem("preferredAudioQuality");
 	getId("audioSelect").value = preferredAudioQuality;
 }
 
@@ -70,6 +70,11 @@ let filenameFormat = "%(playlist_index)s.%(title)s.%(ext)s";
 let playlistIndex = 1;
 let playlistEnd = "";
 
+/**
+ * 
+ * @param {string} id 
+ * @returns {any}
+ */
 function getId(id) {
 	return document.getElementById(id);
 }
@@ -97,6 +102,9 @@ const playlistTxt = "Downloading playlist: ";
 const videoIndex = "Downloading item ";
 const oldVideoIndex = "Downloading video ";
 
+/**
+ * @param {string} type 
+ */
 function download(type) {
 	// Config file
 	let configArg = "";
@@ -121,6 +129,7 @@ function download(type) {
 		cookieArg = "";
 	}
 	let count = 0;
+	let subs, subLangs;
 	let playlistName;
 
 	// If subtitles are checked
@@ -135,7 +144,7 @@ function download(type) {
 
 	hideOptions();
 
-	let quality, format, downloadProcess, videoType;
+	let quality, format, downloadProcess, videoType, audioQuality;
 	if (type === "video") {
 		quality = getId("select").value;
 		videoType = getId("videoTypeSelect").value;
@@ -328,7 +337,7 @@ function managePlaylistRange() {
 		playlistIndex = Number(getId("playlistIndex").value);
 	}
 	if (getId("playlistEnd").value) {
-		playlistEnd = Number(getId("playlistEnd").value);
+		playlistEnd = getId("playlistEnd").value;
 	}
 	console.log(`Range: ${playlistIndex}:${playlistEnd}`);
 	if (playlistIndex > 0) {
@@ -396,6 +405,7 @@ function hideOptions(justHide = false) {
 
 function downloadThumbnails() {
 	let count = 0;
+	let playlistName;
 	hideOptions();
 	nameFormatting();
 	managePlaylistRange();
@@ -465,6 +475,7 @@ function downloadThumbnails() {
 // Download video links
 function saveLinks() {
 	let count = 0;
+	let playlistName;
 	hideOptions();
 	nameFormatting();
 	managePlaylistRange();
@@ -565,7 +576,6 @@ function openFolder(location) {
 
 function closeMenu() {
 	getId("menuIcon").style.transform = "rotate(0deg)";
-	menuIsOpen = false;
 	let count = 0;
 	let opacity = 1;
 	const fade = setInterval(() => {
@@ -573,7 +583,7 @@ function closeMenu() {
 			clearInterval(fade);
 		} else {
 			opacity -= 0.1;
-			getId("menu").style.opacity = opacity;
+			getId("menu").style.opacity = String(opacity);
 			count++;
 		}
 	}, 50);
@@ -600,7 +610,7 @@ audioToggle.addEventListener("click", (event) => {
 });
 
 getId("select").addEventListener("change", () => {
-	value = getId("select").value;
+	const value = getId("select").value;
 	if (value == "best" || value == "worst" || value == "useConfig") {
 		getId("typeSelectBox").style.display = "none";
 	} else {

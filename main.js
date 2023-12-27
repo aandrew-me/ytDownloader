@@ -9,7 +9,7 @@ const {
 	clipboard,
 } = require("electron");
 const {autoUpdater} = require("electron-updater");
-process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true;
+process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = "true";
 const fs = require("fs");
 const path = require("path");
 
@@ -26,6 +26,7 @@ function createWindow() {
 		autoHideMenuBar: true,
 		show: false,
 		icon: __dirname + "/assets/images/icon.png",
+		// @ts-ignore
 		spellcheck: false,
 		webPreferences: {
 			nodeIntegration: true,
@@ -262,6 +263,9 @@ ipcMain.on("autoUpdate", (event, status) => {
 			(_event, releaseNotes, releaseName) => {
 				// For macOS
 				if (process.platform === "darwin") {
+					/**
+					 * @type {Electron.MessageBoxOptions}
+					 */
 					const dialogOpts = {
 						type: "info",
 						buttons: [i18n("Download"), i18n("No")],
@@ -281,6 +285,9 @@ ipcMain.on("autoUpdate", (event, status) => {
 				}
 				// For Windows and Linux
 				else {
+					/**
+					 * @type {Electron.MessageBoxOptions}
+					 */
 					const dialogOpts = {
 						type: "info",
 						buttons: [i18n("Update"), i18n("No")],
@@ -305,6 +312,9 @@ ipcMain.on("autoUpdate", (event, status) => {
 });
 
 autoUpdater.on("update-downloaded", (_event, releaseNotes, releaseName) => {
+	/**
+	 * @type {Electron.MessageBoxOptions}
+	 */
 	const dialogOpts = {
 		type: "info",
 		buttons: [i18n("Restart"), i18n("Later")],
@@ -315,7 +325,7 @@ autoUpdater.on("update-downloaded", (_event, releaseNotes, releaseName) => {
 		if (returnValue.response === 0) {
 			autoUpdater.quitAndInstall();
 		} else {
-			autoUpdater.autoInstallOnAppQuit();
+			autoUpdater.autoInstallOnAppQuit;
 		}
 	});
 });
