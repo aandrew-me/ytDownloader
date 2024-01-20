@@ -466,14 +466,15 @@ async function getInfo(url) {
 						1000000
 					).toFixed(2);
 				} else {
-					if (format.tbr) {
-						size = (
-							(format.tbr * 128 * duration) /
-							1000000
-						).toFixed(2);
-					} else {
-						size = i18n.__("Unknown size");
-					}
+					// if (format.tbr) {
+					// 	size = (
+					// 		(format.tbr * 50 * duration) /
+					// 		1000000
+					// 	).toFixed(2);
+					// } else {
+						
+					// }
+					size = i18n.__("Unknown size");
 				}
 
 				// For videos
@@ -526,7 +527,9 @@ async function getInfo(url) {
 						format.format_id ||
 						"Unknown quality";
 					const spaceAfterQuality = "&#160".repeat(
-						8 - quality.length
+						quality.length > 8 && 8 - quality.length > 0
+							? 8 - quality.length
+							: quality.length + 2
 					);
 
 					// Extension
@@ -1121,16 +1124,21 @@ function download(
 			if (progress.percent == 100) {
 				getId(randomId + "prog").textContent =
 					i18n.__("Processing") + "...";
+				
+				ipcRenderer.send("progress", 0)
 			} else {
 				getId(randomId + "speed").textContent = `${i18n.__("Speed")}: ${
 					progress.currentSpeed || 0
-				}`;
+				}`;			ipcRenderer.send("progress", progress.percent)
+
 				getId(
 					randomId + "prog"
 				).innerHTML = `<progress class="progressBar" min=0 max=100 value=${progress.percent}>`;
+
+				ipcRenderer.send("progress", progress.percent / 100)
 			}
 		})
-		.once("ytDlpEvent", (eventType, eventData) => {
+		.once("ytDlpEvent", (_eventType, _eventData) => {
 			getId(randomId + "prog").textContent = i18n.__("Downloading...");
 		})
 		.once("close", (code) => {

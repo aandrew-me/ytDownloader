@@ -12,27 +12,31 @@ const {autoUpdater} = require("electron-updater");
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = "true";
 const fs = require("fs");
 const path = require("path");
-
 autoUpdater.autoDownload = false;
+/**@type {BrowserWindow} */
 let win = null;
 let secondaryWindow = null;
 let tray = null;
 let isQuiting = false;
 let indexIsOpen = true;
 let trayEnabled = false;
+const configFile = path.join(app.getPath("userData"), "config.json");
 
 function createWindow() {
+	const bounds = JSON.parse((getItem("bounds", configFile) || "{}"));
+	console.log("bounds:", bounds)
+
 	win = new BrowserWindow({
 		autoHideMenuBar: true,
 		show: false,
 		icon: __dirname + "/assets/images/icon.png",
-		// @ts-ignore
-		spellcheck: false,
 		webPreferences: {
 			nodeIntegration: true,
 			contextIsolation: false,
+			spellcheck: false,
 		},
 	});
+	win.setBounds(bounds)
 	win.on("close", (event) => {
 		if (!isQuiting && trayEnabled) {
 			event.preventDefault();
@@ -41,11 +45,14 @@ function createWindow() {
 		}
 		return false;
 	});
+
+	win.on("resize", (event) => {
+		setItem("bounds", JSON.stringify(win.getBounds()), configFile);
+	});
+
 	win.loadFile("html/index.html");
-	win.maximize();
 	// win.setMenu(null)
 	win.show();
-	// win.webContents.openDevTools();
 	autoUpdater.checkForUpdates();
 }
 let loadedLanguage;
@@ -56,7 +63,6 @@ if (!gotTheLock) {
 	app.quit();
 } else {
 	app.on("second-instance", (event, commandLine, workingDirectory) => {
-		// Someone tried to run a second instance, we should focus our window.
 		if (win) {
 			win.show();
 		}
@@ -311,6 +317,12 @@ ipcMain.on("autoUpdate", (event, status) => {
 	}
 });
 
+ipcMain.on("progress", (_event, percentage) => {
+	if (win) {
+		win.setProgressBar(percentage)
+	}
+})
+
 autoUpdater.on("update-downloaded", (_event, releaseNotes, releaseName) => {
 	/**
 	 * @type {Electron.MessageBoxOptions}
@@ -337,4 +349,40 @@ function i18n(phrase) {
 		translation = phrase;
 	}
 	return translation;
+}
+
+/**
+ * @param {string} itemName
+ * @param {string} itemContent
+ * @param {string} configPath
+ */
+function setItem(itemName, itemContent, configPath) {
+	let config = {};
+	if (fs.existsSync(configPath)) {
+		const fileContent = fs.readFileSync(configPath).toString();
+		config = JSON.parse(fileContent);
+		config[itemName] = itemContent;
+	} else {
+		config[itemName] = itemContent;
+	}
+
+	fs.writeFileSync(configPath, JSON.stringify(config));
+}
+
+/**
+ * @param {string} item
+ * @param {string} configPath
+ * @returns {string}
+ */
+function getItem(item, configPath) {
+	if (fs.existsSync(configPath)) {
+		try {
+			const configData = JSON.parse(fs.readFileSync(configPath, "utf8"));
+			return configData[item] || "";
+		} catch (err) {
+			return "";
+		}
+	} else {
+		return "";
+	}
 }
