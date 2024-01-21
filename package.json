@@ -87,13 +87,16 @@
 				"Appimage",
 				"snap",
 				"rpm",
-				"zip"
+				"zip",
+				"pacman",
+				"deb"
 			],
 			"category": "Utility",
 			"artifactName": "${productName}_Linux.${ext}"
 		},
 		"snap": {
-			"grade": "stable"
+			"grade": "stable",
+			"base": "core22"
 		},
 		"win": {
 			"target": [
