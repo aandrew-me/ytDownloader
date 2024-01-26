@@ -338,7 +338,7 @@ body {
 	z-index: 1;
 	left: 0;
 	right: 0;
-	margin: auto;
+	margin: auto auto 20px auto;
 	top: 20%;
 	background-color: var(--box-main);
 	border-radius: 10px;
@@ -347,7 +347,7 @@ body {
 	color: var(--text);
 }
 
-#audioExtract {
+#audioExtract, .separationBox {
 	margin: 10px;
 	padding: 10px;
 	background-color: var(--box-toggle);
@@ -399,6 +399,7 @@ body {
 	font-size: large;
 	margin: 8px;
 	outline: none;
+	max-width: 100%;
 }
 
 #videoFormatSelect, #audioFormatSelect {

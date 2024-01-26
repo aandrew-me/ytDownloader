@@ -261,6 +261,7 @@ async function getInfo(url) {
 	// Cleaning text
 	getId("videoFormatSelect").innerHTML = "";
 	getId("audioFormatSelect").innerHTML = "";
+	getId("audioForVideoFormatSelect").innerHTML = "";
 
 	const startTime = getId("startTime");
 	startTime.value = "";
@@ -603,6 +604,8 @@ async function getInfo(url) {
 						size +
 						"</option>";
 					getId("audioFormatSelect").innerHTML += element;
+					getId("audioForVideoFormatSelect").innerHTML += element;
+					
 				}
 				// Both audio and video available
 				else if (
