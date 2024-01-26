@@ -131,34 +131,8 @@
                 <button class="submitBtn" id="audioDownload">Download</button>
                 <button id="advancedAudioToggle" class="advancedToggle" onClick="advancedToggle()">More options</button>
             </div>
-
-            <!-- Extraction options start -->
-            <div id="audioExtract">
-                <h2 id="extractHeader">Extract Audio</h2>
-                <label class="formatSelect">Select Format </label>
-                <select id="extractSelection" class="select">
-                    <option value="mp3">Mp3</option>
-                    <option value="m4a">M4a</option>
-                    <option value="opus">Opus</option>
-                    <option value="wav">Wav</option>
-                    <option value="alac">Alac</option>
-                    <option value="flac">Flac</option>
-                    <option value="vorbis">Vorbis (ogg)</option>
-                </select>
-                <label class="extractQualitySelect" id="extractQualitySelectTxt">Select Quality</label>
-                <select id="extractQualitySelect" class="select">
-                    <option id="extractQualityNormal" value="5">Normal</option>
-                    <option id="extractQualityBest" value="0">Best</option>
-                    <option id="extractQualityGood" value="2">Good</option>
-                    <option id="extractQualityBad" value="8">Bad</option>
-                    <option id="extractQualityWorst" value="10">Worst</option>
-                </select>
-                <br>
-                <button id="extractBtn">Extract</button>
-            </div>
-
-            <!-- Extraction options end -->
         </div>
+
         <div id="advanced">
             <div class="advancedItem">
                 <span id="quitTxt">Close app when download finishes</span>
@@ -192,6 +166,32 @@
 
         </div>
 
+        <!-- Extraction options start -->
+        <div id="audioExtract">
+            <h2 id="extractHeader">Extract Audio</h2>
+            <label class="formatSelect">Select Format </label>
+            <select id="extractSelection" class="select">
+                <option value="mp3">Mp3</option>
+                <option value="m4a">M4a</option>
+                <option value="opus">Opus</option>
+                <option value="wav">Wav</option>
+                <option value="alac">Alac</option>
+                <option value="flac">Flac</option>
+                <option value="vorbis">Vorbis (ogg)</option>
+            </select>
+            <label class="extractQualitySelect" id="extractQualitySelectTxt">Select Quality</label>
+            <select id="extractQualitySelect" class="select">
+                <option id="extractQualityNormal" value="5">Normal</option>
+                <option id="extractQualityBest" value="0">Best</option>
+                <option id="extractQualityGood" value="2">Good</option>
+                <option id="extractQualityBad" value="8">Bad</option>
+                <option id="extractQualityWorst" value="10">Worst</option>
+            </select>
+            <br>
+            <button id="extractBtn">Extract</button>
+        </div>
+
+        <!-- Extraction options end -->
 
     </div>
     <!-- Downloads list -->

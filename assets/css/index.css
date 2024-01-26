@@ -402,7 +402,7 @@ body {
 	max-width: 100%;
 }
 
-#videoFormatSelect, #audioFormatSelect {
+#videoFormatSelect, #audioFormatSelect, #audioForVideoFormatSelect {
 	font-family: JetBrains, monospace;
 	font-size: medium;
 }
