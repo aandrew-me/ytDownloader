@@ -261,7 +261,7 @@ async function getInfo(url) {
 	// Cleaning text
 	getId("videoFormatSelect").innerHTML = "";
 	getId("audioFormatSelect").innerHTML = "";
-	getId("audioForVideoFormatSelect").innerHTML = "";
+	getId("audioForVideoFormatSelect").innerHTML = `<option value="none|none">No Audio</option>`;
 
 	const startTime = getId("startTime");
 	startTime.value = "";
@@ -488,7 +488,7 @@ async function getInfo(url) {
 
 				if (
 					(format.video_ext !== "none" &&
-					format.audio_ext === "none" &&
+					format.acodec === "none" &&
 					!(
 						format.video_ext === "mp4" &&
 						format.vcodec &&
@@ -626,30 +626,7 @@ async function getInfo(url) {
 					format.audio_ext !== "none" ||
 					(format.acodec !== "none" && format.video_ext !== "none")
 				) {
-					let size;
-					if (format.filesize || format.filesize_approx) {
-						size = (
-							Number(format.filesize || format.filesize_approx) /
-							1000000
-						).toFixed(2);
-					} else {
-						size = i18n.__("Unknown size");
-					}
-					const element =
-						"<option value='" +
-						(format.format_id + "|" + format.ext) +
-						"'>" +
-						(i18n.__(format.format_note) ||
-							format.resolution ||
-							i18n.__("Unknown quality")) +
-						"  |  " +
-						format.ext +
-						"  |  " +
-						size +
-						" " +
-						i18n.__("MB") +
-						"</option>";
-					getId("videoFormatSelect").innerHTML += element;
+					// Skip them
 				}
 
 				// When there is no audio
@@ -940,7 +917,7 @@ function download(
 			audioForVideoExt = audioForVideoValue.split("|")[1];
 		}
 
-		if ((videoExt === "mp4" && audioForVideoExt === "opus") || (videoExt === "webm" && audioForVideoExt === "m4a")) {
+		if ((videoExt === "mp4" && audioForVideoExt === "opus") || (videoExt === "webm" && (audioForVideoExt === "m4a" || audioForVideoExt === "mp4"))) {
 			ext = "mkv"
 		} else {
 			ext = videoExt;
@@ -1031,24 +1008,23 @@ function download(
 	console.log("Filename:", filename);
 
 	/**@type {string} */
-	let audioFormat;
+	let audioFormat = "+ba";
 
 	if (audioForVideoFormat_id === "auto") {
 		if (ext === "mp4") {
 			if (!(audioExtensionList.length == 0)) {
 				if (audioExtensionList.includes("m4a")) {
 					audioFormat = "+m4a";
-				} else {
-					audioFormat = "+ba";
 				}
 			} else {
 				audioFormat = "";
 			}
-		} else {
-			audioFormat = "+ba";
 		}
 
-	} else {
+	} else if (audioForVideoFormat_id === "none") {
+		audioFormat = ""
+	}
+	 else {
 		audioFormat = `+${audioForVideoFormat_id}`;
 	}
 
@@ -1158,6 +1134,8 @@ function download(
 			controller.signal
 		);
 	}
+
+	console.log("Spawn args:" + downloadProcess.ytDlpProcess.spawnargs[downloadProcess.ytDlpProcess.spawnargs.length - 1])
 
 	getId(randomId + ".close").addEventListener("click", () => {
 		controller.abort()
