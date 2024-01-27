@@ -338,12 +338,12 @@ body {
 	z-index: 1;
 	left: 0;
 	right: 0;
-	margin: auto auto 20px auto;
-	top: 20%;
+	margin: auto;
+	top: 16%;
 	background-color: var(--box-main);
 	border-radius: 10px;
 	width: 80%;
-	padding: 10px 10px 20px 10px;
+	padding: 10px 10px 15px 10px;
 	color: var(--text);
 }
 
@@ -399,7 +399,7 @@ body {
 	font-size: large;
 	margin: 8px;
 	outline: none;
-	max-width: 100%;
+	max-width: min(400px, 100%);
 }
 
 #videoFormatSelect, #audioFormatSelect, #audioForVideoFormatSelect {
@@ -578,6 +578,10 @@ button {
 #subHeader {
 	font-weight: bold;
 	margin-top: 0;
+}
+
+h2{
+	margin: 12px;
 }
 
 /* Scrollbar */

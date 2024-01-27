@@ -487,13 +487,14 @@ async function getInfo(url) {
 				// For videos
 
 				if (
-					format.video_ext !== "none" &&
+					(format.video_ext !== "none" &&
 					format.audio_ext === "none" &&
 					!(
 						format.video_ext === "mp4" &&
 						format.vcodec &&
 						format.vcodec.split(".")[0] === "vp09"
-					)
+					))
+					&& (!showMoreFormats ? format.video_ext !== "webm" : true)
 				) {
 					if (size !== i18n.__("Unknown size")) {
 						size = (Number(size) + 0 || Number(audioSize)).toFixed(
@@ -565,6 +566,10 @@ async function getInfo(url) {
 					format.audio_ext !== "none" ||
 					(format.acodec !== "none" && format.video_ext === "none")
 				) {
+					if (!showMoreFormats && format.audio_ext === "webm") {
+						continue;
+					}
+
 					size =
 						size !== i18n.__("Unknown size")
 							? size + " MB"
@@ -611,6 +616,7 @@ async function getInfo(url) {
 						" | " +
 						size +
 						"</option>";
+
 					getId("audioFormatSelect").innerHTML += element;
 					getId("audioForVideoFormatSelect").innerHTML += element;
 					
