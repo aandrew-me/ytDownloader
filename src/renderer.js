@@ -60,6 +60,13 @@ let cookieArg = "";
 let browser = "";
 let maxActiveDownloads = 5;
 let showMoreFormats = false;
+let configArg = "";
+let configTxt = "";
+
+if (localStorage.getItem("configPath")) {
+	configArg = "--config-location";
+	configTxt = `"${localStorage.getItem("configPath")}"`;
+}
 
 function checkMaxDownloads() {
 	if (localStorage.getItem("maxActiveDownloads")) {
@@ -310,6 +317,8 @@ async function getInfo(url) {
 			"--no-warnings",
 			cookieArg,
 			browser,
+			configArg,
+			configTxt,
 			`"${url}"`,
 		],
 		{
@@ -879,8 +888,7 @@ function download(
 ) {
 	// Config file
 	const newTitle = title1 || title;
-	let configArg = "";
-	let configTxt = "";
+
 	if (localStorage.getItem("configPath")) {
 		configArg = "--config-location";
 		configTxt = `"${localStorage.getItem("configPath")}"`;
