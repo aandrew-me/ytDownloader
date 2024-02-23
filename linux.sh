@@ -1,3 +1,7 @@
+#!/bin/bash
+# Script to download the latest x64 linux version of custom ffmpeg build for yt-dlp
+# The binary will be placed in the root dir of the app
+
 #################### VARIABLES #######################
 FFMPEG_URL="https://github.com/yt-dlp/FFmpeg-Builds/releases/download/autobuild-2024-02-22-14-09/ffmpeg-N-113784-g4ea2b271eb-linux64-gpl.tar.xz"
 FFMPEG_FILENAME="ffmpeg-N-113784-g4ea2b271eb-linux64-gpl"
