@@ -171,8 +171,9 @@ To run with [Electron](https://www.electronjs.org/) :
 npm start
 ```
 
-To build for Linux (It will create packages as specified in package.json). The builds are stored in **release** folder. You need to be in a Linux environment to execute those scripts. Otherwise you can download the ffmpeg binary for the respective platform and put it in the root directory of the app and build with electron-builder.
+You need to download ffmpeg and put it in the root directory of the project. If you don't need to build for arm processor, you can download ffmpeg by executing any of the files - linux.sh / mac.sh / windows.sh depending on the platform. Otherwise you need to download ffmpeg from [here](https://github.com/yt-dlp/FFmpeg-Builds/releases) for windows/linux and from [here](http://www.osxexperts.net/) for mac (not tested)
 
+To build for Linux (It will create packages as specified in package.json). The builds are stored in **release** folder.
 ```
 npm run linux
 ```
@@ -188,3 +189,8 @@ To build for macOS
 ```
 npm run mac
 ```
+If you only want to build for one format, you can do
+```
+npx electron-builder -l appimage
+```
+It will just create a linux appimage build.
