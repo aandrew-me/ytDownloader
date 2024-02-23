@@ -129,9 +129,9 @@ fi
 
 # Download and extract FFMPEG
 rm ffmpeg*
-wget "https://github.com/yt-dlp/FFmpeg-Builds/releases/download/autobuild-2024-02-22-14-09/ffmpeg-N-113784-g4ea2b271eb-linux64-gpl.tar.xz"
-tar xvf ffmpeg-N-113784-g4ea2b271eb-linux64-gpl.tar.xz
-cp ffmpeg-N-113784-g4ea2b271eb-linux64-gpl/bin/ffmpeg ffmpeg
+wget "$FFMPEG_URL"
+tar xvf $FFMPEG_ARCHIVENAME
+cp $FFMPEG_FILENAME/bin/ffmpeg ffmpeg
 chmod +x ffmpeg
-rm -rf ffmpeg-N-113784-g4ea2b271eb-linux64-gpl
-rm ffmpeg-N-113784-g4ea2b271eb-linux64-gpl.tar.xz
+rm -rf $FFMPEG_FILENAME
+rm $FFMPEG_ARCHIVENAME
