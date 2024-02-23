@@ -36,20 +36,26 @@
   <content_rating type="oars-1.1" />
 
   <releases>
+    <release version="3.17.2" date="2024-2-23">
+      <description>
+        <p>Fixed conflicts with same filenames</p>
+        <p>Fixed formats not being selected properly</p>
+      </description>
+    </release>
     <release version="3.17.1" date="2024-1-27">
       <description>
         <p>Fixed config file not being used when getting info</p>
       </description>
-  </release>
+    </release>
     <release version="3.17.0" date="2024-1-27">
-        <description>
-          <p>Changelog</p>
-          <ul>
-            <li>Added option to choose audio for video</li>
-            <li>Webm options will be hidden by default</li>
-            <li>Enhancements</li>
-          </ul>
-        </description>
+      <description>
+        <p>Changelog</p>
+        <ul>
+          <li>Added option to choose audio for video</li>
+          <li>Webm options will be hidden by default</li>
+          <li>Enhancements</li>
+        </ul>
+      </description>
     </release>
     <release version="3.16.1" date="2023-12-26" />
     <release version="3.16.0" date="2023-12-24" />
