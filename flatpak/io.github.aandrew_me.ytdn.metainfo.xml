@@ -2,7 +2,10 @@
 <component type="desktop">
   <id>io.github.aandrew_me.ytdn</id>
   <name>Youtube Downloader Plus</name>
-  <developer_name>Andrew</developer_name>
+  <launchable type="desktop-id">io.github.aandrew_me.ytdn.desktop</launchable>
+  <developer id="io.github.aandrew_me">
+    <name>Andrew</name>
+  </developer>
   <url type="bugtracker">https://github.com/aandrew-me/ytDownloader/issues</url>
   <url type="translate">https://github.com/aandrew-me/ytDownloader#internationalization-</url>
   <summary>Download videos and audios from hundreds of sites</summary>
