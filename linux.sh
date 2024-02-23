@@ -1,8 +1,7 @@
-#!/bin/bash
-
 #################### VARIABLES #######################
 FFMPEG_URL="https://github.com/yt-dlp/FFmpeg-Builds/releases/download/autobuild-2024-02-22-14-09/ffmpeg-N-113784-g4ea2b271eb-linux64-gpl.tar.xz"
 FFMPEG_FILENAME="ffmpeg-N-113784-g4ea2b271eb-linux64-gpl"
+FFMPEG_ARCHIVENAME="ffmpeg-N-113784-g4ea2b271eb-linux64-gpl.tar.xz"
 #################### VARIABLES #######################
 
 #################### FUNCTIONS #######################
@@ -125,12 +124,10 @@ fi
 ############################# rpm #############################
 
 # Download and extract FFMPEG
-if [[ -f /usr/bin/rpm ]]; then
- download_and_extract "$FFMPEG_URL" "$FFMPEG_FILENAME" "$FFMPEG_FILENAME.tar.xz"
-
- # Move the extracted ffmpeg binary to the desired location
- mv "$FFMPEG_FILENAME/bin/ffmpeg" ffmpeg || {
-  echo "Error: Moving ffmpeg binary failed."
-  exit 1
- }
-fi
+rm ffmpeg*
+wget "https://github.com/yt-dlp/FFmpeg-Builds/releases/download/autobuild-2024-02-22-14-09/ffmpeg-N-113784-g4ea2b271eb-linux64-gpl.tar.xz"
+tar xvf ffmpeg-N-113784-g4ea2b271eb-linux64-gpl.tar.xz
+cp ffmpeg-N-113784-g4ea2b271eb-linux64-gpl/bin/ffmpeg ffmpeg
+chmod +x ffmpeg
+rm -rf ffmpeg-N-113784-g4ea2b271eb-linux64-gpl
+rm ffmpeg-N-113784-g4ea2b271eb-linux64-gpl.tar.xz
