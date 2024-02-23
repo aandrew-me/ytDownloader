@@ -356,7 +356,7 @@ async function getInfo(url) {
 			const parsedInfo = JSON.parse(info);
 			console.log(parsedInfo);
 
-			title = parsedInfo.title;
+			title = `${parsedInfo.title} [${parsedInfo.id}]`;
 			id = parsedInfo.id;
 			thumbnail = parsedInfo.thumbnail;
 			duration = parsedInfo.duration;
