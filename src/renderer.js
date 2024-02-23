@@ -386,7 +386,7 @@ async function getInfo(url) {
 				`<input class="title" id="titleName" type="text" value="${title}" onchange="renameTitle()">`;
 
 			let audioSize = 0;
-			let defaultVideoFormat = 720;
+			let defaultVideoFormat = 144;
 			let videoFormatCodecs = {};
 
 			let preferredAudioFormatLength = 0;
@@ -400,12 +400,14 @@ async function getInfo(url) {
 				if (
 					format.height <= preferredVideoQuality &&
 					format.height >= defaultVideoFormat &&
-					format.video_ext !== "none" &&
+					(format.video_ext !== "none" &&
+					format.acodec === "none" &&
 					!(
 						format.video_ext === "mp4" &&
 						format.vcodec &&
 						format.vcodec.split(".")[0] === "vp09"
-					)
+					))
+					&& (!showMoreFormats ? format.video_ext !== "webm" : true)
 				) {
 					defaultVideoFormat = format.height;
 
@@ -467,10 +469,14 @@ async function getInfo(url) {
 					format.vcodec &&
 					format.vcodec.split(".")[0] === preferredVideoCodec &&
 					!selected &&
+					(format.video_ext !== "none" &&
+					format.acodec === "none" &&
 					!(
 						format.video_ext === "mp4" &&
+						format.vcodec &&
 						format.vcodec.split(".")[0] === "vp09"
-					)
+					))
+					&& (!showMoreFormats ? format.video_ext !== "webm" : true)
 				) {
 					selectedText = " selected ";
 					selected = true;
