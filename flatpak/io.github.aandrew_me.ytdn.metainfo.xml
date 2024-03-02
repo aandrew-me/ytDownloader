@@ -39,6 +39,12 @@
   <content_rating type="oars-1.1" />
 
   <releases>
+    <release version="3.17.3" date="2024-3-03">
+      <description>
+        <p>Fixed formats not being shown</p>
+        <p>Added Arabic language</p>
+      </description>
+    </release>
     <release version="3.17.2" date="2024-2-23">
       <description>
         <p>Fixed conflicts with same filenames</p>
