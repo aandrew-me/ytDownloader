@@ -108,5 +108,7 @@
 	"Matrix": "Mátrix",
 	"Solarized Dark": "Szolarizált sötét",
 	"Preferred video codec": "Előnyben részesített videokodek",
-	"Show more format options": "További formátumbeállítások megjelenítése"
+	"Show more format options": "További formátumbeállítások megjelenítése",
+	"You need to give the app permission to access home directory to use this. You can do it with Flatseal by enabling the permission with text 'filesystem=home'": "Ennek használatához engedélyt kell adnia az alkalmazásnak a home könyvtár eléréséhez. Meg tudod csinálni a Flatseal segítségével, Ha engedélyezed az engedélyt a 'filesystem=home'szöveggel",
+	"No Audio": "No Audio"
 }
