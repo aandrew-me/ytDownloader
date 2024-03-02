@@ -108,5 +108,7 @@
 	"Matrix": "Matrice",
 	"Solarized Dark": "Solarizzato scuro",
 	"Preferred video codec": "Codifica video preferita",
-	"Show more format options": "Mostra più opzioni di formato"
+	"Show more format options": "Mostra più opzioni di formato",
+	"You need to give the app permission to access home directory to use this. You can do it with Flatseal by enabling the permission with text 'filesystem=home'": "Devi dare all'app il permesso di accedere alla home directory per usarlo. Puoi farlo con Flatseal abilitando l'autorizzazione con il testo 'filesystem=home'",
+	"No Audio": "No Audio"
 }
