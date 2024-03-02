@@ -85,7 +85,7 @@ if (language) {
 function changeLanguage() {
 	const language = getId("select").value;
 	localStorage.setItem("language", language);
-	if (language === "fa") {
+	if (language === "fa" || language === "ar") {
 		rightToLeft = "true";
 		localStorage.setItem("rightToLeft", "true");
 	} else {
