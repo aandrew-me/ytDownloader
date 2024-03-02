@@ -108,5 +108,7 @@
 	"Matrix": "Matrix",
 	"Solarized Dark": "Solarized Dark",
 	"Preferred video codec": "優先するビデオコーデック",
-	"Show more format options": "他のフォーマットオプションを表示"
+	"Show more format options": "他のフォーマットオプションを表示",
+	"You need to give the app permission to access home directory to use this. You can do it with Flatseal by enabling the permission with text 'filesystem=home'": "これを使用するには、ホームディレクトリにアクセスする権限をアプリに与える必要があります。 テキスト'filesystem=home'で権限を有効にすることで、Flatsealでそれを行うことができます",
+	"No Audio": "No Audio"
 }
