@@ -108,5 +108,7 @@
 	"Matrix": "Matriisi",
 	"Solarized Dark": "Solarized, tumma",
 	"Preferred video codec": "Ensisijainen videon koodekki",
-	"Show more format options": "Näytä lisää muotoiluvaihtoehtoja"
+	"Show more format options": "Näytä lisää muotoiluvaihtoehtoja",
+	"You need to give the app permission to access home directory to use this. You can do it with Flatseal by enabling the permission with text 'filesystem=home'": "Sinun on annettava sovellukselle lupa käyttää kotihakemistoa tämän käyttämiseksi. Voit tehdä sen Flatsealilla ottamalla käyttöön oikeudet tekstillä 'filesystem=home'",
+	"No Audio": "No Audio"
 }

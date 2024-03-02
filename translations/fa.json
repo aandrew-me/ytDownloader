@@ -108,5 +108,7 @@
 	"Matrix": "ماتریکس",
 	"Solarized Dark": "تاریک خورشیدی",
 	"Preferred video codec": "کدک ویدیویی ترجیح داده شده",
-	"Show more format options": "نمایش گزینه های فرمت بیشتر"
+	"Show more format options": "نمایش گزینه های فرمت بیشتر",
+	"You need to give the app permission to access home directory to use this. You can do it with Flatseal by enabling the permission with text 'filesystem=home'": "برای استفاده از این باید به برنامه اجازه دسترسی به دایرکتوری اصلی را بدهید. شما می توانید آن را با Flatseal با فعال کردن مجوز با متن 'filesystem=home' انجام دهید",
+	"No Audio": "No Audio"
 }

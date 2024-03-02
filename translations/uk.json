@@ -108,5 +108,7 @@
 	"Matrix": "Matrice",
 	"Solarized Dark": "Салорайзед темна",
 	"Preferred video codec": "Бажаний відео-кодек",
-	"Show more format options": "Показати додаткові параметри формату"
+	"Show more format options": "Показати додаткові параметри формату",
+	"You need to give the app permission to access home directory to use this. You can do it with Flatseal by enabling the permission with text 'filesystem=home'": "Щоб скористатися цим, вам потрібно надати програмі дозвіл на доступ до домашнього каталогу. Ви можете зробити це за допомогою Flatseal, увімкнувши дозвіл із текстом 'filesystem=home'",
+	"No Audio": "No Audio"
 }

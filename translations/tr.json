@@ -108,5 +108,7 @@
 	"Matrix": "Matris",
 	"Solarized Dark": "Solarized koyu",
 	"Preferred video codec": "Tercih edilen video kodeği",
-	"Show more format options": "Daha fazla format ayarı göster"
+	"Show more format options": "Daha fazla format ayarı göster",
+	"You need to give the app permission to access home directory to use this. You can do it with Flatseal by enabling the permission with text 'filesystem=home'": "You need to give the app permission to access home directory to use this. You can do it with Flatseal by enabling the permission with text 'filesystem=home'",
+	"No Audio": "No Audio"
 }
