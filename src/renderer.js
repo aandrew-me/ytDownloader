@@ -401,7 +401,6 @@ async function getInfo(url) {
 					format.height <= preferredVideoQuality &&
 					format.height >= defaultVideoFormat &&
 					(format.video_ext !== "none" &&
-					format.acodec === "none" &&
 					!(
 						format.video_ext === "mp4" &&
 						format.vcodec &&
@@ -470,7 +469,6 @@ async function getInfo(url) {
 					format.vcodec.split(".")[0] === preferredVideoCodec &&
 					!selected &&
 					(format.video_ext !== "none" &&
-					format.acodec === "none" &&
 					!(
 						format.video_ext === "mp4" &&
 						format.vcodec &&
@@ -503,7 +501,6 @@ async function getInfo(url) {
 
 				if (
 					(format.video_ext !== "none" &&
-					format.acodec === "none" &&
 					!(
 						format.video_ext === "mp4" &&
 						format.vcodec &&
@@ -552,7 +549,7 @@ async function getInfo(url) {
 					const spaceAfterQuality = "&#160".repeat(
 						quality.length <= 8 && 8 - quality.length > 0
 							? 8 - quality.length
-							: quality.length + 1
+							: 1
 					);
 
 					// Extension
@@ -570,9 +567,9 @@ async function getInfo(url) {
 						"| " +
 						extension.padEnd(5, "\xa0") +
 						"|  " +
-						vcodec +
-						spaceAfterVcodec +
+						(vcodec ? vcodec + spaceAfterVcodec : '') +
 						size +
+						(format.acodec !== "none" ? " 🔈" : "") +
 						"</option>";
 					getId("videoFormatSelect").innerHTML += element;
 				}
