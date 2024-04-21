@@ -39,6 +39,12 @@
   <content_rating type="oars-1.1" />
 
   <releases>
+    <release version="3.17.4" date="2024-4-21">
+      <description>
+        <p>Added Chinese language</p>
+        <p>Fixed video trim info to filename</p>
+      </description>
+    </release>
     <release version="3.17.3" date="2024-3-03">
       <description>
         <p>Fixed formats not being shown</p>
