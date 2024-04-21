@@ -1016,6 +1016,12 @@ function download(
 	if (filename[0] === ".") {
 		filename = filename.slice(1, 100);
 	}
+
+	// Adding info about trimmed range to filename
+	if (range2 || rangeCmd) {
+		const rangeTxt = (range2 || rangeCmd).replace("*", "");
+		filename += `[${rangeTxt}]`
+	}
 	console.log("Filename:", filename);
 
 	/**@type {string} */
