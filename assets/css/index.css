@@ -132,7 +132,7 @@
 }
 
 body {
-	font-family: sans-serif;
+	font-family: "Ubuntu";
 	text-align: center;
 	padding: 10px;
 	background-color: var(--background);
@@ -281,6 +281,7 @@ body {
 	background-color: var(--box-toggle);
 	color: var(--text);
 	font-size: large;
+	font-family: "Ubuntu";
 }
 
 .itemTitle {
@@ -400,6 +401,7 @@ body {
 	margin: 8px;
 	outline: none;
 	max-width: min(400px, 100%);
+	font-family: "Ubuntu";
 }
 
 #videoFormatSelect, #audioFormatSelect, #audioForVideoFormatSelect {
@@ -442,7 +444,6 @@ input[type="number"]::-webkit-outer-spin-button {
 	display: inline-block;
 	outline: none;
 	position: relative;
-	font-weight: 200;
 }
 .submitBtn:active {
 	border: none;
@@ -524,6 +525,8 @@ svg {
 	cursor: pointer;
 }
 button {
+	font-family: "Ubuntu";
+	font-weight: bold;
 	outline: none;
 }
 
