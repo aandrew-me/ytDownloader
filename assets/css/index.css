@@ -3,6 +3,11 @@
 	src: url("../fonts/JetBrainsMono-Regular.ttf") format("truetype");
 }
 
+@font-face {
+	font-family: "Ubuntu";
+	src: url("../fonts/Ubuntu-Regular.ttf") format("truetype");
+}
+
 :root[theme="light"] {
 	--background: #fff;
 	--text: rgb(45, 45, 45);
