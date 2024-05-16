@@ -1,6 +1,11 @@
 {
 	"dependencies": {
+		"cli": "^1.0.1",
 		"electron-updater": "^5.3.0",
+		"fs": "^0.0.1-security",
+		"fs.promises": "^0.1.2",
+		"promises": "^0.2.5",
+		"util": "^0.12.5",
 		"yt-dlp-wrap-plus": "^2.3.18"
 	},
 	"name": "ytdownloader",
@@ -34,7 +39,7 @@
 	"license": "GPL-3.0",
 	"description": "Download videos and audios from YouTube and many other sites",
 	"devDependencies": {
-		"electron": "^27.0.2",
+		"electron": "^30.0.1",
 		"electron-builder": "^24.6.4",
 		"typescript": "^5.3.3"
 	},
