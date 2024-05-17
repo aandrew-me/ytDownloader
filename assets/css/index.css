@@ -209,7 +209,7 @@ body {
 	opacity: 1;
 	font-size: large;
 	z-index: 2;
-	font-family: sans-serif;
+	font-family: "Ubuntu";
 }
 
 #themeToggle {
@@ -292,7 +292,6 @@ body {
 }
 
 .itemTitle {
-	font-family: sans-serif;
 	padding: 5px;
 }
 .itemBody {
@@ -306,7 +305,6 @@ body {
 	font-weight: bold;
 	cursor: pointer;
 	margin-top: 10px;
-	font-family: sans-serif;
 }
 .progressBar {
 	width: 90%;
