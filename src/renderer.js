@@ -259,6 +259,10 @@ getId("pasteUrl").addEventListener("click", () => {
 });
 
 // Getting video info
+/**
+ *
+ * @param {string} url
+ */
 async function getInfo(url) {
 	audioExtensionList = [];
 	let selected = false;
@@ -308,6 +312,9 @@ async function getInfo(url) {
 	let validInfo = true;
 
 	let info = "";
+
+	// Twitter/X compatibility
+	url = url.replace("//x.com/", "//twitter.com/")
 
 	const infoProcess = cp.spawn(
 		`"${ytDlp}"`,
