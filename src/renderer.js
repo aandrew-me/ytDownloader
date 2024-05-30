@@ -3,7 +3,15 @@ const os = require("os");
 let ffmpeg;
 if (os.platform() === "win32") {
 	ffmpeg = `"${__dirname}\\..\\ffmpeg.exe"`;
-} else {
+} else if (os.platform() === "freebsd") {
+	try {
+		ffmpeg = cp.execSync("which ffmpeg").toString("utf8").split("\n")[0].trim();
+	} catch (error) {
+		console.log(error)
+		showPopup("No ffmpeg found in PATH.");
+	}
+}
+ else {
 	ffmpeg = `"${__dirname}/../ffmpeg"`;
 }
 
@@ -136,6 +144,18 @@ downloadPathSelection();
 let ytDlp;
 let ytdlpPath = path.join(os.homedir(), ".ytDownloader", "ytdlp");
 
+// Use system yt-dlp for freebsd
+if (os.platform() === "freebsd") {
+	try {
+		ytdlpPath = cp.execSync('which yt-dlp').toString("utf8").split("\n")[0].trim();
+	} catch (error) {
+		console.log(error)
+		getId("incorrectMsg").textContent = i18n.__(
+			"No yt-dlp found in PATH. Make sure you have the full executable. App will not work"
+		);
+	}
+}
+
 // ytdlp download path
 let ytdlpDownloadPath;
 if (os.platform() == "win32") {
@@ -179,7 +199,7 @@ async function downloadYtdlp() {
 const fullYtdlpBinIsPresent = !!localStorage.getItem("fullYtdlpBinPresent");
 
 cp.exec(`"${ytdlpPath}" --version`, (error, stdout, stderr) => {
-	if (error || !fullYtdlpBinIsPresent) {
+	if ((error || !fullYtdlpBinIsPresent) && os.platform() !== "freebsd") {
 		getId("popupBox").style.display = "block";
 		process.on("uncaughtException", (reason, promise) => {
 			document.querySelector("#popupBox p").textContent = i18n.__(
@@ -1312,6 +1332,16 @@ function hideHidden() {
 		getId("hidden").style.display = "none";
 		getId("hidden").classList.remove("scale");
 	}, 400);
+}
+
+// Popup message
+function showPopup(text) {
+	console.log("Triggered showpopup");
+	getId("popupText").textContent = text;
+	getId("popupText").style.display = "inline-block";
+	setTimeout(() => {
+		getId("popupText").style.display = "none";
+	}, 2200);
 }
 
 // Menu
