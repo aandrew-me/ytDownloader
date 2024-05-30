@@ -4,7 +4,7 @@ let ffmpeg;
 if (os.platform() === "win32") {
 	ffmpeg = `"${__dirname}\\..\\ffmpeg.exe"`;
 } else {
-	ffmpeg = `"${__dirname}/../ffmpeg"`;
+	ffmpeg = `"/usr/local/bin/ffmpeg"`;
 }
 
 const fs = require("fs");
