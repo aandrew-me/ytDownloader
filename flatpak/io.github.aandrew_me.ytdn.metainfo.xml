@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop">
   <id>io.github.aandrew_me.ytdn</id>
-  <name>Youtube Downloader Plus</name>
+  <name>ytDownloader</name>
   <launchable type="desktop-id">io.github.aandrew_me.ytdn.desktop</launchable>
   <developer id="io.github.aandrew_me">
     <name>Andrew</name>
@@ -10,7 +10,7 @@
   <url type="translate">https://github.com/aandrew-me/ytDownloader#internationalization-</url>
   <summary>Download videos and audios from hundreds of sites</summary>
   <description>
-    <p>ytDownloader lets you download videos and audios of different qualities from hundreds of
+    <p>ytDownloader (Formerly know as Youtube Downloader Plus) lets you download videos and audios of different qualities from hundreds of
       sites including the popular ones but not limited to Youtube, Facebook, Instagram, Tiktok,
       Twitter, Twitch and so on.</p>
     <p>✔️ Supports high quality video resolutions</p>
