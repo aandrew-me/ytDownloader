@@ -39,6 +39,7 @@ getId("trayTxt").textContent = i18n.__("Close app to system tray");
 getId("autoUpdateTxt").textContent = i18n.__("Disable auto updates");
 getId("showMoreFormatsTxt").textContent = i18n.__("Show more format options");
 getId("preferredVideoCodecTxt").textContent = i18n.__("Preferred video codec");
+getId("proxyTitle").textContent = i18n.__("Proxy");
 
 if (process.env.FLATPAK_ID) {
 	getId("flatpakTxt").textContent = i18n.__(

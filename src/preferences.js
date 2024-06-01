@@ -138,6 +138,17 @@ getId("preferredVideoCodec").addEventListener("change", () => {
 	localStorage.setItem("preferredVideoCodec", preferredVideoCodec);
 });
 
+// Proxy
+let proxy = localStorage.getItem("proxy");
+if (proxy) {
+	getId("proxyTxt").value = proxy;
+}
+getId("proxyTxt").addEventListener("change", () => {
+	proxy = getId("proxyTxt").value;
+	localStorage.setItem("proxy", proxy);
+});
+
+
 // Reload
 function reload() {
 	ipcRenderer.send("reload");

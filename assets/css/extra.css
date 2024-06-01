@@ -297,3 +297,11 @@ body::-webkit-scrollbar-thumb {
 	background: linear-gradient(rgb(110, 110, 110), rgb(77, 77, 77));
 	border-radius: 8px;
 }
+
+#proxyTxt:valid {
+	border: 2px solid var(--greenBtn);
+}
+
+#proxyTxt:invalid {
+	border: 2px solid var(--redBtn);
+}

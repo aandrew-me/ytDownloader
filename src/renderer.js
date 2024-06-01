@@ -70,6 +70,7 @@ let maxActiveDownloads = 5;
 let showMoreFormats = false;
 let configArg = "";
 let configTxt = "";
+let proxy = "";
 
 if (localStorage.getItem("configPath")) {
 	configArg = "--config-location";
@@ -319,6 +320,8 @@ async function getInfo(url) {
 		showMoreFormats = false;
 	}
 
+	proxy = getLocalStorageItem("proxy");
+
 	// Whether to use browser cookies or not
 	if (localStorage.getItem("browser")) {
 		browser = localStorage.getItem("browser");
@@ -336,18 +339,23 @@ async function getInfo(url) {
 	// Twitter/X compatibility
 	url = url.replace("//x.com/", "//twitter.com/")
 
+	const infoOptions = [
+		"-j",
+		"--no-playlist",
+		"--no-warnings",
+		proxy ? "--no-check-certificate" : "",
+		proxy ? "--proxy" : "",
+		proxy,
+		cookieArg,
+		browser,
+		configArg,
+		configTxt,
+		`"${url}"`,
+	].filter(item => item)
+
 	const infoProcess = cp.spawn(
 		`"${ytDlp}"`,
-		[
-			"-j",
-			"--no-playlist",
-			"--no-warnings",
-			cookieArg,
-			browser,
-			configArg,
-			configTxt,
-			`"${url}"`,
-		],
+		infoOptions,
 		{
 			shell: true,
 		}
@@ -1082,28 +1090,33 @@ function download(
 		// If video has no sound, audio needs to be downloaded
 		console.log("Downloading both video and audio");
 
+		const args = [
+			range1 || rangeOption,
+			range2 || rangeCmd,
+			"-f",
+			`${format_id}${audioFormat}`,
+			"-o",
+			`"${path.join(downloadDir, filename + `.${ext}`)}"`,
+			"--ffmpeg-location",
+			ffmpeg,
+			subs1 || subs,
+			subs2 || subLangs,
+			"--no-playlist",
+			"--embed-metadata",
+			ext == "mp4" && audioForVideoExt === "m4a" ? "--embed-thumbnail" : "",
+			configArg,
+			configTxt,
+			cookieArg,
+			browser,
+			"--no-mtime",
+			proxy ? "--no-check-certificate" : "",
+			proxy ? "--proxy" : "",
+			proxy,
+			`"${url}"`,
+		].filter(item => item);
+
 		downloadProcess = ytdlp.exec(
-			[
-				range1 || rangeOption,
-				range2 || rangeCmd,
-				"-f",
-				`${format_id}${audioFormat}`,
-				"-o",
-				`"${path.join(downloadDir, filename + `.${ext}`)}"`,
-				"--ffmpeg-location",
-				ffmpeg,
-				subs1 || subs,
-				subs2 || subLangs,
-				"--no-playlist",
-				"--embed-metadata",
-				ext == "mp4" && audioForVideoExt === "m4a" ? "--embed-thumbnail" : "",
-				configArg,
-				configTxt,
-				cookieArg,
-				browser,
-				"--no-mtime",
-				`"${url}"`,
-			],
+			args,
 			{shell: true, detached: false},
 			controller.signal
 		);
@@ -1121,29 +1134,34 @@ function download(
 		console.log(extractFormat1);
 		console.log(extractQuality1);
 
+		const args = [
+			"-x",
+			"--audio-format",
+			extractFormat1,
+			"--audio-quality",
+			extractQuality1,
+			"-o",
+			`"${path.join(downloadDir, filename + `.${extractExt}`)}"`,
+			"--ffmpeg-location",
+			ffmpeg,
+			"--no-playlist",
+			"--embed-metadata",
+			extractFormat1 == "m4a" || extractFormat1 == "mp3"
+				? "--embed-thumbnail"
+				: "",
+			cookieArg,
+			browser,
+			configArg,
+			configTxt,
+			"--no-mtime",
+			proxy ? "--no-check-certificate" : "",
+			proxy ? "--proxy" : "",
+			proxy,
+			`"${url}"`,
+		].filter(item => item)
+
 		downloadProcess = ytdlp.exec(
-			[
-				"-x",
-				"--audio-format",
-				extractFormat1,
-				"--audio-quality",
-				extractQuality1,
-				"-o",
-				`"${path.join(downloadDir, filename + `.${extractExt}`)}"`,
-				"--ffmpeg-location",
-				ffmpeg,
-				"--no-playlist",
-				"--embed-metadata",
-				extractFormat1 == "m4a" || extractFormat1 == "mp3"
-					? "--embed-thumbnail"
-					: "",
-				cookieArg,
-				browser,
-				configArg,
-				configTxt,
-				"--no-mtime",
-				`"${url}"`,
-			],
+			args,
 			{shell: true, detached: false},
 			controller.signal
 		);
@@ -1152,28 +1170,33 @@ function download(
 	else {
 		console.log("downloading only audio or video with audio");
 
+		const args = [
+			range1 || rangeOption,
+			range2 || rangeCmd,
+			"-f",
+			format_id,
+			"-o",
+			`"${path.join(downloadDir, filename + `.${ext}`)}"`,
+			"--ffmpeg-location",
+			ffmpeg,
+			subs1 || subs,
+			subs2 || subLangs,
+			"--no-playlist",
+			"--embed-metadata",
+			ext == "m4a" || ext == "mp4" ? "--embed-thumbnail" : "",
+			cookieArg,
+			browser,
+			configArg,
+			configTxt,
+			"--no-mtime",
+			proxy ? "--no-check-certificate" : "",
+			proxy ? "--proxy" : "",
+			proxy,
+			`"${url}"`,
+		].filter(item => item)
+
 		downloadProcess = ytdlp.exec(
-			[
-				range1 || rangeOption,
-				range2 || rangeCmd,
-				"-f",
-				format_id,
-				"-o",
-				`"${path.join(downloadDir, filename + `.${ext}`)}"`,
-				"--ffmpeg-location",
-				ffmpeg,
-				subs1 || subs,
-				subs2 || subLangs,
-				"--no-playlist",
-				"--embed-metadata",
-				ext == "m4a" || ext == "mp4" ? "--embed-thumbnail" : "",
-				cookieArg,
-				browser,
-				configArg,
-				configTxt,
-				"--no-mtime",
-				`"${url}"`,
-			],
+			args,
 			{shell: true, detached: false},
 			controller.signal
 		);
@@ -1342,6 +1365,15 @@ function showPopup(text) {
 	setTimeout(() => {
 		getId("popupText").style.display = "none";
 	}, 2200);
+}
+
+/**
+ * 
+ * @param {string} item 
+ * @returns string
+ */
+function getLocalStorageItem(item) {
+	return localStorage.getItem(item) || "";
 }
 
 // Menu

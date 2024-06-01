@@ -69,6 +69,7 @@ let foldernameFormat = "%(playlist_title)s";
 let filenameFormat = "%(playlist_index)s.%(title)s.%(ext)s";
 let playlistIndex = 1;
 let playlistEnd = "";
+let proxy = ""
 
 /**
  * 
@@ -113,6 +114,9 @@ function download(type) {
 		configArg = "--config-location";
 		configTxt = `"${localStorage.getItem("configPath")}"`;
 	}
+	proxy = localStorage.getItem("proxy") || "";
+	console.log("Proxy:", proxy)
+
 	nameFormatting();
 	originalCount = 0;
 
@@ -174,26 +178,31 @@ function download(type) {
 	const controller = new AbortController();
 
 	if (type === "video") {
+		const args = [
+			format,
+			"--yes-playlist",
+			"-o",
+			`"${path.join(downloadDir, foldernameFormat, filenameFormat)}"`,
+			"-I",
+			`"${playlistIndex}:${playlistEnd}"`,
+			"--ffmpeg-location",
+			ffmpeg,
+			cookieArg,
+			browser,
+			configArg,
+			configTxt,
+			"--embed-metadata",
+			subs,
+			subLangs,
+			videoType == "mp4" ? "--embed-thumbnail" : "",
+			proxy ? "--no-check-certificate" : "",
+			proxy ? "--proxy" : "",
+			proxy,
+			`"${url}"`,
+		].filter(item => item);
+
 		downloadProcess = ytdlp.exec(
-			[
-				format,
-				"--yes-playlist",
-				"-o",
-				`"${path.join(downloadDir, foldernameFormat, filenameFormat)}"`,
-				"-I",
-				`"${playlistIndex}:${playlistEnd}"`,
-				"--ffmpeg-location",
-				ffmpeg,
-				cookieArg,
-				browser,
-				configArg,
-				configTxt,
-				"--embed-metadata",
-				subs,
-				subLangs,
-				videoType == "mp4" ? "--embed-thumbnail" : "",
-				`"${url}"`,
-			],
+			args,
 			{shell: true, detached: false},
 			controller.signal
 		);
@@ -205,73 +214,85 @@ function download(type) {
 			audioQuality === "auto"
 		) {
 			console.log("Downloading m4a without extracting")
+
+			const args = [
+				"--yes-playlist",
+				"--no-warnings",
+				"-f",
+				`ba[ext=${format}]/ba`,
+				"-o",
+				`"${path.join(
+					downloadDir,
+					foldernameFormat,
+					filenameFormat
+				)}"`,
+				"-I",
+				`"${playlistIndex}:${playlistEnd}"`,
+				"--ffmpeg-location",
+				ffmpeg,
+				cookieArg,
+				browser,
+				configArg,
+				configTxt,
+				"--embed-metadata",
+				subs,
+				subLangs,
+				"--embed-thumbnail",
+				proxy ? "--no-check-certificate" : "",
+				proxy ? "--proxy" : "",
+				proxy,
+				`"${url}"`,
+			].filter(item => item);
+
 			downloadProcess = ytdlp.exec(
-				[
-					"--yes-playlist",
-					"--no-warnings",
-					"-f",
-					`ba[ext=${format}]/ba`,
-					"-o",
-					`"${path.join(
-						downloadDir,
-						foldernameFormat,
-						filenameFormat
-					)}"`,
-					"-I",
-					`"${playlistIndex}:${playlistEnd}"`,
-					"--ffmpeg-location",
-					ffmpeg,
-					cookieArg,
-					browser,
-					configArg,
-					configTxt,
-					"--embed-metadata",
-					subs,
-					subLangs,
-					"--embed-thumbnail",
-					`"${url}"`,
-				],
+				args,
 				{shell: true, detached: false},
 				controller.signal
 			);
 		} else {
 			console.log("Extracting audio")
+
+			const args = [
+				"--yes-playlist",
+				"--no-warnings",
+				"-x",
+				"--audio-format",
+				format,
+				"--audio-quality",
+				audioQuality,
+				"-o",
+				`"${path.join(
+					downloadDir,
+					foldernameFormat,
+					filenameFormat
+				)}"`,
+				"-I",
+				`"${playlistIndex}:${playlistEnd}"`,
+				"--ffmpeg-location",
+				ffmpeg,
+				cookieArg,
+				browser,
+				configArg,
+				configTxt,
+				"--embed-metadata",
+				subs,
+				subLangs,
+				format === "mp3" || format === "m4a" ? "--embed-thumbnail" : "",
+				proxy ? "--no-check-certificate" : "",
+				proxy ? "--proxy" : "",
+				proxy,
+				`"${url}"`,
+			].filter(item => item);
+
 			downloadProcess = ytdlp.exec(
-				[
-					"--yes-playlist",
-					"--no-warnings",
-					"-x",
-					"--audio-format",
-					format,
-					"--audio-quality",
-					audioQuality,
-					"-o",
-					`"${path.join(
-						downloadDir,
-						foldernameFormat,
-						filenameFormat
-					)}"`,
-					"-I",
-					`"${playlistIndex}:${playlistEnd}"`,
-					"--ffmpeg-location",
-					ffmpeg,
-					cookieArg,
-					browser,
-					configArg,
-					configTxt,
-					"--embed-metadata",
-					subs,
-					subLangs,
-					format === "mp3" || format === "m4a" ? "--embed-thumbnail" : "",
-					`"${url}"`,
-				],
+				args,
 				{shell: true, detached: false},
 				controller.signal
 			);
 		}
 	}
 
-	downloadProcess.on("ytDlpEvent", (eventType, eventData) => {
+	downloadProcess.on("ytDlpEvent", (_eventType, eventData) => {
 		// console.log(eventData);
 
 		if (eventData.includes(playlistTxt)) {
@@ -409,23 +430,29 @@ function downloadThumbnails() {
 	hideOptions();
 	nameFormatting();
 	managePlaylistRange();
+
+	const args = [
+		"--yes-playlist",
+		"--no-warnings",
+		"-o",
+		`"${path.join(downloadDir, foldernameFormat, filenameFormat)}"`,
+		cookieArg,
+		browser,
+		"--write-thumbnail",
+		"--convert-thumbnails png",
+		"--skip-download",
+		"-I",
+		`"${playlistIndex}:${playlistEnd}"`,
+		"--ffmpeg-location",
+		ffmpeg,
+		proxy ? "--no-check-certificate" : "",
+		"--proxy",
+		proxy,
+		`"${url}"`,
+	].filter(item => item);
+
 	const downloadProcess = ytdlp.exec(
-		[
-			"--yes-playlist",
-			"--no-warnings",
-			"-o",
-			`"${path.join(downloadDir, foldernameFormat, filenameFormat)}"`,
-			cookieArg,
-			browser,
-			"--write-thumbnail",
-			"--convert-thumbnails png",
-			"--skip-download",
-			"-I",
-			`"${playlistIndex}:${playlistEnd}"`,
-			"--ffmpeg-location",
-			ffmpeg,
-			`"${url}"`,
-		],
+		args,
 		{shell: true, detached: false}
 	);
 
@@ -479,21 +506,27 @@ function saveLinks() {
 	hideOptions();
 	nameFormatting();
 	managePlaylistRange();
+
+	const args = [
+		"--yes-playlist",
+		"--no-warnings",
+		cookieArg,
+		browser,
+		"--skip-download",
+		"--print-to-file",
+		"webpage_url",
+		`"${path.join(downloadDir, foldernameFormat, "links.txt")}"`,
+		"--skip-download",
+		"-I",
+		`"${playlistIndex}:${playlistEnd}"`,
+		proxy ? "--no-check-certificate" : "",
+		"--proxy",
+		proxy,
+		`"${url}"`,
+	].filter(item => item);
+	
 	const downloadProcess = ytdlp.exec(
-		[
-			"--yes-playlist",
-			"--no-warnings",
-			cookieArg,
-			browser,
-			"--skip-download",
-			"--print-to-file",
-			"webpage_url",
-			`"${path.join(downloadDir, foldernameFormat, "links.txt")}"`,
-			"--skip-download",
-			"-I",
-			`"${playlistIndex}:${playlistEnd}"`,
-			`"${url}"`,
-		],
+		args,
 		{shell: true, detached: false}
 	);
 
