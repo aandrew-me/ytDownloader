@@ -110,5 +110,7 @@
 	"Preferred video codec": "首选视频编解码器",
 	"Show more format options": "显示更多格式选项",
 	"You need to give the app permission to access home directory to use this. You can do it with Flatseal by enabling the permission with text 'filesystem=home'": "您需要授予应用程序访问主目录的权限才能使用此功能。您可以通过在 Flatseal 中启用权限并使用文本 'filesystem=home' 来执行此操作",
-	"No Audio": "无音频"
+	"No Audio": "无音频",
+	"Proxy": "Proxy",
+	"Clear Downloads": "Clear Downloads"
 }
