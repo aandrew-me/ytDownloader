@@ -174,19 +174,8 @@ async function downloadYtdlp() {
 	getId("popupSvg").style.display = "inline";
 
 	// Downloading appropriate version of yt-dlp
-	if (os.platform() == "linux") {
-		await YTDlpWrap.downloadFromGithub(
-			ytdlpDownloadPath,
-			"",
-			"linux",
-			true
-		);
-		localStorage.setItem("fullYtdlpBinPresent", "true");
-	} else {
-		// In case of windows/mac
-		await YTDlpWrap.downloadFromGithub(ytdlpDownloadPath);
-		localStorage.setItem("fullYtdlpBinPresent", "true");
-	}
+	await YTDlpWrap.downloadFromGithub(ytdlpDownloadPath);
+	localStorage.setItem("fullYtdlpBinPresent", "true");
 
 	getId("popupBox").style.display = "none";
 	ytDlp = ytdlpPath;
