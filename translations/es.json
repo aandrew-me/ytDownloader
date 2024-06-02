@@ -3,7 +3,7 @@
 	"About": "Acerca de",
 	"Download location": "Ubicación de la descarga",
 	"Current download location - ": "Ubicación de la descarga actual - ",
-	"Enable transparent dark mode(only Linux, needs relaunch)": "Habilitar el modo oscuro transparente (sólo en Linux, necesita relanzar)",
+	"Enable transparent dark mode(only Linux, needs relaunch)": "Habilitar el modo oscuro transparente (solo en Linux, necesita relanzar)",
 	"Please wait, necessary files are being downloaded": "Espere, se están descargando los archivos necesarios",
 	"Video": "Video",
 	"Audio": "Audio",
@@ -110,5 +110,7 @@
 	"Preferred video codec": "Código de vídeo preferido",
 	"Show more format options": "Mostrar más opciones de formato",
 	"You need to give the app permission to access home directory to use this. You can do it with Flatseal by enabling the permission with text 'filesystem=home'": "Debe otorgar permiso a la aplicación para acceder al directorio de inicio para usar esto. Puede hacerlo con Flatseal habilitando el permiso con el texto 'filesystem=home'",
-	"No Audio": "No Audio"
+	"No Audio": "Sin audio",
+	"Proxy": "Proxy",
+	"Clear Downloads": "Clear Downloads"
 }
