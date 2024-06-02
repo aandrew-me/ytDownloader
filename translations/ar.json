@@ -110,5 +110,7 @@
 	"Preferred video codec": "ترميز الفيديو المفضل",
 	"Show more format options": "إظهار المزيد من خيارات التنسيق",
 	"You need to give the app permission to access home directory to use this. You can do it with Flatseal by enabling the permission with text 'filesystem=home'": "تحتاج إلى إعطاء الإذن للتطبيق للوصول إلى المجلد الرئيس لاستخدام هذا. يمكنك ذلك باستخدام Flatseal عن طريق تمكين الإذن ذو النص 'filesystem=home'",
-	"No Audio": "دون صوت"
+	"No Audio": "دون صوت",
+	"Proxy": "Proxy",
+	"Clear Downloads": "Clear Downloads"
 }
