@@ -58,7 +58,7 @@ process.env.PYTHONWARNINGS = "error";
 let downloadDir = "";
 
 // Global variables
-let title, onlyvideo, id, thumbnail, ytdlp, duration;
+let title, onlyvideo, id, thumbnail, ytdlp, duration, extractor_key;
 let audioExtensionList = [];
 let rangeCmd = "";
 let subs = "";
@@ -395,6 +395,7 @@ async function getInfo(url) {
 			id = parsedInfo.id;
 			thumbnail = parsedInfo.thumbnail;
 			duration = parsedInfo.duration;
+			extractor_key = parsedInfo.extractor_key
 			/**
 			 * @typedef {import("./types").format} format
 			 * @type {format[]}
@@ -1103,7 +1104,7 @@ function download(
 			subs2 || subLangs,
 			"--no-playlist",
 			"--embed-metadata",
-			ext == "mp4" && audioForVideoExt === "m4a" ? "--embed-thumbnail" : "",
+			ext == "mp4" && audioForVideoExt === "m4a" && extractor_key === "Youtube" ? "--embed-thumbnail" : "",
 			configArg,
 			configTxt,
 			cookieArg,
@@ -1146,7 +1147,7 @@ function download(
 			ffmpeg,
 			"--no-playlist",
 			"--embed-metadata",
-			extractFormat1 == "m4a" || extractFormat1 == "mp3"
+			(extractFormat1 == "m4a" || extractFormat1 == "mp3") && extractor_key === "Youtube"
 				? "--embed-thumbnail"
 				: "",
 			cookieArg,
@@ -1183,7 +1184,7 @@ function download(
 			subs2 || subLangs,
 			"--no-playlist",
 			"--embed-metadata",
-			ext == "m4a" || ext == "mp4" ? "--embed-thumbnail" : "",
+			(ext == "m4a" || ext == "mp4") && extractor_key === "Youtube" ? "--embed-thumbnail" : "",
 			cookieArg,
 			browser,
 			configArg,

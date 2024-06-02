@@ -20,6 +20,7 @@ type info = {
     thumbnail: string,
     duration: number,
     formats: format[],
+    extractor_key: string,
 }
 
 export {
