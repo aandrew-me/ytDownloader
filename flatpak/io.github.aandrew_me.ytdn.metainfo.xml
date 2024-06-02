@@ -39,6 +39,15 @@
   <content_rating type="oars-1.1" />
 
   <releases>
+    <release version="3.18.0" date="2024-6-02">
+      <description>
+        <p>Added proxy support</p>
+        <p>Added button to clear downloads</p>
+        <p>Fixed download errors</p>
+        <p>Added compatibility for X(Twitter)</p>
+        <p>Minor enhancements</p>
+      </description>
+    </release>
     <release version="3.17.4" date="2024-4-21">
       <description>
         <p>Added Chinese language</p>
