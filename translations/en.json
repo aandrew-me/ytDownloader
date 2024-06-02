@@ -111,5 +111,6 @@
 	"Show more format options": "Show more format options",
 	"You need to give the app permission to access home directory to use this. You can do it with Flatseal by enabling the permission with text 'filesystem=home'": "You need to give the app permission to access home directory to use this. You can do it with Flatseal by enabling the permission with text 'filesystem=home'",
 	"No Audio":"No Audio",
-	"Proxy": "Proxy"
+	"Proxy": "Proxy",
+	"Clear Downloads": "Clear Downloads"
 }

@@ -49,3 +49,7 @@ if (process.env.FLATPAK_ID) {
 		shell.openExternal("https://flathub.org/apps/com.github.tchx84.Flatseal")
 	})
 }
+
+if (process.env.FLATPAK_ID || process.env.SNAP_NAME) {
+	getId("autoUpdatesBox").style.display = "none"
+}

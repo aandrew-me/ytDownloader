@@ -59,4 +59,5 @@ getId("matrixTxt").textContent = i18n.__("Matrix");
 getId("githubTxt").textContent = i18n.__("Github");
 getId("latteTxt").textContent = i18n.__("Latte");
 getId("solarizedDarkTxt").textContent = i18n.__("Solarized Dark");
+getId("clearBtn").textContent = i18n.__("Clear Downloads");
 
