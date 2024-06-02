@@ -535,7 +535,7 @@ button {
 	outline: none;
 }
 
-#extractBtn {
+#extractBtn, .blueBtn {
 	color: white;
 	background-color: var(--blueBtn);
 	border: none;
@@ -546,6 +546,10 @@ button {
 	cursor: pointer;
 	margin: 8px;
 	font-size: large;
+}
+
+#clearBtn {
+	display: none;
 }
 
 #extractBtn:active {

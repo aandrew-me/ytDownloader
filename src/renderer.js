@@ -71,6 +71,7 @@ let showMoreFormats = false;
 let configArg = "";
 let configTxt = "";
 let proxy = "";
+let downloadedItemList = []
 
 if (localStorage.getItem("configPath")) {
 	configArg = "--config-location";
@@ -1009,9 +1010,11 @@ function download(
 
 	getId(randomId + ".close").addEventListener("click", () => {
 		if (getId(randomId)) {
+			removeFromDownloadedList(randomId)
 			fadeItem(randomId);
 		}
 	});
+
 
 	let downloadProcess;
 	let filename = "";
@@ -1236,6 +1239,7 @@ function download(
 		})
 		.once("close", (code) => {
 			getId(randomId + "speed").textContent = "";
+			addToDownloadedList(randomId)
 			currentDownloads--;
 			console.log("Closed with code " + code);
 			if (code == 0) {
@@ -1294,6 +1298,34 @@ function fadeItem(id) {
 	}, 500);
 }
 
+function clearAllDownloaded(){
+	downloadedItemList.forEach(item => {
+		fadeItem(item)
+	})
+	downloadedItemList = []
+	hideClearBtn()
+}
+
+function addToDownloadedList(id){
+	downloadedItemList.push(id)
+
+	if (downloadedItemList.length > 1) {
+		getId("clearBtn").style.display = "inline-block";
+
+	}
+}
+
+function removeFromDownloadedList(id){
+	downloadedItemList.splice(downloadedItemList.indexOf(id), 1);
+
+	if (downloadedItemList.length < 2) {
+		hideClearBtn();
+	}
+}
+
+function hideClearBtn(){
+	getId("clearBtn").style.display = "none"
+}
 // After saving video
 
 function afterSave(location, filename, progressId, thumbnail) {
@@ -1405,6 +1437,10 @@ ipcRenderer.on("link", (event, text) => {
 getId("selectLocation").addEventListener("click", () => {
 	ipcRenderer.send("select-location-main", "");
 });
+
+getId("clearBtn").addEventListener("click", () => {
+	clearAllDownloaded();
+})
 
 ipcRenderer.on("downloadPath", (event, downloadPath) => {
 	console.log(downloadPath);
