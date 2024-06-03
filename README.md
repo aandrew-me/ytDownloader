@@ -116,6 +116,11 @@ Since the app is not signed, when you will try to open the app, macOS will not a
 2. Choose **Security & Privacy**
 3. The app will be shown there. Click on **Open**
 
+On macOs 14.5 Sonoma you need to open terminal and add it by hand:
+```
+sudo xattr -r -d com.apple.quarantine /Applications/YTDownloader.app 
+```
+
 ## Internationalization (Localization) 🌍
 
 Translations into other languages would be highly appreciated. If you want to help translating the app to other languages, you can join from [here](https://crwd.in/ytdownloader). Open a new issue and that language will be added to Crowdin. Please don't make pull requests with json files, instead use Crowdin.
