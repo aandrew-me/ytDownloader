@@ -283,9 +283,15 @@ ipcMain.on("autoUpdate", (event, status) => {
 					};
 					dialog.showMessageBox(dialogOpts).then((returnValue) => {
 						if (returnValue.response === 0) {
-							shell.openExternal(
-								"https://github.com/aandrew-me/ytDownloader/releases/latest/download/YTDownloader_Mac.dmg"
-							);
+							if (process.arch === 'x64') {
+								shell.openExternal(
+									"https://github.com/aandrew-me/ytDownloader/releases/latest/download/YTDownloader_Mac_x64.dmg"
+								);
+							} else {
+								shell.openExternal(
+									"https://github.com/aandrew-me/ytDownloader/releases/latest/download/YTDownloader_Mac_arm64.dmg"
+								);
+							}
 						}
 					});
 				}

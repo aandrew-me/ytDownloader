@@ -39,7 +39,7 @@ jobs:
             - name: Macos Intel Build
               if: matrix.os == 'macos-13'
               run: |
-                curl https://github.com/aandrew-me/ffmpeg-builds/releases/download/v6/ffmpeg_mac_amd64 -o ffmpeg
+                curl -L https://github.com/aandrew-me/ffmpeg-builds/releases/download/v6/ffmpeg_mac_amd64 -o ffmpeg
                 chmod +x ffmpeg
                 npm i
                 npm run gh-mac
@@ -47,7 +47,7 @@ jobs:
             - name: Macos Arm Build
               if: matrix.os == 'macos-latest'
               run: |
-                curl https://github.com/aandrew-me/ffmpeg-builds/releases/download/v6/ffmpeg_mac_arm64 -o ffmpeg
+                curl -L https://github.com/aandrew-me/ffmpeg-builds/releases/download/v6/ffmpeg_mac_arm64 -o ffmpeg
                 chmod +x ffmpeg
                 npm i
                 npm run gh-mac
