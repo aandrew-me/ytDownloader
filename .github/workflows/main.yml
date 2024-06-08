@@ -14,7 +14,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         strategy:
             matrix:
-                os: [macos-latest, ubuntu-latest, windows-latest]
+                os: [macos-latest, macos-13, ubuntu-latest, windows-latest]
 
         steps:
             - name: Checkout code
@@ -36,13 +36,19 @@ jobs:
                 npx electron-builder -l --publish=always
                 npm run gh-linux
             
-            - name: Macos Build
+            - name: Macos Intel Build
+              if: matrix.os == 'macos-13'
+              run: |
+                curl https://github.com/aandrew-me/ffmpeg-builds/releases/download/v6/ffmpeg_mac_amd64 -o ffmpeg
+                chmod +x ffmpeg
+                npm i
+                npm run gh-mac
+            
+            - name: Macos Arm Build
               if: matrix.os == 'macos-latest'
               run: |
-                curl https://evermeet.cx/ffmpeg/ffmpeg-6.0.zip -o ffmpeg.zip
-                unzip ffmpeg.zip
+                curl https://github.com/aandrew-me/ffmpeg-builds/releases/download/v6/ffmpeg_mac_arm64 -o ffmpeg
                 chmod +x ffmpeg
-                rm ffmpeg.zip
                 npm i
                 npm run gh-mac
             
@@ -52,28 +58,3 @@ jobs:
                 Invoke-WebRequest -Uri "https://github.com/aandrew-me/ffmpeg-builds/releases/download/v6/ffmpeg.exe" -OutFile ffmpeg.exe
                 npm i
                 npm run gh-windows
-
-            # - name: Upload Artifacts
-            #   id: upload-artifacts
-            #   uses: softprops/action-gh-release@v1
-            #   with:
-            #       files: |
-            #           tgpt-linux-amd64
-            #           tgpt-linux-i386
-            #           tgpt-linux-arm64
-            #           tgpt-amd64.exe
-            #           tgpt-i386.exe
-            #           tgpt-mac-amd64
-            #           tgpt-mac-arm64
-            #       token: ${{ secrets.GITHUB_TOKEN }}
-            #       draft: true
-            #       tag_name: v
-            #       name: tgpt
-
-#Windows
-                # Invoke-WebRequest -Uri "https://github.com/yt-dlp/FFmpeg-Builds/releases/download/latest/ffmpeg-n6.0-latest-win64-gpl-6.0.zip" -OutFile ffmpeg.zip
-                # Expand-Archive -Path ".\ffmpeg.zip" -DestinationPath ".\ffmpeg"
-                # pwd
-                # cp "D:\a\ytDownloader\ffmpeg\bin\ffmpeg.exe" .\ffmpeg.exe
-                # Remove-Item -Recurse -Force ffmpeg
-                # Remove-Item -Force ffmpeg.zip

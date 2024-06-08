@@ -76,7 +76,7 @@ A modern GUI video and audio downloader supporting [hundreds of sites](https://g
 ## Linux 🐧
 
 Linux has several options available - Flatpak, AppImage, Snap and AUR.
-Flatpak is recommended.
+Flatpak is recommended. For arm processors, download from flathub.
 
 -   ### AppImage
 
