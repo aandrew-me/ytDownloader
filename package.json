@@ -106,7 +106,8 @@
 		},
 		"nsis": {
 			"allowToChangeInstallationDirectory": true,
-			"oneClick": false
+			"oneClick": false,
+			"deleteAppDataOnUninstall": true
 		},
 		"msi": {
 			"oneClick": true,
