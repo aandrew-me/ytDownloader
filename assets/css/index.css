@@ -28,16 +28,16 @@
 :root[theme="dark"] {
 	--background: rgb(40, 40, 40);
 	--text: white;
-	--box-main: rgb(80, 80, 80);
-	--box-toggle: rgb(70, 70, 70);
-	--box-toggleOn: rgb(28 232 138);
+	--box-main: rgb(62, 60, 60);
+	--box-toggle: rgb(47, 47, 47);
+	--box-toggleOn: rgb(2, 123, 63);
 	--item-bg: rgb(75, 75, 75);
 	--box-shadow: none;
-	--select: rgb(127, 253, 127);
-	--greenBtn: #6acd29;
-	--greenBtn-bottom: #4c8824;
-	--redBtn: #d64d4f;
-	--redBtn-bottom: #854243;
+	--select: rgb(68 214 141);
+	--greenBtn: #56a025;
+	--greenBtn-bottom: #3e6c20;
+	--redBtn: #c82b2d;
+	--redBtn-bottom: #803334;
 	--blueBtn: rgb(80, 128, 230);
 	--blueBtn-bottom: rgb(44, 78, 180);
 }
@@ -257,11 +257,12 @@ body {
 .playlistItem {
 	display: flex;
 	position: relative;
-	width: 86%;
+	width: 94%;
+	height: 25px;
 	background-color: var(--item-bg);
 	color: var(--text);
 	padding: 10px 25px;
-	border-radius: 25px;
+	border-radius: 15px;
 	align-items: center;
 	justify-content: space-between;
 	margin: 10px auto;
@@ -304,7 +305,6 @@ body {
 .itemProgress {
 	font-weight: bold;
 	cursor: pointer;
-	margin-top: 10px;
 }
 .progressBar {
 	width: 90%;
@@ -351,6 +351,12 @@ body {
 	width: 80%;
 	padding: 10px 10px 15px 10px;
 	color: var(--text);
+}
+
+#videoBox, #audioBox {
+	background-color: var(--box-toggle);
+	padding: 10px;
+	border-radius: 10px;
 }
 
 #audioExtract, .separationBox {
@@ -409,9 +415,26 @@ body {
 	font-family: "JetBrains";
 }
 
+.audioSelect {
+	width: 180px;
+}
+
+#videoTypeSelect {
+	width: 160px
+}
+
+#audioQualitySelect {
+	width: 230px;
+}
+
+#link {
+	padding: 10px;
+}
+
 #videoFormatSelect, #audioFormatSelect, #audioForVideoFormatSelect {
 	font-family: JetBrains, monospace;
 	font-size: medium;
+	width: 400px;
 }
 
 label {
@@ -485,6 +508,8 @@ input[type="number"]::-webkit-outer-spin-button {
 
 #incorrectMsg {
 	color: var(--redBtn);
+	display: none;
+	/* TODO: add display visible in js code*/
 }
 
 #errorBtn {
@@ -546,6 +571,14 @@ button {
 	cursor: pointer;
 	margin: 8px;
 	font-size: large;
+}
+
+#extractBtn {
+	width: 150px;
+}
+
+#download, #audioDownload {
+	width: 140px;
 }
 
 #clearBtn {
