@@ -363,11 +363,16 @@ function i18n(phrase) {
  * @param {string} configPath
  */
 function setItem(itemName, itemContent, configPath) {
+	console.log("setting with", itemName, itemContent, configPath)
 	let config = {};
 	if (fs.existsSync(configPath)) {
 		const fileContent = fs.readFileSync(configPath).toString();
-		config = JSON.parse(fileContent);
-		config[itemName] = itemContent;
+		try {
+			config = fileContent ? JSON.parse(fileContent) : {};
+			config[itemName] = itemContent;
+		} catch (error) {
+			console.log("Error has occured trying to save window info", error)
+		}
 	} else {
 		config[itemName] = itemContent;
 	}
