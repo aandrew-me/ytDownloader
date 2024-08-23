@@ -84,7 +84,7 @@ function pasteLink() {
 	url = clipboard.readText();
 	getId("link").textContent = " " + url;
 	getId("options").style.display = "block";
-	getId("incorrectMsg").textContent = "";
+	getId("incorrectMsgPlaylist").textContent = "";
 	getId("errorBtn").style.display = "none";
 }
 
@@ -198,6 +198,8 @@ function download(type) {
 			proxy ? "--no-check-certificate" : "",
 			proxy ? "--proxy" : "",
 			proxy,
+			// "--compat-options",
+			// "no-youtube-unavailable-videos",
 			`"${url}"`,
 		].filter(item => item);
 
@@ -387,10 +389,11 @@ function showErrorTxt(error) {
 	getId("openDownloads").style.display = "none";
 	getId("options").style.display = "block";
 	getId("playlistName").textContent = "";
-	getId("incorrectMsg").textContent = i18n.__(
+	getId("incorrectMsgPlaylist").textContent = i18n.__(
 		"Some error has occurred. Check your network and use correct URL"
 	);
-	getId("incorrectMsg").title = error;
+	getId("incorrectMsgPlaylist").style.display = "block"
+	getId("incorrectMsgPlaylist").title = error;
 	getId("errorBtn").style.display = "inline-block";
 	getId("errorDetails").innerHTML = `
 	<strong>URL: ${url}</strong>
@@ -417,6 +420,7 @@ function hideOptions(justHide = false) {
 	getId("errorBtn").style.display = "none";
 	getId("errorDetails").style.display = "none";
 	getId("errorDetails").textContent = "";
+	getId("incorrectMsgPlaylist").style.display = "none"
 	if (!justHide){
 		getId("playlistName").textContent = i18n.__("Processing") + "...";
 		getId("pasteLink").style.display = "none";

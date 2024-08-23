@@ -506,10 +506,12 @@ input[type="number"]::-webkit-outer-spin-button {
 	margin: 5px;
 }
 
-#incorrectMsg {
+#incorrectMsg, #incorrectMsgPlaylist {
 	color: var(--redBtn);
+}
+
+#incorrectMsgPlaylist {
 	display: none;
-	/* TODO: add display visible in js code*/
 }
 
 #errorBtn {

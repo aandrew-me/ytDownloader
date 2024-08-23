@@ -142,6 +142,7 @@ app.whenReady().then(() => {
 	]);
 
 	let trayInUse = false;
+	// TODO: Find why tray icon isn't showing properly on gnome
 	let icon;
 	if (process.platform == "win32") {
 		icon = path.join(__dirname, "resources/icon.ico");
@@ -363,7 +364,6 @@ function i18n(phrase) {
  * @param {string} configPath
  */
 function setItem(itemName, itemContent, configPath) {
-	console.log("setting with", itemName, itemContent, configPath)
 	let config = {};
 	if (fs.existsSync(configPath)) {
 		const fileContent = fs.readFileSync(configPath).toString();
