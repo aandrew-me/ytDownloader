@@ -187,9 +187,19 @@ async function downloadYtdlp() {
 
 // Checking if yt-dlp has been installed by user
 
+// TODO: Remove this after some time
 const fullYtdlpBinIsPresent = !!localStorage.getItem("fullYtdlpBinPresent");
+const removedOldMacYtdlp = !!localStorage.getItem("removedOldMacYtdlp")
 
-cp.exec(`"${ytdlpPath}" --version`, (error, stdout, stderr) => {
+// Removing old yt-dlp for macos
+if (os.platform() === "darwin" && !removedOldMacYtdlp) {
+	if (fs.existsSync(ytdlpPath)) {
+		fs.rmSync(ytdlpPath)
+		localStorage.setItem('removedOldMacYtdlp', "true")
+	}
+}
+
+cp.exec(`"${ytdlpPath}" --version`, (error, _stdout, _stderr) => {
 	if ((error || !fullYtdlpBinIsPresent) && os.platform() !== "freebsd") {
 		getId("popupBox").style.display = "block";
 		process.on("uncaughtException", (reason, promise) => {
@@ -222,6 +232,7 @@ cp.exec(`"${ytdlpPath}" --version`, (error, stdout, stderr) => {
 		ipcRenderer.send("ready-for-links");
 	}
 });
+
 
 function defaultVideoToggle() {
 	let defaultWindow = "video";
@@ -1011,7 +1022,7 @@ function download(
 	// Filtering characters for Unix platforms
 	let pattern = ["/", '"', "`", "#"];
 
-	if (process.platform === "win32") {
+	if (os.platform() === "win32") {
 		pattern = [
 			"[",
 			"]",
@@ -1096,7 +1107,7 @@ function download(
 			subs2 || subLangs,
 			"--no-playlist",
 			"--embed-metadata",
-			ext == "mp4" && audioForVideoExt === "m4a" && extractor_key === "Youtube" ? "--embed-thumbnail" : "",
+			ext == "mp4" && audioForVideoExt === "m4a" && extractor_key === "Youtube" && os.platform() !== "darwin" ? "--embed-thumbnail" : "",
 			configArg,
 			configTxt,
 			cookieArg,
@@ -1139,7 +1150,7 @@ function download(
 			ffmpeg,
 			"--no-playlist",
 			"--embed-metadata",
-			(extractFormat1 == "m4a" || extractFormat1 == "mp3") && extractor_key === "Youtube"
+			(extractFormat1 == "m4a" || extractFormat1 == "mp3") && extractor_key === "Youtube" && os.platform() !== "darwin"
 				? "--embed-thumbnail"
 				: "",
 			cookieArg,
@@ -1176,7 +1187,7 @@ function download(
 			subs2 || subLangs,
 			"--no-playlist",
 			"--embed-metadata",
-			(ext == "m4a" || ext == "mp4") && extractor_key === "Youtube" ? "--embed-thumbnail" : "",
+			(ext == "m4a" || ext == "mp4") && extractor_key === "Youtube" ? "--embed-thumbnail" && os.platform() !== "darwin" : "",
 			cookieArg,
 			browser,
 			configArg,
