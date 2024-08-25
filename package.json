@@ -1,10 +1,10 @@
 {
 	"dependencies": {
-		"electron-updater": "^5.3.0",
+		"electron-updater": "^6.2.1",
 		"yt-dlp-wrap-plus": "^2.3.20"
 	},
 	"name": "ytdownloader",
-	"version": "3.18.1",
+	"version": "3.18.2",
 	"main": "main.js",
 	"scripts": {
 		"start": "electron .",
@@ -34,7 +34,7 @@
 	"description": "Download videos and audios from YouTube and many other sites",
 	"devDependencies": {
 		"electron": "^27.0.2",
-		"electron-builder": "^24.6.4",
+		"electron-builder": "^24.13.3",
 		"typescript": "^5.3.3"
 	},
 	"build": {
