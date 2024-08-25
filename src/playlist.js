@@ -198,8 +198,8 @@ function download(type) {
 			proxy ? "--no-check-certificate" : "",
 			proxy ? "--proxy" : "",
 			proxy,
-			// "--compat-options",
-			// "no-youtube-unavailable-videos",
+			"--compat-options",
+			"no-youtube-unavailable-videos",
 			`"${url}"`,
 		].filter(item => item);
 
@@ -243,6 +243,8 @@ function download(type) {
 				proxy ? "--no-check-certificate" : "",
 				proxy ? "--proxy" : "",
 				proxy,
+				"--compat-options",
+				"no-youtube-unavailable-videos",
 				`"${url}"`,
 			].filter(item => item);
 
@@ -283,6 +285,8 @@ function download(type) {
 				proxy ? "--no-check-certificate" : "",
 				proxy ? "--proxy" : "",
 				proxy,
+				"--compat-options",
+				"no-youtube-unavailable-videos",
 				`"${url}"`,
 			].filter(item => item);
 
@@ -450,8 +454,10 @@ function downloadThumbnails() {
 		"--ffmpeg-location",
 		ffmpeg,
 		proxy ? "--no-check-certificate" : "",
-		"--proxy",
+		proxy ? "--proxy" : "",
 		proxy,
+		"--compat-options",
+		"no-youtube-unavailable-videos",
 		`"${url}"`,
 	].filter(item => item);
 
@@ -459,6 +465,8 @@ function downloadThumbnails() {
 		args,
 		{shell: true, detached: false}
 	);
+
+	// console.log(downloadProcess.ytDlpProcess.spawnargs[2])
 
 	downloadProcess.on("ytDlpEvent", (eventType, eventData) => {
 		// console.log(eventData);
@@ -524,8 +532,10 @@ function saveLinks() {
 		"-I",
 		`"${playlistIndex}:${playlistEnd}"`,
 		proxy ? "--no-check-certificate" : "",
-		"--proxy",
+		proxy ? "--proxy" : "",
 		proxy,
+		"--compat-options",
+		"no-youtube-unavailable-videos",
 		`"${url}"`,
 	].filter(item => item);
 	
