@@ -53,7 +53,32 @@ function createWindow() {
 	win.loadFile("html/index.html");
 	// win.setMenu(null)
 	win.show();
-	autoUpdater.checkForUpdates();
+
+	autoUpdater.checkForUpdates().then(result => {
+		// Removing unnecesary files for windows
+		if (result && process.platform === "win32") {
+			if (result.updateInfo.version === app.getVersion()) {
+				fs.readdir(path.join(process.env.LOCALAPPDATA, "ytdownloader-updater"), {encoding: "utf-8", withFileTypes: true}, (err, files) => {
+					if (err) {
+						console.log("No update directory to clear")
+					} else {
+						files.forEach(file => {
+							if (file.isFile()) {
+								fs.rm(path.join(file.path, file.name), (_err) => {
+									console.log("Removed file:", file.name)
+								})
+							} else {
+								fs.rm(path.join(file.path, file.name), { recursive: true}, (err) => {
+									console.log("Removed directory:", file.name)
+								})
+							}
+						})
+					}
+				})
+
+			}
+		}
+	});
 }
 let loadedLanguage;
 
