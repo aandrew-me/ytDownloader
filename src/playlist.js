@@ -561,7 +561,7 @@ function saveLinks() {
 		) {
 			count += 1;
 			let itemTitle;
-			itemTitle = i18n.__("Link") + " " + originalCount;
+			itemTitle = i18n.__("Link") + " " + count;
 
 			if (count > 1) {
 				getId(`p${count - 1}`).textContent = i18n.__("Link added");

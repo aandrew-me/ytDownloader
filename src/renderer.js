@@ -1187,7 +1187,7 @@ function download(
 			subs2 || subLangs,
 			"--no-playlist",
 			"--embed-metadata",
-			(ext == "m4a" || ext == "mp4") && extractor_key === "Youtube" ? "--embed-thumbnail" && os.platform() !== "darwin" : "",
+			(ext == "m4a" || ext == "mp4") && extractor_key === "Youtube" && os.platform() !== "darwin" ? "--embed-thumbnail" : "",
 			cookieArg,
 			browser,
 			configArg,
