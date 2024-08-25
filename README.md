@@ -69,7 +69,8 @@ A modern GUI video and audio downloader supporting [hundreds of sites](https://g
     ```
     scoop install https://raw.githubusercontent.com/aandrew-me/ytDownloader/main/ytdownloader.json
     ```
--   **Winget**
+-   **Winget** (Might be using outdated version)
+
     App can be installed with [Winget](https://github.com/microsoft/winget-cli) using the following command
     ```
     winget install aandrew-me.ytDownloader
@@ -121,6 +122,8 @@ On macOs 14.5 Sonoma you need to open terminal and add it by hand:
 ```
 sudo xattr -r -d com.apple.quarantine /Applications/YTDownloader.app 
 ```
+
+You will also need to have Python 3.8 or greater installed
 
 ## Internationalization (Localization) 🌍
 
