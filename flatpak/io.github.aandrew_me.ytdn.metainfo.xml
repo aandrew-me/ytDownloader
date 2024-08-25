@@ -39,6 +39,14 @@
   <content_rating type="oars-1.1" />
 
   <releases>
+    <release version="3.18.2" date="2024-8-25">
+      <description>
+        <p>Design enhancements</p>
+        <p>Added removal of old windows updates</p>
+        <p>Ignore unavailable videos for playlists</p>
+        <p>Fixed issues with config file on resize</p>
+      </description>
+    </release>
     <release version="3.18.0" date="2024-6-02">
       <description>
         <p>Added proxy support</p>
