@@ -161,7 +161,7 @@ function download(type) {
 			format = "";
 		} else {
 			if (videoType === "mp4") {
-				format = `-f "${formatId}+m4a/mp4[height=${quality}]+m4a/bv*[height<=${quality}]+ba/best[height<=${quality}]"`;
+				format = `-f "mp4[height=${quality}]+m4a/mp4[height<=${quality}]+м4а/best[height<=${quality}]"`;
 			} else if (videoType === "webm") {
 				format = `-f "webm[height<=${quality}]+opus/bv*[height<=${quality}]+ba/${formatId}+m4a/mp4[height=${quality}]+m4a/best[height<=${quality}]"`;
 			} else {
