@@ -48,9 +48,16 @@ if (os.platform() === "win32") {
 
 if (!fs.existsSync(ffmpegPath)) {
 	try {
-		ffmpeg = execSync("which ffmpeg", {encoding: "utf8"});
-		ffmpeg = `"${ffmpeg.trimEnd()}"`;
+		if (os.platform() === "win32") {
+			ffmpeg = execSync("where ffmpeg.exe", {encoding: "utf8"});
+			console.log({ffmpeg})
+			ffmpeg = `"${ffmpeg.trimEnd()}"`;
+		} else {
+			ffmpeg = execSync("which ffmpeg", {encoding: "utf8"});
+			ffmpeg = `"${ffmpeg.trimEnd()}"`;
+		}
 	} catch (error) {
+		ffmpeg = `""`
 		console.log(error);
 	}
 }
