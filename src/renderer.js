@@ -1106,7 +1106,7 @@ function download(
 			subs1 || subs,
 			subs2 || subLangs,
 			"--no-playlist",
-			"--embed-metadata",
+			// "--embed-metadata",
 			ext == "mp4" && audioForVideoExt === "m4a" && extractor_key === "Youtube" && os.platform() !== "darwin" ? "--embed-thumbnail" : "",
 			configArg,
 			configTxt,
@@ -1149,7 +1149,7 @@ function download(
 			"--ffmpeg-location",
 			ffmpeg,
 			"--no-playlist",
-			"--embed-metadata",
+			// "--embed-metadata",
 			(extractFormat1 == "m4a" || extractFormat1 == "mp3") && extractor_key === "Youtube" && os.platform() !== "darwin"
 				? "--embed-thumbnail"
 				: "",
@@ -1186,7 +1186,7 @@ function download(
 			subs1 || subs,
 			subs2 || subLangs,
 			"--no-playlist",
-			"--embed-metadata",
+			// "--embed-metadata",
 			(ext == "m4a" || ext == "mp4") && extractor_key === "Youtube" && os.platform() !== "darwin" ? "--embed-thumbnail" : "",
 			cookieArg,
 			browser,
