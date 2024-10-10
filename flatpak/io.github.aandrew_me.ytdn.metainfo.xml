@@ -39,6 +39,11 @@
   <content_rating type="oars-1.1" />
 
   <releases>
+    <release version="3.18.3" date="2024-10-10">
+      <description>
+        <p>Fixes and enhancements</p>
+      </description>
+    </release>
     <release version="3.18.2" date="2024-8-25">
       <description>
         <p>Design enhancements</p>
