@@ -473,7 +473,7 @@ async function getInfo(url) {
 						audioExtensionList.push(format.audio_ext);
 					}
 
-					if (format.format_note.length > maxAudioFormatNoteLength) {
+					if (format.format_note && format.format_note.length > maxAudioFormatNoteLength) {
 						maxAudioFormatNoteLength = format.format_note.length
 					}
 				}
