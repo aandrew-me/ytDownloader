@@ -271,7 +271,7 @@ getId("closeHidden").addEventListener("click", () => {
 });
 
 document.addEventListener("keydown", (event) => {
-	if (event.ctrlKey && event.key == "v") {
+	if (event.ctrlKey && event.key == "v" && document.activeElement.tagName !== "INPUT") {
 		pasteUrl();
 	}
 });
