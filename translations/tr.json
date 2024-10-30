@@ -70,7 +70,7 @@
 	"Preferred video quality": "Tercih edilen video kalitesi",
 	"Preferred audio format": "Tercih edilen ses formatı",
 	"Best": "En iyi",
-	"File saved.": "Dosya kaydedildi.",
+	"File saved.": "Dosya kaydedildi",
 	"Open download folder": "İndirme klasörünü açın",
 	"Path:": "Dizin:",
 	"Select config file": "Konfigürasyon dosyasını seç",
@@ -112,5 +112,5 @@
 	"You need to give the app permission to access home directory to use this. You can do it with Flatseal by enabling the permission with text 'filesystem=home'": "Bunu kullanmak için uygulamaya ev dizininize erişme izni vermeniz gerekiyor. Flatseal kullanarak bunu yapabilirsiniz: 'filesystem=home' parametresini kullanın",
 	"No Audio": "Ses Yok",
 	"Proxy": "Proxy",
-	"Clear Downloads": "Clear Downloads"
+	"Clear Downloads": "İndirilenleri temizle"
 }
