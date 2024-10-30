@@ -1058,7 +1058,10 @@ function download(
 
 	// Adding info about trimmed range to filename
 	if (range2 || rangeCmd) {
-		const rangeTxt = (range2 || rangeCmd).replace("*", "");
+		let rangeTxt = (range2 || rangeCmd).replace("*", "");
+		if (os.platform() === "win32") {
+			rangeTxt = rangeTxt.replace(":", "_");
+		}
 		filename += `[${rangeTxt}]`
 	}
 	console.log("Filename:", filename);
