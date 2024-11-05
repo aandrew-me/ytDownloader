@@ -1060,7 +1060,8 @@ function download(
 	if (range2 || rangeCmd) {
 		let rangeTxt = (range2 || rangeCmd).replace("*", "");
 		if (os.platform() === "win32") {
-			rangeTxt = rangeTxt.replace(":", "_");
+			rangeTxt = rangeTxt.replaceAll(":", "_");
+			console.log({rangeTxt})
 		}
 		filename += `[${rangeTxt}]`
 	}
