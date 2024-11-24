@@ -168,9 +168,9 @@ function download(type) {
 			format = "";
 		} else {
 			if (videoType === "mp4") {
-				format = `-f "mp4[height=${quality}]+m4a/mp4[height<=${quality}]+м4а/best[height<=${quality}]"`;
+				format = `-f "bestvideo[height<=1080]+bestaudio[ext=m4a]/best[height<=1080]/best" --merge-output-format "mp4" --recode-video "mp4"`;
 			} else if (videoType === "webm") {
-				format = `-f "webm[height<=${quality}]+opus/bv*[height<=${quality}]+ba/${formatId}+m4a/mp4[height=${quality}]+m4a/best[height<=${quality}]"`;
+				format = `-f "bestvideo[height<=1080]+bestaudio[ext=webm]/best[height<=1080]/best" --merge-output-format "webm" --recode-video "webm"`;
 			} else {
 				format = `-f "bv*[height=${quality}]+ba/best[height=${quality}]/best[height<=${quality}]"`;
 			}
