@@ -401,7 +401,7 @@ async function getInfo(url) {
 			 * @typedef {import("./types").format} format
 			 * @type {format[]}
 			 */
-			const formats = parsedInfo.formats;
+			const formats = parsedInfo.formats || [];
 			console.log(formats);
 
 			/**

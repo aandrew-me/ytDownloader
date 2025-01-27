@@ -13,7 +13,7 @@ let downloadDir = localStorage.getItem("downloadPath") || downloadsDir;
 try {
 	console.log("Trying to access", downloadDir)
 	fs.accessSync(downloadDir, constants.W_OK);
-	downloadDir = downloadsDir;
+	downloadDir = downloadDir;
 } catch (err) {
 	console.log("Unable to write to download directory. Switching to default one.")
 	console.log("Err:", err)
@@ -304,6 +304,14 @@ function download(type) {
 			);
 		}
 	}
+
+	
+	getId("finishBtn").addEventListener("click", () => {
+		controller.abort("user_finished")
+		try {
+			process.kill(downloadProcess.ytDlpProcess.pid, 'SIGHINT')
+		} catch (_error) {}
+	})
 
 	downloadProcess.on("ytDlpEvent", (_eventType, eventData) => {
 		// console.log(eventData);
