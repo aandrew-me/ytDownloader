@@ -1229,7 +1229,8 @@ function download(
 			} else {
 				getId(randomId + "speed").textContent = `${i18n.__("Speed")}: ${
 					progress.currentSpeed || 0
-				}`;			ipcRenderer.send("progress", progress.percent)
+				}`;			
+				ipcRenderer.send("progress", progress.percent)
 
 				getId(
 					randomId + "prog"
@@ -1427,6 +1428,11 @@ getId("aboutWin").addEventListener("click", () => {
 getId("playlistWin").addEventListener("click", () => {
 	closeMenu();
 	ipcRenderer.send("load-win", __dirname + "/playlist.html");
+});
+
+getId("compressorWin").addEventListener("click", () => {
+	closeMenu();
+	ipcRenderer.send("load-win", __dirname + "/compressor.html");
 });
 // getId("newPlaylistWin").addEventListener("click", () => {
 // 	closeMenu();
