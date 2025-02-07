@@ -309,7 +309,7 @@ function download(type) {
 	getId("finishBtn").addEventListener("click", () => {
 		controller.abort("user_finished")
 		try {
-			process.kill(downloadProcess.ytDlpProcess.pid, 'SIGHINT')
+			process.kill(downloadProcess.ytDlpProcess.pid, 'SIGINT')
 		} catch (_error) {}
 	})
 
@@ -714,6 +714,11 @@ getId("aboutWin").addEventListener("click", () => {
 getId("homeWin").addEventListener("click", () => {
 	closeMenu();
 	ipcRenderer.send("load-win", __dirname + "/index.html");
+});
+
+getId("compressorWin").addEventListener("click", () => {
+	closeMenu();
+	ipcRenderer.send("load-win", __dirname + "/compressor.html");
 });
 
 // Translations

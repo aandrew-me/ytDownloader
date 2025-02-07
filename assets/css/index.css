@@ -406,10 +406,10 @@ body {
 	padding: 12px 15px;
 	background-color: var(--select);
 	border: none;
-	border-radius: 10px;
+	border-radius: 12px;
 	cursor: pointer;
 	font-size: large;
-	margin: 8px;
+	margin-bottom: 8px;
 	outline: none;
 	max-width: min(400px, 100%);
 	font-family: "JetBrains";
@@ -726,15 +726,16 @@ body::-webkit-scrollbar-thumb {
 
 
 /* Compressor styles */
-#compressor_body {
-	text-align: left;
+#compressor-header {
+	text-align: center;
+	margin-top: 0;
 }
 
 .container {
 	max-width: 800px;
-	margin: 0 auto;
+	margin: 0 auto 10px auto;
 	background: var(--box-main);
-	padding: 2rem;
+	padding: 30px;
 	border-radius: 8px;
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -754,15 +755,55 @@ body::-webkit-scrollbar-thumb {
 	cursor: pointer;
 }
 
+.compress-select {
+	font-family: "Ubuntu";
+	padding: 10px;
+}
+
 .drop-zone.dragover {
 	border-color: #2196F3;
-	background-color: #f5fbff;
+	background-color: var(--box-toggleOn);
+}
+
+#settings-group-container {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+}
+
+.output-folder-conf {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+#output-folder-box {
+	background-color: var(--item-bg);
+	margin-bottom: 12px;
+	padding: 15px;
+	border-radius: 8px;
+	text-align: left;
+}
+
+#output-folder-input {
+	width: 20px;
+	height: 20px;
+	margin-left: 10px;
+}
+
+.folder-input-checkbox {
+	display: flex;
+	align-items: center;
+}
+#output-suffix {
+	cursor: text;
 }
 
 .settings-group {
-	margin-bottom: 1.5rem;
+	margin-bottom: 10px;
 	display: flex;
 	flex-direction: column;
+	width: 46%;
 }
 
 .compress-label {
@@ -774,19 +815,21 @@ body::-webkit-scrollbar-thumb {
 }
 
 #compression-status {
-	margin-top: 2rem;
+	max-width: 800px;
+	margin: 20px auto 0 auto;
 	border-top: 1px solid var(--item-bg);
-	padding-top: 1rem;
+	padding-top: 20px;
 }
 
 .status-item {
-	padding: 15px;
-	margin: 5px;
+	padding: 16px;
+	margin: 6px auto;
 	border-radius: 4px;
 	display: flex;
 	justify-content: space-between;
 	flex-direction: row;
 	background-color: var(--item-bg);
+	max-width: 800px;
 }
 
 .status-item.success {
@@ -797,21 +840,11 @@ body::-webkit-scrollbar-thumb {
 	color: var(--redBtn);
 }
 
-.filename {
-	flex: 1;
-	font-weight: 500;
-}
-
 .status {
 	min-width: 80px;
 	text-transform: uppercase;
 	font-size: 0.9em;
 	font-weight: bold;
-}
-
-.details {
-	font-size: 0.9em;
-	opacity: 0.8;
 }
 
 .fileinput-btn {
@@ -822,6 +855,7 @@ body::-webkit-scrollbar-thumb {
 	border-radius: 5px;
 	margin: 5px 0 10px 0;
 	cursor: pointer;
+	border: none;
 }
 
 .progressBarCompress {
@@ -829,6 +863,20 @@ body::-webkit-scrollbar-thumb {
 }
 
 .nvidia_opt, .amf_opt, .qsv_opt, .vaapi_opt, .videotoolbox_opt {
+	display: none;
+}
+
+#custom-folder-select{
+	padding: 10px;
+	margin-left: 0;
+	display: none;
+}
+
+#custom-folder-path {
+	font-family: "JetBrains";
+	background-color: var(--box-main);
+	padding: 8px;
+	border-radius: 4px;
 	display: none;
 }
 

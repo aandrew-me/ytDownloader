@@ -21,8 +21,7 @@ getId("menuIcon").addEventListener("click", () => {
 				getId("menu").style.display = "none";
 				clearInterval(fade);
 			} else {
-				opacity -= 0.1;
-				getId("menu").style.opacity = opacity;
+				getId("menu").style.opacity = opacity.toFixed(3).toString();
 				count++;
 			}
 		}, 50);
