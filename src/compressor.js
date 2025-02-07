@@ -4,6 +4,36 @@ const {ipcRenderer, shell} = require("electron");
 const os = require("os");
 const si = require("systeminformation")
 
+let menuIsOpen = false;
+
+getId("menuIcon").addEventListener("click", () => {
+	if (menuIsOpen) {
+		getId("menuIcon").style.transform = "rotate(0deg)";
+		menuIsOpen = false;
+		let count = 0;
+		let opacity = 1;
+		const fade = setInterval(() => {
+			if (count >= 10) {
+				getId("menu").style.display = "none";
+				clearInterval(fade);
+			} else {
+				opacity -= 0.1;
+				getId("menu").style.opacity = opacity.toFixed(3).toString();
+				count++;
+			}
+		}, 50);
+	} else {
+		getId("menuIcon").style.transform = "rotate(90deg)";
+		menuIsOpen = true;
+
+		setTimeout(() => {
+			getId("menu").style.display = "flex";
+			getId("menu").style.opacity = "1";
+		}, 150);
+	}
+});
+
+
 let ffmpeg;
 if (os.platform() === "win32") {
 	ffmpeg = `"${__dirname}\\..\\ffmpeg.exe"`;
@@ -106,9 +136,9 @@ getId("custom-folder-select").addEventListener("click", (e) => {
 
 function updateSelectedFiles() {
 	const fileList = files
-		.map((f) => `${f.name} (${formatBytes(f.size)})`)
+		.map((f) => `${f.name} (${formatBytes(f.size)})<br/>`)
 		.join("\n");
-	selectedFilesDiv.textContent = fileList || "No files selected";
+	selectedFilesDiv.innerHTML = fileList || "No files selected";
 }
 
 // Compression Logic
@@ -169,7 +199,7 @@ function cancelCompression() {
  * @param {File} file
  */
 function generateOutputPath(file, settings) {
-	console.log(settings)
+	console.log({settings})
     const output_extension = settings.extension
     const parsed_file = path.parse(file.path)
 
@@ -191,6 +221,8 @@ function generateOutputPath(file, settings) {
  */
 async function compressVideo(file, settings, itemId, outputPath) {
 	const command = buildFFmpegCommand(file, settings, outputPath);
+
+	console.log("Command: " + command)
 
 	return new Promise((resolve, reject) => {
 		const child = exec(command, (error) => {
@@ -354,8 +386,8 @@ function buildFFmpegCommand(file, settings, outputPath) {
 				"cqp",
 				"-qp_i",
 				parseInt(settings.videoQuality).toString(),
-				"-qp_i",
-				parseInt(settings.videoQuality).toString()
+				"-qp_p",
+				parseInt(settings.videoQuality).toString(),
 			);
 			break;
 		case "amf":
@@ -376,7 +408,9 @@ function buildFFmpegCommand(file, settings, outputPath) {
 				"cqp",
 				"-qp_i",
 				parseInt(settings.videoQuality).toString(),
-				"-qp_i",
+				"-qp_p",
+				parseInt(settings.videoQuality).toString(),
+				"-qp_b",
 				parseInt(settings.videoQuality).toString()
 			);
 			break;
@@ -389,6 +423,10 @@ function buildFFmpegCommand(file, settings, outputPath) {
 			);
 			break;
 	}
+
+	// args.push("-vf", "scale=trunc(iw*1/2)*2:trunc(ih*1/2)*2,format=yuv420p");
+
+	args.push("-vf", "format=yuv420p");
 
 	args.push("-c:a", settings.audioFormat, `"${outputPath}"`);
 
@@ -505,6 +543,18 @@ getId("themeToggle").addEventListener("change", () => {
 	localStorage.setItem("theme", getId("themeToggle").value);
 });
 
+getId("output-folder-input").addEventListener("change", (e) => {
+	const checked = e.target.checked;
+
+	if (!checked) {
+		getId("custom-folder-select").style.display = "block"
+	} else {
+		getId("custom-folder-select").style.display = "none"
+		getId("custom-folder-path").textContent = ""
+		getId("custom-folder-path").style.display = "none"
+	}
+})
+
 const storageTheme = localStorage.getItem("theme");
 if (storageTheme) {
 	document.documentElement.setAttribute("theme", storageTheme);
@@ -517,3 +567,38 @@ ipcRenderer.on("directory-path", (_event, msg) => {
 	customFolderPathItem.textContent = msg;
 	customFolderPathItem.style.display = "inline"
 })
+
+function closeMenu() {
+	getId("menuIcon").style.transform = "rotate(0deg)";
+	let count = 0;
+	let opacity = 1;
+	const fade = setInterval(() => {
+		if (count >= 10) {
+			clearInterval(fade);
+		} else {
+			opacity -= 0.1;
+			getId("menu").style.opacity = String(opacity);
+			count++;
+		}
+	}, 50);
+}
+
+// Menu
+getId("preferenceWin").addEventListener("click", () => {
+	closeMenu();
+	ipcRenderer.send("load-page", __dirname + "/preferences.html");
+});
+
+getId("playlistWin").addEventListener("click", () => {
+	closeMenu();
+	ipcRenderer.send("load-win", __dirname + "/playlist.html");
+});
+
+getId("aboutWin").addEventListener("click", () => {
+	closeMenu();
+	ipcRenderer.send("load-page", __dirname + "/about.html");
+});
+getId("homeWin").addEventListener("click", () => {
+	closeMenu();
+	ipcRenderer.send("load-win", __dirname + "/index.html");
+});

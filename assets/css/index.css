@@ -878,6 +878,7 @@ body::-webkit-scrollbar-thumb {
 #custom-folder-select{
 	padding: 10px;
 	margin-left: 0;
+	display: none;
 }
 
 #custom-folder-path {

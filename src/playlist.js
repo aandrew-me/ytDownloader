@@ -716,6 +716,11 @@ getId("homeWin").addEventListener("click", () => {
 	ipcRenderer.send("load-win", __dirname + "/index.html");
 });
 
+getId("compressorWin").addEventListener("click", () => {
+	closeMenu();
+	ipcRenderer.send("load-win", __dirname + "/compressor.html");
+});
+
 // Translations
 getId("pasteLink").textContent = i18n.__(
 	"Click to paste playlist link from clipboard [Ctrl + V]"
