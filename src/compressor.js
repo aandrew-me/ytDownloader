@@ -1,6 +1,6 @@
 const {exec} = require("child_process");
 const path = require("path");
-const {ipcRenderer} = require("electron");
+const {ipcRenderer, shell} = require("electron");
 const os = require("os");
 const si = require("systeminformation")
 
@@ -13,6 +13,7 @@ if (os.platform() === "win32") {
 
 const vaapi_device = "/dev/dri/renderD128"
 
+// Checking GPU
 si.graphics().then((info) => {
     console.log({gpuInfo: info})
 	const gpuDevices = info.controllers;
@@ -61,6 +62,7 @@ si.graphics().then((info) => {
 let files = [];
 let activeProcesses = new Set();
 let currentItemId = "";
+let isCancelled = false;
 
 /**
  * @param {string} id
@@ -98,6 +100,10 @@ fileInput.addEventListener("change", (e) => {
 	updateSelectedFiles();
 });
 
+getId("custom-folder-select").addEventListener("click", (e) => {
+	ipcRenderer.send("get-directory", "")
+})
+
 function updateSelectedFiles() {
 	const fileList = files
 		.map((f) => `${f.name} (${formatBytes(f.size)})`)
@@ -120,45 +126,71 @@ async function startCompression() {
 			"f" + Math.random().toFixed(10).toString().slice(2).toString();
 		currentItemId = itemId;
 
+		const outputPath = generateOutputPath(file, settings);
+
 		try {
-			await compressVideo(file, settings, itemId);
-			updateProgress("success", "Successfully compressed", itemId);
-            currentItemId = ""
+			await compressVideo(file, settings, itemId, outputPath);
+
+			if (isCancelled) {
+				isCancelled = false;
+			} else {
+				updateProgress("success", "", itemId);
+				const fileSavedElement = document.createElement("b")
+				fileSavedElement.textContent = "File saved. Click to open"
+				fileSavedElement.onclick = () => {
+					shell.showItemInFolder(outputPath)
+				}
+				getId(itemId + "_prog").appendChild(fileSavedElement)
+				currentItemId = ""
+			}
 		} catch (error) {
-			updateProgress("error", error.message, itemId);
+			const errorElement = document.createElement("div")
+			errorElement.onclick = () => {
+				ipcRenderer.send("error_dialog", error.message)
+			}
+			errorElement.textContent = "Error. Click for details"
+			updateProgress("error", "", itemId);
+			getId(itemId + "_prog").appendChild(errorElement)
             currentItemId = ""
 		}
 	}
 }
 
 function cancelCompression() {
-	activeProcesses.forEach((child) => child.kill("SIGTERM"));
+	activeProcesses.forEach((child) => {
+		child.stdin.write("q")
+		isCancelled = true;
+	});
 	activeProcesses.clear();
-	updateProgress("", "cancelled", currentItemId);
+	updateProgress("error", "Cancelled", currentItemId);
 }
 
 /**
  * @param {File} file
  */
 function generateOutputPath(file, settings) {
+	console.log(settings)
     const output_extension = settings.extension
     const parsed_file = path.parse(file.path)
 
+	let outputDir = settings.outputPath || parsed_file.dir
+
 
     if (output_extension == "unchanged") {
-        return path.join(parsed_file.dir, `${parsed_file.name}_compressed${parsed_file.ext}`);
+        return path.join(outputDir, `${parsed_file.name}${settings.outputSuffix}${parsed_file.ext}`);
     }
 
-    return path.join(parsed_file.dir, `${parsed_file.name}_compressed.${output_extension}`);
+    return path.join(outputDir, `${parsed_file.name}_compressed.${output_extension}`);
 }
 
 /**
  * @param {File} file
  * @param {{ encoder: any; speed: any; videoQuality: any; audioQuality?: any; audioFormat: string, extension: string }} settings
  * @param {string} itemId
+ * @param {string} outputPath
  */
-async function compressVideo(file, settings, itemId) {
-	const command = buildFFmpegCommand(file, settings);
+async function compressVideo(file, settings, itemId, outputPath) {
+	const command = buildFFmpegCommand(file, settings, outputPath);
 
 	return new Promise((resolve, reject) => {
 		const child = exec(command, (error) => {
@@ -167,7 +199,9 @@ async function compressVideo(file, settings, itemId) {
 		});
 
 		activeProcesses.add(child);
-		child.on("exit", () => activeProcesses.delete(child));
+		child.on("exit", (_code) => {
+			activeProcesses.delete(child)
+		});
 
 		let video_info = {
 			duration: "",
@@ -182,6 +216,7 @@ async function compressVideo(file, settings, itemId) {
 		);
 
 		child.stderr.on("data", (data) => {
+			// console.log(data)
 			const duration_match = data.match(/Duration:\s*([\d:.]+)/);
 			if (duration_match) {
 				video_info.duration = duration_match[1];
@@ -202,7 +237,7 @@ async function compressVideo(file, settings, itemId) {
 					? timeToSeconds(progressTime[1])
 					: null;
 
-			if (currentSeconds) {
+			if (currentSeconds && !isCancelled) {
 				const progress = Math.round(
 					(currentSeconds / totalSeconds) * 100
 				);
@@ -218,15 +253,14 @@ async function compressVideo(file, settings, itemId) {
 /**
  * @param {File} file
  * @param {{ encoder: string; speed: string; videoQuality: string; audioQuality: string; audioFormat: string }} settings
+ * @param {string} outputPath
  */
-function buildFFmpegCommand(file, settings) {
+function buildFFmpegCommand(file, settings, outputPath) {
     const inputPath = file.path;
-
-    const outputPath = generateOutputPath(file, settings);
 
     console.log("Output path: " + outputPath)
 
-	const args = ["-y", "-stats", "-i", `"${inputPath}"`];
+	const args = ["-hide_banner", "-y", "-stats", "-i", `"${inputPath}"`];
 
 	switch (settings.encoder) {
 		case "copy":
@@ -363,7 +397,7 @@ function buildFFmpegCommand(file, settings) {
 
 /**
  *
- * @returns {{ encoder: string; speed: string; videoQuality: string; audioQuality?: string; audioFormat: string, extension: string }} settings
+ * @returns {{ encoder: string; speed: string; videoQuality: string; audioQuality?: string; audioFormat: string, extension: string, outputPath:string }} settings
  */
 function getEncoderSettings() {
 	return {
@@ -377,6 +411,9 @@ function getEncoderSettings() {
 		audioFormat: getId("audio-format").value,
         // @ts-ignore
         extension: getId("file_extension").value,
+		outputPath: getId("custom-folder-path").textContent,
+		// @ts-ignore
+		outputSuffix: getId("output-suffix").value,
 	};
 }
 
@@ -399,7 +436,9 @@ function updateProgress(status, data, itemId) {
 		getId(itemId).classList.add(status);
 	}
 
-	getId(itemId + "_prog").textContent = data;
+	if (itemId) {
+		getId(itemId + "_prog").textContent = data;
+	}
 }
 
 /**
@@ -471,3 +510,10 @@ if (storageTheme) {
 	document.documentElement.setAttribute("theme", storageTheme);
 	getId("themeToggle").value = storageTheme;
 }
+
+ipcRenderer.on("directory-path", (_event, msg) => {
+	let customFolderPathItem = getId("custom-folder-path") 
+
+	customFolderPathItem.textContent = msg;
+	customFolderPathItem.style.display = "inline"
+})

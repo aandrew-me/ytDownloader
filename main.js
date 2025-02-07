@@ -266,6 +266,16 @@ ipcMain.on("select-location-secondary", () => {
 	}
 });
 
+ipcMain.on("get-directory", () => {
+	const location = dialog.showOpenDialogSync({
+		properties: ["openDirectory"],
+	});
+
+	if (location) {
+		win.webContents.send("directory-path", location);
+	}
+});
+
 ipcMain.on("select-config", () => {
 	const location = dialog.showOpenDialogSync({
 		properties: ["openFile"],
@@ -353,6 +363,21 @@ ipcMain.on("progress", (_event, percentage) => {
 	if (win) {
 		win.setProgressBar(percentage)
 	}
+})
+
+ipcMain.on("error_dialog", (_event, message) => {
+	dialog.showMessageBox(win, {
+		type: "error",
+		title: "Error",
+		message: message,
+		buttons: [
+			"Ok", "Copy error"
+		]
+	}).then((result) => {
+		if (result.response == 1) {
+			clipboard.writeText(message)
+		}
+	})
 })
 
 autoUpdater.on("update-downloaded", (_event, releaseNotes, releaseName) => {

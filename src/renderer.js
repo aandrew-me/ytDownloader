@@ -1214,7 +1214,7 @@ function download(
 	getId(randomId + ".close").addEventListener("click", () => {
 		controller.abort()
 		try {
-			process.kill(downloadProcess.ytDlpProcess.pid, 'SIGHINT')
+			process.kill(downloadProcess.ytDlpProcess.pid, 'SIGINT')
 		} catch (_error) {}
 	});
 
