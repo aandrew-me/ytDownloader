@@ -110,7 +110,6 @@ let preferredVideoCodec = "avc1";
 /**
  *
  * @param {string} id
- * @returns {any}
  */
 function getId(id) {
 	return document.getElementById(id);
@@ -1349,11 +1348,14 @@ function afterSave(location, filename, progressId, thumbnail) {
 		finalLocation = location.split(path.sep).join("\\\\");
 		finalFilename = filename.split(path.sep).join("\\\\");
 	}
-	getId(
-		progressId
-	).innerHTML = `<b onClick="showItem(\`${finalLocation}\`, \`${finalFilename}\`)">${i18n.__(
-		"File saved. Click to Open"
-	)}</b>`;
+	const fileSavedElement = document.createElement("b")
+	fileSavedElement.textContent = i18n.__("File saved. Click to Open")
+	fileSavedElement.onclick = () => {
+		showItem(finalLocation, finalFilename)
+	}
+
+	getId(progressId).innerHTML = "";
+	getId(progressId).appendChild(fileSavedElement);
 
 	window.scrollTo(0, document.body.scrollHeight);
 }
