@@ -3,20 +3,15 @@ const audioToggle = getId("audioToggle");
 const incorrectMsg = getId("incorrectMsg");
 const loadingMsg = getId("loadingWrapper");
 
-function getId(id) {
-	return document.getElementById(id);
-}
-
 // Video and audio toggle
 
-videoToggle.addEventListener("click", (event) => {
+videoToggle.addEventListener("click", (_event) => {
 	selectVideo()
 });
 
-audioToggle.addEventListener("click", (event) => {
+audioToggle.addEventListener("click", (_event) => {
 	selectAudio()
 });
-
 /////////////
 function selectVideo(){
 	localStorage.setItem("defaultWindow", "video")

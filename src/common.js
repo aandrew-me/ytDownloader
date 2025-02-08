@@ -1,40 +1,4 @@
 const electron = require("electron");
-/**
- *
- * @param {string} id
- * @returns {any}
- */
-function getId(id) {
-	return document.getElementById(id);
-}
-
-let menuIsOpen = false;
-
-getId("menuIcon").addEventListener("click", () => {
-	if (menuIsOpen) {
-		getId("menuIcon").style.transform = "rotate(0deg)";
-		menuIsOpen = false;
-		let count = 0;
-		let opacity = 1;
-		const fade = setInterval(() => {
-			if (count >= 10) {
-				getId("menu").style.display = "none";
-				clearInterval(fade);
-			} else {
-				getId("menu").style.opacity = opacity.toFixed(3).toString();
-				count++;
-			}
-		}, 50);
-	} else {
-		getId("menuIcon").style.transform = "rotate(90deg)";
-		menuIsOpen = true;
-
-		setTimeout(() => {
-			getId("menu").style.display = "flex";
-			getId("menu").style.opacity = 1;
-		}, 150);
-	}
-});
 
 getId("themeToggle").addEventListener("change", () => {
 	document.documentElement.setAttribute("theme", getId("themeToggle").value);

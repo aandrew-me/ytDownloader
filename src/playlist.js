@@ -5,6 +5,7 @@ const os = require("os");
 const fs = require("fs");
 const {execSync} = require("child_process");
 const { constants } = require("fs/promises");
+const { initializeMenu } = require("../utils/menu");
 let url;
 const ytDlp = localStorage.getItem("ytdlp");
 const ytdlp = new YTDlpWrap(`"${ytDlp}"`);
@@ -305,13 +306,14 @@ function download(type) {
 		}
 	}
 
+	// TODO
 	
-	getId("finishBtn").addEventListener("click", () => {
-		controller.abort("user_finished")
-		try {
-			process.kill(downloadProcess.ytDlpProcess.pid, 'SIGINT')
-		} catch (_error) {}
-	})
+	// getId("finishBtn").addEventListener("click", () => {
+	// 	controller.abort("user_finished")
+	// 	try {
+	// 		process.kill(downloadProcess.ytDlpProcess.pid, 'SIGINT')
+	// 	} catch (_error) {}
+	// })
 
 	downloadProcess.on("ytDlpEvent", (_eventType, eventData) => {
 		// console.log(eventData);
@@ -697,6 +699,12 @@ getId("advancedToggle").addEventListener("click", () => {
 	}
 });
 
+let menuIsOpen = false;
+
+getId("menuIcon").addEventListener("click", () => {
+	menuIsOpen = initializeMenu(menuIsOpen)
+})
+
 // Menu
 getId("openDownloads").addEventListener("click", () => {
 	openFolder(downloadDir);
@@ -704,20 +712,24 @@ getId("openDownloads").addEventListener("click", () => {
 
 getId("preferenceWin").addEventListener("click", () => {
 	closeMenu();
+	menuIsOpen = false;
 	ipcRenderer.send("load-page", __dirname + "/preferences.html");
 });
 
 getId("aboutWin").addEventListener("click", () => {
 	closeMenu();
+	menuIsOpen = false;
 	ipcRenderer.send("load-page", __dirname + "/about.html");
 });
 getId("homeWin").addEventListener("click", () => {
 	closeMenu();
+	menuIsOpen = false;
 	ipcRenderer.send("load-win", __dirname + "/index.html");
 });
 
 getId("compressorWin").addEventListener("click", () => {
 	closeMenu();
+	menuIsOpen = false;
 	ipcRenderer.send("load-win", __dirname + "/compressor.html");
 });
 
