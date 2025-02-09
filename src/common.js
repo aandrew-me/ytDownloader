@@ -21,6 +21,7 @@ getId("menuIcon").addEventListener("click", () => {
 				getId("menu").style.display = "none";
 				clearInterval(fade);
 			} else {
+				opacity -= 0.1;
 				getId("menu").style.opacity = opacity.toFixed(3).toString();
 				count++;
 			}
@@ -31,7 +32,7 @@ getId("menuIcon").addEventListener("click", () => {
 
 		setTimeout(() => {
 			getId("menu").style.display = "flex";
-			getId("menu").style.opacity = 1;
+			getId("menu").style.opacity = "1";
 		}, 150);
 	}
 });

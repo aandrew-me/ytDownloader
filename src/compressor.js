@@ -37,7 +37,15 @@ getId("menuIcon").addEventListener("click", () => {
 let ffmpeg;
 if (os.platform() === "win32") {
 	ffmpeg = `"${__dirname}\\..\\ffmpeg.exe"`;
-} else {
+} else if (os.platform() === "freebsd") {
+	try {
+		ffmpeg = cp.execSync("which ffmpeg").toString("utf8").split("\n")[0].trim();
+	} catch (error) {
+		console.log(error)
+		showPopup("No ffmpeg found in PATH.");
+	}
+}
+ else {
 	ffmpeg = `"${__dirname}/../ffmpeg"`;
 }
 
@@ -304,6 +312,7 @@ function buildFFmpegCommand(file, settings, outputPath) {
 				"libx264",
 				"-preset",
 				settings.speed,
+				"-vf", "format=yuv420p",
 				"-crf",
 				parseInt(settings.videoQuality).toString()
 			);
@@ -312,6 +321,7 @@ function buildFFmpegCommand(file, settings, outputPath) {
 			args.push(
 				"-c:v",
 				"libx265",
+				"-vf", "format=yuv420p",
 				"-preset",
 				settings.speed,
 				"-crf",
@@ -323,6 +333,7 @@ function buildFFmpegCommand(file, settings, outputPath) {
 			args.push(
 				"-c:v",
 				"h264_qsv",
+				"-vf", "format=yuv420p",
 				"-preset",
 				settings.speed,
 				"-global_quality",
@@ -359,6 +370,7 @@ function buildFFmpegCommand(file, settings, outputPath) {
 			args.push(
 				"-c:v",
 				"h264_nvenc",
+				"-vf", "format=yuv420p",
 				"-preset",
 				getNvencPreset(settings.speed),
 				"-rc",
@@ -380,6 +392,7 @@ function buildFFmpegCommand(file, settings, outputPath) {
 			args.push(
 				"-c:v",
 				"hevc_amf",
+				"-vf", "format=yuv420p",
 				"-quality",
 				amf_hevc_quality,
 				"-rc",
@@ -402,6 +415,7 @@ function buildFFmpegCommand(file, settings, outputPath) {
 			args.push(
 				"-c:v",
 				"h264_amf",
+				"-vf", "format=yuv420p",
 				"-quality",
 				amf_quality,
 				"-rc",
@@ -417,6 +431,7 @@ function buildFFmpegCommand(file, settings, outputPath) {
 		case "videotoolbox":
 			args.push(
 				"-c:v",
+				"-vf", "format=yuv420p",
 				"h264_videotoolbox",
 				"-q:v",
 				parseInt(settings.videoQuality).toString()
@@ -425,8 +440,6 @@ function buildFFmpegCommand(file, settings, outputPath) {
 	}
 
 	// args.push("-vf", "scale=trunc(iw*1/2)*2:trunc(ih*1/2)*2,format=yuv420p");
-
-	args.push("-vf", "format=yuv420p");
 
 	args.push("-c:a", settings.audioFormat, `"${outputPath}"`);
 
@@ -499,7 +512,7 @@ function createProgressItem(filename, status, data, itemId) {
         <div class="filename">${visibleFilename}</div>
         <div id="${itemId + "_prog"}" class="itemProgress">${data}</div>
     `;
-	statusElement.prepend(newStatus);
+	statusElement.append(newStatus);
 }
 
 /**
@@ -527,21 +540,6 @@ function timeToSeconds(timeStr) {
 	const [hh, mm, ss] = timeStr.split(":").map(parseFloat);
 	return hh * 3600 + mm * 60 + ss;
 }
-
-// Menu
-getId("preferenceWin").addEventListener("click", () => {
-	closeMenu();
-	ipcRenderer.send("load-page", __dirname + "/preferences.html");
-});
-
-getId("aboutWin").addEventListener("click", () => {
-	closeMenu();
-	ipcRenderer.send("load-page", __dirname + "/about.html");
-});
-getId("homeWin").addEventListener("click", () => {
-	closeMenu();
-	ipcRenderer.send("load-win", __dirname + "/index.html");
-});
 
 getId("themeToggle").addEventListener("change", () => {
 	document.documentElement.setAttribute("theme", getId("themeToggle").value);
@@ -591,19 +589,33 @@ function closeMenu() {
 // Menu
 getId("preferenceWin").addEventListener("click", () => {
 	closeMenu();
+	menuIsOpen = false;
 	ipcRenderer.send("load-page", __dirname + "/preferences.html");
 });
 
 getId("playlistWin").addEventListener("click", () => {
 	closeMenu();
+	menuIsOpen = false;
 	ipcRenderer.send("load-win", __dirname + "/playlist.html");
 });
 
 getId("aboutWin").addEventListener("click", () => {
 	closeMenu();
+	menuIsOpen = false;
 	ipcRenderer.send("load-page", __dirname + "/about.html");
 });
 getId("homeWin").addEventListener("click", () => {
 	closeMenu();
+	menuIsOpen = false;
 	ipcRenderer.send("load-win", __dirname + "/index.html");
 });
+
+// Popup message
+function showPopup(text) {
+	console.log("Triggered showpopup");
+	getId("popupText").textContent = text;
+	getId("popupText").style.display = "inline-block";
+	setTimeout(() => {
+		getId("popupText").style.display = "none";
+	}, 2200);
+}

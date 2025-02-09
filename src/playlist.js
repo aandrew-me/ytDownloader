@@ -306,12 +306,12 @@ function download(type) {
 	}
 
 	
-	getId("finishBtn").addEventListener("click", () => {
-		controller.abort("user_finished")
-		try {
-			process.kill(downloadProcess.ytDlpProcess.pid, 'SIGINT')
-		} catch (_error) {}
-	})
+	// getId("finishBtn").addEventListener("click", () => {
+	// 	controller.abort("user_finished")
+	// 	try {
+	// 		process.kill(downloadProcess.ytDlpProcess.pid, 'SIGINT')
+	// 	} catch (_error) {}
+	// })
 
 	downloadProcess.on("ytDlpEvent", (_eventType, eventData) => {
 		// console.log(eventData);
