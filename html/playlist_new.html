@@ -34,6 +34,17 @@
         <a id="homeWin" class="menuItem">Homepage</a>
         <a id="preferenceWin" class="menuItem">Preferences</a>
         <a id="aboutWin" class="menuItem">About</a>
+        <span id="themeTxt" class="menuItem">Theme:</span>
+        <select name="themeToggle" id="themeToggle">
+            <option id="lightTxt" value="light">Light</option>
+            <option id="darkTxt" value="dark">Dark</option>
+            <option id="frappeTxt" value="frappe">Frappé</option>
+            <option id="onedarkTxt" value="onedark">One dark</option>
+            <option id="matrixTxt" value="matrix">Matrix</option>
+            <option id="githubTxt" value="github">Github</option>
+            <option id="latteTxt" value="latte">Latte</option>
+            <option id="solarizedDarkTxt" value="solarized-dark">Solarized Dark</option>
+        </select>
     </div>
 
     <button class="submitBtn" id="pasteLink">Click to paste playlist link from clipboard [Ctrl + V]</button>
@@ -58,7 +69,6 @@
     <button class="advancedToggle" id="errorBtn" onclick="toggleErrorDetails()">Error Details ▼</button>
     <div id="errorDetails" onclick="copyErrorToClipboard()"></div>
     <div id="data">
-
     </div>
     <div id="goToTop"></div>
 </body>

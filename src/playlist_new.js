@@ -60,7 +60,7 @@ function pasteLink() {
 	getId("errorDetails").style.display = "none";
 	getId("errorDetails").textContent = "";
 	exec(
-		`yt-dlp --yes-playlist --no-warnings -J --flat-playlist "${clipboardText}"`,
+		`${ytDlp} --yes-playlist --no-warnings -J --flat-playlist "${clipboardText}"`,
 		(error, stdout, stderr) => {
 			if (error) {
 				getId("loadingWrapper").style.display = "none";
@@ -81,6 +81,7 @@ function pasteLink() {
 				// If correct playlist url is used
 				if (parsed.entries) {
 					parsed.entries.forEach((entry) => {
+						console.log(entry)
 						const randId = Math.random()
 							.toFixed(10)
 							.toString()
@@ -97,6 +98,7 @@ function pasteLink() {
 							<div class="itemTitle">${entry.title}</div>
 							<div>${formatTime(entry.duration)}</div>
 							<input type="checkbox" class="playlistCheck" id="c${randId}">
+							<input type="hidden" id="link${randId}" value="${entry.url}">
 						</div>
 					</div>
 						`;
