@@ -112,5 +112,20 @@
 	"You need to give the app permission to access home directory to use this. You can do it with Flatseal by enabling the permission with text 'filesystem=home'": "আপনাকে এই অ্যাপ তা কে যথাযথ অনুমতি দিতে হবে. এইটা করতে পারেন \"ফ্ল্যাটসিল\" নামক অ্যাপ এর মাদ্ধমে 'filesystem=home' হিসেবে চিহ্নিত পারমিশন তা কে চালু করে দিয়ে|",
 	"No Audio": "অডিও বিহীন",
 	"Proxy": "প্রক্সী",
-	"Clear Downloads": "ডাউনলোড লিস্ট মুছে দিন"
+	"Clear Downloads": "ডাউনলোড লিস্ট মুছে দিন",
+	"Compressor": "Compressor",
+	"Drag and drop file(s)": "Drag and drop file(s)",
+	"Choose File(s)": "Choose File(s)",
+	"No files selected": "No files selected",
+	"Video format": "Video format",
+	"Video Encoder": "Video Encoder",
+	"Compression Speed": "Compression Speed",
+	"Video Quality": "Video Quality",
+	"Audio Format": "Audio Format",
+	"Output suffix": "Output suffix",
+	"Output in same folder": "Output in same folder",
+	"Select custom folder": "Select custom folder",
+	"Start Compression": "Start Compression",
+	"Cancel": "Cancel",
+	"Error! Click for details": "Error! Click for details"
 }
