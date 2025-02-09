@@ -112,5 +112,20 @@
 	"You need to give the app permission to access home directory to use this. You can do it with Flatseal by enabling the permission with text 'filesystem=home'": "您需要授予应用程序访问主目录的权限才能使用此功能。您可以通过在 Flatseal 中启用权限并使用文本 'filesystem=home' 来执行此操作",
 	"No Audio": "无音频",
 	"Proxy": "Proxy",
-	"Clear Downloads": "Clear Downloads"
+	"Clear Downloads": "Clear Downloads",
+	"Compressor": "Compressor",
+	"Drag and drop file(s)": "Drag and drop file(s)",
+	"Choose File(s)": "Choose File(s)",
+	"No files selected": "No files selected",
+	"Video format": "Video format",
+	"Video Encoder": "Video Encoder",
+	"Compression Speed": "Compression Speed",
+	"Video Quality": "Video Quality",
+	"Audio Format": "Audio Format",
+	"Output suffix": "Output suffix",
+	"Output in same folder": "Output in same folder",
+	"Select custom folder": "Select custom folder",
+	"Start Compression": "Start Compression",
+	"Cancel": "Cancel",
+	"Error! Click for details": "Error! Click for details"
 }
