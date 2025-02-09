@@ -46,8 +46,6 @@ function createWindow() {
 		return false;
 	});
 
-	// TODO: Remember maximize state
-
 	win.on("resize", (event) => {
 		setItem("bounds", JSON.stringify(win.getBounds()), configFile);
 	});

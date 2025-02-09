@@ -24,8 +24,6 @@ const path = require("path");
 const {shell, ipcRenderer, clipboard} = require("electron");
 const {default: YTDlpWrap} = require("yt-dlp-wrap-plus");
 const {constants} = require("fs/promises");
-const { getId } = require("../utils/common");
-const { initializeMenu } = require("../utils/menu");
 
 // Directories
 const homedir = os.homedir();
@@ -109,6 +107,13 @@ let controllers = new Object();
 let preferredVideoQuality = 720;
 let preferredAudioQuality = "";
 let preferredVideoCodec = "avc1";
+/**
+ *
+ * @param {string} id
+ */
+function getId(id) {
+	return document.getElementById(id);
+}
 
 function downloadPathSelection() {
 	let localPath = localStorage.getItem("downloadPath");
@@ -1412,34 +1417,23 @@ function getLocalStorageItem(item) {
 }
 
 // Menu
-
-let menuIsOpen = false;
-
-getId("menuIcon").addEventListener("click", () => {
-	menuIsOpen = initializeMenu(menuIsOpen)
-})
-
 getId("preferenceWin").addEventListener("click", () => {
 	closeMenu();
-	menuIsOpen = false;
 	ipcRenderer.send("load-page", __dirname + "/preferences.html");
 });
 
 getId("aboutWin").addEventListener("click", () => {
 	closeMenu();
-	menuIsOpen = false;
 	ipcRenderer.send("load-page", __dirname + "/about.html");
 });
 
 getId("playlistWin").addEventListener("click", () => {
 	closeMenu();
-	menuIsOpen = false;
 	ipcRenderer.send("load-win", __dirname + "/playlist.html");
 });
 
 getId("compressorWin").addEventListener("click", () => {
 	closeMenu();
-	menuIsOpen = false;
 	ipcRenderer.send("load-win", __dirname + "/compressor.html");
 });
 // getId("newPlaylistWin").addEventListener("click", () => {

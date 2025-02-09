@@ -2,17 +2,44 @@ const {exec} = require("child_process");
 const path = require("path");
 const {ipcRenderer, shell} = require("electron");
 const os = require("os");
-const si = require("systeminformation");
-const menu = require("../utils/menu");
-const getFfmpegPath = require("../utils/ffmpeg");
+const si = require("systeminformation")
 
 let menuIsOpen = false;
 
 getId("menuIcon").addEventListener("click", () => {
-	menuIsOpen = menu.initializeMenu(menuIsOpen)
-})
+	if (menuIsOpen) {
+		getId("menuIcon").style.transform = "rotate(0deg)";
+		menuIsOpen = false;
+		let count = 0;
+		let opacity = 1;
+		const fade = setInterval(() => {
+			if (count >= 10) {
+				getId("menu").style.display = "none";
+				clearInterval(fade);
+			} else {
+				opacity -= 0.1;
+				getId("menu").style.opacity = opacity.toFixed(3).toString();
+				count++;
+			}
+		}, 50);
+	} else {
+		getId("menuIcon").style.transform = "rotate(90deg)";
+		menuIsOpen = true;
 
-let ffmpeg = getFfmpegPath();
+		setTimeout(() => {
+			getId("menu").style.display = "flex";
+			getId("menu").style.opacity = "1";
+		}, 150);
+	}
+});
+
+
+let ffmpeg;
+if (os.platform() === "win32") {
+	ffmpeg = `"${__dirname}\\..\\ffmpeg.exe"`;
+} else {
+	ffmpeg = `"${__dirname}/../ffmpeg"`;
+}
 
 const vaapi_device = "/dev/dri/renderD128"
 
@@ -27,44 +54,33 @@ si.graphics().then((info) => {
         const gpuModel = gpu.model.toLowerCase()
 
         if (gpuName.includes("nvidia") || gpuModel.includes("nvidia")) {
-			document.querySelectorAll(".nvidia_opt").forEach(
-				/** @param {HTMLElement} opt */
-				(opt) => {
+            document.querySelectorAll(".nvidia_opt").forEach((opt) => {
                 opt.style.display = "block"
             })
         }  else if (gpuName.includes("advanced micro devices") || gpuModel.includes("amd")) {
             if (os.platform() == "win32") {
-                document.querySelectorAll(".amf_opt").forEach(
-				/** @param {HTMLElement} opt */
-				(opt) => {
-					opt.style.display = "block"
+                document.querySelectorAll(".amf_opt").forEach((opt) => {
+                    opt.style.display = "block"
+
                 })
             } else {
-                document.querySelectorAll(".vaapi_opt").forEach(
-					/** @param {HTMLElement} opt */
-					(opt) => {
+                document.querySelectorAll(".vaapi_opt").forEach((opt) => {
                     opt.style.display = "block"
                 })
             }
         } else if (gpuName.includes("intel")) {
             if (os.platform() == "win32") {
-                document.querySelectorAll(".qsv_opt").forEach(
-					/** @param {HTMLElement} opt */
-					(opt) => {
+                document.querySelectorAll(".qsv_opt").forEach((opt) => {
                     opt.style.display = "block"
                 })
             } else if (os.platform() != "darwin") {
-                document.querySelectorAll(".vaapi_opt").forEach(
-					/** @param {HTMLElement} opt */
-					(opt) => {
+                document.querySelectorAll(".vaapi_opt").forEach((opt) => {
                     opt.style.display = "block"
                 })
             }
         } else {
             if (os.platform() == "darwin") {
-                document.querySelectorAll(".videotoolbox_opt").forEach(
-					/** @param {HTMLElement} opt */
-					(opt) => {
+                document.querySelectorAll(".videotoolbox_opt").forEach((opt) => {
                     opt.style.display = "block"
                 })
             }
@@ -99,9 +115,7 @@ dropZone.addEventListener("dragleave", () => {
 	dropZone.classList.remove("dragover");
 });
 
-dropZone.addEventListener("drop",
-	/** @param {DragEvent} e */
-	(e) => {
+dropZone.addEventListener("drop", (e) => {
 	e.preventDefault();
 	dropZone.classList.remove("dragover");
 	// @ts-ignore
@@ -111,8 +125,8 @@ dropZone.addEventListener("drop",
 });
 
 fileInput.addEventListener("change", (e) => {
-	const target = /** @type {HTMLInputElement} */ (e.target);
-	files = Array.from(target.files);
+	// @ts-ignore
+	files = Array.from(e.target.files);
 	updateSelectedFiles();
 });
 
@@ -270,7 +284,7 @@ async function compressVideo(file, settings, itemId, outputPath) {
 
 /**
  * @param {File} file
- * @param {{ encoder: string; speed: string; videoQuality: string; audioQuality?: string; audioFormat: string }} settings
+ * @param {{ encoder: string; speed: string; videoQuality: string; audioQuality: string; audioFormat: string }} settings
  * @param {string} outputPath
  */
 function buildFFmpegCommand(file, settings, outputPath) {
@@ -288,7 +302,6 @@ function buildFFmpegCommand(file, settings, outputPath) {
 			args.push(
 				"-c:v",
 				"libx264",
-				"-vf", "format=yuv420p",
 				"-preset",
 				settings.speed,
 				"-crf",
@@ -299,7 +312,6 @@ function buildFFmpegCommand(file, settings, outputPath) {
 			args.push(
 				"-c:v",
 				"libx265",
-				"-vf", "format=yuv420p",
 				"-preset",
 				settings.speed,
 				"-crf",
@@ -311,7 +323,6 @@ function buildFFmpegCommand(file, settings, outputPath) {
 			args.push(
 				"-c:v",
 				"h264_qsv",
-				"-vf", "format=yuv420p",
 				"-preset",
 				settings.speed,
 				"-global_quality",
@@ -348,7 +359,6 @@ function buildFFmpegCommand(file, settings, outputPath) {
 			args.push(
 				"-c:v",
 				"h264_nvenc",
-				"-vf", "format=yuv420p",
 				"-preset",
 				getNvencPreset(settings.speed),
 				"-rc",
@@ -370,7 +380,6 @@ function buildFFmpegCommand(file, settings, outputPath) {
 			args.push(
 				"-c:v",
 				"hevc_amf",
-				"-vf", "format=yuv420p",
 				"-quality",
 				amf_hevc_quality,
 				"-rc",
@@ -393,7 +402,6 @@ function buildFFmpegCommand(file, settings, outputPath) {
 			args.push(
 				"-c:v",
 				"h264_amf",
-				"-vf", "format=yuv420p",
 				"-quality",
 				amf_quality,
 				"-rc",
@@ -417,6 +425,8 @@ function buildFFmpegCommand(file, settings, outputPath) {
 	}
 
 	// args.push("-vf", "scale=trunc(iw*1/2)*2:trunc(ih*1/2)*2,format=yuv420p");
+
+	args.push("-vf", "format=yuv420p");
 
 	args.push("-c:a", settings.audioFormat, `"${outputPath}"`);
 
@@ -489,7 +499,7 @@ function createProgressItem(filename, status, data, itemId) {
         <div class="filename">${visibleFilename}</div>
         <div id="${itemId + "_prog"}" class="itemProgress">${data}</div>
     `;
-	statusElement.append(newStatus);
+	statusElement.prepend(newStatus);
 }
 
 /**
@@ -518,14 +528,28 @@ function timeToSeconds(timeStr) {
 	return hh * 3600 + mm * 60 + ss;
 }
 
+// Menu
+getId("preferenceWin").addEventListener("click", () => {
+	closeMenu();
+	ipcRenderer.send("load-page", __dirname + "/preferences.html");
+});
+
+getId("aboutWin").addEventListener("click", () => {
+	closeMenu();
+	ipcRenderer.send("load-page", __dirname + "/about.html");
+});
+getId("homeWin").addEventListener("click", () => {
+	closeMenu();
+	ipcRenderer.send("load-win", __dirname + "/index.html");
+});
+
 getId("themeToggle").addEventListener("change", () => {
 	document.documentElement.setAttribute("theme", getId("themeToggle").value);
 	localStorage.setItem("theme", getId("themeToggle").value);
 });
 
 getId("output-folder-input").addEventListener("change", (e) => {
-	const target = /** @type {HTMLInputElement} */ (e.target);
-	const checked = target.checked;
+	const checked = e.target.checked;
 
 	if (!checked) {
 		getId("custom-folder-select").style.display = "block"
@@ -539,7 +563,6 @@ getId("output-folder-input").addEventListener("change", (e) => {
 const storageTheme = localStorage.getItem("theme");
 if (storageTheme) {
 	document.documentElement.setAttribute("theme", storageTheme);
-	// @ts-ignore
 	getId("themeToggle").value = storageTheme;
 }
 
@@ -568,23 +591,19 @@ function closeMenu() {
 // Menu
 getId("preferenceWin").addEventListener("click", () => {
 	closeMenu();
-	menuIsOpen = false;
 	ipcRenderer.send("load-page", __dirname + "/preferences.html");
 });
 
 getId("playlistWin").addEventListener("click", () => {
 	closeMenu();
-	menuIsOpen = false;
 	ipcRenderer.send("load-win", __dirname + "/playlist.html");
 });
 
 getId("aboutWin").addEventListener("click", () => {
 	closeMenu();
-	menuIsOpen = false;
 	ipcRenderer.send("load-page", __dirname + "/about.html");
 });
 getId("homeWin").addEventListener("click", () => {
 	closeMenu();
-	menuIsOpen = false;
 	ipcRenderer.send("load-win", __dirname + "/index.html");
 });
