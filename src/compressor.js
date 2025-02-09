@@ -484,8 +484,9 @@ function createProgressItem(filename, status, data, itemId) {
 	const newStatus = document.createElement("div");
 	newStatus.id = itemId;
 	newStatus.className = `status-item ${status}`;
+	const visibleFilename = filename.substring(0, 45);
 	newStatus.innerHTML = `
-        <div class="filename">${filename}</div>
+        <div class="filename">${visibleFilename}</div>
         <div id="${itemId + "_prog"}" class="itemProgress">${data}</div>
     `;
 	statusElement.append(newStatus);

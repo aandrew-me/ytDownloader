@@ -880,4 +880,9 @@ body::-webkit-scrollbar-thumb {
 	display: none;
 }
 
+#selected-files {
+	padding-top: 10px;
+	opacity: 0.8;
+}
+
 /* End */
