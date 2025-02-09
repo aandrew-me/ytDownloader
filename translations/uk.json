@@ -112,5 +112,20 @@
 	"You need to give the app permission to access home directory to use this. You can do it with Flatseal by enabling the permission with text 'filesystem=home'": "Щоб скористатися цим, вам потрібно надати програмі дозвіл на доступ до домашнього каталогу. Ви можете зробити це за допомогою Flatseal, увімкнувши дозвіл із текстом 'filesystem=home'",
 	"No Audio": "Без звуку",
 	"Proxy": "Проксі",
-	"Clear Downloads": "Вичистити завантаження"
+	"Clear Downloads": "Вичистити завантаження",
+	"Compressor": "Compressor",
+	"Drag and drop file(s)": "Drag and drop file(s)",
+	"Choose File(s)": "Choose File(s)",
+	"No files selected": "No files selected",
+	"Video format": "Video format",
+	"Video Encoder": "Video Encoder",
+	"Compression Speed": "Compression Speed",
+	"Video Quality": "Video Quality",
+	"Audio Format": "Audio Format",
+	"Output suffix": "Output suffix",
+	"Output in same folder": "Output in same folder",
+	"Select custom folder": "Select custom folder",
+	"Start Compression": "Start Compression",
+	"Cancel": "Cancel",
+	"Error! Click for details": "Error! Click for details"
 }
