@@ -25,15 +25,18 @@ A modern GUI video and audio downloader supporting [hundreds of sites](https://g
 
 ## Features 🚀
 
-✅ Light/Dark mode
 
 ✅ Supports hundreds of sites including Youtube, Facebook, Instagram, Tiktok, Twitter and so on.
 
-✅ Advanced options like Range Selection
+✅ Multiple themes
+
+✅ Video Compressor with Hardware Acceleration
+
+✅ Advanced options like Range Selection, Subtitles
 
 ✅ Download playlists
 
-✅ Available on Linux, Windows & macOS
+✅ Available on Linux, Windows, Freebsd & macOS
 
 ✅ Fast download speeds
 
