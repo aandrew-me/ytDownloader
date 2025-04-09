@@ -208,3 +208,6 @@ If you only want to build for one format, you can do
 npx electron-builder -l appimage
 ```
 It will just create a linux appimage build.
+
+## Donations
+You can donate to my Payeer account: **P1129645521**
