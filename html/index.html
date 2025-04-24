@@ -47,7 +47,7 @@
         <a id="playlistWin" class="menuItem">Download Playlist</a>
         <!-- <a id="newPlaylistWin" class="menuItem">New Playlist</a> -->
         <a id="preferenceWin" class="menuItem">Preferences</a>
-            <a id="compressorWin" class="menuItem">Compressor</a>
+        <a id="compressorWin" class="menuItem">Compressor</a>
         <a id="aboutWin" class="menuItem">About</a>
         <span id="themeTxt" class="menuItem">Theme:</span>
         <select name="themeToggle" id="themeToggle">
@@ -93,48 +93,54 @@
         </div>
         <p id="title">Title </p>
 
-        <!-- Video tab -->
-        <div id="videoList">
-            <div class="separationBox">
-                <h2 id="videoHeader">Video</h2>
-                <label class="formatSelect">Select Format </label>
-                <select id="videoFormatSelect" class="select">
-                </select>
-                <br>
-                <input type="hidden" name="url" class="url" id="url">
+        <div class="videoAudioContainer">
+            <!-- Video tab -->
+            <div id="videoList">
+                <div class="separationBox">
+                    <h2 id="videoHeader">Video</h2>
+                    <label class="formatSelect">Select Format </label>
+                    <select id="videoFormatSelect" class="select">
+                    </select>
+                    <br>
+                    <input type="hidden" name="url" class="url" id="url">
 
-                <!-- Audio options for video -->
-                <div id="audioForVideo">
-                    <h2 id="audioHeader">Audio</h2>
-                    <label class="formatSelect">Select Audio Format </label>
-                    <select id="audioForVideoFormatSelect" class="select">
+                    <!-- Audio options for video -->
+                    <div id="audioForVideo">
+                        <h2 id="audioHeader">Audio</h2>
+                        <label class="formatSelect">Select Audio Format </label>
+                        <select id="audioForVideoFormatSelect" class="select">
+                        </select>
+                        <br>
+                        <input type="hidden" name="url" class="url">
+                    </div>
+                    <br>
+                </div>
+
+
+                <br>
+                <button class="submitBtn" id="videoDownload">Download</button>
+                <button id="advancedVideoToggle" class="blueBtn" onClick="advancedToggle()">More options</button>
+            </div>
+
+            <!-- Audio tab -->
+            <div id="audioList">
+                <div id="audioPresent">
+                    <label class="formatSelect">Select Format </label>
+                    <select id="audioFormatSelect" class="select">
                     </select>
                     <br>
                     <input type="hidden" name="url" class="url">
+                    <button class="submitBtn" id="audioDownload">Download</button>
+                    <button id="advancedAudioToggle" class="blueBtn" onClick="advancedToggle()">More options</button>
                 </div>
-                <br>
-            </div>
-
-
-            <br>
-            <button class="submitBtn" id="videoDownload">Download</button>
-            <button id="advancedVideoToggle" class="advancedToggle" onClick="advancedToggle()">More options</button>
-        </div>
-
-        <!-- Audio tab -->
-        <div id="audioList">
-            <div id="audioPresent">
-                <label class="formatSelect">Select Format </label>
-                <select id="audioFormatSelect" class="select">
-                </select>
-                <br>
-                <input type="hidden" name="url" class="url">
-                <button class="submitBtn" id="audioDownload">Download</button>
-                <button id="advancedAudioToggle" class="advancedToggle" onClick="advancedToggle()">More options</button>
             </div>
         </div>
 
         <div id="advanced">
+            <!-- <div class="advancedItem">
+                <p>Custom yt-dlp arguments</p>
+                <input type="text" id="argInput">
+            </div> -->
             <div class="advancedItem">
                 <span id="quitTxt">Close app when download finishes</span>
                 <input type="checkbox" id="quitChecked" class="cb">

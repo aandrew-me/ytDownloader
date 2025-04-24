@@ -3,6 +3,7 @@
 	--text: rgb(45, 45, 45);
 	--box-main: #eef4f3;
 	--box-toggle: rgb(215 238 233);
+	--box-separation: rgb(215 238 233);
 	--box-toggleOn: rgb(28 232 138);
 	--item-bg: #dddddd;
 	--box-shadow: none;
@@ -16,20 +17,22 @@
 }
 
 :root[theme="dark"] {
-	--background: rgb(40, 40, 40);
-	--text: white;
-	--box-main: rgb(80, 80, 80);
-	--box-toggle: rgb(70, 70, 70);
-	--box-toggleOn: rgb(28 232 138);
-	--item-bg: rgb(75, 75, 75);
+	--background: #121212;
+	--text: rgb(229, 229, 229);
+	--box-main: #1d1d1d;
+	--box-toggle: #191919;
+	--box-separation: #2e2e2e;
+	--box-toggleOn: #2e2e2e;
+	--item-bg: #191919;
 	--box-shadow: none;
-	--select: rgb(127, 253, 127);
-	--greenBtn: #6acd29;
-	--greenBtn-bottom: #4c8824;
-	--redBtn: #d64d4f;
-	--redBtn-bottom: #854243;
+	--select: rgb(68 214 141);
+	--greenBtn: #24D166;
+	--greenBtn-bottom: #3e6c20;
+	--redBtn: #c82b2d;
+	--redBtn-bottom: #803334;
 	--blueBtn: rgb(80, 128, 230);
 	--blueBtn-bottom: rgb(44, 78, 180);
+	--border: none;
 }
 
 :root[theme="frappe"] {
@@ -37,6 +40,7 @@
 	--text: #e2e8ff;
 	--box-main: #303446;
 	--box-toggle: #414559;
+	--box-separation: #414559;
 	--box-toggleOn: #607dc1;
 	--item-bg: #414559;
 	--select: #8caaee;
@@ -52,6 +56,7 @@
 	--text: #d2d6df;
 	--box-main: #4d515d;
 	--box-toggle: #2f333d;
+	--box-separation: #2f333d;
 	--box-toggleOn: #13a3b7;
 	--item-bg: #4d515d;
 	--select: #57b6c2;
@@ -67,6 +72,7 @@
 	--text: #00ff41;
 	--box-main: #0c2216;
 	--box-toggle: #214338;
+	--box-separation: #214338;
 	--box-toggleOn: #24782e;
 	--item-bg: #214338;
 	--select: #00ff41;
@@ -83,6 +89,7 @@
 	--text: #292d31;
 	--box-main: #ffffff;
 	--box-toggle: #f3f3f3;
+	--box-separation: #f3f3f3;
 	--box-toggleOn: #cce5ff;
 	--item-bg: #3a66d150;
 	--select: #cce5ff;
@@ -99,6 +106,7 @@
 	--text: #4c4f69;
 	--box-main: #eff1f5;
 	--box-toggle: #e6e9ef;
+	--box-separation: #e6e9ef;
 	--box-toggleOn: #cce5ff;
 	--item-bg: #bcc0cc;
 	--select: #cce5ff;
@@ -115,6 +123,7 @@
 	--text: #a4b1b3;
 	--box-main: #003745;
 	--box-toggle: #2e4c52;
+	--box-separation: #2e4c52;
 	--box-toggleOn: #005a6f;
 	--item-bg: #003745;
 	--select: #2aa198;

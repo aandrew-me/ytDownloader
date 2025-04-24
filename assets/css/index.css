@@ -13,6 +13,7 @@
 	--text: rgb(45, 45, 45);
 	--box-main: #eef4f3;
 	--box-toggle: rgb(215 238 233);
+	--box-separation: rgb(215 238 233);
 	--box-toggleOn: rgb(28 232 138);
 	--item-bg: #dddddd;
 	--box-shadow: none;
@@ -26,13 +27,13 @@
 }
 
 :root[theme="dark"] {
-	--background: #141d28;
-	--text: white;
-	--box-main: #161b26;
-	--box-toggle: #141924;
-	--box-separation: #1c2331;
-	--box-toggleOn: #1d2835;
-	--item-bg: rgb(75, 75, 75);
+	--background: #121212;
+	--text: rgb(229, 229, 229);
+	--box-main: #1d1d1d;
+	--box-toggle: #191919;
+	--box-separation: #2e2e2e;
+	--box-toggleOn: #2e2e2e;
+	--item-bg: #191919;
 	--box-shadow: none;
 	--select: rgb(68 214 141);
 	--greenBtn: #24D166;
@@ -41,6 +42,7 @@
 	--redBtn-bottom: #803334;
 	--blueBtn: rgb(80, 128, 230);
 	--blueBtn-bottom: rgb(44, 78, 180);
+	--border: none;
 }
 
 :root[theme="frappe"] {
@@ -48,6 +50,7 @@
 	--text: #e2e8ff;
 	--box-main: #303446;
 	--box-toggle: #414559;
+	--box-separation: #414559;
 	--box-toggleOn: #607dc1;
 	--item-bg: #414559;
 	--select: #8caaee;
@@ -63,6 +66,7 @@
 	--text: #d2d6df;
 	--box-main: #4d515d;
 	--box-toggle: #2f333d;
+	--box-separation: #2f333d;
 	--box-toggleOn: #13a3b7;
 	--item-bg: #4d515d;
 	--select: #57b6c2;
@@ -78,6 +82,7 @@
 	--text: #00ff41;
 	--box-main: #0c2216;
 	--box-toggle: #214338;
+	--box-separation: #214338;
 	--box-toggleOn: #24782e;
 	--item-bg: #214338;
 	--select: #00ff41;
@@ -94,6 +99,7 @@
 	--text: #292d31;
 	--box-main: #ffffff;
 	--box-toggle: #f3f3f3;
+	--box-separation: #f3f3f3;
 	--box-toggleOn: #cce5ff;
 	--item-bg: #3a66d150;
 	--select: #cce5ff;
@@ -110,6 +116,7 @@
 	--text: #4c4f69;
 	--box-main: #eff1f5;
 	--box-toggle: #e6e9ef;
+	--box-separation: #e6e9ef;
 	--box-toggleOn: #cce5ff;
 	--item-bg: #bcc0cc;
 	--select: #cce5ff;
@@ -126,6 +133,7 @@
 	--text: #a4b1b3;
 	--box-main: #003745;
 	--box-toggle: #2e4c52;
+	--box-separation: #2e4c52;
 	--box-toggleOn: #005a6f;
 	--item-bg: #003745;
 	--select: #2aa198;
@@ -173,15 +181,12 @@ body {
 	background-color: rgb(137, 226, 255);
 	color: rgb(35, 35, 35);
 	border: none;
-	border-bottom: 4px solid rgb(63, 169, 205);
 	padding: 10px;
 	border-radius: 10px;
 	cursor: pointer;
 	position: relative;
 }
 #tryBtn:active {
-	top: 4px;
-	margin-bottom: 4px;
 	border: none;
 }
 
@@ -251,7 +256,7 @@ body {
 	color: var(--text);
 	margin: 10px auto;
 	border-radius: 10px;
-	padding: 10px;
+	padding: 20px;
 	align-items: center;
 	justify-content: space-between;
 }
@@ -262,7 +267,7 @@ body {
 	height: 25px;
 	background-color: var(--item-bg);
 	color: var(--text);
-	padding: 10px 25px;
+	padding: 16px 25px;
 	border-radius: 15px;
 	align-items: center;
 	justify-content: space-between;
@@ -283,11 +288,12 @@ body {
 .title {
 	padding: 12px 10px;
 	border-radius: 8px;
+	margin-left: 4px;
 	border: none;
 	outline: none;
 	width: 50%;
 	text-align: center;
-	background-color: var(--box-toggle);
+	background-color: var(--box-separation);
 	color: var(--text);
 	font-size: large;
 	font-family: "Ubuntu";
@@ -315,8 +321,8 @@ body {
 }
 .itemClose {
 	position: absolute;
-	top: 5px;
-	right: 5px;
+	top: 8px;
+	right: 8px;
 	cursor: pointer;
 	cursor: pointer;
 	width: 20px;
@@ -329,9 +335,9 @@ body {
 }
 
 #closeHidden {
-	bottom: 5px;
+	bottom: 7px;
 	position: absolute;
-	right: 5px;
+	right: 10px;
 	cursor: pointer;
 	cursor: pointer;
 	width: 20px;
@@ -350,8 +356,9 @@ body {
 	background-color: var(--box-main);
 	border-radius: 15px;
 	width: 80%;
-	padding: 10px 10px 15px 10px;
+	padding: 10px 10px 25px 10px;
 	color: var(--text);
+	border: var(--border);
 }
 
 #videoBox, #audioBox {
@@ -393,7 +400,7 @@ body {
 .toggleBtn {
 	width: 50%;
 	font-size: x-large;
-	border: none;
+	border: var(--border);
 	background-color: var(--box-toggle);
 	border-radius: 10px;
 	cursor: pointer;
@@ -439,6 +446,10 @@ body {
 	width: 400px;
 }
 
+.formatSelect {
+	margin-right: 4px;
+}
+
 label {
 	position: relative;
 	top: 3px;
@@ -468,7 +479,6 @@ input[type="number"]::-webkit-outer-spin-button {
 	background-color: var(--greenBtn);
 	color: white;
 	border: none;
-	border-bottom: 5.5px solid var(--greenBtn-bottom);
 	font-size: large;
 	cursor: pointer;
 	display: inline-block;
@@ -476,9 +486,8 @@ input[type="number"]::-webkit-outer-spin-button {
 	position: relative;
 }
 .submitBtn:active {
+	background-color: var(--greenBtn-bottom);
 	border: none;
-	top: 5.5px;
-	margin-bottom: 5.5px;
 }
 
 .resumeBtn {
@@ -487,7 +496,6 @@ input[type="number"]::-webkit-outer-spin-button {
 	background-color: rgb(64, 227, 64);
 	color: white;
 	border: none;
-	border-bottom: 4px solid rgb(54, 205, 54);
 	cursor: pointer;
 	display: inline-block;
 	outline: none;
@@ -568,7 +576,6 @@ button {
 	color: white;
 	background-color: var(--blueBtn);
 	border: none;
-	border-bottom: 4px solid var(--blueBtn-bottom);
 	position: relative;
 	padding: 15px;
 	border-radius: 10px;
@@ -590,8 +597,7 @@ button {
 }
 
 #extractBtn:active, .blueBtn:active {
-	top: 4px;
-	margin-bottom: 12px;
+	background-color: var(--blueBtn-bottom);
 	border: none;
 }
 
@@ -599,7 +605,6 @@ button {
 	color: white;
 	background-color: var(--redBtn);
 	border: none;
-	border-bottom: 5px solid var(--redBtn-bottom);
 	position: relative;
 	padding: 15px;
 	border-radius: 10px;
@@ -609,8 +614,7 @@ button {
 }
 
 .advancedToggle:active {
-	top: 5px;
-	margin-bottom: 13px;
+	background-color: var(--blueBtn-bottom);
 	border: none;
 }
 
@@ -887,4 +891,9 @@ body::-webkit-scrollbar-thumb {
 	opacity: 0.8;
 }
 
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
 /* End */

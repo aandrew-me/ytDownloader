@@ -38,8 +38,31 @@ getId("menuIcon").addEventListener("click", () => {
 });
 
 getId("themeToggle").addEventListener("change", () => {
-	document.documentElement.setAttribute("theme", getId("themeToggle").value);
 	localStorage.setItem("theme", getId("themeToggle").value);
+
+	const x = window.innerWidth;
+	const y = 0;
+	const maxRadius = Math.hypot(window.innerWidth, window.innerHeight);
+
+	const transition = document.startViewTransition(() => {
+		document.documentElement.setAttribute("theme", getId("themeToggle").value);
+	});
+
+	transition.ready.then(() => {
+	  document.documentElement.animate(
+		{
+		  clipPath: [
+			`circle(0px at ${x}px ${y}px)`,
+			`circle(${maxRadius}px at ${x}px ${y}px)`
+		  ]
+		},
+		{
+		  duration: 1100,
+		  easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+		  pseudoElement: '::view-transition-new(root)'
+		}
+	  );
+	});
 });
 
 const storageTheme = localStorage.getItem("theme");
