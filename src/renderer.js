@@ -1109,6 +1109,7 @@ function download(
 			subs1 || subs,
 			subs2 || subLangs,
 			"--no-playlist",
+			"--embed-chapters",
 			// "--embed-metadata",
 			ext == "mp4" && audioForVideoExt === "m4a" && extractor_key === "Youtube" && os.platform() !== "darwin" ? "--embed-thumbnail" : "",
 			configArg,
@@ -1151,6 +1152,7 @@ function download(
 			`"${path.join(downloadDir, filename + `.${extractExt}`)}"`,
 			"--ffmpeg-location",
 			ffmpeg,
+			"--embed-chapters",
 			"--no-playlist",
 			// "--embed-metadata",
 			(extractFormat1 == "m4a" || extractFormat1 == "mp3") && extractor_key === "Youtube" && os.platform() !== "darwin"
@@ -1189,6 +1191,7 @@ function download(
 			subs1 || subs,
 			subs2 || subLangs,
 			"--no-playlist",
+			"--embed-chapters",
 			// "--embed-metadata",
 			(ext == "m4a" || ext == "mp4") && extractor_key === "Youtube" && os.platform() !== "darwin" ? "--embed-thumbnail" : "",
 			cookieArg,
@@ -1221,6 +1224,7 @@ function download(
 	downloadProcess
 		.on("progress", (progress) => {
 			if (progress.percent == 100) {
+				getId(randomId + "speed").textContent = "";
 				getId(randomId + "prog").textContent =
 					i18n.__("Processing") + "...";
 				
