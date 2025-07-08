@@ -6,7 +6,6 @@
 [![GitHub downloads](https://img.shields.io/github/downloads/aandrew-me/ytdownloader/total?label=Github%20downloads)](https://github.com/aandrew-me/ytDownloader/releases)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/aandrew-me/ytdownloader?label=latest%20release)](https://github.com/aandrew-me/ytDownloader/releases/latest)
 [![Flathub](https://img.shields.io/flathub/v/io.github.aandrew_me.ytdn)](https://flathub.org/apps/io.github.aandrew_me.ytdn)
-[![AUR version](https://img.shields.io/aur/version/ytdownloader-gui)](https://aur.archlinux.org/packages/ytdownloader-gui)
 [![Snapcraft](https://badgen.net/snapcraft/v/ytdownloader)](https://snapcraft.io/ytdownloader)
 ![Chocolatey Version](https://img.shields.io/chocolatey/v/ytdownloader)
 
@@ -20,7 +19,6 @@ A modern GUI video and audio downloader supporting [hundreds of sites](https://g
 "><img src="https://user-images.githubusercontent.com/66430340/187172806-a8edd12a-ef58-4a05-96a3-99d7490b42f6.png" style="width:190px;"></a>
 <a href="https://github.com/aandrew-me/ytDownloader/releases/latest/download/YTDownloader_Mac_arm64.dmg"><img src="https://cdn.jsdelivr.net/gh/aandrew-me/badges/download_mac_apple_silicon.png" style="width:200px;"></a>
 <a href="https://github.com/aandrew-me/ytDownloader/releases/latest/download/YTDownloader_Mac_x64.dmg"><img src="https://cdn.jsdelivr.net/gh/aandrew-me/badges/download_mac_intel.png" style="width:200px;"></a>
-<a href="https://aur.archlinux.org/packages/ytdownloader-gui"><img src="https://github-production-user-asset-6210df.s3.amazonaws.com/66430340/238885924-de1880ec-ebb9-40b1-bd0f-d98d0ddeedd9.png" alt="AUR" style="width:200px;"></a>
 <a href="https://community.chocolatey.org/packages/ytdownloader"><img style="width:200px;" src="https://github-production-user-asset-6210df.s3.amazonaws.com/66430340/238886537-7b2769fe-bd62-4921-a0eb-edf2eb06216d.png" alt="Chocolatey"></a>
 
 ## Features 🚀
@@ -80,7 +78,7 @@ A modern GUI video and audio downloader supporting [hundreds of sites](https://g
     ```
 ## Linux 🐧
 
-Linux has several options available - Flatpak, AppImage, Snap and AUR.
+Linux has several options available - Flatpak, AppImage and Snap.
 Flatpak is recommended. For arm processors, download from flathub.
 
 -   ### AppImage
@@ -89,20 +87,6 @@ Flatpak is recommended. For arm processors, download from flathub.
     It just needs to be executed after downloading. See more about [AppImages here](https://appimage.org/).
 
     [AppImageLauncher](https://github.com/TheAssassin/AppImageLauncher) is recommended for integrating AppImages.
-
--   ### AUR package
-
-    The app is available in [AUR](https://aur.archlinux.org/packages/ytdownloader-gui) with the name `ytdownloader-gui`. To build with pamac the required command is -
-
-    ```
-    pamac install ytdownloader-gui
-    ```
-
-    Using yay
-
-    ```
-    yay -S ytdownloader-gui
-    ```
 
 -   ### Flatpak
     ```
@@ -208,6 +192,3 @@ If you only want to build for one format, you can do
 npx electron-builder -l appimage
 ```
 It will just create a linux appimage build.
-
-## Donations
-You can donate to my Payeer account: **P1129645521**
