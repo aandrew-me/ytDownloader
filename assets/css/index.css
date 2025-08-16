@@ -154,7 +154,7 @@ body {
 	transition: 0.4s;
 	font-size: large;
 }
-#popupBox {
+#popupBox, #popupBoxMac {
 	width: 100vw;
 	height: 100vh;
 	margin: 0;
@@ -165,7 +165,7 @@ body {
 	z-index: 2;
 	display: none;
 }
-#popup {
+#popup, #popupMac {
 	position: absolute;
 	padding: 20px;
 	top: 50%;

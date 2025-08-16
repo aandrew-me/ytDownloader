@@ -5,21 +5,20 @@ if (os.platform() === "win32") {
 	ffmpeg = `"${__dirname}\\..\\ffmpeg.exe"`;
 } else if (os.platform() === "freebsd") {
 	try {
-		ffmpeg = cp.execSync("which ffmpeg").toString("utf8").split("\n")[0].trim();
+		ffmpeg = cp
+			.execSync("which ffmpeg")
+			.toString("utf8")
+			.split("\n")[0]
+			.trim();
 	} catch (error) {
-		console.log(error)
+		console.log(error);
 		showPopup("No ffmpeg found in PATH.");
 	}
-}
- else {
+} else {
 	ffmpeg = `"${__dirname}/../ffmpeg"`;
 }
 
 const fs = require("fs");
-
-/////////////////////////////////////
-// Do not change the lines at the top
-/////////////////////////////////////
 const path = require("path");
 const {shell, ipcRenderer, clipboard} = require("electron");
 const {default: YTDlpWrap} = require("yt-dlp-wrap-plus");
@@ -71,7 +70,7 @@ let showMoreFormats = false;
 let configArg = "";
 let configTxt = "";
 let proxy = "";
-let downloadedItemList = []
+let downloadedItemList = [];
 
 if (localStorage.getItem("configPath")) {
 	configArg = "--config-location";
@@ -145,12 +144,31 @@ downloadPathSelection();
 let ytDlp;
 let ytdlpPath = path.join(os.homedir(), ".ytDownloader", "ytdlp");
 
+if (os.platform() === "darwin") {
+	try {
+		ytdlpPath = cp
+			.execSync("which yt-dlp")
+			.toString("utf8")
+			.split("\n")[0]
+			.trim();
+	} catch (error) {
+		console.log(error);
+		getId("incorrectMsg").textContent = i18n.__(
+			"No yt-dlp found in PATH. Download it with homebrew."
+		);
+	}
+}
+
 // Use system yt-dlp for freebsd
 if (os.platform() === "freebsd") {
 	try {
-		ytdlpPath = cp.execSync('which yt-dlp').toString("utf8").split("\n")[0].trim();
+		ytdlpPath = cp
+			.execSync("which yt-dlp")
+			.toString("utf8")
+			.split("\n")[0]
+			.trim();
 	} catch (error) {
-		console.log(error)
+		console.log(error);
 		getId("incorrectMsg").textContent = i18n.__(
 			"No yt-dlp found in PATH. Make sure you have the full executable. App will not work"
 		);
@@ -163,6 +181,14 @@ if (os.platform() == "win32") {
 	ytdlpDownloadPath = path.join(os.homedir(), ".ytDownloader", "ytdlp.exe");
 } else {
 	ytdlpDownloadPath = path.join(os.homedir(), ".ytDownloader", "ytdlp");
+}
+
+function showMacYtdlpPopup() {
+	getId("popupBoxMac").style.display = "block";
+}
+
+function hideMacYtdlpPopup() {
+	getId("popupBoxMac").style.display = "none";
 }
 
 // Downloading yt-dlp
@@ -186,37 +212,31 @@ async function downloadYtdlp() {
 
 // Checking if yt-dlp has been installed by user
 
-// TODO: Remove this after some time
 const fullYtdlpBinIsPresent = !!localStorage.getItem("fullYtdlpBinPresent");
-const removedOldMacYtdlp = !!localStorage.getItem("removedOldMacYtdlp")
-
-// Removing old yt-dlp for macos
-if (os.platform() === "darwin" && !removedOldMacYtdlp) {
-	if (fs.existsSync(ytdlpPath)) {
-		fs.rmSync(ytdlpPath)
-		localStorage.setItem('removedOldMacYtdlp', "true")
-	}
-}
 
 cp.exec(`"${ytdlpPath}" --version`, (error, _stdout, _stderr) => {
 	if ((error || !fullYtdlpBinIsPresent) && os.platform() !== "freebsd") {
-		getId("popupBox").style.display = "block";
-		process.on("uncaughtException", (reason, promise) => {
-			document.querySelector("#popupBox p").textContent = i18n.__(
-				"Failed to download necessary files. Please check your network and try again"
-			);
-			getId("popupSvg").style.display = "none";
-			getId("popup").innerHTML += `<button id="tryBtn">${i18n.__(
-				"Try again"
-			)}</button>`;
-			console.log("Failed to download yt-dlp");
+		if (os.platform() == "darwin") {
+			showMacYtdlpPopup()
+		} else {
+			getId("popupBox").style.display = "block";
+			process.on("uncaughtException", (reason, promise) => {
+				document.querySelector("#popupBox p").textContent = i18n.__(
+					"Failed to download necessary files. Please check your network and try again"
+				);
+				getId("popupSvg").style.display = "none";
+				getId("popup").innerHTML += `<button id="tryBtn">${i18n.__(
+					"Try again"
+				)}</button>`;
+				console.log("Failed to download yt-dlp");
 
-			getId("tryBtn").addEventListener("click", () => {
-				getId("popup").removeChild(getId("popup").lastChild);
-				downloadYtdlp();
+				getId("tryBtn").addEventListener("click", () => {
+					getId("popup").removeChild(getId("popup").lastChild);
+					downloadYtdlp();
+				});
 			});
-		});
-		downloadYtdlp();
+			downloadYtdlp();
+		}
 	} else {
 		console.log("yt-dlp binary is present in PATH");
 		ytDlp = ytdlpPath;
@@ -231,7 +251,6 @@ cp.exec(`"${ytdlpPath}" --version`, (error, _stdout, _stderr) => {
 		ipcRenderer.send("ready-for-links");
 	}
 });
-
 
 function defaultVideoToggle() {
 	let defaultWindow = "video";
@@ -270,7 +289,11 @@ getId("closeHidden").addEventListener("click", () => {
 });
 
 document.addEventListener("keydown", (event) => {
-	if (event.ctrlKey && event.key == "v" && document.activeElement.tagName !== "INPUT") {
+	if (
+		event.ctrlKey &&
+		event.key == "v" &&
+		document.activeElement.tagName !== "INPUT"
+	) {
 		pasteUrl();
 	}
 });
@@ -293,7 +316,9 @@ async function getInfo(url) {
 	// Cleaning text
 	getId("videoFormatSelect").innerHTML = "";
 	getId("audioFormatSelect").innerHTML = "";
-	getId("audioForVideoFormatSelect").innerHTML = `<option value="none|none">No Audio</option>`;
+	getId(
+		"audioForVideoFormatSelect"
+	).innerHTML = `<option value="none|none">No Audio</option>`;
 
 	const startTime = getId("startTime");
 	startTime.value = "";
@@ -348,15 +373,11 @@ async function getInfo(url) {
 		configArg,
 		configTxt,
 		`"${url}"`,
-	].filter(item => item)
+	].filter((item) => item);
 
-	const infoProcess = cp.spawn(
-		`"${ytDlp}"`,
-		infoOptions,
-		{
-			shell: true,
-		}
-	);
+	const infoProcess = cp.spawn(`"${ytDlp}"`, infoOptions, {
+		shell: true,
+	});
 
 	infoProcess.stdout.on("data", (data) => {
 		info += data;
@@ -392,7 +413,7 @@ async function getInfo(url) {
 			id = parsedInfo.id;
 			thumbnail = parsedInfo.thumbnail;
 			duration = parsedInfo.duration;
-			extractor_key = parsedInfo.extractor_key
+			extractor_key = parsedInfo.extractor_key;
 			/**
 			 * @typedef {import("./types").format} format
 			 * @type {format[]}
@@ -433,13 +454,13 @@ async function getInfo(url) {
 				if (
 					format.height <= preferredVideoQuality &&
 					format.height >= defaultVideoFormat &&
-					(format.video_ext !== "none" &&
+					format.video_ext !== "none" &&
 					!(
 						format.video_ext === "mp4" &&
 						format.vcodec &&
 						format.vcodec.split(".")[0] === "vp09"
-					))
-					&& (!showMoreFormats ? format.video_ext !== "webm" : true)
+					) &&
+					(!showMoreFormats ? format.video_ext !== "webm" : true)
 				) {
 					defaultVideoFormat = format.height;
 
@@ -464,13 +485,16 @@ async function getInfo(url) {
 					audioSize =
 						Number(format.filesize || format.filesize_approx) /
 						1000000;
-					
+
 					if (!audioExtensionList.includes(format.audio_ext)) {
 						audioExtensionList.push(format.audio_ext);
 					}
 
-					if (format.format_note && format.format_note.length > maxAudioFormatNoteLength) {
-						maxAudioFormatNoteLength = format.format_note.length
+					if (
+						format.format_note &&
+						format.format_note.length > maxAudioFormatNoteLength
+					) {
+						maxAudioFormatNoteLength = format.format_note.length;
 					}
 				}
 
@@ -501,13 +525,13 @@ async function getInfo(url) {
 					format.vcodec &&
 					format.vcodec.split(".")[0] === preferredVideoCodec &&
 					!selected &&
-					(format.video_ext !== "none" &&
+					format.video_ext !== "none" &&
 					!(
 						format.video_ext === "mp4" &&
 						format.vcodec &&
 						format.vcodec.split(".")[0] === "vp09"
-					))
-					&& (!showMoreFormats ? format.video_ext !== "webm" : true)
+					) &&
+					(!showMoreFormats ? format.video_ext !== "webm" : true)
 				) {
 					selectedText = " selected ";
 					selected = true;
@@ -525,7 +549,7 @@ async function getInfo(url) {
 					// 		1000000
 					// 	).toFixed(2);
 					// } else {
-						
+
 					// }
 					size = i18n.__("Unknown size");
 				}
@@ -533,13 +557,13 @@ async function getInfo(url) {
 				// For videos
 
 				if (
-					(format.video_ext !== "none" &&
+					format.video_ext !== "none" &&
 					!(
 						format.video_ext === "mp4" &&
 						format.vcodec &&
 						format.vcodec.split(".")[0] === "vp09"
-					))
-					&& (!showMoreFormats ? format.video_ext !== "webm" : true)
+					) &&
+					(!showMoreFormats ? format.video_ext !== "webm" : true)
 				) {
 					if (size !== i18n.__("Unknown size")) {
 						size = (Number(size) + 0 || Number(audioSize)).toFixed(
@@ -600,7 +624,7 @@ async function getInfo(url) {
 						"| " +
 						extension.padEnd(5, "\xa0") +
 						"|  " +
-						(vcodec ? vcodec + spaceAfterVcodec : '') +
+						(vcodec ? vcodec + spaceAfterVcodec : "") +
 						size +
 						(format.acodec !== "none" ? " 🔊" : "") +
 						"</option>";
@@ -642,10 +666,14 @@ async function getInfo(url) {
 					const format_id = format.format_id + "|" + audio_ext;
 
 					/**@type {string} */
-					let formatNote = (i18n.__(format.format_note) ||
-					i18n.__("Unknown quality"));
+					let formatNote =
+						i18n.__(format.format_note) ||
+						i18n.__("Unknown quality");
 
-					formatNote = formatNote.padEnd(maxAudioFormatNoteLength, "\xa0")
+					formatNote = formatNote.padEnd(
+						maxAudioFormatNoteLength,
+						"\xa0"
+					);
 
 					const element =
 						"<option value='" +
@@ -664,7 +692,6 @@ async function getInfo(url) {
 
 					getId("audioFormatSelect").innerHTML += element;
 					getId("audioForVideoFormatSelect").innerHTML += element;
-					
 				}
 				// Both audio and video available
 				else if (
@@ -944,7 +971,7 @@ function download(
 	if (type === "video") {
 		const videoValue = getId("videoFormatSelect").value;
 		/**@type {string} */
-		const audioForVideoValue = getId("audioForVideoFormatSelect").value
+		const audioForVideoValue = getId("audioForVideoFormatSelect").value;
 
 		format_id = videoValue.split("|")[0];
 		const videoExt = videoValue.split("|")[1];
@@ -961,13 +988,15 @@ function download(
 			audioForVideoExt = audioForVideoValue.split("|")[1];
 		}
 
-		if ((videoExt === "mp4" && audioForVideoExt === "opus") || (videoExt === "webm" && (audioForVideoExt === "m4a" || audioForVideoExt === "mp4"))) {
-			ext = "mkv"
+		if (
+			(videoExt === "mp4" && audioForVideoExt === "opus") ||
+			(videoExt === "webm" &&
+				(audioForVideoExt === "m4a" || audioForVideoExt === "mp4"))
+		) {
+			ext = "mkv";
 		} else {
 			ext = videoExt;
 		}
-
-
 	} else if (type === "audio") {
 		format_id = getId("audioFormatSelect").value.split("|")[0];
 		if (getId("audioFormatSelect").value.split("|")[1] === "webm") {
@@ -1006,11 +1035,10 @@ function download(
 
 	getId(randomId + ".close").addEventListener("click", () => {
 		if (getId(randomId)) {
-			removeFromDownloadedList(randomId)
+			removeFromDownloadedList(randomId);
 			fadeItem(randomId);
 		}
 	});
-
 
 	let downloadProcess;
 	let filename = "";
@@ -1057,9 +1085,9 @@ function download(
 		let rangeTxt = (range2 || rangeCmd).replace("*", "");
 		if (os.platform() === "win32") {
 			rangeTxt = rangeTxt.replaceAll(":", "_");
-			console.log({rangeTxt})
+			console.log({rangeTxt});
 		}
-		filename += `[${rangeTxt}]`
+		filename += `[${rangeTxt}]`;
 	}
 	console.log("Filename:", filename);
 
@@ -1076,11 +1104,9 @@ function download(
 				audioFormat = "";
 			}
 		}
-
 	} else if (audioForVideoFormat_id === "none") {
-		audioFormat = ""
-	}
-	 else {
+		audioFormat = "";
+	} else {
 		audioFormat = `+${audioForVideoFormat_id}`;
 	}
 
@@ -1108,7 +1134,12 @@ function download(
 			"--no-playlist",
 			"--embed-chapters",
 			// "--embed-metadata",
-			ext == "mp4" && audioForVideoExt === "m4a" && extractor_key === "Youtube" && os.platform() !== "darwin" ? "--embed-thumbnail" : "",
+			ext == "mp4" &&
+			audioForVideoExt === "m4a" &&
+			extractor_key === "Youtube" &&
+			os.platform() !== "darwin"
+				? "--embed-thumbnail"
+				: "",
 			configArg,
 			configTxt,
 			cookieArg,
@@ -1118,7 +1149,7 @@ function download(
 			proxy ? "--proxy" : "",
 			proxy,
 			`"${url}"`,
-		].filter(item => item);
+		].filter((item) => item);
 
 		downloadProcess = ytdlp.exec(
 			args,
@@ -1152,7 +1183,9 @@ function download(
 			"--embed-chapters",
 			"--no-playlist",
 			// "--embed-metadata",
-			(extractFormat1 == "m4a" || extractFormat1 == "mp3") && extractor_key === "Youtube" && os.platform() !== "darwin"
+			(extractFormat1 == "m4a" || extractFormat1 == "mp3") &&
+			extractor_key === "Youtube" &&
+			os.platform() !== "darwin"
 				? "--embed-thumbnail"
 				: "",
 			cookieArg,
@@ -1164,7 +1197,7 @@ function download(
 			proxy ? "--proxy" : "",
 			proxy,
 			`"${url}"`,
-		].filter(item => item)
+		].filter((item) => item);
 
 		downloadProcess = ytdlp.exec(
 			args,
@@ -1190,7 +1223,11 @@ function download(
 			"--no-playlist",
 			"--embed-chapters",
 			// "--embed-metadata",
-			(ext == "m4a" || ext == "mp4") && extractor_key === "Youtube" && os.platform() !== "darwin" ? "--embed-thumbnail" : "",
+			(ext == "m4a" || ext == "mp4") &&
+			extractor_key === "Youtube" &&
+			os.platform() !== "darwin"
+				? "--embed-thumbnail"
+				: "",
 			cookieArg,
 			browser,
 			configArg,
@@ -1200,7 +1237,7 @@ function download(
 			proxy ? "--proxy" : "",
 			proxy,
 			`"${url}"`,
-		].filter(item => item)
+		].filter((item) => item);
 
 		downloadProcess = ytdlp.exec(
 			args,
@@ -1209,12 +1246,17 @@ function download(
 		);
 	}
 
-	console.log("Spawn args:" + downloadProcess.ytDlpProcess.spawnargs[downloadProcess.ytDlpProcess.spawnargs.length - 1])
+	console.log(
+		"Spawn args:" +
+			downloadProcess.ytDlpProcess.spawnargs[
+				downloadProcess.ytDlpProcess.spawnargs.length - 1
+			]
+	);
 
 	getId(randomId + ".close").addEventListener("click", () => {
-		controller.abort()
+		controller.abort();
 		try {
-			process.kill(downloadProcess.ytDlpProcess.pid, 'SIGINT')
+			process.kill(downloadProcess.ytDlpProcess.pid, "SIGINT");
 		} catch (_error) {}
 	});
 
@@ -1224,19 +1266,19 @@ function download(
 				getId(randomId + "speed").textContent = "";
 				getId(randomId + "prog").textContent =
 					i18n.__("Processing") + "...";
-				
-				ipcRenderer.send("progress", 0)
+
+				ipcRenderer.send("progress", 0);
 			} else {
 				getId(randomId + "speed").textContent = `${i18n.__("Speed")}: ${
 					progress.currentSpeed || 0
-				}`;			
-				ipcRenderer.send("progress", progress.percent)
+				}`;
+				ipcRenderer.send("progress", progress.percent);
 
 				getId(
 					randomId + "prog"
 				).innerHTML = `<progress class="progressBar" min=0 max=100 value=${progress.percent}>`;
 
-				ipcRenderer.send("progress", progress.percent / 100)
+				ipcRenderer.send("progress", progress.percent / 100);
 			}
 		})
 		.once("ytDlpEvent", (_eventType, _eventData) => {
@@ -1244,7 +1286,7 @@ function download(
 		})
 		.once("close", (code) => {
 			getId(randomId + "speed").textContent = "";
-			addToDownloadedList(randomId)
+			addToDownloadedList(randomId);
 			currentDownloads--;
 			console.log("Closed with code " + code);
 			if (code == 0) {
@@ -1303,24 +1345,23 @@ function fadeItem(id) {
 	}, 500);
 }
 
-function clearAllDownloaded(){
-	downloadedItemList.forEach(item => {
-		fadeItem(item)
-	})
-	downloadedItemList = []
-	hideClearBtn()
+function clearAllDownloaded() {
+	downloadedItemList.forEach((item) => {
+		fadeItem(item);
+	});
+	downloadedItemList = [];
+	hideClearBtn();
 }
 
-function addToDownloadedList(id){
-	downloadedItemList.push(id)
+function addToDownloadedList(id) {
+	downloadedItemList.push(id);
 
 	if (downloadedItemList.length > 1) {
 		getId("clearBtn").style.display = "inline-block";
-
 	}
 }
 
-function removeFromDownloadedList(id){
+function removeFromDownloadedList(id) {
 	downloadedItemList.splice(downloadedItemList.indexOf(id), 1);
 
 	if (downloadedItemList.length < 2) {
@@ -1328,8 +1369,8 @@ function removeFromDownloadedList(id){
 	}
 }
 
-function hideClearBtn(){
-	getId("clearBtn").style.display = "none"
+function hideClearBtn() {
+	getId("clearBtn").style.display = "none";
 }
 // After saving video
 
@@ -1349,11 +1390,11 @@ function afterSave(location, filename, progressId, thumbnail) {
 		finalLocation = location.split(path.sep).join("\\\\");
 		finalFilename = filename.split(path.sep).join("\\\\");
 	}
-	const fileSavedElement = document.createElement("b")
-	fileSavedElement.textContent = i18n.__("File saved. Click to Open")
+	const fileSavedElement = document.createElement("b");
+	fileSavedElement.textContent = i18n.__("File saved. Click to Open");
 	fileSavedElement.onclick = () => {
-		showItem(finalLocation, finalFilename)
-	}
+		showItem(finalLocation, finalFilename);
+	};
 
 	getId(progressId).innerHTML = "";
 	getId(progressId).appendChild(fileSavedElement);
@@ -1409,8 +1450,8 @@ function showPopup(text) {
 }
 
 /**
- * 
- * @param {string} item 
+ *
+ * @param {string} item
  * @returns string
  */
 function getLocalStorageItem(item) {
@@ -1453,7 +1494,7 @@ getId("selectLocation").addEventListener("click", () => {
 
 getId("clearBtn").addEventListener("click", () => {
 	clearAllDownloaded();
-})
+});
 
 ipcRenderer.on("downloadPath", (event, downloadPath) => {
 	console.log(downloadPath);
