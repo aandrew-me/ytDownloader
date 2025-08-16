@@ -336,9 +336,6 @@ async function getInfo(url) {
 
 	let info = "";
 
-	// Twitter/X compatibility
-	url = url.replace("//x.com/", "//twitter.com/")
-
 	const infoOptions = [
 		"-j",
 		"--no-playlist",
@@ -605,7 +602,7 @@ async function getInfo(url) {
 						"|  " +
 						(vcodec ? vcodec + spaceAfterVcodec : '') +
 						size +
-						(format.acodec !== "none" ? " 🔈" : "") +
+						(format.acodec !== "none" ? " 🔊" : "") +
 						"</option>";
 					getId("videoFormatSelect").innerHTML += element;
 				}
