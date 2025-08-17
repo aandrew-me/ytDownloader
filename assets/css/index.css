@@ -582,6 +582,7 @@ button {
 	cursor: pointer;
 	margin: 8px;
 	font-size: large;
+	text-decoration: none;
 }
 
 #extractBtn {

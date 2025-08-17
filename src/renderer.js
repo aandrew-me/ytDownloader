@@ -140,22 +140,20 @@ function downloadPathSelection() {
 
 downloadPathSelection();
 
+const possiblePaths = [
+  "/opt/homebrew/bin/yt-dlp",  // Apple Silicon
+  "/usr/local/bin/yt-dlp",     // Intel
+];
+
 // Checking for yt-dlp
 let ytDlp;
 let ytdlpPath = path.join(os.homedir(), ".ytDownloader", "ytdlp");
 
 if (os.platform() === "darwin") {
-	try {
-		ytdlpPath = cp
-			.execSync("which yt-dlp")
-			.toString("utf8")
-			.split("\n")[0]
-			.trim();
-	} catch (error) {
-		console.log(error);
-		getId("incorrectMsg").textContent = i18n.__(
-			"No yt-dlp found in PATH. Download it with homebrew."
-		);
+	ytdlpPath = possiblePaths.find(p => fs.existsSync(p)) || null;
+
+	if (ytdlpPath == null) {
+		showMacYtdlpPopup()
 	}
 }
 
@@ -215,10 +213,7 @@ async function downloadYtdlp() {
 const fullYtdlpBinIsPresent = !!localStorage.getItem("fullYtdlpBinPresent");
 
 cp.exec(`"${ytdlpPath}" --version`, (error, _stdout, _stderr) => {
-	if ((error || !fullYtdlpBinIsPresent) && os.platform() !== "freebsd") {
-		if (os.platform() == "darwin") {
-			showMacYtdlpPopup()
-		} else {
+	if ((error || !fullYtdlpBinIsPresent) && os.platform() !== "freebsd" && os.platform() !== "darwin") {
 			getId("popupBox").style.display = "block";
 			process.on("uncaughtException", (reason, promise) => {
 				document.querySelector("#popupBox p").textContent = i18n.__(
@@ -236,7 +231,6 @@ cp.exec(`"${ytdlpPath}" --version`, (error, _stdout, _stderr) => {
 				});
 			});
 			downloadYtdlp();
-		}
 	} else {
 		console.log("yt-dlp binary is present in PATH");
 		ytDlp = ytdlpPath;
