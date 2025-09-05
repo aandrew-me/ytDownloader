@@ -116,7 +116,7 @@
 	"Compressor": "Compressor",
 	"Drag and drop file(s)": "Drag and drop file(s)",
 	"Choose File(s)": "Choose File(s)",
-	"No files selected": "No files selected",
+	"No files selected": "",
 	"Video format": "Video format",
 	"Video Encoder": "Video Encoder",
 	"Compression Speed": "Compression Speed",
@@ -127,5 +127,7 @@
 	"Select custom folder": "Select custom folder",
 	"Start Compression": "Start Compression",
 	"Cancel": "Cancel",
-	"Error! Click for details": "Error! Click for details"
+	"Error! Click for details": "Error! Click for details",
+	"You need to download yt-dlp from homebrew first": "You need to download yt-dlp from homebrew first",
+	"Open Homebrew": "Open Homebrew"
 }
