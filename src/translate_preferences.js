@@ -48,6 +48,8 @@ if (process.env.FLATPAK_ID) {
 	getId("flatpakTxt").addEventListener("click", () => {
 		shell.openExternal("https://flathub.org/apps/com.github.tchx84.Flatseal")
 	})
+
+	getId("flatpakTxt").style.display = "block"
 }
 
 if (process.env.FLATPAK_ID || process.env.SNAP_NAME) {

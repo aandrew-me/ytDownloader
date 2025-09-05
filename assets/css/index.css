@@ -33,10 +33,10 @@
 	--box-toggle: #191919;
 	--box-separation: #2e2e2e;
 	--box-toggleOn: #2e2e2e;
-	--item-bg: #191919;
+	--item-bg: #2c2e31;
 	--box-shadow: none;
 	--select: rgb(68 214 141);
-	--greenBtn: #24D166;
+	--greenBtn: #24d166;
 	--greenBtn-bottom: #3e6c20;
 	--redBtn: #c82b2d;
 	--redBtn-bottom: #803334;
@@ -64,7 +64,7 @@
 :root[theme="onedark"] {
 	--background: #282c34;
 	--text: #d2d6df;
-	--box-main: #4d515d;
+	--box-main: #3a3d46;
 	--box-toggle: #2f333d;
 	--box-separation: #2f333d;
 	--box-toggleOn: #13a3b7;
@@ -154,7 +154,8 @@ body {
 	transition: 0.4s;
 	font-size: large;
 }
-#popupBox, #popupBoxMac {
+#popupBox,
+#popupBoxMac {
 	width: 100vw;
 	height: 100vh;
 	margin: 0;
@@ -165,7 +166,8 @@ body {
 	z-index: 2;
 	display: none;
 }
-#popup, #popupMac {
+#popup,
+#popupMac {
 	position: absolute;
 	padding: 20px;
 	top: 50%;
@@ -228,14 +230,15 @@ body {
 	outline: none;
 	border: none;
 	font-family: "Ubuntu";
-  font-size: large;
+	font-size: large;
 }
 .menuItem {
-  font-family: "Ubuntu";
-  color: white;
+	font-family: "Ubuntu";
+	color: white;
 	text-decoration: none;
 	padding: 5px;
 	cursor: pointer;
+	border-bottom: 1px solid #37384a;
 }
 .menuItem:active,
 .menuItem:link {
@@ -361,13 +364,15 @@ body {
 	border: var(--border);
 }
 
-#videoBox, #audioBox {
+#videoBox,
+#audioBox {
 	background-color: var(--box-toggle);
 	padding: 10px;
 	border-radius: 10px;
 }
 
-#audioExtract, .separationBox {
+#audioExtract,
+.separationBox {
 	margin: 10px;
 	padding: 10px;
 	background-color: var(--box-separation);
@@ -382,7 +387,7 @@ body {
 	left: 0;
 	right: 0;
 	margin: auto;
-	top: 20%;
+	top: 15%;
 	background-color: var(--box-main);
 	width: 80%;
 	border-radius: 10px;
@@ -429,7 +434,7 @@ body {
 }
 
 #videoTypeSelect {
-	width: 160px
+	width: 160px;
 }
 
 #audioQualitySelect {
@@ -440,7 +445,9 @@ body {
 	padding: 10px;
 }
 
-#videoFormatSelect, #audioFormatSelect, #audioForVideoFormatSelect {
+#videoFormatSelect,
+#audioFormatSelect,
+#audioForVideoFormatSelect {
 	font-family: JetBrains, monospace;
 	font-size: medium;
 	width: 400px;
@@ -516,7 +523,8 @@ input[type="number"]::-webkit-outer-spin-button {
 	margin: 5px;
 }
 
-#incorrectMsg, #incorrectMsgPlaylist {
+#incorrectMsg,
+#incorrectMsgPlaylist {
 	color: var(--redBtn);
 }
 
@@ -572,7 +580,8 @@ button {
 	outline: none;
 }
 
-#extractBtn, .blueBtn {
+#extractBtn,
+.blueBtn {
 	color: white;
 	background-color: var(--blueBtn);
 	border: none;
@@ -589,7 +598,8 @@ button {
 	width: 150px;
 }
 
-#download, #audioDownload {
+#download,
+#audioDownload {
 	width: 140px;
 }
 
@@ -597,7 +607,8 @@ button {
 	display: none;
 }
 
-#extractBtn:active, .blueBtn:active {
+#extractBtn:active,
+.blueBtn:active {
 	background-color: var(--blueBtn-bottom);
 	border: none;
 }
@@ -623,10 +634,10 @@ button {
 	display: none;
 }
 .advancedItem {
-	border: 1.5px solid gray;
 	border-radius: 15px;
 	padding: 20px;
 	margin: 10px;
+	background-color: var(--item-bg);
 }
 
 #subHeader {
@@ -634,7 +645,7 @@ button {
 	margin-top: 0;
 }
 
-h2{
+h2 {
 	margin: 12px;
 	font-size: 24px;
 }
@@ -701,7 +712,7 @@ body::-webkit-scrollbar {
 	width: 10px;
 }
 body::-webkit-scrollbar-thumb {
-	background:linear-gradient(rgb(110, 110, 110), rgb(77, 77, 77));
+	background: linear-gradient(rgb(110, 110, 110), rgb(77, 77, 77));
 	border-radius: 8px;
 }
 
@@ -731,7 +742,6 @@ body::-webkit-scrollbar-thumb {
 	}
 }
 
-
 /* Compressor styles */
 #compressor-header {
 	text-align: center;
@@ -758,7 +768,7 @@ body::-webkit-scrollbar-thumb {
 }
 
 .drop-zone:hover {
-	border-color: #2196F3;
+	border-color: #2196f3;
 	cursor: pointer;
 }
 
@@ -768,7 +778,7 @@ body::-webkit-scrollbar-thumb {
 }
 
 .drop-zone.dragover {
-	border-color: #2196F3;
+	border-color: #2196f3;
 	background-color: var(--box-toggleOn);
 }
 
@@ -814,7 +824,7 @@ body::-webkit-scrollbar-thumb {
 }
 
 .compress-label {
-	font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 	display: block;
 	margin-bottom: 10px;
 	font-weight: 500;
@@ -869,11 +879,15 @@ body::-webkit-scrollbar-thumb {
 	width: 200px;
 }
 
-.nvidia_opt, .amf_opt, .qsv_opt, .vaapi_opt, .videotoolbox_opt {
+.nvidia_opt,
+.amf_opt,
+.qsv_opt,
+.vaapi_opt,
+.videotoolbox_opt {
 	display: none;
 }
 
-#custom-folder-select{
+#custom-folder-select {
 	padding: 10px;
 	margin-left: 0;
 	display: none;
@@ -894,7 +908,7 @@ body::-webkit-scrollbar-thumb {
 
 ::view-transition-old(root),
 ::view-transition-new(root) {
-  animation: none;
-  mix-blend-mode: normal;
+	animation: none;
+	mix-blend-mode: normal;
 }
 /* End */

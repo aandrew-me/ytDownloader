@@ -8,12 +8,10 @@ function getId(id) {
 	return document.getElementById(id);
 }
 
-let menuIsOpen = false;
-
 getId("menuIcon").addEventListener("click", () => {
-	if (menuIsOpen) {
+	const menuDisplay = getId("menu").style.display;
+	if (menuDisplay != "none" && menuDisplay != "") {
 		getId("menuIcon").style.transform = "rotate(0deg)";
-		menuIsOpen = false;
 		let count = 0;
 		let opacity = 1;
 		const fade = setInterval(() => {
@@ -28,7 +26,6 @@ getId("menuIcon").addEventListener("click", () => {
 		}, 50);
 	} else {
 		getId("menuIcon").style.transform = "rotate(90deg)";
-		menuIsOpen = true;
 
 		setTimeout(() => {
 			getId("menu").style.display = "flex";

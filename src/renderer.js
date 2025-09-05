@@ -103,7 +103,7 @@ let currentDownloads = 0;
 let controllers = new Object();
 
 // Video and audio preferences
-let preferredVideoQuality = 720;
+let preferredVideoQuality = 1080;
 let preferredAudioQuality = "";
 let preferredVideoCodec = "avc1";
 /**
@@ -141,8 +141,8 @@ function downloadPathSelection() {
 downloadPathSelection();
 
 const possiblePaths = [
-  "/opt/homebrew/bin/yt-dlp",  // Apple Silicon
-  "/usr/local/bin/yt-dlp",     // Intel
+	"/opt/homebrew/bin/yt-dlp", // Apple Silicon
+	"/usr/local/bin/yt-dlp", // Intel
 ];
 
 // Checking for yt-dlp
@@ -150,10 +150,10 @@ let ytDlp;
 let ytdlpPath = path.join(os.homedir(), ".ytDownloader", "ytdlp");
 
 if (os.platform() === "darwin") {
-	ytdlpPath = possiblePaths.find(p => fs.existsSync(p)) || null;
+	ytdlpPath = possiblePaths.find((p) => fs.existsSync(p)) || null;
 
 	if (ytdlpPath == null) {
-		showMacYtdlpPopup()
+		showMacYtdlpPopup();
 	}
 }
 
@@ -213,24 +213,28 @@ async function downloadYtdlp() {
 const fullYtdlpBinIsPresent = !!localStorage.getItem("fullYtdlpBinPresent");
 
 cp.exec(`"${ytdlpPath}" --version`, (error, _stdout, _stderr) => {
-	if ((error || !fullYtdlpBinIsPresent) && os.platform() !== "freebsd" && os.platform() !== "darwin") {
-			getId("popupBox").style.display = "block";
-			process.on("uncaughtException", (reason, promise) => {
-				document.querySelector("#popupBox p").textContent = i18n.__(
-					"Failed to download necessary files. Please check your network and try again"
-				);
-				getId("popupSvg").style.display = "none";
-				getId("popup").innerHTML += `<button id="tryBtn">${i18n.__(
-					"Try again"
-				)}</button>`;
-				console.log("Failed to download yt-dlp");
+	if (
+		(error || !fullYtdlpBinIsPresent) &&
+		os.platform() !== "freebsd" &&
+		os.platform() !== "darwin"
+	) {
+		getId("popupBox").style.display = "block";
+		process.on("uncaughtException", (reason, promise) => {
+			document.querySelector("#popupBox p").textContent = i18n.__(
+				"Failed to download necessary files. Please check your network and try again"
+			);
+			getId("popupSvg").style.display = "none";
+			getId("popup").innerHTML += `<button id="tryBtn">${i18n.__(
+				"Try again"
+			)}</button>`;
+			console.log("Failed to download yt-dlp");
 
-				getId("tryBtn").addEventListener("click", () => {
-					getId("popup").removeChild(getId("popup").lastChild);
-					downloadYtdlp();
-				});
+			getId("tryBtn").addEventListener("click", () => {
+				getId("popup").removeChild(getId("popup").lastChild);
+				downloadYtdlp();
 			});
-			downloadYtdlp();
+		});
+		downloadYtdlp();
 	} else {
 		console.log("yt-dlp binary is present in PATH");
 		ytDlp = ytdlpPath;
@@ -378,20 +382,22 @@ async function getInfo(url) {
 	});
 
 	infoProcess.stderr.on("data", (error) => {
-		validInfo = false;
-		// Error message handling
-		console.log(error.toString("utf8"));
-		getId("loadingWrapper").style.display = "none";
-		getId("incorrectMsg").textContent = i18n.__(
-			"Some error has occurred. Check your network and use correct URL"
-		);
-		getId("errorBtn").style.display = "inline-block";
-		getId("errorDetails").innerHTML = `
+		if (!error.toString().startsWith("WARNING")) {
+			validInfo = false;
+			// Error message handling
+			console.log(error.toString("utf8"));
+			getId("loadingWrapper").style.display = "none";
+			getId("incorrectMsg").textContent = i18n.__(
+				"Some error has occurred. Check your network and use correct URL"
+			);
+			getId("errorBtn").style.display = "inline-block";
+			getId("errorDetails").innerHTML = `
 		<strong>URL: ${url}</strong>
 		<br><br>
 		${error.toString("utf8")}
 		`;
-		getId("errorDetails").title = i18n.__("Click to copy");
+			getId("errorDetails").title = i18n.__("Click to copy");
+		}
 	});
 
 	infoProcess.on("close", () => {
@@ -1114,6 +1120,8 @@ function download(
 		// If video has no sound, audio needs to be downloaded
 		console.log("Downloading both video and audio");
 
+		const cleanFfmpegPathWin = path.join(__dirname, "..", "ffmpeg.exe");
+
 		const args = [
 			range1 || rangeOption,
 			range2 || rangeCmd,
@@ -1123,6 +1131,10 @@ function download(
 			`"${path.join(downloadDir, filename + `.${ext}`)}"`,
 			"--ffmpeg-location",
 			ffmpeg,
+			// Fix for windows media player
+			os.platform() == "win32" && audioFormat == "" && ext == "mp4"
+				? `--exec "\\"${cleanFfmpegPathWin}\\" -y -i {} -c copy -movflags +faststart -brand isom {}.fixed.mp4 && move /Y {}.fixed.mp4 {}"`
+				: "",
 			subs1 || subs,
 			subs2 || subLangs,
 			"--no-playlist",

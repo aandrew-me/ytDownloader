@@ -24,20 +24,15 @@
     <div class="prefBox" style="border: none;">
         <strong id="dlText">Download location</strong>
     </div>
-    <br>
-
 
     <div class="prefBox">
         <span id="clText">Current download location - </span><span id="path"></span>
     </div>
 
-    <br>
     <button id="selectLocation" class="greenBtn">Select Download Location</button>
 
     <p id="msg">
     </p>
-
-    <br>
 
     <!-- Language -->
     <div class="prefBox">
@@ -64,7 +59,6 @@
             <option value="bn">বাংলা</option>
         </select>
     </div>
-    <br>
 
     <!-- Video Quality -->
     <div class="prefBox">
@@ -81,7 +75,6 @@
         </select>
 
     </div>
-    <br>
 
     <!-- Video Codec -->
     <div class="prefBox">
@@ -95,7 +88,6 @@
 
     </div>
 
-    <br>
     <!-- Audio format -->
     <div class="prefBox">
         <span id="preferredAudioTxt">Preferred audio format</span>
@@ -128,13 +120,11 @@
             <option value="vivaldi">Vivaldi</option>
         </select>
     </div>
-    <br>
 
     <div class="prefBox">
         <span id="proxyTitle">Proxy</span>
         <input type="text" id="proxyTxt" placeholder="Example: http://localhost:8080" pattern="^(http:\/\/|https:\/\/|socks5:\/\/)?[a-zA-Z0-9.]+:[\d]+$">
     </div>
-    <br>
 
     <div id="pathConfig">
 
@@ -151,13 +141,11 @@
             <span id="configPath"></span>
         </div>
     </div>
-    <br>
 
     <div class="prefBox">
         <span id="showMoreFormatsTxt">Show more format options</span>
         <input type="checkbox" class="cb" id="showMoreFormats">
     </div>
-    <br>
 
     <div class="prefBox">
         <span id="fileFormatTxt">Filename format for playlists</span>
@@ -166,25 +154,24 @@
         <button class="redBtn" id="resetFilenameFormat">Reset to default</button>
     </div>
 
-    <br>
     <div class="prefBox">
         <span id="dirFormatTxt">Folder name format for playlists</span>
         <input type="text" id="foldernameFormat" value="%(playlist_title)s" placeholder="yt-dlp format style">
         <button class="redBtn" id="resetFoldernameFormat">Reset to default</button>
     </div>
 
-    <br>
+
     <div class="prefBox">
         <span id="maxTxt">Maximum number of active downloads</span>
         <input type="number" min="1" class="input" id="maxDownloads" value="5">
     </div>
 
-    <br>
+
     <div class="prefBox">
         <span id="trayTxt">Close to system tray</span>
         <input type="checkbox" class="cb" id="closeToTray">
     </div>
-    <br>
+    
     <div class="prefBox" id="autoUpdatesBox">
         <span id="autoUpdateTxt">Disable auto updates</span>
         <input type="checkbox" class="cb" id="autoUpdateDisabled">

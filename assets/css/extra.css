@@ -174,7 +174,7 @@ input[type="text"],
 #pathConfig {
 	display: flex;
 	justify-content: space-between;
-	margin: 0 15px;
+	margin: 15px 15px;
 	padding: 20px 15px;
 	border-radius: 15px;
 	background-color: var(--box-main);
@@ -186,6 +186,7 @@ input[type="text"],
 	cursor: pointer;
 	text-decoration: underline;
 	color: var(--blueBtn);
+	display: none;
 }
 
 .prefBox {
