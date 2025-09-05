@@ -236,9 +236,9 @@ body {
 	font-family: "Ubuntu";
 	color: white;
 	text-decoration: none;
-	padding: 5px;
+	padding: 8px;
 	cursor: pointer;
-	border-bottom: 1px solid #37384a;
+	border-bottom: 1px solid #303142;
 }
 .menuItem:active,
 .menuItem:link {
@@ -246,7 +246,6 @@ body {
 }
 
 #pasteUrl {
-	display: none;
 	margin-top: 15px;
 	font-weight: bold;
 }

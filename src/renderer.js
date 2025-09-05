@@ -1,6 +1,13 @@
 const cp = require("child_process");
 const os = require("os");
+const fs = require("fs");
+const path = require("path");
+const {shell, ipcRenderer, clipboard} = require("electron");
+const {default: YTDlpWrap} = require("yt-dlp-wrap-plus");
+const {constants} = require("fs/promises");
+
 let ffmpeg = "";
+
 if (os.platform() === "win32") {
 	ffmpeg = `"${__dirname}\\..\\ffmpeg.exe"`;
 } else if (os.platform() === "freebsd") {
@@ -18,15 +25,10 @@ if (os.platform() === "win32") {
 	ffmpeg = `"${__dirname}/../ffmpeg"`;
 }
 
-const fs = require("fs");
-const path = require("path");
-const {shell, ipcRenderer, clipboard} = require("electron");
-const {default: YTDlpWrap} = require("yt-dlp-wrap-plus");
-const {constants} = require("fs/promises");
-
 // Directories
 const homedir = os.homedir();
 let appdir = path.join(homedir, "Downloads");
+
 if (os.platform() === "linux") {
 	try {
 		const xdgDownloadDir = cp
@@ -37,7 +39,7 @@ if (os.platform() === "linux") {
 			appdir = xdgDownloadDir;
 			console.log("xdg download dir:", xdgDownloadDir);
 		}
-	} catch (err) {}
+	} catch (_err) {}
 }
 const hiddenDir = path.join(homedir, ".ytDownloader");
 const i18n = new (require("../translations/i18n"))();
@@ -46,18 +48,17 @@ fs.mkdir(hiddenDir, {recursive: true}, () => {});
 
 // System tray
 const trayEnabled = localStorage.getItem("closeToTray");
+
 if (trayEnabled == "true") {
 	console.log("Tray is Enabled");
 	ipcRenderer.send("useTray", true);
 }
-// Ignore Python warnings
-process.env.PYTHONWARNINGS = "error";
 
 // Download directory
 let downloadDir = "";
 
 // Global variables
-let title, onlyvideo, id, thumbnail, ytdlp, duration, extractor_key;
+let title, onlyVideo, thumbnail, ytdlp, duration, extractor_key;
 let audioExtensionList = [];
 let rangeCmd = "";
 let subs = "";
@@ -71,45 +72,43 @@ let configArg = "";
 let configTxt = "";
 let proxy = "";
 let downloadedItemList = [];
+let ytDlpIsPresent = false;
 
 if (localStorage.getItem("configPath")) {
 	configArg = "--config-location";
 	configTxt = `"${localStorage.getItem("configPath")}"`;
 }
 
-function checkMaxDownloads() {
-	if (localStorage.getItem("maxActiveDownloads")) {
-		const number = Number(localStorage.getItem("maxActiveDownloads"));
-		if (number < 1) {
-			maxActiveDownloads = 1;
-		} else {
-			maxActiveDownloads = number;
-		}
-	}
-}
 checkMaxDownloads();
 
 // Get system proxy
-getSystemProxy("https://www.google.com").then(proxyInfo => {
+getSystemProxy("https://www.google.com").then((proxyInfo) => {
 	if (proxyInfo != "DIRECT") {
 		try {
-			const proxyUrl = proxyInfo.split(" ")[1]
-			
-			proxy = proxyUrl
+			const proxyUrl = proxyInfo.split(" ")[1];
 
-			console.log("System proxy: " + proxy)
+			proxy = proxyUrl;
+
+			console.log("System proxy: " + proxy);
 		} catch (_) {}
 	}
-})
+});
 
-// Check for auto updates
+// Check for updates
 let autoUpdate = true;
-const autoUpdateStatus = localStorage.getItem("autoUpdate");
-if (autoUpdateStatus) {
-	if (autoUpdateStatus == "false") {
-		autoUpdate = false;
-	}
+
+if (localStorage.getItem("autoUpdate") == "false") {
+	autoUpdate = false;
 }
+
+if (process.windowsStore) {
+	autoUpdate = false;
+}
+
+if (process.env.YTDOWNLOADER_AUTO_UPDATES == "0") {
+	autoUpdate = false
+}
+
 ipcRenderer.send("autoUpdate", autoUpdate);
 
 let currentDownloads = 0;
@@ -123,33 +122,6 @@ let preferredVideoCodec = "avc1";
  *
  * @param {string} id
  */
-function getId(id) {
-	return document.getElementById(id);
-}
-
-function downloadPathSelection() {
-	let localPath = localStorage.getItem("downloadPath");
-
-	if (localPath) {
-		downloadDir = localPath;
-		try {
-			fs.accessSync(localPath, constants.W_OK);
-			downloadDir = localPath;
-		} catch (err) {
-			console.log(
-				"Unable to write to download directory. Switching to default one."
-			);
-			console.log(err);
-			downloadDir = appdir;
-			localStorage.setItem("downloadPath", appdir);
-		}
-	} else {
-		downloadDir = appdir;
-		localStorage.setItem("downloadPath", appdir);
-	}
-	getId("path").textContent = downloadDir;
-	fs.mkdir(downloadDir, {recursive: true}, () => {});
-}
 
 downloadPathSelection();
 
@@ -159,25 +131,29 @@ const possiblePaths = [
 ];
 
 // Checking for yt-dlp
-let ytDlp;
-let ytdlpPath = path.join(os.homedir(), ".ytDownloader", "ytdlp");
+let ytDlpPath = path.join(os.homedir(), ".ytDownloader", "ytdlp");
 
+// Macos yt-dlp check
 if (os.platform() === "darwin") {
-	ytdlpPath = possiblePaths.find((p) => fs.existsSync(p)) || null;
+	ytDlpPath = possiblePaths.find((p) => fs.existsSync(p)) || null;
 
-	if (ytdlpPath == null) {
+	if (ytDlpPath == null) {
 		showMacYtdlpPopup();
+	} else {
+		ytDlpIsPresent = true;
 	}
 }
 
 // Use system yt-dlp for freebsd
 if (os.platform() === "freebsd") {
 	try {
-		ytdlpPath = cp
+		ytDlpPath = cp
 			.execSync("which yt-dlp")
 			.toString("utf8")
 			.split("\n")[0]
 			.trim();
+
+		ytDlpIsPresent = true;
 	} catch (error) {
 		console.log(error);
 		getId("incorrectMsg").textContent = i18n.__(
@@ -186,112 +162,69 @@ if (os.platform() === "freebsd") {
 	}
 }
 
-// ytdlp download path
-let ytdlpDownloadPath;
-if (os.platform() == "win32") {
-	ytdlpDownloadPath = path.join(os.homedir(), ".ytDownloader", "ytdlp.exe");
-} else {
-	ytdlpDownloadPath = path.join(os.homedir(), ".ytDownloader", "ytdlp");
-}
+// Checking if yt-dlp bin is present
+if (
+	localStorage.getItem("ytdlp") &&
+	os.platform() != "darwin" &&
+	os.platform() != "freebsd"
+) {
+	const localStorageytDlpPath = localStorage.getItem("ytdlp");
 
-function showMacYtdlpPopup() {
-	getId("popupBoxMac").style.display = "block";
-}
-
-function hideMacYtdlpPopup() {
-	getId("popupBoxMac").style.display = "none";
-}
-
-// Downloading yt-dlp
-async function downloadYtdlp() {
-	document.querySelector("#popupBox p").textContent = i18n.__(
-		"Please wait, necessary files are being downloaded"
-	);
-	getId("popupSvg").style.display = "inline";
-
-	// Downloading appropriate version of yt-dlp
-	await YTDlpWrap.downloadFromGithub(ytdlpDownloadPath);
-	localStorage.setItem("fullYtdlpBinPresent", "true");
-
-	getId("popupBox").style.display = "none";
-	ytDlp = ytdlpPath;
-	ytdlp = new YTDlpWrap(`"${ytDlp}"`);
-	localStorage.setItem("ytdlp", ytDlp);
-	getId("pasteUrl").style.display = "inline-block";
-	console.log("yt-dlp bin Path: " + ytDlp);
-}
-
-// Checking if yt-dlp has been installed by user
-
-const fullYtdlpBinIsPresent = !!localStorage.getItem("fullYtdlpBinPresent");
-
-cp.exec(`"${ytdlpPath}" --version`, (error, _stdout, _stderr) => {
-	if (
-		(error || !fullYtdlpBinIsPresent) &&
-		os.platform() !== "freebsd" &&
-		os.platform() !== "darwin"
-	) {
-		getId("popupBox").style.display = "block";
-		process.on("uncaughtException", (reason, promise) => {
-			document.querySelector("#popupBox p").textContent = i18n.__(
-				"Failed to download necessary files. Please check your network and try again"
-			);
-			getId("popupSvg").style.display = "none";
-			getId("popup").innerHTML += `<button id="tryBtn">${i18n.__(
-				"Try again"
-			)}</button>`;
-			console.log("Failed to download yt-dlp");
-
-			getId("tryBtn").addEventListener("click", () => {
-				getId("popup").removeChild(getId("popup").lastChild);
-				downloadYtdlp();
-			});
-		});
-		downloadYtdlp();
-	} else {
+	if (fs.existsSync(localStorageytDlpPath)) {
 		console.log("yt-dlp binary is present in PATH");
-		ytDlp = ytdlpPath;
-		ytdlp = new YTDlpWrap(`"${ytDlp}"`);
-		localStorage.setItem("ytdlp", ytDlp);
-		cp.spawn(`${ytDlp}`, ["-U"]).stdout.on("data", (data) =>
+		ytdlp = new YTDlpWrap(`"${ytDlpPath}"`);
+
+		cp.spawn(`${ytDlpPath}`, ["-U"]).stdout.on("data", (data) =>
 			console.log(data.toString("utf8"))
 		);
-		getId("pasteUrl").style.display = "inline-block";
-		console.log("yt-dlp bin Path: " + ytDlp);
+
+		console.log("yt-dlp bin Path: " + ytDlpPath);
 
 		ipcRenderer.send("ready-for-links");
-	}
-});
 
-function defaultVideoToggle() {
-	let defaultWindow = "video";
-	if (localStorage.getItem("defaultWindow")) {
-		defaultWindow = localStorage.getItem("defaultWindow");
+		ytDlpIsPresent = true;
 	}
-	if (defaultWindow == "video") {
-		selectVideo();
+}
+
+// If path doesn't exist in localStorage
+if (!ytDlpIsPresent) {
+	// yt-dlp download path
+	let ytDlpDownloadPath;
+	if (os.platform() == "win32") {
+		ytDlpDownloadPath = path.join(
+			os.homedir(),
+			".ytDownloader",
+			"ytdlp.exe"
+		);
 	} else {
-		selectAudio();
+		ytDlpDownloadPath = path.join(os.homedir(), ".ytDownloader", "ytdlp");
 	}
-}
 
-// Pasting url from clipboard
+	cp.exec(`"${ytDlpPath}" --version`, (error, _stdout, _stderr) => {
+		if (
+			error &&
+			os.platform() !== "freebsd" &&
+			os.platform() !== "darwin"
+		) {
+			getId("popupBox").style.display = "block";
 
-function pasteUrl() {
-	defaultVideoToggle();
-	hideHidden();
-	getId("loadingWrapper").style.display = "flex";
-	getId("incorrectMsg").textContent = "";
-	const url = clipboard.readText();
-	getInfo(url);
-}
+			process.on("uncaughtException", (_reason, _promise) => {
+				handleYtDlpError();
+			});
 
-function pasteFromTray(url) {
-	defaultVideoToggle();
-	hideHidden();
-	getId("loadingWrapper").style.display = "flex";
-	getId("incorrectMsg").textContent = "";
-	getInfo(url);
+			downloadYtDlp(ytDlpDownloadPath);
+		} else {
+			console.log("yt-dlp binary is present in PATH");
+			ytdlp = new YTDlpWrap(`"${ytDlpPath}"`);
+			
+			cp.spawn(`${ytDlpPath}`, ["-U"]).stdout.on("data", (data) =>
+				console.log(data.toString("utf8"))
+			);
+			console.log("yt-dlp bin Path: " + ytDlpPath);
+
+			ipcRenderer.send("ready-for-links");
+		}
+	});
 }
 
 getId("closeHidden").addEventListener("click", () => {
@@ -321,35 +254,28 @@ getId("pasteUrl").addEventListener("click", () => {
 async function getInfo(url) {
 	audioExtensionList = [];
 	let selected = false;
-	onlyvideo = false;
+	onlyVideo = false;
 	let audioIsPresent = false;
 	downloadPathSelection();
-	// Cleaning text
-	getId("videoFormatSelect").innerHTML = "";
-	getId("audioFormatSelect").innerHTML = "";
-	getId(
-		"audioForVideoFormatSelect"
-	).innerHTML = `<option value="none|none">No Audio</option>`;
 
-	const startTime = getId("startTime");
-	startTime.value = "";
-	getId("endTime").value = "";
-	getId("errorBtn").style.display = "none";
-	getId("errorDetails").style.display = "none";
-	getId("errorDetails").textContent = "";
+	// Cleaning text
+	resetDomValues()
 
 	if (localStorage.getItem("preferredVideoQuality")) {
 		preferredVideoQuality = Number(
 			localStorage.getItem("preferredVideoQuality")
 		);
 	}
+
 	if (localStorage.getItem("preferredAudioQuality")) {
 		preferredAudioQuality = localStorage.getItem("preferredAudioQuality");
 		getId("extractSelection").value = preferredAudioQuality;
 	}
+
 	if (localStorage.getItem("preferredVideoCodec")) {
 		preferredVideoCodec = localStorage.getItem("preferredVideoCodec");
 	}
+
 	if (localStorage.getItem("showMoreFormats") === "true") {
 		showMoreFormats = true;
 	} else {
@@ -358,11 +284,11 @@ async function getInfo(url) {
 
 	proxy = getLocalStorageItem("proxy");
 
-
 	// Whether to use browser cookies or not
 	if (localStorage.getItem("browser")) {
 		browser = localStorage.getItem("browser");
 	}
+	
 	if (browser) {
 		cookieArg = "--cookies-from-browser";
 	} else {
@@ -387,7 +313,7 @@ async function getInfo(url) {
 		`"${url}"`,
 	].filter((item) => item);
 
-	const infoProcess = cp.spawn(`"${ytDlp}"`, infoOptions, {
+	const infoProcess = cp.spawn(`"${ytDlpPath}"`, infoOptions, {
 		shell: true,
 	});
 
@@ -424,7 +350,6 @@ async function getInfo(url) {
 			console.log(parsedInfo);
 
 			title = `${parsedInfo.title} [${parsedInfo.id}]`;
-			id = parsedInfo.id;
 			thumbnail = parsedInfo.thumbnail;
 			duration = parsedInfo.duration;
 			extractor_key = parsedInfo.extractor_key;
@@ -495,7 +420,7 @@ async function getInfo(url) {
 					(format.acodec !== "none" && format.video_ext === "none")
 				) {
 					audioIsPresent = true;
-					onlyvideo = true;
+					onlyVideo = true;
 					audioSize =
 						Number(format.filesize || format.filesize_approx) /
 						1000000;
@@ -1130,7 +1055,7 @@ function download(
 	console.log(rangeOption + " " + rangeCmd);
 	console.log(`-f ${format_id}${audioFormat}`);
 
-	if (type === "video" && onlyvideo) {
+	if (type === "video" && onlyVideo) {
 		// If video has no sound, audio needs to be downloaded
 		console.log("Downloading both video and audio");
 
@@ -1483,6 +1408,34 @@ function getLocalStorageItem(item) {
 	return localStorage.getItem(item) || "";
 }
 
+function getId(id) {
+	return document.getElementById(id);
+}
+
+function downloadPathSelection() {
+	let localPath = localStorage.getItem("downloadPath");
+
+	if (localPath) {
+		downloadDir = localPath;
+		try {
+			fs.accessSync(localPath, constants.W_OK);
+			downloadDir = localPath;
+		} catch (err) {
+			console.log(
+				"Unable to write to download directory. Switching to default one."
+			);
+			console.log(err);
+			downloadDir = appdir;
+			localStorage.setItem("downloadPath", appdir);
+		}
+	} else {
+		downloadDir = appdir;
+		localStorage.setItem("downloadPath", appdir);
+	}
+	getId("path").textContent = downloadDir;
+	fs.mkdir(downloadDir, {recursive: true}, () => {});
+}
+
 // Menu
 getId("preferenceWin").addEventListener("click", () => {
 	closeMenu();
@@ -1526,3 +1479,95 @@ ipcRenderer.on("downloadPath", (event, downloadPath) => {
 	getId("path").textContent = downloadPath[0];
 	downloadDir = downloadPath[0];
 });
+
+// Downloading yt-dlp
+async function downloadYtDlp(downloadPath) {
+	document.querySelector("#popupBox p").textContent = i18n.__(
+		"Please wait, necessary files are being downloaded"
+	);
+	getId("popupSvg").style.display = "inline";
+
+	// Downloading appropriate version of yt-dlp
+	await YTDlpWrap.downloadFromGithub(downloadPath);
+
+	getId("popupBox").style.display = "none";
+	ytdlp = new YTDlpWrap(`"${ytDlpPath}"`);
+	localStorage.setItem("ytdlp", ytDlpPath);
+	console.log("yt-dlp bin Path: " + ytDlpPath);
+}
+
+function checkMaxDownloads() {
+	if (localStorage.getItem("maxActiveDownloads")) {
+		const number = Number(localStorage.getItem("maxActiveDownloads"));
+		if (number < 1) {
+			maxActiveDownloads = 1;
+		} else {
+			maxActiveDownloads = number;
+		}
+	}
+}
+
+function defaultVideoToggle() {
+	let defaultWindow = "video";
+	if (localStorage.getItem("defaultWindow")) {
+		defaultWindow = localStorage.getItem("defaultWindow");
+	}
+	if (defaultWindow == "video") {
+		selectVideo();
+	} else {
+		selectAudio();
+	}
+}
+
+// Pasting url from clipboard
+function pasteUrl() {
+	defaultVideoToggle();
+	hideHidden();
+	getId("loadingWrapper").style.display = "flex";
+	getId("incorrectMsg").textContent = "";
+	const url = clipboard.readText();
+	getInfo(url);
+}
+
+function pasteFromTray(url) {
+	defaultVideoToggle();
+	hideHidden();
+	getId("loadingWrapper").style.display = "flex";
+	getId("incorrectMsg").textContent = "";
+	getInfo(url);
+}
+
+function showMacYtdlpPopup() {
+	getId("popupBoxMac").style.display = "block";
+}
+
+function handleYtDlpError() {
+	document.querySelector("#popupBox p").textContent = i18n.__(
+		"Failed to download necessary files. Please check your network and try again"
+	);
+	getId("popupSvg").style.display = "none";
+	getId("popup").innerHTML += `<button id="tryBtn">${i18n.__(
+		"Try again"
+	)}</button>`;
+
+	console.log("Failed to download yt-dlp");
+
+	getId("tryBtn").addEventListener("click", () => {
+		getId("popup").removeChild(getId("popup").lastChild);
+		downloadYtDlp();
+	});
+}
+
+
+function resetDomValues() {
+	getId("videoFormatSelect").innerHTML = "";
+	getId("audioFormatSelect").innerHTML = "";
+	getId(
+		"audioForVideoFormatSelect"
+	).innerHTML = `<option value="none|none">No Audio</option>`;
+	getId("startTime").value = "";
+	getId("endTime").value = "";
+	getId("errorBtn").style.display = "none";
+	getId("errorDetails").style.display = "none";
+	getId("errorDetails").textContent = "";
+}
