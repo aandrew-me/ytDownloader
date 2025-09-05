@@ -89,6 +89,19 @@ function checkMaxDownloads() {
 }
 checkMaxDownloads();
 
+// Get system proxy
+getSystemProxy("https://www.google.com").then(proxyInfo => {
+	if (proxyInfo != "DIRECT") {
+		try {
+			const proxyUrl = proxyInfo.split(" ")[1]
+			
+			proxy = proxyUrl
+
+			console.log("System proxy: " + proxy)
+		} catch (_) {}
+	}
+})
+
 // Check for auto updates
 let autoUpdate = true;
 const autoUpdateStatus = localStorage.getItem("autoUpdate");
@@ -344,6 +357,7 @@ async function getInfo(url) {
 	}
 
 	proxy = getLocalStorageItem("proxy");
+
 
 	// Whether to use browser cookies or not
 	if (localStorage.getItem("browser")) {
@@ -1406,6 +1420,11 @@ function afterSave(location, filename, progressId, thumbnail) {
 	getId(progressId).appendChild(fileSavedElement);
 
 	window.scrollTo(0, document.body.scrollHeight);
+}
+
+async function getSystemProxy(url) {
+	const proxy = await ipcRenderer.invoke("get-proxy", url);
+	return proxy;
 }
 
 function showItem(location, filename) {
