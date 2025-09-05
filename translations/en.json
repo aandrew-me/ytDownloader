@@ -127,5 +127,8 @@
 	"Select custom folder": "Select custom folder",
 	"Start Compression": "Start Compression",
 	"Cancel": "Cancel",
-	"Error! Click for details": "Error! Click for details"
+	"Error! Click for details": "Error! Click for details",
+	"You need to download yt-dlp from homebrew first": "You need to download yt-dlp from homebrew first",
+	"Open Homebrew":"Open Homebrew"
+
 }

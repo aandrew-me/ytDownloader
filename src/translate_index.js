@@ -60,4 +60,6 @@ getId("githubTxt").textContent = i18n.__("Github");
 getId("latteTxt").textContent = i18n.__("Latte");
 getId("solarizedDarkTxt").textContent = i18n.__("Solarized Dark");
 getId("clearBtn").textContent = i18n.__("Clear Downloads");
+getId("popupMacTxt").textContent = i18n.__("You need to download yt-dlp from homebrew first");
+getId("openHomebrew").textContent = i18n.__("Open Homebrew");
 
