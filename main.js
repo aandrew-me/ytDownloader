@@ -238,7 +238,9 @@ ipcMain.on("load-page", (event, file) => {
 	secondaryWindow.loadFile(file);
 	secondaryWindow.setMenu(null);
 	// secondaryWindow.maximize();
+	// secondaryWindow.webContents.openDevTools()
 	secondaryWindow.show();
+	
 });
 
 ipcMain.on("close-secondary", () => {
