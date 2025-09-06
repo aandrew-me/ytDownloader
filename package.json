@@ -1,6 +1,6 @@
 {
 	"dependencies": {
-		"electron-updater": "^6.3.9",
+		"electron-updater": "^6.6.2",
 		"systeminformation": "^5.25.11",
 		"yt-dlp-wrap-plus": "^2.3.20"
 	},
@@ -34,8 +34,8 @@
 	"license": "GPL-3.0",
 	"description": "Download videos and audios from YouTube and many other sites",
 	"devDependencies": {
-		"electron": "^30.5.1",
-		"electron-builder": "^25.1.8",
+		"electron": "^30.0.0",
+		"electron-builder": "^26.0.12",
 		"typescript": "^5.3.3"
 	},
 	"build": {
@@ -52,6 +52,7 @@
 			"./assets/**/*",
 			"./src/*.js",
 			"ffmpeg*",
+			"!ffmpeg.patch",
 			"translations"
 		],
 		"electronLanguages": [
