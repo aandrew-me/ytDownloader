@@ -54,6 +54,9 @@
 			"ffmpeg*",
 			"translations"
 		],
+		"electronLanguages": [
+			"en-US"
+		],
 		"mac": {
 			"category": "Utility",
 			"target": [
