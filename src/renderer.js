@@ -128,7 +128,7 @@ if (os.platform() === "darwin") {
 		showMacYtdlpPopup();
 	} else {
 		ytDlpIsPresent = true;
-		setLocalStorageYtDlp(ytDlpPath)
+		setLocalStorageYtDlp(ytDlpPath);
 	}
 }
 
@@ -142,11 +142,11 @@ if (os.platform() === "freebsd") {
 			.trim();
 
 		ytDlpIsPresent = true;
-		setLocalStorageYtDlp(ytDlpPath)
+		setLocalStorageYtDlp(ytDlpPath);
 	} catch (error) {
 		console.log(error);
 
-		hidePasteBtn()
+		hidePasteBtn();
 
 		getId("incorrectMsg").textContent = i18n.__(
 			"No yt-dlp found in PATH. Make sure you have the full executable. App will not work"
@@ -163,9 +163,9 @@ if (process.env.YTDOWNLOADER_YTDLP_PATH) {
 
 		ytDlp = new YTDlpWrap(`"${ytDlpPath}"`);
 		ytDlpIsPresent = true;
-		setLocalStorageYtDlp(ytDlpPath)
+		setLocalStorageYtDlp(ytDlpPath);
 	} else {
-		hidePasteBtn()
+		hidePasteBtn();
 
 		getId("incorrectMsg").textContent = i18n.__(
 			"You have specified YTDOWNLOADER_YTDLP_PATH, but no file exists there."
@@ -183,9 +183,8 @@ if (
 	const localStorageytDlpPath = localStorage.getItem("ytdlp");
 
 	if (fs.existsSync(localStorageytDlpPath)) {
-		
-		logYtDlpPresent(ytDlpPath)
-		
+		logYtDlpPresent(ytDlpPath);
+
 		ytDlp = new YTDlpWrap(`"${ytDlpPath}"`);
 
 		cp.spawn(`${ytDlpPath}`, ["-U"]).stdout.on("data", (data) =>
@@ -195,10 +194,9 @@ if (
 		ipcRenderer.send("ready-for-links");
 
 		ytDlpIsPresent = true;
-		setLocalStorageYtDlp(ytDlpPath)
+		setLocalStorageYtDlp(ytDlpPath);
 	}
 }
-
 
 if (
 	!ytDlpIsPresent &&
@@ -228,16 +226,16 @@ if (
 
 			downloadYtDlp(ytDlpDownloadPath);
 		} else {
-			logYtDlpPresent(ytDlpPath)
-			
+			logYtDlpPresent(ytDlpPath);
+
 			ytDlp = new YTDlpWrap(`"${ytDlpPath}"`);
 
 			cp.spawn(`${ytDlpPath}`, ["-U"]).stdout.on("data", (data) =>
 				console.log(data.toString("utf8"))
 			);
-			
+
 			ipcRenderer.send("ready-for-links");
-			setLocalStorageYtDlp(ytDlpPath)
+			setLocalStorageYtDlp(ytDlpPath);
 		}
 	});
 }
@@ -254,20 +252,18 @@ if (os.platform() === "win32") {
 			.trim();
 	} catch (error) {
 		console.log(error);
-		
-		getId("incorrectMsg").textContent = i18n.__(
-			"No ffmpeg found in PATH"
-		);
+
+		getId("incorrectMsg").textContent = i18n.__("No ffmpeg found in PATH");
 	}
 } else {
 	ffmpeg = `"${__dirname}/../ffmpeg"`;
 }
 
 if (process.env.YTDOWNLOADER_FFMPEG_PATH) {
-	ffmpeg = `"${process.env.YTDOWNLOADER_FFMPEG_PATH}"`
+	ffmpeg = `"${process.env.YTDOWNLOADER_FFMPEG_PATH}"`;
 
 	if (fs.existsSync(process.env.YTDOWNLOADER_FFMPEG_PATH)) {
-		console.log("Using YTDOWNLOADER_FFMPEG_PATH")
+		console.log("Using YTDOWNLOADER_FFMPEG_PATH");
 	} else {
 		getId("incorrectMsg").textContent = i18n.__(
 			"You have specified YTDOWNLOADER_FFMPEG_PATH, but no file exists there."
@@ -275,8 +271,7 @@ if (process.env.YTDOWNLOADER_FFMPEG_PATH) {
 	}
 }
 
-console.log(ffmpeg)
-
+console.log(ffmpeg);
 
 getId("closeHidden").addEventListener("click", () => {
 	hideHidden();
@@ -425,9 +420,22 @@ async function getInfo(url) {
 			getId("hidden").style.display = "inline-block";
 			getId("hidden").classList.add("scaleUp");
 
-			getId("title").innerHTML =
-				`<b>${i18n.__("Title ")}</b>: ` +
-				`<input class="title" id="titleName" type="text" value="${title}" onchange="renameTitle()">`;
+			const titleElement = getId("title");
+			titleElement.textContent = "";
+
+			titleElement.append(
+				Object.assign(document.createElement("b"), {
+					textContent: i18n.__("Title "),
+				}),
+				": ",
+				Object.assign(document.createElement("input"), {
+					className: "title",
+					id: "titleName",
+					type: "text",
+					value: title,
+					onchange: renameTitle,
+				})
+			);
 
 			let audioSize = 0;
 			let defaultVideoFormat = 144;
@@ -1627,11 +1635,10 @@ function logYtDlpPresent(ytDlpPath) {
 	console.log(ytDlpPath);
 }
 
-
 function hidePasteBtn() {
-	getId("pasteUrl").style.display = "none"
+	getId("pasteUrl").style.display = "none";
 }
 
 function setLocalStorageYtDlp(ytDlpPath) {
-	localStorage.setItem("ytdlp", ytDlpPath)
+	localStorage.setItem("ytdlp", ytDlpPath);
 }
