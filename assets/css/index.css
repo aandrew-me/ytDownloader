@@ -153,7 +153,13 @@ body {
 	color: var(--text);
 	transition: 0.4s;
 	font-size: large;
+	user-select: none
 }
+
+img {
+  -webkit-user-drag: none;
+}
+
 #popupBox,
 #popupBoxMac {
 	width: 100vw;
