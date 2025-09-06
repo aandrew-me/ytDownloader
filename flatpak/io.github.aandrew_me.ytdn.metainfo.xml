@@ -43,6 +43,13 @@
   <content_rating type="oars-1.1" />
 
   <releases>
+    <release version="3.19.2" date="2025-09-06">
+      <description>
+        <p>Improved app performance</p>
+        <p>UI improvements</p>
+        <p>Fixed minor bugs</p>
+      </description>
+    </release>
     <release version="3.19.1" date="2025-05-20">
       <description>
         <p>Added support for chapters</p>
