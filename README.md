@@ -105,18 +105,17 @@ Flatpak is recommended. For arm processors, download from flathub.
 
 ## macOS 🍎
 
-Since the app is not signed, when you will try to open the app, macOS will not allow you to open it. So you will need to follow some steps to open it.
+Since the app is not signed, when you will try to open the app, macOS will not allow you to open it. 
 
-1. Click on **System Preferences** on your Mac Dock.
-2. Choose **Security & Privacy**
-3. The app will be shown there. Click on **Open**
-
-On macOs 14.5 Sonoma you need to open terminal and add it by hand:
+You need to open terminal and execute:
 ```
 sudo xattr -r -d com.apple.quarantine /Applications/YTDownloader.app 
 ```
 
-You will also need to have Python 3.8 or greater installed
+You will also need to install `yt-dlp` with [homebrew](https://brew.sh/)
+```
+brew install yt-dlp
+```
 
 ## Internationalization (Localization) 🌍
 
