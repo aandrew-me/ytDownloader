@@ -4,22 +4,26 @@ const path = require("path");
 const os = require("os");
 const fs = require("fs");
 const {execSync} = require("child_process");
-const { constants } = require("fs/promises");
+const {constants} = require("fs/promises");
 let url;
 const ytDlp = localStorage.getItem("ytdlp");
+console.log(`yt-dlp: ${ytDlp}`)
 const ytdlp = new YTDlpWrap(`"${ytDlp}"`);
 const downloadsDir = path.join(os.homedir(), "Downloads");
 let downloadDir = localStorage.getItem("downloadPath") || downloadsDir;
+
 try {
-	console.log("Trying to access", downloadDir)
 	fs.accessSync(downloadDir, constants.W_OK);
 	downloadDir = downloadDir;
 } catch (err) {
-	console.log("Unable to write to download directory. Switching to default one.")
-	console.log("Err:", err)
+	console.log(
+		"Unable to write to download directory. Switching to default one."
+	);
+	console.log("Err:", err);
 	downloadDir = downloadsDir;
 	localStorage.setItem("downloadPath", downloadsDir);
 }
+
 getId("path").textContent = downloadDir;
 const i18n = new (require("../translations/i18n"))();
 let cookieArg = "";
@@ -38,34 +42,41 @@ const formats = {
 let originalCount = 0;
 let ffmpeg;
 let ffmpegPath;
+
 if (os.platform() === "win32") {
-	ffmpeg = `"${__dirname}\\..\\ffmpeg.exe"`;
 	ffmpegPath = `${__dirname}\\..\\ffmpeg.exe`;
+} else if (os.platform() === "freebsd") {
+	try {
+		ffmpegPath = execSync("which ffmpeg")
+			.toString("utf8")
+			.split("\n")[0]
+			.trim();
+	} catch (error) {
+		console.log(error);
+	}
 } else {
-	ffmpeg = `"${__dirname}/../ffmpeg"`;
 	ffmpegPath = `${__dirname}/../ffmpeg`;
 }
 
-if (!fs.existsSync(ffmpegPath)) {
-	try {
-		if (os.platform() === "win32") {
-			ffmpeg = execSync("where ffmpeg.exe", {encoding: "utf8"});
-			console.log({ffmpeg})
-			ffmpeg = `"${ffmpeg.trimEnd()}"`;
-		} else {
-			ffmpeg = execSync("which ffmpeg", {encoding: "utf8"});
-			ffmpeg = `"${ffmpeg.trimEnd()}"`;
-		}
-	} catch (error) {
-		ffmpeg = `""`
-		console.log(error);
+if (process.env.YTDOWNLOADER_FFMPEG_PATH) {
+	ffmpegPath = `${process.env.YTDOWNLOADER_FFMPEG_PATH}`;
+
+	if (fs.existsSync(process.env.YTDOWNLOADER_FFMPEG_PATH)) {
+		console.log("Using YTDOWNLOADER_FFMPEG_PATH");
+	} else {
+		console.error("No ffmpeg found in " + ffmpeg);
 	}
 }
+
+ffmpeg = `"${ffmpegPath}"`
+
 console.log("ffmpeg:", ffmpeg);
+
+
 
 if (localStorage.getItem("preferredVideoQuality")) {
 	const preferredVideoQuality = localStorage.getItem("preferredVideoQuality");
-	getId('select').value = preferredVideoQuality
+	getId("select").value = preferredVideoQuality;
 }
 if (localStorage.getItem("preferredAudioQuality")) {
 	const preferredAudioQuality = localStorage.getItem("preferredAudioQuality");
@@ -76,11 +87,11 @@ let foldernameFormat = "%(playlist_title)s";
 let filenameFormat = "%(playlist_index)s.%(title)s.%(ext)s";
 let playlistIndex = 1;
 let playlistEnd = "";
-let proxy = ""
+let proxy = "";
 
 /**
- * 
- * @param {string} id 
+ *
+ * @param {string} id
  * @returns {any}
  */
 function getId(id) {
@@ -111,7 +122,7 @@ const videoIndex = "Downloading item ";
 const oldVideoIndex = "Downloading video ";
 
 /**
- * @param {string} type 
+ * @param {string} type
  */
 function download(type) {
 	// Config file
@@ -122,7 +133,7 @@ function download(type) {
 		configTxt = `"${localStorage.getItem("configPath")}"`;
 	}
 	proxy = localStorage.getItem("proxy") || "";
-	console.log("Proxy:", proxy)
+	console.log("Proxy:", proxy);
 
 	nameFormatting();
 	originalCount = 0;
@@ -147,7 +158,7 @@ function download(type) {
 	if (getId("subChecked").checked) {
 		subs = "--write-subs";
 		subLangs = "--sub-langs all";
-		console.log("Downloading with subtitles")
+		console.log("Downloading with subtitles");
 	} else {
 		subs = "";
 		subLangs = "";
@@ -201,14 +212,18 @@ function download(type) {
 			"--embed-metadata",
 			subs,
 			subLangs,
-			videoType == "mp4" && (url.includes("youtube.com/") || url.includes("youtu.be/")) && os.platform() !== "darwin" ? "--embed-thumbnail" : "",
+			videoType == "mp4" &&
+			(url.includes("youtube.com/") || url.includes("youtu.be/")) &&
+			os.platform() !== "darwin"
+				? "--embed-thumbnail"
+				: "",
 			proxy ? "--no-check-certificate" : "",
 			proxy ? "--proxy" : "",
 			proxy,
 			"--compat-options",
 			"no-youtube-unavailable-videos",
 			`"${url}"`,
-		].filter(item => item);
+		].filter((item) => item);
 
 		downloadProcess = ytdlp.exec(
 			args,
@@ -222,7 +237,7 @@ function download(type) {
 			format === "m4a" &&
 			audioQuality === "auto"
 		) {
-			console.log("Downloading m4a without extracting")
+			console.log("Downloading m4a without extracting");
 
 			const args = [
 				"--yes-playlist",
@@ -230,11 +245,7 @@ function download(type) {
 				"-f",
 				`ba[ext=${format}]/ba`,
 				"-o",
-				`"${path.join(
-					downloadDir,
-					foldernameFormat,
-					filenameFormat
-				)}"`,
+				`"${path.join(downloadDir, foldernameFormat, filenameFormat)}"`,
 				"-I",
 				`"${playlistIndex}:${playlistEnd}"`,
 				"--ffmpeg-location",
@@ -253,7 +264,7 @@ function download(type) {
 				"--compat-options",
 				"no-youtube-unavailable-videos",
 				`"${url}"`,
-			].filter(item => item);
+			].filter((item) => item);
 
 			downloadProcess = ytdlp.exec(
 				args,
@@ -261,7 +272,7 @@ function download(type) {
 				controller.signal
 			);
 		} else {
-			console.log("Extracting audio")
+			console.log("Extracting audio");
 
 			const args = [
 				"--yes-playlist",
@@ -272,11 +283,7 @@ function download(type) {
 				"--audio-quality",
 				audioQuality,
 				"-o",
-				`"${path.join(
-					downloadDir,
-					foldernameFormat,
-					filenameFormat
-				)}"`,
+				`"${path.join(downloadDir, foldernameFormat, filenameFormat)}"`,
 				"-I",
 				`"${playlistIndex}:${playlistEnd}"`,
 				"--ffmpeg-location",
@@ -288,14 +295,20 @@ function download(type) {
 				"--embed-metadata",
 				subs,
 				subLangs,
-				format === "mp3" || format === "m4a" && (url.includes("youtube.com/") || url.includes("youtu.be/")) && os.platform() !== "darwin" ? "--embed-thumbnail" : "",
+				format === "mp3" ||
+				(format === "m4a" &&
+					(url.includes("youtube.com/") ||
+						url.includes("youtu.be/")) &&
+					os.platform() !== "darwin")
+					? "--embed-thumbnail"
+					: "",
 				proxy ? "--no-check-certificate" : "",
 				proxy ? "--proxy" : "",
 				proxy,
 				"--compat-options",
 				"no-youtube-unavailable-videos",
 				`"${url}"`,
-			].filter(item => item);
+			].filter((item) => item);
 
 			downloadProcess = ytdlp.exec(
 				args,
@@ -305,7 +318,6 @@ function download(type) {
 		}
 	}
 
-	
 	// getId("finishBtn").addEventListener("click", () => {
 	// 	controller.abort("user_finished")
 	// 	try {
@@ -411,7 +423,7 @@ function showErrorTxt(error) {
 	getId("incorrectMsgPlaylist").textContent = i18n.__(
 		"Some error has occurred. Check your network and use correct URL"
 	);
-	getId("incorrectMsgPlaylist").style.display = "block"
+	getId("incorrectMsgPlaylist").style.display = "block";
 	getId("incorrectMsgPlaylist").title = error;
 	getId("errorBtn").style.display = "inline-block";
 	getId("errorDetails").innerHTML = `
@@ -439,8 +451,8 @@ function hideOptions(justHide = false) {
 	getId("errorBtn").style.display = "none";
 	getId("errorDetails").style.display = "none";
 	getId("errorDetails").textContent = "";
-	getId("incorrectMsgPlaylist").style.display = "none"
-	if (!justHide){
+	getId("incorrectMsgPlaylist").style.display = "none";
+	if (!justHide) {
 		getId("playlistName").textContent = i18n.__("Processing") + "...";
 		getId("pasteLink").style.display = "none";
 		getId("openDownloads").style.display = "inline-block";
@@ -474,12 +486,9 @@ function downloadThumbnails() {
 		"--compat-options",
 		"no-youtube-unavailable-videos",
 		`"${url}"`,
-	].filter(item => item);
+	].filter((item) => item);
 
-	const downloadProcess = ytdlp.exec(
-		args,
-		{shell: true, detached: false}
-	);
+	const downloadProcess = ytdlp.exec(args, {shell: true, detached: false});
 
 	// console.log(downloadProcess.ytDlpProcess.spawnargs[2])
 
@@ -552,12 +561,9 @@ function saveLinks() {
 		"--compat-options",
 		"no-youtube-unavailable-videos",
 		`"${url}"`,
-	].filter(item => item);
-	
-	const downloadProcess = ytdlp.exec(
-		args,
-		{shell: true, detached: false}
-	);
+	].filter((item) => item);
+
+	const downloadProcess = ytdlp.exec(args, {shell: true, detached: false});
 
 	downloadProcess.on("ytDlpEvent", (eventType, eventData) => {
 		// console.log(eventData);
@@ -762,13 +768,13 @@ getId("githubTxt").textContent = i18n.__("Github");
 getId("latteTxt").textContent = i18n.__("Latte");
 getId("solarizedDarkTxt").textContent = i18n.__("Solarized Dark");
 
-getId("audioQualitySelectTxt").textContent = i18n.__("Select Quality")
-getId("audioQualityAuto").textContent = i18n.__("Auto")
-getId("audioQualityNormal").textContent = i18n.__("Normal")
-getId("audioQualityBest").textContent = i18n.__("Best")
-getId("audioQualityGood").textContent = i18n.__("Good")
-getId("audioQualityBad").textContent = i18n.__("Bad")
-getId("audioQualityWorst").textContent = i18n.__("Worst")
+getId("audioQualitySelectTxt").textContent = i18n.__("Select Quality");
+getId("audioQualityAuto").textContent = i18n.__("Auto");
+getId("audioQualityNormal").textContent = i18n.__("Normal");
+getId("audioQualityBest").textContent = i18n.__("Best");
+getId("audioQualityGood").textContent = i18n.__("Good");
+getId("audioQualityBad").textContent = i18n.__("Bad");
+getId("audioQualityWorst").textContent = i18n.__("Worst");
 
 getId("subHeader").textContent = i18n.__("Subtitles");
 getId("subTxt").textContent = i18n.__("Download subtitles if available");

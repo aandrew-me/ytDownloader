@@ -1,8 +1,9 @@
-const {exec} = require("child_process");
+const {exec, execSync} = require("child_process");
 const path = require("path");
 const {ipcRenderer, shell} = require("electron");
 const os = require("os");
-const si = require("systeminformation")
+const si = require("systeminformation");
+const { existsSync } = require("fs");
 
 let menuIsOpen = false;
 
@@ -33,68 +34,85 @@ getId("menuIcon").addEventListener("click", () => {
 	}
 });
 
-
 let ffmpeg;
+// Ffmpeg check
 if (os.platform() === "win32") {
 	ffmpeg = `"${__dirname}\\..\\ffmpeg.exe"`;
 } else if (os.platform() === "freebsd") {
 	try {
-		ffmpeg = cp.execSync("which ffmpeg").toString("utf8").split("\n")[0].trim();
+		ffmpeg = execSync("which ffmpeg")
+			.toString("utf8")
+			.split("\n")[0]
+			.trim();
 	} catch (error) {
-		console.log(error)
-		showPopup("No ffmpeg found in PATH.");
+		showPopup("No ffmpeg found in PATH")
 	}
-}
- else {
+} else {
 	ffmpeg = `"${__dirname}/../ffmpeg"`;
 }
 
-const vaapi_device = "/dev/dri/renderD128"
+if (process.env.YTDOWNLOADER_FFMPEG_PATH) {
+	ffmpeg = `"${process.env.YTDOWNLOADER_FFMPEG_PATH}"`;
+
+	if (existsSync(process.env.YTDOWNLOADER_FFMPEG_PATH)) {
+		console.log("Using YTDOWNLOADER_FFMPEG_PATH");
+	} else {
+		showPopup("You have specified YTDOWNLOADER_FFMPEG_PATH, but no file exists there.")
+	}
+}
+
+console.log(ffmpeg);
+
+const vaapi_device = "/dev/dri/renderD128";
 
 // Checking GPU
 si.graphics().then((info) => {
-    console.log({gpuInfo: info})
+	console.log({gpuInfo: info});
 	const gpuDevices = info.controllers;
 
-    gpuDevices.forEach((gpu) => {
-        // NVIDIA
-        const gpuName = gpu.vendor.toLowerCase()
-        const gpuModel = gpu.model.toLowerCase()
+	gpuDevices.forEach((gpu) => {
+		// NVIDIA
+		const gpuName = gpu.vendor.toLowerCase();
+		const gpuModel = gpu.model.toLowerCase();
 
-        if (gpuName.includes("nvidia") || gpuModel.includes("nvidia")) {
-            document.querySelectorAll(".nvidia_opt").forEach((opt) => {
-                opt.style.display = "block"
-            })
-        }  else if (gpuName.includes("advanced micro devices") || gpuModel.includes("amd")) {
-            if (os.platform() == "win32") {
-                document.querySelectorAll(".amf_opt").forEach((opt) => {
-                    opt.style.display = "block"
-
-                })
-            } else {
-                document.querySelectorAll(".vaapi_opt").forEach((opt) => {
-                    opt.style.display = "block"
-                })
-            }
-        } else if (gpuName.includes("intel")) {
-            if (os.platform() == "win32") {
-                document.querySelectorAll(".qsv_opt").forEach((opt) => {
-                    opt.style.display = "block"
-                })
-            } else if (os.platform() != "darwin") {
-                document.querySelectorAll(".vaapi_opt").forEach((opt) => {
-                    opt.style.display = "block"
-                })
-            }
-        } else {
-            if (os.platform() == "darwin") {
-                document.querySelectorAll(".videotoolbox_opt").forEach((opt) => {
-                    opt.style.display = "block"
-                })
-            }
-        }
-    })
-})
+		if (gpuName.includes("nvidia") || gpuModel.includes("nvidia")) {
+			document.querySelectorAll(".nvidia_opt").forEach((opt) => {
+				opt.style.display = "block";
+			});
+		} else if (
+			gpuName.includes("advanced micro devices") ||
+			gpuModel.includes("amd")
+		) {
+			if (os.platform() == "win32") {
+				document.querySelectorAll(".amf_opt").forEach((opt) => {
+					opt.style.display = "block";
+				});
+			} else {
+				document.querySelectorAll(".vaapi_opt").forEach((opt) => {
+					opt.style.display = "block";
+				});
+			}
+		} else if (gpuName.includes("intel")) {
+			if (os.platform() == "win32") {
+				document.querySelectorAll(".qsv_opt").forEach((opt) => {
+					opt.style.display = "block";
+				});
+			} else if (os.platform() != "darwin") {
+				document.querySelectorAll(".vaapi_opt").forEach((opt) => {
+					opt.style.display = "block";
+				});
+			}
+		} else {
+			if (os.platform() == "darwin") {
+				document
+					.querySelectorAll(".videotoolbox_opt")
+					.forEach((opt) => {
+						opt.style.display = "block";
+					});
+			}
+		}
+	});
+});
 
 /** @type {File[]} */
 let files = [];
@@ -127,7 +145,7 @@ dropZone.addEventListener("drop", (e) => {
 	e.preventDefault();
 	dropZone.classList.remove("dragover");
 	// @ts-ignore
-	console.log(e.dataTransfer)
+	console.log(e.dataTransfer);
 	files = Array.from(e.dataTransfer.files);
 	updateSelectedFiles();
 });
@@ -139,8 +157,8 @@ fileInput.addEventListener("change", (e) => {
 });
 
 getId("custom-folder-select").addEventListener("click", (e) => {
-	ipcRenderer.send("get-directory", "")
-})
+	ipcRenderer.send("get-directory", "");
+});
 
 function updateSelectedFiles() {
 	const fileList = files
@@ -158,7 +176,6 @@ async function startCompression() {
 
 	const settings = getEncoderSettings();
 
-
 	for (const file of files) {
 		const itemId =
 			"f" + Math.random().toFixed(10).toString().slice(2).toString();
@@ -173,30 +190,30 @@ async function startCompression() {
 				isCancelled = false;
 			} else {
 				updateProgress("success", "", itemId);
-				const fileSavedElement = document.createElement("b")
-				fileSavedElement.textContent = "File saved. Click to open"
+				const fileSavedElement = document.createElement("b");
+				fileSavedElement.textContent = "File saved. Click to open";
 				fileSavedElement.onclick = () => {
-					shell.showItemInFolder(outputPath)
-				}
-				getId(itemId + "_prog").appendChild(fileSavedElement)
-				currentItemId = ""
+					shell.showItemInFolder(outputPath);
+				};
+				getId(itemId + "_prog").appendChild(fileSavedElement);
+				currentItemId = "";
 			}
 		} catch (error) {
-			const errorElement = document.createElement("div")
+			const errorElement = document.createElement("div");
 			errorElement.onclick = () => {
-				ipcRenderer.send("error_dialog", error.message)
-			}
-			errorElement.textContent = "Error. Click for details"
+				ipcRenderer.send("error_dialog", error.message);
+			};
+			errorElement.textContent = "Error. Click for details";
 			updateProgress("error", "", itemId);
-			getId(itemId + "_prog").appendChild(errorElement)
-            currentItemId = ""
+			getId(itemId + "_prog").appendChild(errorElement);
+			currentItemId = "";
 		}
 	}
 }
 
 function cancelCompression() {
 	activeProcesses.forEach((child) => {
-		child.stdin.write("q")
+		child.stdin.write("q");
 		isCancelled = true;
 	});
 	activeProcesses.clear();
@@ -207,18 +224,23 @@ function cancelCompression() {
  * @param {File} file
  */
 function generateOutputPath(file, settings) {
-	console.log({settings})
-    const output_extension = settings.extension
-    const parsed_file = path.parse(file.path)
+	console.log({settings});
+	const output_extension = settings.extension;
+	const parsed_file = path.parse(file.path);
 
-	let outputDir = settings.outputPath || parsed_file.dir
+	let outputDir = settings.outputPath || parsed_file.dir;
 
+	if (output_extension == "unchanged") {
+		return path.join(
+			outputDir,
+			`${parsed_file.name}${settings.outputSuffix}${parsed_file.ext}`
+		);
+	}
 
-    if (output_extension == "unchanged") {
-        return path.join(outputDir, `${parsed_file.name}${settings.outputSuffix}${parsed_file.ext}`);
-    }
-
-    return path.join(outputDir, `${parsed_file.name}_compressed.${output_extension}`);
+	return path.join(
+		outputDir,
+		`${parsed_file.name}_compressed.${output_extension}`
+	);
 }
 
 /**
@@ -230,7 +252,7 @@ function generateOutputPath(file, settings) {
 async function compressVideo(file, settings, itemId, outputPath) {
 	const command = buildFFmpegCommand(file, settings, outputPath);
 
-	console.log("Command: " + command)
+	console.log("Command: " + command);
 
 	return new Promise((resolve, reject) => {
 		const child = exec(command, (error) => {
@@ -240,7 +262,7 @@ async function compressVideo(file, settings, itemId, outputPath) {
 
 		activeProcesses.add(child);
 		child.on("exit", (_code) => {
-			activeProcesses.delete(child)
+			activeProcesses.delete(child);
 		});
 
 		let video_info = {
@@ -296,9 +318,9 @@ async function compressVideo(file, settings, itemId, outputPath) {
  * @param {string} outputPath
  */
 function buildFFmpegCommand(file, settings, outputPath) {
-    const inputPath = file.path;
+	const inputPath = file.path;
 
-    console.log("Output path: " + outputPath)
+	console.log("Output path: " + outputPath);
 
 	const args = ["-hide_banner", "-y", "-stats", "-i", `"${inputPath}"`];
 
@@ -312,7 +334,8 @@ function buildFFmpegCommand(file, settings, outputPath) {
 				"libx264",
 				"-preset",
 				settings.speed,
-				"-vf", "format=yuv420p",
+				"-vf",
+				"format=yuv420p",
 				"-crf",
 				parseInt(settings.videoQuality).toString()
 			);
@@ -321,7 +344,8 @@ function buildFFmpegCommand(file, settings, outputPath) {
 			args.push(
 				"-c:v",
 				"libx265",
-				"-vf", "format=yuv420p",
+				"-vf",
+				"format=yuv420p",
 				"-preset",
 				settings.speed,
 				"-crf",
@@ -333,7 +357,8 @@ function buildFFmpegCommand(file, settings, outputPath) {
 			args.push(
 				"-c:v",
 				"h264_qsv",
-				"-vf", "format=yuv420p",
+				"-vf",
+				"format=yuv420p",
 				"-preset",
 				settings.speed,
 				"-global_quality",
@@ -353,24 +378,25 @@ function buildFFmpegCommand(file, settings, outputPath) {
 				parseInt(settings.videoQuality).toString()
 			);
 			break;
-        case "hevc_vaapi":
-            args.push(
-                "-vaapi_device",
-                vaapi_device,
-                "-vf",
-                "format=nv12,hwupload",
-                "-c:v",
-                "hevc_vaapi",
-                "-qp",
-                parseInt(settings.videoQuality).toString()
-            );
-            break;
+		case "hevc_vaapi":
+			args.push(
+				"-vaapi_device",
+				vaapi_device,
+				"-vf",
+				"format=nv12,hwupload",
+				"-c:v",
+				"hevc_vaapi",
+				"-qp",
+				parseInt(settings.videoQuality).toString()
+			);
+			break;
 		// Nvidia windows and linux
 		case "nvenc":
 			args.push(
 				"-c:v",
 				"h264_nvenc",
-				"-vf", "format=yuv420p",
+				"-vf",
+				"format=yuv420p",
 				"-preset",
 				getNvencPreset(settings.speed),
 				"-rc",
@@ -392,7 +418,8 @@ function buildFFmpegCommand(file, settings, outputPath) {
 			args.push(
 				"-c:v",
 				"hevc_amf",
-				"-vf", "format=yuv420p",
+				"-vf",
+				"format=yuv420p",
 				"-quality",
 				amf_hevc_quality,
 				"-rc",
@@ -400,7 +427,7 @@ function buildFFmpegCommand(file, settings, outputPath) {
 				"-qp_i",
 				parseInt(settings.videoQuality).toString(),
 				"-qp_p",
-				parseInt(settings.videoQuality).toString(),
+				parseInt(settings.videoQuality).toString()
 			);
 			break;
 		case "amf":
@@ -415,7 +442,8 @@ function buildFFmpegCommand(file, settings, outputPath) {
 			args.push(
 				"-c:v",
 				"h264_amf",
-				"-vf", "format=yuv420p",
+				"-vf",
+				"format=yuv420p",
 				"-quality",
 				amf_quality,
 				"-rc",
@@ -431,7 +459,8 @@ function buildFFmpegCommand(file, settings, outputPath) {
 		case "videotoolbox":
 			args.push(
 				"-c:v",
-				"-vf", "format=yuv420p",
+				"-vf",
+				"format=yuv420p",
 				"h264_videotoolbox",
 				"-q:v",
 				parseInt(settings.videoQuality).toString()
@@ -460,8 +489,8 @@ function getEncoderSettings() {
 		videoQuality: getId("video-quality").value,
 		// @ts-ignore
 		audioFormat: getId("audio-format").value,
-        // @ts-ignore
-        extension: getId("file_extension").value,
+		// @ts-ignore
+		extension: getId("file_extension").value,
 		outputPath: getId("custom-folder-path").textContent,
 		// @ts-ignore
 		outputSuffix: getId("output-suffix").value,
@@ -550,13 +579,13 @@ getId("output-folder-input").addEventListener("change", (e) => {
 	const checked = e.target.checked;
 
 	if (!checked) {
-		getId("custom-folder-select").style.display = "block"
+		getId("custom-folder-select").style.display = "block";
 	} else {
-		getId("custom-folder-select").style.display = "none"
-		getId("custom-folder-path").textContent = ""
-		getId("custom-folder-path").style.display = "none"
+		getId("custom-folder-select").style.display = "none";
+		getId("custom-folder-path").textContent = "";
+		getId("custom-folder-path").style.display = "none";
 	}
-})
+});
 
 const storageTheme = localStorage.getItem("theme");
 if (storageTheme) {
@@ -565,11 +594,11 @@ if (storageTheme) {
 }
 
 ipcRenderer.on("directory-path", (_event, msg) => {
-	let customFolderPathItem = getId("custom-folder-path") 
+	let customFolderPathItem = getId("custom-folder-path");
 
 	customFolderPathItem.textContent = msg;
-	customFolderPathItem.style.display = "inline"
-})
+	customFolderPathItem.style.display = "inline";
+});
 
 function closeMenu() {
 	getId("menuIcon").style.transform = "rotate(0deg)";
