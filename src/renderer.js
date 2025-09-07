@@ -128,6 +128,7 @@ if (os.platform() === "darwin") {
 		showMacYtdlpPopup();
 	} else {
 		ytDlpIsPresent = true;
+		ytDlp = new YTDlpWrap(`"${ytDlpPath}"`);
 		setLocalStorageYtDlp(ytDlpPath);
 	}
 }
@@ -142,6 +143,7 @@ if (os.platform() === "freebsd") {
 			.trim();
 
 		ytDlpIsPresent = true;
+		ytDlp = new YTDlpWrap(`"${ytDlpPath}"`);
 		setLocalStorageYtDlp(ytDlpPath);
 	} catch (error) {
 		console.log(error);

@@ -293,11 +293,11 @@ ipcMain.on("quit", () => {
 	app.quit();
 });
 
-ipcMain.handle('get-proxy', async (event, url) => {
-  const sess = event.sender.session; // get session from sender
-  const proxy = await sess.resolveProxy(url);
-  return proxy;
-});
+// ipcMain.handle('get-proxy', async (event, url) => {
+//   const sess = event.sender.session; // get session from sender
+//   const proxy = await sess.resolveProxy(url);
+//   return proxy;
+// });
 // Auto update
 let autoUpdate = false;
 
