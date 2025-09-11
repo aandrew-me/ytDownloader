@@ -8,6 +8,7 @@
 [![Flathub](https://img.shields.io/flathub/v/io.github.aandrew_me.ytdn)](https://flathub.org/apps/io.github.aandrew_me.ytdn)
 [![Snapcraft](https://badgen.net/snapcraft/v/ytdownloader)](https://snapcraft.io/ytdownloader)
 ![Chocolatey Version](https://img.shields.io/chocolatey/v/ytdownloader)
+![WinGet Package Version](https://img.shields.io/winget/v/aandrew-me.ytDownloader)
 
 A modern GUI video and audio downloader supporting [hundreds of sites](https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md)
 
@@ -76,7 +77,7 @@ A modern GUI video and audio downloader supporting [hundreds of sites](https://g
     ```
     scoop install https://raw.githubusercontent.com/aandrew-me/ytDownloader/main/ytdownloader.json
     ```
--   **Winget** (Might be using outdated version)
+-   **Winget**
 
     App can be installed with [Winget](https://github.com/microsoft/winget-cli) using the following command
     ```
