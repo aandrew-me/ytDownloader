@@ -35,7 +35,7 @@ A modern GUI video and audio downloader supporting [hundreds of sites](https://g
 
 ✅ Download playlists
 
-✅ Available on Linux, Windows, Freebsd & macOS
+✅ Available on Linux, Windows & macOS
 
 ✅ Fast download speeds
 
