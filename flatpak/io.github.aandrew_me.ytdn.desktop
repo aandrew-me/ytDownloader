@@ -1,7 +1,0 @@
-[Desktop Entry]
-Name=ytDownloader
-Comment=Download videos and audios from YouTube and other sites
-Exec=run.sh
-Type=Application
-Icon=io.github.aandrew_me.ytdn
-Categories=Utility;

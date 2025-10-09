@@ -1,0 +1,197 @@
+/* Base Styling */
+body {
+	font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont,
+		"Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", sans-serif;
+	text-align: center;
+	padding: 60px;
+	scroll-behavior: smooth;
+	background: linear-gradient(135deg, #f5f7fa, #e4ebf7);
+	color: #222;
+	line-height: 1.6;
+}
+
+a {
+	text-decoration: none;
+	color: rgb(61, 150, 238);
+}
+/* Header */
+h1 {
+	margin-top: 100px;
+	font-size: 3rem;
+	font-weight: 700;
+	color: #1a1a1a;
+	letter-spacing: -0.5px;
+}
+
+.info {
+	max-width: 800px;
+	margin: auto;
+	padding: 15px;
+	font-size: 1.1rem;
+	color: #555;
+}
+
+.vsh {
+	position: absolute;
+	left: -9999px;
+	top: auto;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+}
+
+/* Download Button (Top Right) */
+#download {
+	position: absolute;
+	top: 20px;
+	right: 20px;
+	background: linear-gradient(135deg, #28a745, #218838);
+	color: white;
+	padding: 12px 20px;
+	border-radius: 8px;
+	font-size: 1rem;
+	cursor: pointer;
+	font-weight: 600;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+#download:hover {
+	transform: scale(1.05);
+	box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+}
+
+/* Icon (Top Left) */
+.icon {
+	position: absolute;
+	top: 20px;
+	left: 20px;
+	width: 48px;
+	height: 48px;
+	filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+/* Section Headings */
+h2 {
+	font-size: 2.4rem;
+	margin-top: 80px;
+	color: #1f1f1f;
+	font-weight: 600;
+}
+
+/* Features List */
+.features {
+	text-align: left;
+	display: inline-block;
+	background: white;
+	padding: 25px 35px;
+	border-radius: 12px;
+	box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+	margin-top: 20px;
+}
+.features p {
+	margin: 8px 0;
+	font-size: 1rem;
+	color: #444;
+}
+
+
+/* Download Section Buttons */
+.downloadBtn {
+	padding: 14px;
+	display: inline-block;
+	width: 220px;
+	margin: 8px;
+	background: linear-gradient(135deg, #28a745, #218838);
+	color: white;
+	font-weight: 600;
+	border-radius: 8px;
+	font-size: 1.1rem;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+	transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.downloadBtn:hover {
+	transform: scale(1.05);
+	box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* Store Badges */
+.badge {
+	width: 280px;
+	margin: 10px;
+	transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.badge:hover {
+	transform: scale(1.07);
+	box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+}
+
+video {
+	width: 70%;	
+	height: auto;
+	display: block;
+	/* margin: 0 auto; */
+	margin: 30px auto;
+	border-radius: 10px;
+}
+
+/* Responsive */
+@media screen and (max-width: 650px) {
+	body {
+		padding: 10px;
+	}
+	h1 {
+		font-size: 2.2rem;
+	}
+
+	video {
+		width: 100%;
+	}
+	#download {
+		font-size: 0.9rem;
+		padding: 10px 16px;
+	}
+}
+
+/* ========================= */
+/* Dark Theme (Auto-detect)  */
+/* ========================= */
+@media (prefers-color-scheme: dark) {
+	body {
+		background: linear-gradient(135deg, #262729, #181a1b);
+		color: #e4e4e4;
+	}
+	h1,
+	h2 {
+		color: #ffffff;
+	}
+	.info {
+		color: #bbb;
+	}
+	.features {
+		background: #242628;
+		box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+	}
+	.features p {
+		color: #ccc;
+	}
+	video {
+		box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+	}
+	#download,
+	.downloadBtn {
+		background: linear-gradient(135deg, #2ecc71, #27ae60);
+		box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+	}
+
+	.mac-badge {
+		box-shadow: 1px 1px 10px rgb(73, 73, 73);
+		border-radius: 10px;
+	}
+
+	.mac-badge:hover {
+		box-shadow: 2px 2px 20px rgb(73, 73, 73);
+	}
+}
+
+
