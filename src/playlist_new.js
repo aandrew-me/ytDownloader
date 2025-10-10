@@ -401,7 +401,7 @@ function downloadFullPlaylist(type) {
     }
 
     const controller = new AbortController();
-
+    
     const commonArgs = [
         "--yes-playlist",
         "--no-warnings",
