@@ -721,10 +721,13 @@ getId("homeWin").addEventListener("click", () => {
 	closeMenu();
 	ipcRenderer.send("load-win", __dirname + "/index.html");
 });
-
 getId("compressorWin").addEventListener("click", () => {
 	closeMenu();
 	ipcRenderer.send("load-win", __dirname + "/compressor.html");
+});
+getId("newPlaylistWin").addEventListener("click", () => {
+	closeMenu();
+	ipcRenderer.send("load-win", __dirname + "/playlist_new.html");
 });
 
 // Translations
