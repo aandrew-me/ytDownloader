@@ -628,6 +628,12 @@ getId("playlistWin").addEventListener("click", () => {
 	ipcRenderer.send("load-win", __dirname + "/playlist.html");
 });
 
+getId("newPlaylistWin").addEventListener("click", () => {
+	closeMenu();
+	menuIsOpen = false;
+	ipcRenderer.send("load-win", __dirname + "/playlist_new.html");
+});
+
 getId("aboutWin").addEventListener("click", () => {
 	closeMenu();
 	menuIsOpen = false;

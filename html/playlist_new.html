@@ -10,6 +10,11 @@
     <script src="../src/playlist_new.js" defer></script>
     <script src="../src/common.js" defer></script>
     <script>window.i18n = new (require('../translations/i18n'));</script>
+    <style>
+        #advancedMenu {
+            display: none;
+        }
+    </style>
 </head>
 
 <body>
@@ -19,6 +24,7 @@
 
     <div id="menu">
         <a id="homeWin" class="menuItem">Homepage</a>
+        <a id="playlistWin" class="menuItem">Download Playlist</a>
         <a id="compressorWin" class="menuItem">Compressor</a>
         <a id="preferenceWin" class="menuItem">Preferences</a>
         <a id="aboutWin" class="menuItem">About</a>
@@ -34,11 +40,11 @@
             <option id="solarizedDarkTxt" value="solarized-dark">Solarized Dark</option>
         </select>
     </div>
-
+    <br>
     <button class="submitBtn" id="pasteLink">Click to paste playlist link from clipboard [Ctrl + V]</button>
 
     <div id="loadingWrapper">
-        <span id="processing">Loading </span>
+        <span id="processing">Processing </span>
         <svg version="1.1" id="L4" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
             y="0px" viewBox="0 0 100 100" enable-background="new 0 0 0 0" xml:space="preserve">
             <circle fill="rgb(84, 171, 222)" stroke="none" cx="6" cy="50" r="6">
@@ -60,46 +66,13 @@
 
     <div id="options">
         <img src="../assets/images/close.png" alt="close" id="closeHidden">
+        <br>
         <strong id="linkTitle">Link:</strong>
         <span id="link"></span>
         <br><br>
-
-        <div id="btnContainer">
-            <button class="toggleBtn" id="fullVideoToggle">All Videos</button>
-            <button class="toggleBtn" id="selectiveVideoToggle">Selective Videos</button>
-            <button class="toggleBtn" id="audioToggle">Audio</button>
-        </div>
-
-        <div id="fullVideoModeBox">
-            <label id="videoFormat">Select Video Format </label>
-            <select id="selectFullVideoQuality" class="select">
-                <option value="best" id="bestVideoOption">Best</option>
-                <option value="worst" id="worstVideoOption">Worst</option>
-                <option value="useConfig" id="useConfigTxt">Use config file</option>
-                <option value="144">144p</option>
-                <option value="240">240p</option>
-                <option value="360">360p</option>
-                <option value="480">480p</option>
-                <option value="720">720p (HD)</option>
-                <option value="1080">1080p (FHD)</option>
-                <option value="1440">1440p</option>
-                <option value="2160">2160p (4k)</option>
-            </select>
-            <br>
-            <div id="typeSelectBoxFullVideo">
-                <label id="videoQualityTxt">Select video quality</label>
-                <select id="videoTypeSelectFullVideo" class="select">
-                    <option value="auto" id="autoTxt">Auto</option>
-                    <option value="mp4">Mp4</option>
-                    <option value="webm">WebM</option>
-                </select>
-            </div>
-            <br>
-            <button class="submitBtn" id="downloadFullVideo">Download Full Playlist</button>
-        </div>
-
+        <!-- selecting video quality -->
         <div id="selectiveVideoModeBox">
-            <label id="selectiveVideoQualityLabel">Select Video Quality for Selected Items</label>
+            <label id="selectiveVideoQualityLabel">Select Video Quality</label>
             <select id="selectSelectiveVideoQuality" class="select">
                 <option value="1080">1080p (FHD)</option>
                 <option value="720">720p (HD)</option>
@@ -111,6 +84,16 @@
                 <option value="worst">Worst</option>
             </select>
             <br>
+            <!-- selecting video format -->
+            <div id="typeSelectBox">
+                <label id="videoFormat">Select Video Format</label>
+                <select id="videoTypeSelect" class="select">
+                    <option value="auto" id="autoTxt">Auto</option>
+                    <option value="mp4">Mp4</option>
+                    <option value="webm">WebM</option>
+                </select>
+            </div>
+            <!-- playlist videos container -->
             <div id="selectiveVideoListContainer">
                 </div>
             <div class="center" style="margin-top: 20px;">
@@ -118,42 +101,11 @@
             </div>
         </div>
 
-        <div id="audioModeBox">
-            <label id="audioFormat">Select Audio format </label>
-            <select id="selectFullAudioFormat" class="select">
-                <option value="mp3">Mp3</option>
-                <option value="m4a">M4a</option>
-                <option value="opus">Opus</option>
-                <option value="wav">Wav</option>
-                <option value="alac">Alac</option>
-                <option value="flac">Flac</option>
-                <option value="vorbis">Vorbis (ogg)</option>
-            </select>
-            <br>
-            <label class="audioQualitySelect" id="audioQualitySelectTxt">Select Quality</label>
-            <select id="selectFullAudioQuality" class="select">
-                <option id="audioQualityAuto" value="auto">Auto</option>
-                <option id="audioQualityNormal" value="5">Normal</option>
-                <option id="audioQualityBest" value="0">Best</option>
-                <option id="audioQualityGood" value="2">Good</option>
-                <option id="audioQualityBad" value="8">Bad</option>
-                <option id="audioQualityWorst" value="10">Worst</option>
-            </select>
-            <br><br>
-            <button class="submitBtn" id="downloadFullAudio">Download Full Audio Playlist</button>
-        </div>
-
         <br>
         <button id="advancedToggle" class="blueBtn">More options</button>
         <br>
 
         <div id="advancedMenu">
-            <div class="advancedItem">
-                <span id="rangeTxt">Playlist range</span>
-                <input type="number" id="playlistIndex" class="input" placeholder="Start">:
-                <input type="number" id="playlistEnd" class="input" placeholder="End">
-                <br><br>
-            </div>
 
             <div class="advancedItem">
                 <div><span id="clText">Current download location - </span><span id="path"></span></div>
@@ -167,17 +119,12 @@
                 <input id="subChecked" class="cb" type="checkbox">
             </div>
             <br>
-
-            <button class="submitBtn" id="downloadThumbnails">Download thumbnails</button>
-            <button class="submitBtn" id="saveLinks">Save video links</button>
         </div>
 
         <p id="incorrectMsgPlaylist"></p>
         <div id="errorDetails" onclick="copyErrorToClipboard()"></div>
     </div>
 
-    <h2 id="playlistName"></h2>
-    <button class="submitBtn" id="openDownloads">Open download folder</button>
     <div id="list">
     </div>
 

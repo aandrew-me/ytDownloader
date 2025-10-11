@@ -1510,17 +1510,17 @@ getId("aboutWin").addEventListener("click", () => {
 
 getId("playlistWin").addEventListener("click", () => {
 	closeMenu();
-	ipcRenderer.send("load-win", __dirname + "/playlist_new.html");
+	ipcRenderer.send("load-win", __dirname + "/playlist.html");
 });
 
 getId("compressorWin").addEventListener("click", () => {
 	closeMenu();
 	ipcRenderer.send("load-win", __dirname + "/compressor.html");
 });
-// getId("newPlaylistWin").addEventListener("click", () => {
-// 	closeMenu();
-// 	ipcRenderer.send("load-win", __dirname + "/playlist_new.html");
-// });
+getId("newPlaylistWin").addEventListener("click", () => {
+	closeMenu();
+	ipcRenderer.send("load-win", __dirname + "/playlist_new.html");
+});
 
 ipcRenderer.on("link", (event, text) => {
 	pasteFromTray(text);
