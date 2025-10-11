@@ -6,1641 +6,1249 @@ const {shell, ipcRenderer, clipboard} = require("electron");
 const {default: YTDlpWrap} = require("yt-dlp-wrap-plus");
 const {constants} = require("fs/promises");
 
-let ffmpeg = "";
-
-// Directories
-const homedir = os.homedir();
-let appdir = path.join(homedir, "Downloads");
-
-if (os.platform() === "linux") {
-	try {
-		const xdgDownloadDir = cp
-			.execSync("xdg-user-dir DOWNLOAD")
-			.toString()
-			.trim();
-		if (xdgDownloadDir.length > 1) {
-			appdir = xdgDownloadDir;
-			console.log("xdg download dir:", xdgDownloadDir);
-		}
-	} catch (_err) {}
-}
-const hiddenDir = path.join(homedir, ".ytDownloader");
 const i18n = new (require("../translations/i18n"))();
 
-fs.mkdir(hiddenDir, {recursive: true}, () => {});
+const CONSTANTS = {
+	DOM_IDS: {
+		// Main UI
+		PASTE_URL_BTN: "pasteUrl",
+		LOADING_WRAPPER: "loadingWrapper",
+		INCORRECT_MSG: "incorrectMsg",
+		ERROR_BTN: "errorBtn",
+		ERROR_DETAILS: "errorDetails",
+		PATH_DISPLAY: "path",
+		SELECT_LOCATION_BTN: "selectLocation",
+		DOWNLOAD_LIST: "list",
+		CLEAR_BTN: "clearBtn",
+		// Hidden Info Panel
+		HIDDEN_PANEL: "hidden",
+		CLOSE_HIDDEN_BTN: "closeHidden",
+		TITLE_CONTAINER: "title",
+		TITLE_INPUT: "titleName",
+		URL_INPUTS: ".url",
+		AUDIO_PRESENT_SECTION: "audioPresent",
+		// Format Selectors
+		VIDEO_FORMAT_SELECT: "videoFormatSelect",
+		AUDIO_FORMAT_SELECT: "audioFormatSelect",
+		AUDIO_FOR_VIDEO_FORMAT_SELECT: "audioForVideoFormatSelect",
+		// Download Buttons
+		VIDEO_DOWNLOAD_BTN: "videoDownload",
+		AUDIO_DOWNLOAD_BTN: "audioDownload",
+		EXTRACT_BTN: "extractBtn",
+		// Audio Extraction
+		EXTRACT_SELECTION: "extractSelection",
+		EXTRACT_QUALITY_SELECT: "extractQualitySelect",
+		// Advanced Options
+		START_TIME: "startTime",
+		END_TIME: "endTime",
+		SUB_CHECKED: "subChecked",
+		QUIT_CHECKED: "quitChecked",
+		// Popups
+		POPUP_BOX: "popupBox",
+		POPUP_BOX_MAC: "popupBoxMac",
+		POPUP_TEXT: "popupText",
+		POPUP_SVG: "popupSvg",
+		// Menu
+		MENU_ICON: "menuIcon",
+		MENU: "menu",
+		PREFERENCE_WIN: "preferenceWin",
+		ABOUT_WIN: "aboutWin",
+		PLAYLIST_WIN: "playlistWin",
+		COMPRESSOR_WIN: "compressorWin",
+	},
+	LOCAL_STORAGE_KEYS: {
+		DOWNLOAD_PATH: "downloadPath",
+		YT_DLP_PATH: "ytdlp",
+		MAX_DOWNLOADS: "maxActiveDownloads",
+		PREFERRED_VIDEO_QUALITY: "preferredVideoQuality",
+		PREFERRED_AUDIO_QUALITY: "preferredAudioQuality",
+		PREFERRED_VIDEO_CODEC: "preferredVideoCodec",
+		SHOW_MORE_FORMATS: "showMoreFormats",
+		BROWSER_COOKIES: "browser",
+		PROXY: "proxy",
+		CONFIG_PATH: "configPath",
+		AUTO_UPDATE: "autoUpdate",
+		CLOSE_TO_TRAY: "closeToTray",
+	},
+};
 
-// System tray
-const trayEnabled = localStorage.getItem("closeToTray");
-
-if (trayEnabled == "true") {
-	console.log("Tray is Enabled");
-	ipcRenderer.send("useTray", true);
-}
-
-// Download directory
-let downloadDir = "";
-
-// Global variables
-let title, onlyVideo, thumbnail, ytDlp, duration, extractor_key;
-let audioExtensionList = [];
-let rangeCmd = "";
-let subs = "";
-let subLangs;
-let rangeOption = "--download-sections";
-let cookieArg = "";
-let browser = "";
-let maxActiveDownloads = 5;
-let showMoreFormats = false;
-let configArg = "";
-let configTxt = "";
-let proxy = "";
-let downloadedItemList = [];
-let ytDlpIsPresent = false;
-
-if (localStorage.getItem("configPath")) {
-	configArg = "--config-location";
-	configTxt = `"${localStorage.getItem("configPath")}"`;
-}
-
-checkMaxDownloads();
-
-// Get system proxy
-// getSystemProxy("https://www.google.com").then((proxyInfo) => {
-// 	if (proxyInfo != "DIRECT") {
-// 		try {
-// 			const proxyUrl = proxyInfo.split(" ")[1];
-
-// 			proxy = proxyUrl;
-
-// 			console.log("System proxy: " + proxy);
-// 		} catch (_) {}
-// 	}
-// });
-
-// Check for updates
-let autoUpdate = true;
-
-if (localStorage.getItem("autoUpdate") == "false") {
-	autoUpdate = false;
-}
-
-if (process.windowsStore) {
-	autoUpdate = false;
-}
-
-if (process.env.YTDOWNLOADER_AUTO_UPDATES == "0") {
-	autoUpdate = false;
-}
-
-ipcRenderer.send("autoUpdate", autoUpdate);
-
-let currentDownloads = 0;
-let controllers = new Object();
-
-// Video and audio preferences
-let preferredVideoQuality = 1080;
-let preferredAudioQuality = "";
-let preferredVideoCodec = "avc1";
 /**
- *
- * @param {string} id
+ * Shorthand for document.getElementById.
+ * @param {string} id The ID of the DOM element.
+ * @returns {HTMLElement | null}
  */
+const $ = (id) => document.getElementById(id);
 
-downloadPathSelection();
-
-const possiblePaths = [
-	"/opt/homebrew/bin/yt-dlp", // Apple Silicon
-	"/usr/local/bin/yt-dlp", // Intel
-];
-
-// Checking for yt-dlp
-let ytDlpPath = path.join(os.homedir(), ".ytDownloader", "ytdlp");
-
-if (os.platform() == "win32") {
-	ytDlpPath = path.join(os.homedir(), ".ytDownloader", "ytdlp.exe");
-}
-
-// Macos yt-dlp check
-if (os.platform() === "darwin") {
-	ytDlpPath = possiblePaths.find((p) => fs.existsSync(p)) || null;
-
-	if (ytDlpPath == null) {
-		showMacYtdlpPopup();
-	} else {
-		ytDlpIsPresent = true;
-		ytDlp = new YTDlpWrap(`"${ytDlpPath}"`);
-		setLocalStorageYtDlp(ytDlpPath);
-	}
-}
-
-// Use system yt-dlp for freebsd
-if (os.platform() === "freebsd") {
-	try {
-		ytDlpPath = cp
-			.execSync("which yt-dlp")
-			.toString("utf8")
-			.split("\n")[0]
-			.trim();
-
-		ytDlpIsPresent = true;
-		ytDlp = new YTDlpWrap(`"${ytDlpPath}"`);
-		setLocalStorageYtDlp(ytDlpPath);
-	} catch (error) {
-		console.log(error);
-
-		hidePasteBtn();
-
-		getId("incorrectMsg").textContent = i18n.__(
-			"No yt-dlp found in PATH. Make sure you have the full executable. App will not work"
-		);
-	}
-}
-
-// Getting yt-dlp path from environment variable
-if (process.env.YTDOWNLOADER_YTDLP_PATH) {
-	ytDlpPath = process.env.YTDOWNLOADER_YTDLP_PATH;
-
-	if (fs.existsSync(ytDlpPath)) {
-		logYtDlpPresent(ytDlpPath);
-
-		ytDlp = new YTDlpWrap(`"${ytDlpPath}"`);
-		ytDlpIsPresent = true;
-		setLocalStorageYtDlp(ytDlpPath);
-	} else {
-		hidePasteBtn();
-
-		getId("incorrectMsg").textContent = i18n.__(
-			"You have specified YTDOWNLOADER_YTDLP_PATH, but no file exists there."
-		);
-	}
-}
-
-// Checking if yt-dlp bin is present
-if (
-	localStorage.getItem("ytdlp") &&
-	os.platform() != "darwin" &&
-	os.platform() != "freebsd" &&
-	!process.env.YTDOWNLOADER_YTDLP_PATH
-) {
-	const localStorageytDlpPath = localStorage.getItem("ytdlp");
-
-	if (fs.existsSync(localStorageytDlpPath)) {
-		logYtDlpPresent(ytDlpPath);
-
-		ytDlp = new YTDlpWrap(`"${ytDlpPath}"`);
-
-		cp.spawn(`${ytDlpPath}`, ["-U"]).stdout.on("data", (data) =>
-			console.log(data.toString("utf8"))
-		);
-
-		ipcRenderer.send("ready-for-links");
-
-		ytDlpIsPresent = true;
-		setLocalStorageYtDlp(ytDlpPath);
-	}
-}
-
-if (
-	!ytDlpIsPresent &&
-	!process.env.YTDOWNLOADER_YTDLP_PATH &&
-	os.platform() !== "freebsd" &&
-	os.platform() !== "darwin"
-) {
-	// yt-dlp download path
-	let ytDlpDownloadPath;
-	if (os.platform() == "win32") {
-		ytDlpDownloadPath = path.join(
-			os.homedir(),
-			".ytDownloader",
-			"ytdlp.exe"
-		);
-	} else {
-		ytDlpDownloadPath = path.join(os.homedir(), ".ytDownloader", "ytdlp");
+class YtDownloaderApp {
+	constructor() {
+		this.state = {
+			ytDlp: null,
+			ytDlpPath: "",
+			ffmpegPath: "",
+			downloadDir: "",
+			maxActiveDownloads: 5,
+			currentDownloads: 0,
+			// Video metadata
+			videoInfo: {
+				title: "",
+				thumbnail: "",
+				duration: 0,
+				extractor_key: "",
+				url: "",
+			},
+			// Download options
+			downloadOptions: {
+				rangeCmd: "",
+				rangeOption: "",
+				subs: "",
+				subLangs: "",
+			},
+			// Preferences
+			preferences: {
+				videoQuality: 1080,
+				audioQuality: "",
+				videoCodec: "avc1",
+				showMoreFormats: false,
+				proxy: "",
+				browserForCookies: "",
+				configPath: "",
+			},
+			downloadControllers: new Map(),
+			downloadedItems: new Set(),
+			downloadQueue: [],
+		};
 	}
 
-	cp.exec(`"${ytDlpPath}" --version`, (error, _stdout, _stderr) => {
-		if (error) {
-			getId("popupBox").style.display = "block";
+	/**
+	 * Initializes the application, setting up directories, finding executables,
+	 * and attaching event listeners.
+	 */
+	async initialize() {
+		this._setupDirectories();
+		this._configureTray();
+		this._configureAutoUpdate();
 
-			process.on("uncaughtException", (_reason, _promise) => {
-				handleYtDlpError();
-			});
+		try {
+			this.state.ytDlpPath = await this._findOrDownloadYtDlp();
+			this.state.ytDlp = new YTDlpWrap(this.state.ytDlpPath);
+			this.state.ffmpegPath = await this._findFfmpeg();
 
-			downloadYtDlp(ytDlpDownloadPath);
-		} else {
-			logYtDlpPresent(ytDlpPath);
+			console.log("yt-dlp path:", this.state.ytDlpPath);
+			console.log("ffmpeg path:", this.state.ffmpegPath);
 
-			ytDlp = new YTDlpWrap(`"${ytDlpPath}"`);
+			this._loadSettings();
+			this._addEventListeners();
 
-			cp.spawn(`${ytDlpPath}`, ["-U"]).stdout.on("data", (data) =>
-				console.log(data.toString("utf8"))
-			);
-
+			// Signal to the main process that the renderer is ready for links
 			ipcRenderer.send("ready-for-links");
-			setLocalStorageYtDlp(ytDlpPath);
+		} catch (error) {
+			console.error("Initialization failed:", error);
+			$(CONSTANTS.DOM_IDS.INCORRECT_MSG).textContent = error.message;
+			$(CONSTANTS.DOM_IDS.PASTE_URL_BTN).style.display = "none";
 		}
-	});
-}
-
-// Ffmpeg check
-if (os.platform() === "win32") {
-	ffmpeg = `"${__dirname}\\..\\ffmpeg.exe"`;
-} else if (os.platform() === "freebsd") {
-	try {
-		ffmpeg = cp
-			.execSync("which ffmpeg")
-			.toString("utf8")
-			.split("\n")[0]
-			.trim();
-	} catch (error) {
-		console.log(error);
-
-		getId("incorrectMsg").textContent = i18n.__("No ffmpeg found in PATH");
 	}
-} else {
-	ffmpeg = `"${__dirname}/../ffmpeg"`;
-}
 
-if (process.env.YTDOWNLOADER_FFMPEG_PATH) {
-	ffmpeg = `"${process.env.YTDOWNLOADER_FFMPEG_PATH}"`;
+	/**
+	 * Sets up the application's hidden directory and the default download directory.
+	 */
+	_setupDirectories() {
+		const homedir = os.homedir();
+		const hiddenDir = path.join(homedir, ".ytDownloader");
+		fs.mkdirSync(hiddenDir, {recursive: true});
 
-	if (fs.existsSync(process.env.YTDOWNLOADER_FFMPEG_PATH)) {
-		console.log("Using YTDOWNLOADER_FFMPEG_PATH");
-	} else {
-		getId("incorrectMsg").textContent = i18n.__(
-			"You have specified YTDOWNLOADER_FFMPEG_PATH, but no file exists there."
+		let defaultDownloadDir = path.join(homedir, "Downloads");
+		if (os.platform() === "linux") {
+			try {
+				const xdgDownloadDir = cp
+					.execSync("xdg-user-dir DOWNLOAD")
+					.toString()
+					.trim();
+				if (xdgDownloadDir) {
+					defaultDownloadDir = xdgDownloadDir;
+				}
+			} catch (err) {
+				console.warn("Could not execute xdg-user-dir:", err.message);
+			}
+		}
+
+		const savedPath = localStorage.getItem(
+			CONSTANTS.LOCAL_STORAGE_KEYS.DOWNLOAD_PATH
 		);
-	}
-}
+		if (savedPath) {
+			try {
+				fs.accessSync(savedPath, constants.W_OK);
+				this.state.downloadDir = savedPath;
+			} catch {
+				console.warn(
+					`Cannot write to saved path "${savedPath}". Falling back to default.`
+				);
+				this.state.downloadDir = defaultDownloadDir;
+				localStorage.setItem(
+					CONSTANTS.LOCAL_STORAGE_KEYS.DOWNLOAD_PATH,
+					defaultDownloadDir
+				);
+			}
+		} else {
+			this.state.downloadDir = defaultDownloadDir;
+		}
 
-console.log(ffmpeg);
-
-getId("closeHidden").addEventListener("click", () => {
-	hideHidden();
-	getId("loadingWrapper").style.display = "none";
-});
-
-document.addEventListener("keydown", (event) => {
-	if (
-		event.ctrlKey &&
-		event.key == "v" &&
-		document.activeElement.tagName !== "INPUT"
-	) {
-		pasteUrl();
-	}
-});
-
-getId("pasteUrl").addEventListener("click", () => {
-	pasteUrl();
-});
-
-// Getting video info
-/**
- *
- * @param {string} url
- */
-async function getInfo(url) {
-	audioExtensionList = [];
-	let selected = false;
-	onlyVideo = false;
-	let audioIsPresent = false;
-	downloadPathSelection();
-
-	// Cleaning text
-	resetDomValues();
-
-	if (localStorage.getItem("preferredVideoQuality")) {
-		preferredVideoQuality = Number(
-			localStorage.getItem("preferredVideoQuality")
-		);
+		$(CONSTANTS.DOM_IDS.PATH_DISPLAY).textContent = this.state.downloadDir;
+		fs.mkdirSync(this.state.downloadDir, {recursive: true});
 	}
 
-	if (localStorage.getItem("preferredAudioQuality")) {
-		preferredAudioQuality = localStorage.getItem("preferredAudioQuality");
-		getId("extractSelection").value = preferredAudioQuality;
+	/**
+	 * Checks localStorage to determine if the tray icon should be used.
+	 */
+	_configureTray() {
+		if (
+			localStorage.getItem(CONSTANTS.LOCAL_STORAGE_KEYS.CLOSE_TO_TRAY) ===
+			"true"
+		) {
+			console.log("Tray is enabled.");
+			ipcRenderer.send("useTray", true);
+		}
 	}
 
-	if (localStorage.getItem("preferredVideoCodec")) {
-		preferredVideoCodec = localStorage.getItem("preferredVideoCodec");
+	/**
+	 * Checks settings to determine if auto-updates should be enabled.
+	 */
+	_configureAutoUpdate() {
+		let autoUpdate = true;
+		if (
+			localStorage.getItem(CONSTANTS.LOCAL_STORAGE_KEYS.AUTO_UPDATE) ===
+			"false"
+		) {
+			autoUpdate = false;
+		}
+		if (
+			process.windowsStore ||
+			process.env.YTDOWNLOADER_AUTO_UPDATES === "0"
+		) {
+			autoUpdate = false;
+		}
+		ipcRenderer.send("autoUpdate", autoUpdate);
 	}
 
-	if (localStorage.getItem("showMoreFormats") === "true") {
-		showMoreFormats = true;
-	} else {
-		showMoreFormats = false;
-	}
+	/**
+	 * Locates the yt-dlp executable path from various sources or downloads it.
+	 * @returns {Promise<string>} A promise that resolves with the path to yt-dlp.
+	 */
+	async _findOrDownloadYtDlp() {
+		const hiddenDir = path.join(os.homedir(), ".ytDownloader");
+		const defaultYtDlpName =
+			os.platform() === "win32" ? "ytdlp.exe" : "ytdlp";
+		const defaultYtDlpPath = path.join(hiddenDir, defaultYtDlpName);
 
-	proxy = getLocalStorageItem("proxy");
-
-	// Whether to use browser cookies or not
-	if (localStorage.getItem("browser")) {
-		browser = localStorage.getItem("browser");
-	}
-
-	if (browser) {
-		cookieArg = "--cookies-from-browser";
-	} else {
-		cookieArg = "";
-	}
-
-	let validInfo = true;
-
-	let info = "";
-
-	const infoOptions = [
-		"-j",
-		"--no-playlist",
-		"--no-warnings",
-		proxy ? "--no-check-certificate" : "",
-		proxy ? "--proxy" : "",
-		proxy,
-		cookieArg,
-		browser,
-		configArg,
-		configTxt,
-		`"${url}"`,
-	].filter((item) => item);
-
-	const infoProcess = cp.spawn(`"${ytDlpPath}"`, infoOptions, {
-		shell: true,
-	});
-
-	infoProcess.stdout.on("data", (data) => {
-		info += data;
-	});
-
-	infoProcess.stderr.on("data", (error) => {
-		if (!error.toString().startsWith("WARNING")) {
-			validInfo = false;
-			// Error message handling
-			console.log(error.toString("utf8"));
-			getId("loadingWrapper").style.display = "none";
-			getId("incorrectMsg").textContent = i18n.__(
-				"Some error has occurred. Check your network and use correct URL"
+		// Priority 1: Environment Variable
+		if (process.env.YTDOWNLOADER_YTDLP_PATH) {
+			if (fs.existsSync(process.env.YTDOWNLOADER_YTDLP_PATH)) {
+				return process.env.YTDOWNLOADER_YTDLP_PATH;
+			}
+			throw new Error(
+				"YTDOWNLOADER_YTDLP_PATH is set, but no file exists there."
 			);
-			getId("errorBtn").style.display = "inline-block";
-			getId("errorDetails").innerHTML = `
-		<strong>URL: ${url}</strong>
-		<br><br>
-		${error.toString("utf8")}
-		`;
-			getId("errorDetails").title = i18n.__("Click to copy");
 		}
-	});
 
-	infoProcess.on("close", () => {
-		if (validInfo) {
-			/**
-			 * @typedef {import("./types").info} info
-			 * @type {info}
-			 */
-			const parsedInfo = JSON.parse(info);
-			console.log(parsedInfo);
+		// Priority 2: System-installed versions (macOS, BSD)
+		if (os.platform() === "darwin") {
+			const possiblePaths = [
+				"/opt/homebrew/bin/yt-dlp",
+				"/usr/local/bin/yt-dlp",
+			];
+			const foundPath = possiblePaths.find((p) => fs.existsSync(p));
+			if (foundPath) return foundPath;
+			$(CONSTANTS.DOM_IDS.POPUP_BOX_MAC).style.display = "block";
+		} else if (os.platform() === "freebsd") {
+			try {
+				return cp.execSync("which yt-dlp").toString().trim();
+			} catch {
+				throw new Error(
+					"No yt-dlp found in PATH on FreeBSD. Please install it."
+				);
+			}
+		}
 
-			title = `${parsedInfo.title} [${parsedInfo.id}]`;
-			thumbnail = parsedInfo.thumbnail;
-			duration = parsedInfo.duration;
-			extractor_key = parsedInfo.extractor_key;
-			/**
-			 * @typedef {import("./types").format} format
-			 * @type {format[]}
-			 */
-			const formats = parsedInfo.formats || [];
-			console.log(formats);
+		// Priority 3: localStorage
+		const storedPath = localStorage.getItem(
+			CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_PATH
+		);
+		if (storedPath && fs.existsSync(storedPath)) {
+			cp.spawn(`"${storedPath}"`, ["-U"], {shell: true})
+				.on("error", (err) =>
+					console.error(
+						"Failed to run background yt-dlp update:",
+						err
+					)
+				)
+				.stdout.on("data", (data) =>
+					console.log("yt-dlp update check:", data.toString())
+				);
+			return storedPath;
+		}
 
-			/**
-			 * @type {HTMLInputElement[]}
-			 */
-			// @ts-ignore
-			const urlElements = document.querySelectorAll(".url");
-			urlElements.forEach((element) => {
-				element.value = url;
+		// Priority 4: Default location or download
+		try {
+			await fs.promises.access(defaultYtDlpPath);
+			return defaultYtDlpPath;
+		} catch {
+			console.log("yt-dlp not found, downloading...");
+			$(CONSTANTS.DOM_IDS.POPUP_BOX).style.display = "block";
+			$(CONSTANTS.DOM_IDS.POPUP_SVG).style.display = "inline";
+			document.querySelector("#popupBox p").textContent = i18n.__(
+				"Please wait, necessary files are being downloaded"
+			);
+
+			try {
+				await YTDlpWrap.downloadFromGithub(defaultYtDlpPath);
+				$(CONSTANTS.DOM_IDS.POPUP_BOX).style.display = "none";
+				localStorage.setItem(
+					CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_PATH,
+					defaultYtDlpPath
+				);
+				return defaultYtDlpPath;
+			} catch (downloadError) {
+				console.error("Failed to download yt-dlp:", downloadError);
+				document.querySelector("#popupBox p").textContent = i18n.__(
+					"Failed to download necessary files. Please check your network and try again"
+				);
+				$(CONSTANTS.DOM_IDS.POPUP_SVG).style.display = "none";
+				throw new Error("Failed to download yt-dlp.");
+			}
+		}
+	}
+
+	/**
+	 * Locates the ffmpeg executable path.
+	 * @returns {Promise<string>} A promise that resolves with the path to ffmpeg.
+	 */
+	async _findFfmpeg() {
+		// Priority 1: Environment Variable
+		if (process.env.YTDOWNLOADER_FFMPEG_PATH) {
+			if (fs.existsSync(process.env.YTDOWNLOADER_FFMPEG_PATH)) {
+				return process.env.YTDOWNLOADER_FFMPEG_PATH;
+			}
+			throw new Error(
+				"YTDOWNLOADER_FFMPEG_PATH is set, but no file exists there."
+			);
+		}
+
+		// Priority 2: System-installed (FreeBSD)
+		if (os.platform() === "freebsd") {
+			try {
+				return cp.execSync("which ffmpeg").toString().trim();
+			} catch {
+				throw new Error(
+					"No ffmpeg found in PATH on FreeBSD. App may not work correctly."
+				);
+			}
+		}
+
+		// Priority 3: Bundled ffmpeg
+		return os.platform() === "win32"
+			? path.join(__dirname, "..", "ffmpeg.exe")
+			: path.join(__dirname, "..", "ffmpeg");
+	}
+
+	/**
+	 * Loads various settings from localStorage into the application state.
+	 */
+	_loadSettings() {
+		const prefs = this.state.preferences;
+		prefs.videoQuality =
+			Number(
+				localStorage.getItem(
+					CONSTANTS.LOCAL_STORAGE_KEYS.PREFERRED_VIDEO_QUALITY
+				)
+			) || 1080;
+		prefs.audioQuality =
+			localStorage.getItem(
+				CONSTANTS.LOCAL_STORAGE_KEYS.PREFERRED_AUDIO_QUALITY
+			) || "";
+		prefs.videoCodec =
+			localStorage.getItem(
+				CONSTANTS.LOCAL_STORAGE_KEYS.PREFERRED_VIDEO_CODEC
+			) || "avc1";
+		prefs.showMoreFormats =
+			localStorage.getItem(
+				CONSTANTS.LOCAL_STORAGE_KEYS.SHOW_MORE_FORMATS
+			) === "true";
+		prefs.proxy =
+			localStorage.getItem(CONSTANTS.LOCAL_STORAGE_KEYS.PROXY) || "";
+		prefs.browserForCookies =
+			localStorage.getItem(
+				CONSTANTS.LOCAL_STORAGE_KEYS.BROWSER_COOKIES
+			) || "";
+		prefs.configPath =
+			localStorage.getItem(CONSTANTS.LOCAL_STORAGE_KEYS.CONFIG_PATH) ||
+			"";
+
+		const maxDownloads = Number(
+			localStorage.getItem(CONSTANTS.LOCAL_STORAGE_KEYS.MAX_DOWNLOADS)
+		);
+		this.state.maxActiveDownloads = maxDownloads >= 1 ? maxDownloads : 5;
+	}
+
+	/**
+	 * Attaches all necessary event listeners for the UI.
+	 */
+	_addEventListeners() {
+		$(CONSTANTS.DOM_IDS.PASTE_URL_BTN).addEventListener("click", () =>
+			this.pasteAndGetInfo()
+		);
+		document.addEventListener("keydown", (event) => {
+			if (
+				event.ctrlKey &&
+				event.key === "v" &&
+				document.activeElement.tagName !== "INPUT"
+			) {
+				this.pasteAndGetInfo();
+			}
+		});
+
+		// Download buttons
+		$(CONSTANTS.DOM_IDS.VIDEO_DOWNLOAD_BTN).addEventListener("click", () =>
+			this.handleDownloadRequest("video")
+		);
+		$(CONSTANTS.DOM_IDS.AUDIO_DOWNLOAD_BTN).addEventListener("click", () =>
+			this.handleDownloadRequest("audio")
+		);
+		$(CONSTANTS.DOM_IDS.EXTRACT_BTN).addEventListener("click", () =>
+			this.handleDownloadRequest("extract")
+		);
+
+		// UI controls
+		$(CONSTANTS.DOM_IDS.CLOSE_HIDDEN_BTN).addEventListener("click", () =>
+			this._hideInfoPanel()
+		);
+		$(CONSTANTS.DOM_IDS.SELECT_LOCATION_BTN).addEventListener("click", () =>
+			ipcRenderer.send("select-location-main", "")
+		);
+		$(CONSTANTS.DOM_IDS.CLEAR_BTN).addEventListener("click", () =>
+			this._clearAllDownloaded()
+		);
+
+		// Error details
+		$(CONSTANTS.DOM_IDS.ERROR_DETAILS).addEventListener("click", (e) => {
+			clipboard.writeText(e.target.innerText);
+			this._showPopup("Copied error details to clipboard.");
+		});
+
+		// IPC listeners
+		ipcRenderer.on("link", (event, text) => this.getInfo(text));
+		ipcRenderer.on("downloadPath", (event, downloadPath) => {
+			const newPath = downloadPath[0];
+			$(CONSTANTS.DOM_IDS.PATH_DISPLAY).textContent = newPath;
+			this.state.downloadDir = newPath;
+		});
+
+		// Menu Listeners
+		const menuMapping = {
+			[CONSTANTS.DOM_IDS.PREFERENCE_WIN]: "/preferences.html",
+			[CONSTANTS.DOM_IDS.ABOUT_WIN]: "/about.html",
+		};
+		const windowMapping = {
+			[CONSTANTS.DOM_IDS.PLAYLIST_WIN]: "/playlist.html",
+			[CONSTANTS.DOM_IDS.COMPRESSOR_WIN]: "/compressor.html",
+		};
+
+		Object.entries(menuMapping).forEach(([id, page]) => {
+			$(id)?.addEventListener("click", () => {
+				this._closeMenu();
+				ipcRenderer.send("load-page", path.join(__dirname, page));
+			});
+		});
+
+		Object.entries(windowMapping).forEach(([id, page]) => {
+			$(id)?.addEventListener("click", () => {
+				this._closeMenu();
+				ipcRenderer.send("load-win", path.join(__dirname, page));
+			});
+		});
+	}
+
+	// --- Public Methods ---
+
+	/**
+	 * Pastes URL from clipboard and initiates fetching video info.
+	 */
+	pasteAndGetInfo() {
+		this.getInfo(clipboard.readText());
+	}
+
+	/**
+	 * Fetches video metadata from a given URL.
+	 * @param {string} url The video URL.
+	 */
+	async getInfo(url) {
+		this._defaultVideoToggle();
+		this._resetUIForNewLink();
+		this.state.videoInfo.url = url;
+
+		try {
+			const metadata = await this._fetchVideoMetadata(url);
+			this.state.videoInfo = {
+				...this.state.videoInfo,
+				id: metadata.id,
+				title: metadata.title,
+				thumbnail: metadata.thumbnail,
+				duration: metadata.duration,
+				extractor_key: metadata.extractor_key,
+			};
+			this._populateFormatSelectors(metadata.formats || []);
+			this._displayInfoPanel();
+		} catch (error) {
+			this._showError(error.message, url);
+		} finally {
+			$(CONSTANTS.DOM_IDS.LOADING_WRAPPER).style.display = "none";
+		}
+	}
+
+	/**
+	 * Handles a download request, either starting it immediately or queuing it.
+	 * @param {'video' | 'audio' | 'extract'} type The type of download.
+	 */
+	handleDownloadRequest(type) {
+		this._updateDownloadOptionsFromUI();
+
+		const downloadJob = {
+			type,
+			url: this.state.videoInfo.url,
+			title: this.state.videoInfo.title,
+			thumbnail: this.state.videoInfo.thumbnail,
+			options: {...this.state.downloadOptions},
+			// Capture UI values at the moment of click
+			uiSnapshot: {
+				videoFormat: $(CONSTANTS.DOM_IDS.VIDEO_FORMAT_SELECT).value,
+				audioForVideoFormat: $(
+					CONSTANTS.DOM_IDS.AUDIO_FOR_VIDEO_FORMAT_SELECT
+				).value,
+				audioFormat: $(CONSTANTS.DOM_IDS.AUDIO_FORMAT_SELECT).value,
+				extractFormat: $(CONSTANTS.DOM_IDS.EXTRACT_SELECTION).value,
+				extractQuality: $(CONSTANTS.DOM_IDS.EXTRACT_QUALITY_SELECT)
+					.value,
+			},
+		};
+
+		if (this.state.currentDownloads < this.state.maxActiveDownloads) {
+			this._startDownload(downloadJob);
+		} else {
+			this._queueDownload(downloadJob);
+		}
+		this._hideInfoPanel();
+	}
+
+	/**
+	 * Executes yt-dlp to get video metadata in JSON format.
+	 * @param {string} url The video URL.
+	 * @returns {Promise<object>} A promise that resolves with the parsed JSON metadata.
+	 */
+	_fetchVideoMetadata(url) {
+		return new Promise((resolve, reject) => {
+			const {proxy, browserForCookies, configPath} =
+				this.state.preferences;
+			const args = [
+				"-j",
+				"--no-playlist",
+				"--no-warnings",
+				proxy ? "--proxy" : "",
+				proxy,
+				browserForCookies ? "--cookies-from-browser" : "",
+				browserForCookies,
+				configPath ? "--config-location" : "",
+				configPath ? `"${configPath}"` : "",
+				`"${url}"`,
+			].filter(Boolean);
+
+			const process = this.state.ytDlp.exec(args, {shell: true});
+
+			let stdout = "";
+			let stderr = "";
+
+			process.ytDlpProcess.stdout.on("data", (data) => (stdout += data));
+			process.ytDlpProcess.stderr.on("data", (data) => (stderr += data));
+
+			process.on("close", () => {
+				if (stdout) {
+					try {
+						resolve(JSON.parse(stdout));
+					} catch (e) {
+						reject(
+							new Error(
+								"Failed to parse yt-dlp JSON output: " +
+									(stderr || e.message)
+							)
+						);
+					}
+				} else {
+					reject(
+						new Error(
+							stderr || `yt-dlp exited with a non-zero code.`
+						)
+					);
+				}
 			});
 
-			getId("loadingWrapper").style.display = "none";
+			process.on("error", (err) => reject(err));
+		});
+	}
 
-			getId("hidden").style.display = "inline-block";
-			getId("hidden").classList.add("scaleUp");
+	/**
+	 * Starts the download process for a given job.
+	 * @param {object} job The download job object.
+	 */
+	_startDownload(job) {
+		this.state.currentDownloads++;
+		const randomId = "item_" + Math.random().toString(36).substring(2, 12);
 
-			const titleElement = getId("title");
-			titleElement.textContent = "";
+		const {downloadArgs, finalFilename, finalExt} =
+			this._prepareDownloadArgs(job);
 
-			titleElement.append(
-				Object.assign(document.createElement("b"), {
-					textContent: i18n.__("Title "),
-				}),
-				": ",
-				Object.assign(document.createElement("input"), {
-					className: "title",
-					id: "titleName",
-					type: "text",
-					value: title,
-					onchange: renameTitle,
-				})
-			);
+		this._createDownloadUI(randomId, job);
 
-			let audioSize = 0;
-			let defaultVideoFormat = 144;
-			let videoFormatCodecs = {};
+		const controller = new AbortController();
+		this.state.downloadControllers.set(randomId, controller);
 
-			let preferredAudioFormatLength = 0;
-			let preferredAudioFormatCount = 0;
-			let maxAudioFormatNoteLength = 10;
+		const downloadProcess = this.state.ytDlp.exec(downloadArgs, {
+			shell: true,
+			detached: false,
+			signal: controller.signal,
+		});
 
-			// Initially going through all formats
-			// Getting approx size of audio file and checking if audio is present
-			for (let format of formats) {
-				// Find the item with the preferred video format
-				if (
-					format.height <= preferredVideoQuality &&
-					format.height >= defaultVideoFormat &&
-					format.video_ext !== "none" &&
-					!(
-						format.video_ext === "mp4" &&
-						format.vcodec &&
-						format.vcodec.split(".")[0] === "vp09"
-					) &&
-					(!showMoreFormats ? format.video_ext !== "webm" : true)
-				) {
-					defaultVideoFormat = format.height;
+		console.log(
+			"Spawned yt-dlp with args:",
+			downloadProcess.ytDlpProcess.spawnargs.join(" ")
+		);
 
-					// Creating a list of available codecs for the required video height
-					if (!videoFormatCodecs[format.height]) {
-						videoFormatCodecs[format.height] = {codecs: []};
-					}
-					if (format.vcodec) {
-						videoFormatCodecs[format.height].codecs.push(
-							format.vcodec.split(".")[0]
-						);
-					}
-				}
+		// Attach event listeners
+		downloadProcess
+			.on("progress", (progress) =>
+				this._updateProgressUI(randomId, progress)
+			)
+			.once("ytDlpEvent", () => {
+				const el = $(`${randomId}_prog`);
+				if (el) el.textContent = i18n.__("Downloading...");
+			})
+			.once("close", (code) => {
+				this._handleDownloadCompletion(
+					code,
+					randomId,
+					finalFilename,
+					finalExt,
+					job.thumbnail
+				);
+			})
+			.once("error", (error) => {
+				this._handleDownloadError(error, randomId);
+			});
+	}
 
-				// Going through audio list
-				if (
-					format.audio_ext !== "none" ||
-					(format.acodec !== "none" && format.video_ext === "none")
-				) {
-					audioIsPresent = true;
-					onlyVideo = true;
-					audioSize =
-						Number(format.filesize || format.filesize_approx) /
-						1000000;
+	/**
+	 * Queues a download job if the maximum number of active downloads is reached.
+	 * @param {object} job The download job object.
+	 */
+	_queueDownload(job) {
+		const randomId = "queue_" + Math.random().toString(36).substring(2, 12);
+		this.state.downloadQueue.push({...job, queueId: randomId});
+		const itemHTML = `
+            <div class="item" id="${randomId}">
+                <div class="itemIconBox">
+                    <img src="${
+						job.thumbnail || "../assets/images/thumb.png"
+					}" alt="thumbnail" class="itemIcon" crossorigin="anonymous">
+                    <span class="itemType">${i18n.__(
+						job.type === "video" ? "Video" : "Audio"
+					)}</span>
+                </div>
+                <div class="itemBody">
+                    <div class="itemTitle">${job.title}</div>
+                    <p>${i18n.__("Download pending...")}</p>
+                </div>
+            </div>`;
+		$(CONSTANTS.DOM_IDS.DOWNLOAD_LIST).insertAdjacentHTML(
+			"beforeend",
+			itemHTML
+		);
+	}
 
-					if (!audioExtensionList.includes(format.audio_ext)) {
-						audioExtensionList.push(format.audio_ext);
-					}
-
-					if (
-						format.format_note &&
-						format.format_note.length > maxAudioFormatNoteLength
-					) {
-						maxAudioFormatNoteLength = format.format_note.length;
-					}
-				}
-
-				if (
-					format.audio_ext === preferredAudioQuality ||
-					format.acodec === preferredAudioQuality
-				) {
-					preferredAudioFormatLength++;
-				}
-			}
-
-			const availableCodecs = videoFormatCodecs[defaultVideoFormat]
-				? videoFormatCodecs[defaultVideoFormat].codecs
-				: [];
-
-			if (!availableCodecs.includes(preferredVideoCodec)) {
-				preferredVideoCodec =
-					availableCodecs[availableCodecs.length - 1];
-			}
-
-			for (let format of formats) {
-				let size;
-				let selectedText = "";
-				let audioSelectedText = "";
-
-				if (
-					format.height == defaultVideoFormat &&
-					format.vcodec &&
-					format.vcodec.split(".")[0] === preferredVideoCodec &&
-					!selected &&
-					format.video_ext !== "none" &&
-					!(
-						format.video_ext === "mp4" &&
-						format.vcodec &&
-						format.vcodec.split(".")[0] === "vp09"
-					) &&
-					(!showMoreFormats ? format.video_ext !== "webm" : true)
-				) {
-					selectedText = " selected ";
-					selected = true;
-				}
-
-				if (format.filesize || format.filesize_approx) {
-					size = (
-						Number(format.filesize || format.filesize_approx) /
-						1000000
-					).toFixed(2);
-				} else {
-					// if (format.tbr) {
-					// 	size = (
-					// 		(format.tbr * 50 * duration) /
-					// 		1000000
-					// 	).toFixed(2);
-					// } else {
-
-					// }
-					size = i18n.__("Unknown size");
-				}
-
-				// For videos
-
-				if (
-					format.video_ext !== "none" &&
-					!(
-						format.video_ext === "mp4" &&
-						format.vcodec &&
-						format.vcodec.split(".")[0] === "vp09"
-					) &&
-					(!showMoreFormats ? format.video_ext !== "webm" : true)
-				) {
-					if (size !== i18n.__("Unknown size")) {
-						size = (Number(size) + 0 || Number(audioSize)).toFixed(
-							1
-						);
-						size = size + " " + i18n.__("MB");
-					}
-
-					const format_id =
-						format.format_id +
-						"|" +
-						format.ext +
-						"|" +
-						(format.height || "NO");
-
-					// Video codec
-
-					const vcodec =
-						format.vcodec && showMoreFormats
-							? format.vcodec.split(".")[0]
-							: "";
-					let spaceAfterVcodec = showMoreFormats
-						? "&#160".repeat(5 - vcodec.length)
-						: "";
-					showMoreFormats
-						? (spaceAfterVcodec += "|  ")
-						: (spaceAfterVcodec += "");
-
-					// Quality
-					const quality =
-						(format.height
-							? format.height +
-							  "p" +
-							  (format.fps == 60 ? "60" : "")
-							: "") ||
-						format.format_note ||
-						format.resolution ||
-						format.format_id ||
-						"Unknown quality";
-					const spaceAfterQuality = "&#160".repeat(
-						quality.length <= 8 && 8 - quality.length > 0
-							? 8 - quality.length
-							: 1
-					);
-
-					// Extension
-					const extension = format.ext;
-
-					// Format and Quality Options
-					const element =
-						"<option value='" +
-						format_id +
-						"'" +
-						selectedText +
-						">" +
-						quality +
-						spaceAfterQuality +
-						"| " +
-						extension.padEnd(5, "\xa0") +
-						"|  " +
-						(vcodec ? vcodec + spaceAfterVcodec : "") +
-						size +
-						(format.acodec !== "none" ? " 🔊" : "") +
-						"</option>";
-					getId("videoFormatSelect").innerHTML += element;
-				}
-				// For audios
-				else if (
-					format.audio_ext !== "none" ||
-					(format.acodec !== "none" && format.video_ext === "none")
-				) {
-					if (!showMoreFormats && format.audio_ext === "webm") {
-						continue;
-					}
-
-					size =
-						size !== i18n.__("Unknown size")
-							? size + " MB"
-							: i18n.__("Unknown size");
-					let audio_ext;
-
-					if (format.audio_ext === "webm") {
-						audio_ext = "opus";
-					} else {
-						audio_ext = format.audio_ext;
-					}
-					if (
-						format.audio_ext === preferredAudioQuality ||
-						format.acodec === preferredAudioQuality
-					) {
-						preferredAudioFormatCount += 1;
-						if (
-							preferredAudioFormatCount ===
-							preferredAudioFormatLength
-						) {
-							audioSelectedText = " selected ";
-						}
-					}
-
-					const format_id = format.format_id + "|" + audio_ext;
-
-					/**@type {string} */
-					let formatNote =
-						i18n.__(format.format_note) ||
-						i18n.__("Unknown quality");
-
-					formatNote = formatNote.padEnd(
-						maxAudioFormatNoteLength,
-						"\xa0"
-					);
-
-					const element =
-						"<option value='" +
-						format_id +
-						"'" +
-						audioSelectedText +
-						">" +
-						// i18n.__("Quality") +
-						// ": " +
-						formatNote +
-						"| " +
-						audio_ext.padEnd(4, "\xa0") +
-						" | " +
-						size +
-						"</option>";
-
-					getId("audioFormatSelect").innerHTML += element;
-					getId("audioForVideoFormatSelect").innerHTML += element;
-				}
-				// Both audio and video available
-				else if (
-					format.audio_ext !== "none" ||
-					(format.acodec !== "none" && format.video_ext !== "none")
-				) {
-					// Skip them
-				}
-
-				// When there is no audio
-				if (audioIsPresent === false) {
-					getId("audioPresent").style.display = "none";
-				} else {
-					getId("audioPresent").style.display = "block";
-				}
-			}
+	/**
+	 * Checks the queue and starts the next download if a slot is available.
+	 */
+	_processQueue() {
+		if (
+			this.state.downloadQueue.length > 0 &&
+			this.state.currentDownloads < this.state.maxActiveDownloads
+		) {
+			const nextJob = this.state.downloadQueue.shift();
+			// Remove the pending UI element
+			$(nextJob.queueId)?.remove();
+			this._startDownload(nextJob);
 		}
-	});
-}
-
-// Video download event
-getId("videoDownload").addEventListener("click", (event) => {
-	checkMaxDownloads();
-	hideHidden();
-	console.log(`Current:${currentDownloads} Max:${maxActiveDownloads}`);
-
-	if (currentDownloads < maxActiveDownloads) {
-		manageAdvanced(duration);
-		download("video");
-		currentDownloads++;
-	} else {
-		// Handling active downloads for video
-		manageAdvanced(duration);
-		const range1 = rangeOption;
-		const range2 = rangeCmd;
-		const subs1 = subs;
-		const subs2 = subLangs;
-		const url1 = getId("url").value;
-		const thumb1 = thumbnail;
-		const title1 = title;
-
-		const randId = Math.random().toFixed(10).toString().slice(2);
-		const item = `
-		<div class="item" id="${randId}">
-			<div class="itemIconBox">
-			<img src="${
-				thumbnail || "../assets/images/thumb.png"
-			}" alt="No thumbnail" class="itemIcon" crossorigin="anonymous">
-			<span class="itemType">${i18n.__("Video")}</span>
-			</div>
-			<div class="itemBody">
-				<div class="itemTitle">${title}</div>
-				<p>${i18n.__("Download pending")}</p>
-			</div>
-		</div>
-		`;
-		getId("list").innerHTML += item;
-		const interval = setInterval(() => {
-			if (currentDownloads < maxActiveDownloads) {
-				getId(randId).remove();
-				download(
-					"video",
-					url1,
-					range1,
-					range2,
-					subs1,
-					subs2,
-					thumb1,
-					title1
-				);
-				currentDownloads++;
-				clearInterval(interval);
-			}
-		}, 2000);
-	}
-});
-
-// Audio download event
-getId("audioDownload").addEventListener("click", (event) => {
-	checkMaxDownloads();
-	hideHidden();
-	console.log(`Current:${currentDownloads} Max:${maxActiveDownloads}`);
-
-	if (currentDownloads < maxActiveDownloads) {
-		manageAdvanced(duration);
-		download("audio");
-		currentDownloads++;
-	} else {
-		// Handling active downloads for audio
-		manageAdvanced(duration);
-		const range1 = rangeOption;
-		const range2 = rangeCmd;
-		const subs1 = subs;
-		const subs2 = subLangs;
-		const url1 = getId("url").value;
-		const thumb1 = thumbnail;
-		const title1 = title;
-
-		const randId = Math.random().toFixed(10).toString().slice(2);
-
-		const item = `
-		
-		<div class="item" id="${randId}">
-			<div class="itemIconBox">
-			<img src="${thumbnail}" alt="No thumbnail" class="itemIcon" crossorigin="anonymous">
-			<span class="itemType">${i18n.__("Audio")}</span>
-			</div>
-			<div class="itemBody">
-				<div class="itemTitle">${title}</div>
-				<p>${i18n.__("Download pending")}</p>
-			</div>
-		</div>
-		`;
-		getId("list").innerHTML += item;
-		const interval = setInterval(() => {
-			if (currentDownloads < maxActiveDownloads) {
-				getId(randId).remove();
-				download(
-					"audio",
-					url1,
-					range1,
-					range2,
-					subs1,
-					subs2,
-					thumb1,
-					title1
-				);
-				currentDownloads++;
-				clearInterval(interval);
-			}
-		}, 2000);
-	}
-});
-
-getId("extractBtn").addEventListener("click", () => {
-	checkMaxDownloads();
-	hideHidden();
-
-	console.log(`Current:${currentDownloads} Max:${maxActiveDownloads}`);
-
-	if (currentDownloads < maxActiveDownloads) {
-		manageAdvanced(duration);
-		download("extract");
-		currentDownloads++;
-	} else {
-		manageAdvanced(duration);
-		const range1 = rangeOption;
-		const range2 = rangeCmd;
-		const subs1 = subs;
-		const subs2 = subLangs;
-		const url1 = getId("url").value;
-		const randId = Math.random().toFixed(10).toString().slice(2);
-		const thumb1 = thumbnail;
-		const title1 = title;
-		const extractFormat = getId("extractSelection").value;
-		const extractQuality = getId("extractQualitySelect").value;
-
-		const item = `
-		<div class="item" id="${randId}">
-			<div class="itemIconBox">
-			<img src="${thumbnail}" alt="No thumbnail" class="itemIcon" crossorigin="anonymous">
-			<span class="itemType">${i18n.__("Audio")}</span>
-		</div>
-			<div class="itemBody">
-				<div class="itemTitle">${title}</div>
-				<p>${i18n.__("Download pending")}</p>
-			</div>
-		</div>
-		`;
-		getId("list").innerHTML += item;
-		const interval = setInterval(() => {
-			if (currentDownloads < maxActiveDownloads) {
-				getId(randId).remove();
-				download(
-					"extract",
-					url1,
-					range1,
-					range2,
-					subs1,
-					subs2,
-					thumb1,
-					title1,
-					extractFormat,
-					extractQuality
-				);
-				currentDownloads++;
-				clearInterval(interval);
-			}
-		}, 2000);
-	}
-});
-
-// Time formatting
-
-function timeFormat(duration) {
-	// Hours, minutes and seconds
-	var hrs = ~~(duration / 3600);
-	var mins = ~~((duration % 3600) / 60);
-	var secs = ~~duration % 60;
-	// Output like "1:01" or "4:03:59" or "123:03:59"
-	var ret = "";
-	if (hrs > 0) {
-		ret += "" + hrs + ":" + (mins < 10 ? "0" : "");
-	}
-	ret += "" + mins + ":" + (secs < 10 ? "0" : "");
-	ret += "" + secs;
-	return ret;
-}
-
-// Manage advanced options, needs to be called
-
-function manageAdvanced(duration) {
-	let startTime = getId("startTime").value;
-	let endTime = getId("endTime").value;
-
-	if (startTime && !endTime) {
-		rangeCmd = `*${startTime}-${timeFormat(duration)}`;
-		rangeOption = "--download-sections";
-	} else if (!startTime && endTime) {
-		rangeCmd = `*0-${endTime}`;
-		rangeOption = "--download-sections";
-	} else if (startTime && endTime) {
-		rangeCmd = `*${startTime}-${endTime}`;
-		rangeOption = "--download-sections";
-	} else {
-		rangeOption = "";
-		rangeCmd = "";
 	}
 
-	// If subtitles are checked
-	if (getId("subChecked").checked) {
-		subs = "--write-subs";
-		subLangs = "--sub-langs all";
-	} else {
-		subs = "";
-		subLangs = "";
-	}
+	/**
+	 * Prepares the command-line arguments for yt-dlp based on the download job.
+	 * @param {object} job The download job object.
+	 * @returns {{downloadArgs: string[], finalFilename: string, finalExt: string}}
+	 */
+	_prepareDownloadArgs(job) {
+		const {type, url, title, options, uiSnapshot} = job;
+		const {rangeOption, rangeCmd, subs, subLangs} = options;
+		const {proxy, browserForCookies, configPath} = this.state.preferences;
 
-	console.log("Range option: " + rangeOption);
-	console.log("rangeCmd:" + rangeCmd);
-}
-//////////////////////////////
-// Downloading with yt-dlp
-//////////////////////////////
+		let format_id, ext, audioForVideoFormat_id, audioFormat;
 
-function download(
-	type,
-	url1 = "",
-	range1 = "",
-	range2 = "",
-	subs1 = "",
-	subs2 = "",
-	thumb1 = "",
-	title1 = "",
-	extractFormat = "",
-	extractQuality = ""
-) {
-	// Config file
-	const newTitle = title1 || title;
+		if (type === "video") {
+			const [videoFid, videoExt] = uiSnapshot.videoFormat.split("|");
+			const [audioFid, audioExt] =
+				uiSnapshot.audioForVideoFormat.split("|");
 
-	if (localStorage.getItem("configPath")) {
-		configArg = "--config-location";
-		configTxt = `"${localStorage.getItem("configPath")}"`;
-	}
+			format_id = videoFid;
+			audioForVideoFormat_id = audioFid;
 
-	const url = url1 || getId("url").value;
-	console.log("URL", url);
-	let ext, extractExt, extractFormat1, extractQuality1, audioForVideoExt;
+			// Determine final container extension
+			const finalAudioExt = audioExt === "webm" ? "opus" : audioExt;
+			ext =
+				(videoExt === "mp4" && finalAudioExt === "opus") ||
+				(videoExt === "webm" &&
+					(finalAudioExt === "m4a" || finalAudioExt === "mp4"))
+					? "mkv"
+					: videoExt;
 
-	/**@type {string}*/
-	let format_id, audioForVideoFormat_id;
-	const randomId = "a" + Math.random().toFixed(10).toString().slice(2);
-
-	// Whether to close app
-	let quit = Boolean(getId("quitChecked").checked);
-
-	if (type === "video") {
-		const videoValue = getId("videoFormatSelect").value;
-		/**@type {string} */
-		const audioForVideoValue = getId("audioForVideoFormatSelect").value;
-
-		format_id = videoValue.split("|")[0];
-		const videoExt = videoValue.split("|")[1];
-
-		if (videoValue.split("|")[2] != "NO") {
-			preferredVideoQuality = Number(videoValue.split("|")[2]);
-		}
-
-		audioForVideoFormat_id = audioForVideoValue.split("|")[0];
-
-		if (audioForVideoValue.split("|")[1] === "webm") {
-			audioForVideoExt = "opus";
+			// Determine audio format string for yt-dlp
+			audioFormat =
+				audioForVideoFormat_id === "none"
+					? ""
+					: `+${audioForVideoFormat_id}`;
+		} else if (type === "audio") {
+			[format_id, ext] = uiSnapshot.audioFormat.split("|");
+			ext = ext === "webm" ? "opus" : ext;
 		} else {
-			audioForVideoExt = audioForVideoValue.split("|")[1];
+			// type === 'extract'
+			ext =
+				{alac: "m4a", vorbis: "ogg"}[uiSnapshot.extractFormat] ||
+				uiSnapshot.extractFormat;
 		}
+
+		// Sanitize filename
+		const invalidChars =
+			os.platform() === "win32" ? /[<>:"/\\|?*[\]`#]/g : /["/`#]/g;
+		let finalFilename = title
+			.replace(invalidChars, "")
+			.trim()
+			.slice(0, 100);
+		if (finalFilename.startsWith(".")) {
+			finalFilename = finalFilename.substring(1);
+		}
+		if (rangeCmd) {
+			let rangeTxt = rangeCmd.replace("*", "");
+			if (os.platform() === "win32")
+				rangeTxt = rangeTxt.replace(/:/g, "_");
+			finalFilename += ` [${rangeTxt}]`;
+		}
+
+		const outputPath = `"${path.join(
+			this.state.downloadDir,
+			`${finalFilename}.${ext}`
+		)}"`;
+		const commonArgs = [
+			"--no-playlist",
+			"--embed-chapters",
+			"--no-mtime",
+			rangeOption,
+			rangeCmd,
+			browserForCookies ? "--cookies-from-browser" : "",
+			browserForCookies,
+			proxy ? "--proxy" : "",
+			proxy,
+			configPath ? "--config-location" : "",
+			configPath ? `"${configPath}"` : "",
+			"--ffmpeg-location",
+			`"${this.state.ffmpegPath}"`,
+			`"${url}"`,
+		].filter(Boolean);
+
+		let downloadArgs;
+		if (type === "extract") {
+			downloadArgs = [
+				"-x",
+				"--audio-format",
+				uiSnapshot.extractFormat,
+				"--audio-quality",
+				uiSnapshot.extractQuality,
+				"-o",
+				outputPath,
+				...commonArgs,
+			];
+		} else {
+			const formatString =
+				type === "video" ? `${format_id}${audioFormat}` : format_id;
+			downloadArgs = [
+				"-f",
+				formatString,
+				"-o",
+				outputPath,
+				subs,
+				subLangs,
+				...commonArgs,
+			];
+		}
+
+		return {downloadArgs, finalFilename, finalExt: ext};
+	}
+
+	/**
+	 * Handles the completion of a download process.
+	 */
+	_handleDownloadCompletion(code, randomId, filename, ext, thumbnail) {
+		this.state.currentDownloads--;
+		this.state.downloadControllers.delete(randomId);
+
+		if (code === 0) {
+			this._showDownloadSuccessUI(randomId, filename, ext, thumbnail);
+			this.state.downloadedItems.add(randomId);
+			this._updateClearAllButton();
+		} else if (code !== null) {
+			// code is null if aborted, so only show error if it's a real exit code
+			this._handleDownloadError(
+				new Error(`Download process exited with code ${code}.`),
+				randomId
+			);
+		}
+
+		this._processQueue();
+
+		if ($(CONSTANTS.DOM_IDS.QUIT_CHECKED).checked) {
+			ipcRenderer.send("quit", "quit");
+		}
+	}
+
+	/**
+	 * Handles an error during the download process.
+	 */
+	_handleDownloadError(error, randomId) {
+		if (
+			error.name === "AbortError" ||
+			error.message.includes("AbortError")
+		) {
+			console.log(`Download ${randomId} was aborted.`);
+			this.state.currentDownloads = Math.max(
+				0,
+				this.state.currentDownloads - 1
+			);
+			this.state.downloadControllers.delete(randomId);
+			this._processQueue();
+			return; // Don't treat user cancellation as an error
+		}
+		this.state.currentDownloads--;
+		this.state.downloadControllers.delete(randomId);
+		console.error("Download Error:", error);
+		const progressEl = $(`${randomId}_prog`);
+		if (progressEl) {
+			progressEl.textContent = i18n.__("Error. Hover for details.");
+			progressEl.title = error.message;
+		}
+		this._processQueue();
+	}
+
+	/**
+	 * Updates the download options state from the UI elements.
+	 */
+	_updateDownloadOptionsFromUI() {
+		const startTime = $(CONSTANTS.DOM_IDS.START_TIME).value;
+		const endTime = $(CONSTANTS.DOM_IDS.END_TIME).value;
+		const duration = this.state.videoInfo.duration;
+
+		if (startTime || endTime) {
+			const start = startTime || "0";
+			const end = endTime || this._formatTime(duration);
+			this.state.downloadOptions.rangeCmd = `*${start}-${end}`;
+			this.state.downloadOptions.rangeOption = "--download-sections";
+		} else {
+			this.state.downloadOptions.rangeCmd = "";
+			this.state.downloadOptions.rangeOption = "";
+		}
+
+		if ($(CONSTANTS.DOM_IDS.SUB_CHECKED).checked) {
+			this.state.downloadOptions.subs = "--write-subs";
+			this.state.downloadOptions.subLangs = "--sub-langs all";
+		} else {
+			this.state.downloadOptions.subs = "";
+			this.state.downloadOptions.subLangs = "";
+		}
+	}
+
+	/**
+	 * Formats seconds into HH:MM:SS format.
+	 * @param {number} duration in seconds.
+	 * @returns {string}
+	 */
+	_formatTime(duration) {
+		const hrs = ~~(duration / 3600);
+		const mins = ~~((duration % 3600) / 60);
+		const secs = ~~duration % 60;
+		let ret = "";
+		if (hrs > 0) {
+			ret += `${hrs}:${mins < 10 ? "0" : ""}`;
+		}
+		ret += `${mins}:${secs < 10 ? "0" : ""}${secs}`;
+		return ret;
+	}
+
+	/**
+	 * Resets the UI state for a new link.
+	 */
+	_resetUIForNewLink() {
+		this._hideInfoPanel();
+		$(CONSTANTS.DOM_IDS.LOADING_WRAPPER).style.display = "flex";
+		$(CONSTANTS.DOM_IDS.INCORRECT_MSG).textContent = "";
+		$(CONSTANTS.DOM_IDS.ERROR_BTN).style.display = "none";
+		$(CONSTANTS.DOM_IDS.ERROR_DETAILS).style.display = "none";
+		$(CONSTANTS.DOM_IDS.VIDEO_FORMAT_SELECT).innerHTML = "";
+		$(CONSTANTS.DOM_IDS.AUDIO_FORMAT_SELECT).innerHTML = "";
+		$(CONSTANTS.DOM_IDS.AUDIO_FOR_VIDEO_FORMAT_SELECT).innerHTML =
+			'<option value="none|none">No Audio</option>';
+	}
+
+	/**
+	 * Populates the video and audio format <select> elements.
+	 * @param {Array} formats The formats array from yt-dlp metadata.
+	 */
+	_populateFormatSelectors(formats) {
+		const videoSelect = $(CONSTANTS.DOM_IDS.VIDEO_FORMAT_SELECT);
+		const audioSelect = $(CONSTANTS.DOM_IDS.AUDIO_FORMAT_SELECT);
+		const audioForVideoSelect = $(
+			CONSTANTS.DOM_IDS.AUDIO_FOR_VIDEO_FORMAT_SELECT
+		);
+
+		const {videoQuality, videoCodec, showMoreFormats} =
+			this.state.preferences;
+		let bestMatchHeight = 0;
+
+		// Find the best available video height based on preference
+		formats.forEach((f) => {
+			if (
+				f.height &&
+				f.height <= videoQuality &&
+				f.height > bestMatchHeight &&
+				f.video_ext !== "none"
+			) {
+				bestMatchHeight = f.height;
+			}
+		});
+		if (bestMatchHeight === 0 && formats.length > 0) {
+			bestMatchHeight = Math.max(
+				...formats.filter((f) => f.height).map((f) => f.height)
+			);
+		}
+
+		// Determine preferred codec for the best height
+		const availableCodecs = new Set(
+			formats
+				.filter((f) => f.height === bestMatchHeight && f.vcodec)
+				.map((f) => f.vcodec.split(".")[0])
+		);
+		const finalCodec = availableCodecs.has(videoCodec)
+			? videoCodec
+			: [...availableCodecs].pop();
+
+		let isAVideoSelected = false;
+		formats.forEach((format) => {
+			const size = format.filesize || format.filesize_approx;
+			const displaySize = size
+				? `${(size / 1000000).toFixed(2)} MB`
+				: i18n.__("Unknown size");
+
+			if (format.video_ext !== "none" && format.vcodec !== "none") {
+				if (
+					!showMoreFormats &&
+					(format.ext === "webm" || format.vcodec?.startsWith("vp"))
+				) {
+					return;
+				}
+				let isSelected = false;
+				if (
+					!isAVideoSelected &&
+					format.height === bestMatchHeight &&
+					format.vcodec?.startsWith(finalCodec)
+				) {
+					isSelected = true;
+					isAVideoSelected = true;
+				}
+
+				const quality = `${format.height || "???"}p${
+					format.fps === 60 ? "60" : ""
+				}`;
+				const vcodec = showMoreFormats
+					? `| ${format.vcodec?.split(".")[0]}`
+					: "";
+				const hasAudio = format.acodec !== "none" ? " 🔊" : "";
+
+				const option = `<option value="${format.format_id}|${
+					format.ext
+				}|${format.height}" ${
+					isSelected ? "selected" : ""
+				}>${quality.padEnd(9, " ")} | ${format.ext.padEnd(
+					5,
+					" "
+				)} ${vcodec} | ${displaySize} ${hasAudio}</option>`;
+				videoSelect.innerHTML += option;
+			} else if (
+				format.acodec !== "none" &&
+				format.video_ext === "none"
+			) {
+				if (!showMoreFormats && format.ext === "webm") return;
+
+				const audioExt = format.ext === "webm" ? "opus" : format.ext;
+				const formatNote =
+					i18n.__(format.format_note) || i18n.__("Unknown quality");
+				const option = `<option value="${
+					format.format_id
+				}|${audioExt}">${formatNote.padEnd(
+					15,
+					" "
+				)} | ${audioExt.padEnd(5, " ")} | ${displaySize}</option>`;
+				audioSelect.innerHTML += option;
+				audioForVideoSelect.innerHTML += option;
+			}
+		});
 
 		if (
-			(videoExt === "mp4" && audioForVideoExt === "opus") ||
-			(videoExt === "webm" &&
-				(audioForVideoExt === "m4a" || audioForVideoExt === "mp4"))
+			formats.every((f) => f.acodec === "none" || f.acodec === undefined)
 		) {
-			ext = "mkv";
+			$(CONSTANTS.DOM_IDS.AUDIO_PRESENT_SECTION).style.display = "none";
 		} else {
-			ext = videoExt;
-		}
-	} else if (type === "audio") {
-		format_id = getId("audioFormatSelect").value.split("|")[0];
-		if (getId("audioFormatSelect").value.split("|")[1] === "webm") {
-			ext = "opus";
-		} else {
-			ext = getId("audioFormatSelect").value.split("|")[1];
+			$(CONSTANTS.DOM_IDS.AUDIO_PRESENT_SECTION).style.display = "block";
 		}
 	}
-	console.log("Download extension:", ext);
 
-	const newItem = `
-		<div class="item" id="${randomId}">
-		<div class="itemIconBox">
-			<img src="${
-				thumb1 || thumbnail || "../assets/images/thumb.png"
-			}" alt="No thumbnail" class="itemIcon" crossorigin="anonymous">
-			<span class="itemType">${
-				type === "video" ? i18n.__("Video") : i18n.__("Audio")
-			}</span>
-		</div>
-		<img src="../assets/images/close.png" onClick="fadeItem('${randomId}')" class="itemClose"}" id="${
-		randomId + ".close"
-	}">
+	/**
+	 * Shows the hidden panel with video information.
+	 */
+	_displayInfoPanel() {
+		const info = this.state.videoInfo;
+		const titleContainer = $(CONSTANTS.DOM_IDS.TITLE_CONTAINER);
 
-
-		<div class="itemBody">
-			<div class="itemTitle">${newTitle}</div>
-			<strong class="itemSpeed" id="${randomId + "speed"}"></strong>
-			<div id="${randomId + "prog"}" class="itemProgress"></div>
-		</div>
-	</div>
-	`;
-	getId("list").innerHTML += newItem;
-	getId("loadingWrapper").style.display = "none";
-	getId(randomId + "prog").textContent = i18n.__("Preparing...");
-
-	getId(randomId + ".close").addEventListener("click", () => {
-		if (getId(randomId)) {
-			removeFromDownloadedList(randomId);
-			fadeItem(randomId);
-		}
-	});
-
-	let downloadProcess;
-	let filename = "";
-
-	// Filtering characters for Unix platforms
-	let pattern = ["/", '"', "`", "#"];
-
-	if (os.platform() === "win32") {
-		pattern = [
-			"[",
-			"]",
-			"*",
-			"<",
-			">",
-			"|",
-			"\\",
-			"/",
-			"?",
-			'"',
-			"`",
-			"#",
-			"：",
-			":",
-		];
-	}
-
-	// Trying to remove ambiguous characters
-	for (let i = 0; i < newTitle.length; i++) {
-		let letter = "";
-		if (pattern.includes(newTitle[i])) {
-			letter = "";
-		} else {
-			letter = newTitle[i];
-		}
-		filename += letter;
-	}
-	filename = filename.slice(0, 100);
-	if (filename[0] === ".") {
-		filename = filename.slice(1, 100);
-	}
-
-	// Adding info about trimmed range to filename
-	if (range2 || rangeCmd) {
-		let rangeTxt = (range2 || rangeCmd).replace("*", "");
-		if (os.platform() === "win32") {
-			rangeTxt = rangeTxt.replaceAll(":", "_");
-			console.log({rangeTxt});
-		}
-		filename += `[${rangeTxt}]`;
-	}
-	console.log("Filename:", filename);
-
-	/**@type {string} */
-	let audioFormat = "+ba";
-
-	if (audioForVideoFormat_id === "auto") {
-		if (ext === "mp4") {
-			if (!(audioExtensionList.length == 0)) {
-				if (audioExtensionList.includes("m4a")) {
-					audioFormat = "+m4a";
-				}
-			} else {
-				audioFormat = "";
-			}
-		}
-	} else if (audioForVideoFormat_id === "none") {
-		audioFormat = "";
-	} else {
-		audioFormat = `+${audioForVideoFormat_id}`;
-	}
-
-	const controller = new AbortController();
-	controllers[randomId] = controller;
-
-	console.log(rangeOption + " " + rangeCmd);
-	console.log(`-f ${format_id}${audioFormat}`);
-
-	if (type === "video" && onlyVideo) {
-		// If video has no sound, audio needs to be downloaded
-		console.log("Downloading both video and audio");
-
-		const cleanFfmpegPathWin = path.join(__dirname, "..", "ffmpeg.exe");
-
-		const args = [
-			range1 || rangeOption,
-			range2 || rangeCmd,
-			"-f",
-			`${format_id}${audioFormat}`,
-			"-o",
-			`"${path.join(downloadDir, filename + `.${ext}`)}"`,
-			"--ffmpeg-location",
-			ffmpeg,
-			// Fix for windows media player
-			os.platform() == "win32" && audioFormat == "" && ext == "mp4"
-				? `--exec "\\"${cleanFfmpegPathWin}\\" -y -i {} -c copy -movflags +faststart -brand isom {}.fixed.mp4 && move /Y {}.fixed.mp4 {}"`
-				: "",
-			subs1 || subs,
-			subs2 || subLangs,
-			"--no-playlist",
-			"--embed-chapters",
-			// "--embed-metadata",
-			ext == "mp4" &&
-			audioForVideoExt === "m4a" &&
-			extractor_key === "Youtube" &&
-			os.platform() !== "darwin"
-				? "--embed-thumbnail"
-				: "",
-			configArg,
-			configTxt,
-			cookieArg,
-			browser,
-			"--no-mtime",
-			proxy ? "--no-check-certificate" : "",
-			proxy ? "--proxy" : "",
-			proxy,
-			`"${url}"`,
-		].filter((item) => item);
-
-		downloadProcess = ytDlp.exec(
-			args,
-			{shell: true, detached: false},
-			controller.signal
+		titleContainer.innerHTML = ""; // Clear previous content
+		titleContainer.append(
+			Object.assign(document.createElement("b"), {
+				textContent: i18n.__("Title ") + ": ",
+			}),
+			Object.assign(document.createElement("input"), {
+				className: "title",
+				id: CONSTANTS.DOM_IDS.TITLE_INPUT,
+				type: "text",
+				value: `${info.title} [${info.id}]`,
+				onchange: (e) => (this.state.videoInfo.title = e.target.value),
+			})
 		);
-	} else if (type === "extract") {
-		if (extractFormat == "alac") {
-			extractExt = "m4a";
-		} else if (extractFormat == "vorbis") {
-			extractExt = "ogg";
-		} else {
-			extractExt = extractFormat || getId("extractSelection").value;
-		}
-		extractFormat1 = extractFormat || getId("extractSelection").value;
-		extractQuality1 = extractQuality || getId("extractQualitySelect").value;
 
-		console.log(extractFormat1);
-		console.log(extractQuality1);
+		document
+			.querySelectorAll(CONSTANTS.DOM_IDS.URL_INPUTS)
+			.forEach((el) => {
+				el.value = info.url;
+			});
 
-		const args = [
-			"-x",
-			"--audio-format",
-			extractFormat1,
-			"--audio-quality",
-			extractQuality1,
-			"-o",
-			`"${path.join(downloadDir, filename + `.${extractExt}`)}"`,
-			"--ffmpeg-location",
-			ffmpeg,
-			"--embed-chapters",
-			"--no-playlist",
-			// "--embed-metadata",
-			(extractFormat1 == "m4a" || extractFormat1 == "mp3") &&
-			extractor_key === "Youtube" &&
-			os.platform() !== "darwin"
-				? "--embed-thumbnail"
-				: "",
-			cookieArg,
-			browser,
-			configArg,
-			configTxt,
-			"--no-mtime",
-			proxy ? "--no-check-certificate" : "",
-			proxy ? "--proxy" : "",
-			proxy,
-			`"${url}"`,
-		].filter((item) => item);
-
-		downloadProcess = ytDlp.exec(
-			args,
-			{shell: true, detached: false},
-			controller.signal
-		);
+		const hiddenPanel = $(CONSTANTS.DOM_IDS.HIDDEN_PANEL);
+		hiddenPanel.style.display = "inline-block";
+		hiddenPanel.classList.add("scaleUp");
 	}
-	// If downloading only audio or video with audio
-	else {
-		console.log("downloading only audio or video with audio");
 
-		const args = [
-			range1 || rangeOption,
-			range2 || rangeCmd,
-			"-f",
-			format_id,
-			"-o",
-			`"${path.join(downloadDir, filename + `.${ext}`)}"`,
-			"--ffmpeg-location",
-			ffmpeg,
-			subs1 || subs,
-			subs2 || subLangs,
-			"--no-playlist",
-			"--embed-chapters",
-			// "--embed-metadata",
-			(ext == "m4a" || ext == "mp4") &&
-			extractor_key === "Youtube" &&
-			os.platform() !== "darwin"
-				? "--embed-thumbnail"
-				: "",
-			cookieArg,
-			browser,
-			configArg,
-			configTxt,
-			"--no-mtime",
-			proxy ? "--no-check-certificate" : "",
-			proxy ? "--proxy" : "",
-			proxy,
-			`"${url}"`,
-		].filter((item) => item);
+	/**
+	 * Creates the initial UI element for a new download.
+	 */
+	_createDownloadUI(randomId, job) {
+		const itemHTML = `
+            <div class="item" id="${randomId}">
+                <div class="itemIconBox">
+                    <img src="${
+						job.thumbnail || "../assets/images/thumb.png"
+					}" alt="thumbnail" class="itemIcon" crossorigin="anonymous">
+                    <span class="itemType">${i18n.__(
+						job.type === "video" ? "Video" : "Audio"
+					)}</span>
+                </div>
+                <img src="../assets/images/close.png" class="itemClose" id="${randomId}_close">
+                <div class="itemBody">
+                    <div class="itemTitle">${job.title}</div>
+                    <strong class="itemSpeed" id="${randomId}_speed"></strong>
+                    <div id="${randomId}_prog" class="itemProgress">${i18n.__(
+			"Preparing..."
+		)}</div>
+                </div>
+            </div>`;
+		$(CONSTANTS.DOM_IDS.DOWNLOAD_LIST).insertAdjacentHTML(
+			"beforeend",
+			itemHTML
+		);
 
-		downloadProcess = ytDlp.exec(
-			args,
-			{shell: true, detached: false},
-			controller.signal
+		$(`${randomId}_close`).addEventListener("click", () =>
+			this._cancelDownload(randomId)
 		);
 	}
 
-	console.log(
-		"Spawn args:" +
-			downloadProcess.ytDlpProcess.spawnargs[
-				downloadProcess.ytDlpProcess.spawnargs.length - 1
-			]
-	);
+	/**
+	 * Updates the progress bar and speed for a download item.
+	 */
+	_updateProgressUI(randomId, progress) {
+		const speedEl = $(`${randomId}_speed`);
+		const progEl = $(`${randomId}_prog`);
+		if (!speedEl || !progEl) return;
 
-	getId(randomId + ".close").addEventListener("click", () => {
-		controller.abort();
-		try {
-			process.kill(downloadProcess.ytDlpProcess.pid, "SIGINT");
-		} catch (_error) {}
-	});
-
-	downloadProcess
-		.on("progress", (progress) => {
-			if (progress.percent == 100) {
-				getId(randomId + "speed").textContent = "";
-				getId(randomId + "prog").textContent =
-					i18n.__("Processing") + "...";
-
-				ipcRenderer.send("progress", 0);
-			} else {
-				getId(randomId + "speed").textContent = `${i18n.__("Speed")}: ${
-					progress.currentSpeed || 0
-				}`;
-				ipcRenderer.send("progress", progress.percent);
-
-				getId(
-					randomId + "prog"
-				).innerHTML = `<progress class="progressBar" min=0 max=100 value=${progress.percent}>`;
-
-				ipcRenderer.send("progress", progress.percent / 100);
-			}
-		})
-		.once("ytDlpEvent", (_eventType, _eventData) => {
-			getId(randomId + "prog").textContent = i18n.__("Downloading...");
-		})
-		.once("close", (code) => {
-			getId(randomId + "speed").textContent = "";
-			addToDownloadedList(randomId);
-			currentDownloads--;
-			console.log("Closed with code " + code);
-			if (code == 0) {
-				// If extration is done
-				if (type === "extract") {
-					console.log(
-						path.join(downloadDir, filename + `.${extractFormat1}`)
-					);
-
-					afterSave(
-						downloadDir,
-						filename + `.${extractExt}`,
-						randomId + "prog",
-						thumb1 || thumbnail
-					);
-				}
-				// If download is done
-				else {
-					console.log(path.join(downloadDir, filename + `.${ext}`));
-					afterSave(
-						downloadDir,
-						filename + `.${ext}`,
-						randomId + "prog",
-						thumb1 || thumbnail
-					);
-				}
-			}
-			if (quit) {
-				console.log("Quitting app");
-				quitApp();
-			}
-		})
-		.once("error", (error) => {
-			currentDownloads--;
-			getId(randomId + "prog").textContent = i18n.__(
-				"Some error has occurred. Hover to see details"
-			);
-			getId(randomId + "prog").title = error.message;
-			console.log(error.message);
-		});
-}
-
-function quitApp() {
-	ipcRenderer.send("quit", "quit");
-}
-
-// Removing item
-
-function fadeItem(id) {
-	controllers[id].abort();
-	getId(id).classList.add("scale");
-	setTimeout(() => {
-		if (getId(id)) {
-			getId(id).remove();
-		}
-	}, 500);
-}
-
-function clearAllDownloaded() {
-	downloadedItemList.forEach((item) => {
-		fadeItem(item);
-	});
-	downloadedItemList = [];
-	hideClearBtn();
-}
-
-function addToDownloadedList(id) {
-	downloadedItemList.push(id);
-
-	if (downloadedItemList.length > 1) {
-		getId("clearBtn").style.display = "inline-block";
-	}
-}
-
-function removeFromDownloadedList(id) {
-	downloadedItemList.splice(downloadedItemList.indexOf(id), 1);
-
-	if (downloadedItemList.length < 2) {
-		hideClearBtn();
-	}
-}
-
-function hideClearBtn() {
-	getId("clearBtn").style.display = "none";
-}
-// After saving video
-
-function afterSave(location, filename, progressId, thumbnail) {
-	const notify = new Notification("ytDownloader", {
-		body: filename,
-		icon: thumbnail,
-	});
-
-	notify.onclick = () => {
-		showItem(finalLocation, finalFilename);
-	};
-
-	let finalLocation = location;
-	let finalFilename = filename;
-	if (os.platform() === "win32") {
-		finalLocation = location.split(path.sep).join("\\\\");
-		finalFilename = filename.split(path.sep).join("\\\\");
-	}
-	const fileSavedElement = document.createElement("b");
-	fileSavedElement.textContent = i18n.__("File saved. Click to Open");
-	fileSavedElement.onclick = () => {
-		showItem(finalLocation, finalFilename);
-	};
-
-	getId(progressId).innerHTML = "";
-	getId(progressId).appendChild(fileSavedElement);
-
-	window.scrollTo(0, document.body.scrollHeight);
-}
-
-// async function getSystemProxy(url) {
-// 	const proxy = await ipcRenderer.invoke("get-proxy", url);
-// 	return proxy;
-// }
-
-function showItem(location, filename) {
-	shell.showItemInFolder(`${path.join(location, filename)}`);
-}
-
-// Rename title
-
-function renameTitle() {
-	title = getId("titleName").value;
-	console.log(title);
-}
-
-// Opening windows
-function closeMenu() {
-	getId("menuIcon").style.transform = "rotate(0deg)";
-	let count = 0;
-	let opacity = 1;
-	const fade = setInterval(() => {
-		if (count >= 10) {
-			clearInterval(fade);
-			getId("menu").style.display = "none";
+		if (progress.percent === 100) {
+			speedEl.textContent = "";
+			progEl.textContent = i18n.__("Processing...");
+			ipcRenderer.send("progress", 0);
 		} else {
-			opacity -= 0.1;
-			getId("menu").style.opacity = String(opacity);
-			count++;
+			speedEl.textContent = `${i18n.__("Speed")}: ${
+				progress.currentSpeed || "0 B/s"
+			}`;
+			progEl.innerHTML = `<progress class="progressBar" value="${progress.percent}" max="100"></progress>`;
+			ipcRenderer.send("progress", progress.percent / 100);
 		}
-	}, 50);
-}
-
-function hideHidden() {
-	getId("hidden").classList.remove("scaleUp");
-	getId("hidden").classList.add("scale");
-	setTimeout(() => {
-		getId("hidden").style.display = "none";
-		getId("hidden").classList.remove("scale");
-	}, 400);
-}
-
-// Popup message
-function showPopup(text) {
-	console.log("Triggered showpopup");
-	getId("popupText").textContent = text;
-	getId("popupText").style.display = "inline-block";
-	setTimeout(() => {
-		getId("popupText").style.display = "none";
-	}, 2200);
-}
-
-/**
- *
- * @param {string} item
- * @returns string
- */
-function getLocalStorageItem(item) {
-	return localStorage.getItem(item) || "";
-}
-
-function getId(id) {
-	return document.getElementById(id);
-}
-
-function downloadPathSelection() {
-	let localPath = localStorage.getItem("downloadPath");
-
-	if (localPath) {
-		downloadDir = localPath;
-		try {
-			fs.accessSync(localPath, constants.W_OK);
-			downloadDir = localPath;
-		} catch (err) {
-			console.log(
-				"Unable to write to download directory. Switching to default one."
-			);
-			console.log(err);
-			downloadDir = appdir;
-			localStorage.setItem("downloadPath", appdir);
-		}
-	} else {
-		downloadDir = appdir;
-		localStorage.setItem("downloadPath", appdir);
 	}
-	getId("path").textContent = downloadDir;
-	fs.mkdir(downloadDir, {recursive: true}, () => {});
-}
 
-// Menu
-getId("preferenceWin").addEventListener("click", () => {
-	closeMenu();
-	ipcRenderer.send("load-page", __dirname + "/preferences.html");
-});
+	/**
+	 * Updates a download item's UI to show it has completed successfully.
+	 */
+	_showDownloadSuccessUI(randomId, filename, ext, thumbnail) {
+		const progressEl = $(`${randomId}_prog`);
+		if (!progressEl) return;
 
-getId("aboutWin").addEventListener("click", () => {
-	closeMenu();
-	ipcRenderer.send("load-page", __dirname + "/about.html");
-});
+		const fullFilename = `${filename}.${ext}`;
+		const fullPath = path.join(this.state.downloadDir, fullFilename);
 
-getId("playlistWin").addEventListener("click", () => {
-	closeMenu();
-	ipcRenderer.send("load-win", __dirname + "/playlist.html");
-});
+		progressEl.innerHTML = ""; // Clear progress bar
+		const link = document.createElement("b");
+		link.textContent = i18n.__("File saved. Click to Open");
+		link.style.cursor = "pointer";
+		link.onclick = () => shell.showItemInFolder(fullPath);
+		progressEl.appendChild(link);
+		$(`${randomId}_speed`).textContent = "";
 
-getId("compressorWin").addEventListener("click", () => {
-	closeMenu();
-	ipcRenderer.send("load-win", __dirname + "/compressor.html");
-});
-// getId("newPlaylistWin").addEventListener("click", () => {
-// 	closeMenu();
-// 	ipcRenderer.send("load-win", __dirname + "/playlist_new.html");
-// });
+		// Send desktop notification
+		new Notification("ytDownloader", {
+			body: fullFilename,
+			icon: thumbnail,
+		}).onclick = () => {
+			shell.showItemInFolder(fullPath);
+		};
+	}
 
-ipcRenderer.on("link", (event, text) => {
-	pasteFromTray(text);
-});
+	/**
+	 * Shows an error message in the main UI.
+	 */
+	_showError(errorMessage, url) {
+		$(CONSTANTS.DOM_IDS.INCORRECT_MSG).textContent = i18n.__(
+			"An error occurred. Check your network and URL."
+		);
+		$(CONSTANTS.DOM_IDS.ERROR_BTN).style.display = "inline-block";
+		const errorDetails = $(CONSTANTS.DOM_IDS.ERROR_DETAILS);
+		errorDetails.innerHTML = `<strong>URL: ${url}</strong><br><br>${errorMessage}`;
+		errorDetails.title = i18n.__("Click to copy details");
+	}
 
-// Selecting download directory
-getId("selectLocation").addEventListener("click", () => {
-	ipcRenderer.send("select-location-main", "");
-});
+	/**
+	 * Hides the info panel with an animation.
+	 */
+	_hideInfoPanel() {
+		const panel = $(CONSTANTS.DOM_IDS.HIDDEN_PANEL);
+		if (panel.style.display !== "none") {
+			panel.classList.remove("scaleUp");
+			panel.classList.add("scale");
+			setTimeout(() => {
+				panel.style.display = "none";
+				panel.classList.remove("scale");
+			}, 400);
+		}
+	}
 
-getId("clearBtn").addEventListener("click", () => {
-	clearAllDownloaded();
-});
+	/**
+	 * Displays a temporary popup message.
+	 */
+	_showPopup(text) {
+		const popup = $(CONSTANTS.DOM_IDS.POPUP_TEXT);
+		popup.textContent = text;
+		popup.style.display = "inline-block";
+		setTimeout(() => {
+			popup.style.display = "none";
+		}, 2200);
+	}
 
-ipcRenderer.on("downloadPath", (event, downloadPath) => {
-	console.log(downloadPath);
-	getId("path").textContent = downloadPath[0];
-	downloadDir = downloadPath[0];
-});
+	/**
+	 * Hides the main menu.
+	 */
+	_closeMenu() {
+		$(CONSTANTS.DOM_IDS.MENU_ICON).style.transform = "rotate(0deg)";
+		$(CONSTANTS.DOM_IDS.MENU).style.opacity = "0";
+		setTimeout(
+			() => ($(CONSTANTS.DOM_IDS.MENU).style.display = "none"),
+			500
+		);
+	}
 
-// Downloading yt-dlp
-async function downloadYtDlp(downloadPath) {
-	document.querySelector("#popupBox p").textContent = i18n.__(
-		"Please wait, necessary files are being downloaded"
-	);
-	getId("popupSvg").style.display = "inline";
+	/**
+	 * Cancels a download in progress or removes it from the queue.
+	 * @param {string} id The ID of the download item.
+	 */
+	_cancelDownload(id) {
+		// If it's an active download
+		if (this.state.downloadControllers.has(id)) {
+			this.state.downloadControllers.get(id).abort();
+		}
+		// If it's in the queue
+		this.state.downloadQueue = this.state.downloadQueue.filter(
+			(job) => job.queueId !== id
+		);
+		this._fadeAndRemoveItem(id);
+	}
 
-	// Downloading appropriate version of yt-dlp
-	await YTDlpWrap.downloadFromGithub(downloadPath);
+	/**
+	 * Fades and removes a DOM element.
+	 */
+	_fadeAndRemoveItem(id) {
+		const item = $(id);
+		if (item) {
+			item.classList.add("scale");
+			setTimeout(() => item.remove(), 500);
+		}
+	}
 
-	getId("popupBox").style.display = "none";
-	ytDlp = new YTDlpWrap(`"${ytDlpPath}"`);
-	localStorage.setItem("ytdlp", ytDlpPath);
-	console.log("yt-dlp bin Path: " + ytDlpPath);
-}
+	/**
+	 * Removes all completed download items from the UI.
+	 */
+	_clearAllDownloaded() {
+		this.state.downloadedItems.forEach((id) => this._fadeAndRemoveItem(id));
+		this.state.downloadedItems.clear();
+		this._updateClearAllButton();
+	}
 
-function checkMaxDownloads() {
-	if (localStorage.getItem("maxActiveDownloads")) {
-		const number = Number(localStorage.getItem("maxActiveDownloads"));
-		if (number < 1) {
-			maxActiveDownloads = 1;
+	/**
+	 * Shows or hides the "Clear All" button based on the number of completed items.
+	 */
+	_updateClearAllButton() {
+		const btn = $(CONSTANTS.DOM_IDS.CLEAR_BTN);
+		btn.style.display =
+			this.state.downloadedItems.size > 1 ? "inline-block" : "none";
+	}
+
+	/**
+	 * Toggles between audio and video tabs
+	 */
+	_defaultVideoToggle() {
+		let defaultWindow = "video";
+		if (localStorage.getItem("defaultWindow")) {
+			defaultWindow = localStorage.getItem("defaultWindow");
+		}
+		if (defaultWindow == "video") {
+			selectVideo();
 		} else {
-			maxActiveDownloads = number;
+			selectAudio();
 		}
 	}
 }
 
-function defaultVideoToggle() {
-	let defaultWindow = "video";
-	if (localStorage.getItem("defaultWindow")) {
-		defaultWindow = localStorage.getItem("defaultWindow");
-	}
-	if (defaultWindow == "video") {
-		selectVideo();
-	} else {
-		selectAudio();
-	}
-}
-
-// Pasting url from clipboard
-function pasteUrl() {
-	defaultVideoToggle();
-	hideHidden();
-	getId("loadingWrapper").style.display = "flex";
-	getId("incorrectMsg").textContent = "";
-	const url = clipboard.readText();
-	getInfo(url);
-}
-
-function pasteFromTray(url) {
-	defaultVideoToggle();
-	hideHidden();
-	getId("loadingWrapper").style.display = "flex";
-	getId("incorrectMsg").textContent = "";
-	getInfo(url);
-}
-
-function showMacYtdlpPopup() {
-	getId("popupBoxMac").style.display = "block";
-}
-
-function handleYtDlpError() {
-	document.querySelector("#popupBox p").textContent = i18n.__(
-		"Failed to download necessary files. Please check your network and try again"
-	);
-	getId("popupSvg").style.display = "none";
-	getId("popup").innerHTML += `<button id="tryBtn">${i18n.__(
-		"Try again"
-	)}</button>`;
-
-	console.log("Failed to download yt-dlp");
-
-	getId("tryBtn").addEventListener("click", () => {
-		getId("popup").removeChild(getId("popup").lastChild);
-		downloadYtDlp();
-	});
-}
-
-function resetDomValues() {
-	getId("videoFormatSelect").innerHTML = "";
-	getId("audioFormatSelect").innerHTML = "";
-	getId(
-		"audioForVideoFormatSelect"
-	).innerHTML = `<option value="none|none">No Audio</option>`;
-	getId("startTime").value = "";
-	getId("endTime").value = "";
-	getId("errorBtn").style.display = "none";
-	getId("errorDetails").style.display = "none";
-	getId("errorDetails").textContent = "";
-}
-
-function logYtDlpPresent(ytDlpPath) {
-	console.log("yt-dlp bin is present");
-	console.log(ytDlpPath);
-}
-
-function hidePasteBtn() {
-	getId("pasteUrl").style.display = "none";
-}
-
-function setLocalStorageYtDlp(ytDlpPath) {
-	localStorage.setItem("ytdlp", ytDlpPath);
-}
+// --- Application Entry Point ---
+document.addEventListener("DOMContentLoaded", () => {
+	const app = new YtDownloaderApp();
+	app.initialize();
+});
