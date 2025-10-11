@@ -117,6 +117,13 @@
 			"createDesktopShortcut": true,
 			"createStartMenuShortcut": true,
 			"shortcutName": "YTDownloader"
+		},
+		"appx": {
+			"publisher": "CN=E2D3E7B6-04EB-4CC9-857E-F24A66539745",
+			"publisherDisplayName": "aandrew-me",
+			"identityName": "aandrew-me.YTDownloaderPlus",
+			"applicationId": "YTDownloaderPlus",
+			"displayName": "YTDownloader Plus"
 		}
 	}
 }
