@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" theme="dark">
+<html lang="en" theme="dark" dir="ltr">
 
 <head>
     <header></header>
@@ -164,16 +164,51 @@
             </div>
 
             <div class="advancedItem">
-                <strong id="rangeText" title="DASH Webm not supported">Download particular time-range</strong>
-                <br><br>
-                <label id="start">Start</label>
-                <input type="text" id="startTime" class="time" placeholder="00:00"
-                    title="If kept empty, it will start from the beginning">
-                :
-                <input type="text" id="endTime" class="time" placeholder="10:00"
-                    title="If kept empty, it will be downloaded to the end">
-                <label id="end">End</label>
-            </div>
+                <div class="time-range-header">
+                    <strong id="rangeText" title="DASH Webm not supported">Download particular time-range</strong>
+                    <div class="start-time-controls">
+                        <div class="time-range-row">
+                            <label id="start">Start</label>
+                            <div class="time-selector">
+                                <span class="time-label">hh</span>
+                                <select id="startHour" class="time-dropdown">
+                                    <option value="00">00</option>
+                                </select>
+                                :
+                                <span class="time-label">mm</span>
+                                <select id="startMinute" class="time-dropdown">
+                                    <option value="00">00</option>
+                                </select>
+                                :
+                                <span class="time-label">ss</span>
+                                <select id="startSecond" class="time-dropdown">
+                                    <option value="00">00</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="end-time-container">
+                    <div class="time-range-row">
+                        <label id="end">End</label>
+                        <div class="time-selector">
+                            <span class="time-label">hh</span>
+                            <select id="endHour" class="time-dropdown">
+                                <option value="00">00</option>
+                            </select>
+                            :
+                            <span class="time-label">mm</span>
+                            <select id="endMinute" class="time-dropdown">
+                                <option value="00">00</option>
+                            </select>
+                            :
+                            <span class="time-label">ss</span>
+                            <select id="endSecond" class="time-dropdown">
+                                <option value="00">00</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
 
 
             <div class="advancedItem">
