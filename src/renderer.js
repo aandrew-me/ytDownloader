@@ -99,6 +99,9 @@ class YtDownloaderApp {
 				duration: 0,
 				extractor_key: "",
 				url: "",
+				durationHours: 0,
+				durationMinutes: 0,
+				durationSeconds: 0,
 			},
 			// Download options
 			downloadOptions: {
@@ -518,6 +521,11 @@ class YtDownloaderApp {
 	 * @param {'video' | 'audio' | 'extract'} type The type of download.
 	 */
 	handleDownloadRequest(type) {
+		// Validate time selection BEFORE updating options or proceeding
+		if (!this._validateTimeSelectionOnDownload()) {
+			return; // Stop if invalid
+		}
+
 		this._updateDownloadOptionsFromUI();
 
 		const downloadJob = {
@@ -660,20 +668,20 @@ class YtDownloaderApp {
 		const randomId = "queue_" + Math.random().toString(36).substring(2, 12);
 		this.state.downloadQueue.push({...job, queueId: randomId});
 		const itemHTML = `
-            <div class="item" id="${randomId}">
-                <div class="itemIconBox">
-                    <img src="${
+			<div class="item" id="${randomId}">
+				<div class="itemIconBox">
+					<img src="${
 						job.thumbnail || "../assets/images/thumb.png"
 					}" alt="thumbnail" class="itemIcon" crossorigin="anonymous">
-                    <span class="itemType">${i18n.__(
+					<span class="itemType">${i18n.__(
 						job.type === "video" ? "Video" : "Audio"
 					)}</span>
-                </div>
-                <div class="itemBody">
-                    <div class="itemTitle">${job.title}</div>
-                    <p>${i18n.__("Download pending...")}</p>
-                </div>
-            </div>`;
+				</div>
+				<div class="itemBody">
+					<div class="itemTitle">${job.title}</div>
+					<p>${i18n.__("Download pending...")}</p>
+				</div>
+			</div>`;
 		$(CONSTANTS.DOM_IDS.DOWNLOAD_LIST).insertAdjacentHTML(
 			"beforeend",
 			itemHTML
@@ -977,8 +985,6 @@ class YtDownloaderApp {
 		$(CONSTANTS.DOM_IDS.END_MINUTE).value = minutes.toString().padStart(2, '0');
 		$(CONSTANTS.DOM_IDS.END_SECOND).value = seconds.toString().padStart(2, '0');
 		
-		// Add validation to time dropdowns
-		this._addTimeValidationListeners();
 	}
 	
 	/**
@@ -1057,40 +1063,8 @@ class YtDownloaderApp {
 	/**
 	 * Adds event listeners to validate time selection is within video duration
 	 */
-	_addTimeValidationListeners() {
-		const timeDropdowns = [
-			$(CONSTANTS.DOM_IDS.START_HOUR),
-			$(CONSTANTS.DOM_IDS.START_MINUTE),
-			$(CONSTANTS.DOM_IDS.START_SECOND),
-			$(CONSTANTS.DOM_IDS.END_HOUR),
-			$(CONSTANTS.DOM_IDS.END_MINUTE),
-			$(CONSTANTS.DOM_IDS.END_SECOND)
-		];
-		
-		timeDropdowns.forEach(dropdown => {
-			dropdown.addEventListener('change', () => {
-				this._validateTimeSelection();
-				
-				// If hour dropdown changes, update minute options
-				if (dropdown.id === CONSTANTS.DOM_IDS.START_HOUR || dropdown.id === CONSTANTS.DOM_IDS.END_HOUR) {
-					const { durationHours, durationMinutes } = this.state.videoInfo;
-					this._populateMinuteDropdowns(durationHours, durationMinutes);
-				}
-				
-				// If minute dropdown changes, update second options
-				if (dropdown.id === CONSTANTS.DOM_IDS.START_MINUTE || dropdown.id === CONSTANTS.DOM_IDS.END_MINUTE) {
-					const { durationHours, durationMinutes, durationSeconds } = this.state.videoInfo;
-					this._populateSecondDropdowns(durationHours, durationMinutes, durationSeconds);
-				}
-			});
-		});
-	}
-	
-	/**
-	 * Validates that time selection is within video duration and start time is before end time
-	 */
-	_validateTimeSelection() {
-		if (!this.state.videoInfo.duration) return;
+	_validateTimeSelectionOnDownload() {
+			if (!this.state.videoInfo.duration) return true; // Skip if no duration
 		
 		const startHour = parseInt($(CONSTANTS.DOM_IDS.START_HOUR).value) || 0;
 		const startMinute = parseInt($(CONSTANTS.DOM_IDS.START_MINUTE).value) || 0;
@@ -1109,29 +1083,17 @@ class YtDownloaderApp {
 		
 		// Validate end time doesn't exceed video duration
 		if (endTimeInSeconds > durationInSeconds) {
-			$(CONSTANTS.DOM_IDS.END_HOUR).value = durationHours.toString().padStart(2, '0');
-			$(CONSTANTS.DOM_IDS.END_MINUTE).value = durationMinutes.toString().padStart(2, '0');
-			$(CONSTANTS.DOM_IDS.END_SECOND).value = durationSeconds.toString().padStart(2, '0');
 			this._showPopup("End time cannot exceed video duration.");
-			
-			// Update dropdowns if selection changes
-			this._populateMinuteDropdowns(durationHours, durationMinutes);
-			this._populateSecondDropdowns(durationHours, durationMinutes, durationSeconds);
+			return false;
 		}
 		
 		// Validate start time is less than end time
 		if (startTimeInSeconds >= endTimeInSeconds) {
-			// Set start time to one second before end time
-			const newStartTimeInSeconds = Math.max(0, endTimeInSeconds - 1);
-			const newStartHours = Math.floor(newStartTimeInSeconds / 3600);
-			const newStartMinutes = Math.floor((newStartTimeInSeconds % 3600) / 60);
-			const newStartSeconds = Math.floor(newStartTimeInSeconds % 60);
-			
-			$(CONSTANTS.DOM_IDS.START_HOUR).value = newStartHours.toString().padStart(2, '0');
-			$(CONSTANTS.DOM_IDS.START_MINUTE).value = newStartMinutes.toString().padStart(2, '0');
-			$(CONSTANTS.DOM_IDS.START_SECOND).value = newStartSeconds.toString().padStart(2, '0');
 			this._showPopup("Start time must be less than end time.");
+			return false;
 		}
+		// All valid
+		return true;
 	}
 
 	/**
@@ -1298,24 +1260,24 @@ class YtDownloaderApp {
 	 */
 	_createDownloadUI(randomId, job) {
 		const itemHTML = `
-            <div class="item" id="${randomId}">
-                <div class="itemIconBox">
-                    <img src="${
+			<div class="item" id="${randomId}">
+				<div class="itemIconBox">
+					<img src="${
 						job.thumbnail || "../assets/images/thumb.png"
 					}" alt="thumbnail" class="itemIcon" crossorigin="anonymous">
-                    <span class="itemType">${i18n.__(
+					<span class="itemType">${i18n.__(
 						job.type === "video" ? "Video" : "Audio"
 					)}</span>
-                </div>
-                <img src="../assets/images/close.png" class="itemClose" id="${randomId}_close">
-                <div class="itemBody">
-                    <div class="itemTitle">${job.title}</div>
-                    <strong class="itemSpeed" id="${randomId}_speed"></strong>
-                    <div id="${randomId}_prog" class="itemProgress">${i18n.__(
+				</div>
+				<img src="../assets/images/close.png" class="itemClose" id="${randomId}_close">
+				<div class="itemBody">
+					<div class="itemTitle">${job.title}</div>
+					<strong class="itemSpeed" id="${randomId}_speed"></strong>
+					<div id="${randomId}_prog" class="itemProgress">${i18n.__(
 			"Preparing..."
 		)}</div>
-                </div>
-            </div>`;
+				</div>
+			</div>`;
 		$(CONSTANTS.DOM_IDS.DOWNLOAD_LIST).insertAdjacentHTML(
 			"beforeend",
 			itemHTML
