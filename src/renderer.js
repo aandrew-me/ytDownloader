@@ -437,10 +437,9 @@ class YtDownloaderApp {
 		this.state.downloadQueue.push({...job, queueId: randomId});
 		const itemHTML = `
             <div class="item" id="${randomId}">
-                <div class="itemIconBox">
-                    <img src="${job.thumbnail || "../assets/images/thumb.png"}" alt="thumbnail" class="itemIcon" crossorigin="anonymous">
-                    <span class="itemType">${i18n.__(job.type === "video" ? "Video" : "Audio")}</span>
-                </div>
+				<div class="itemIconBox">
+					<img src="${job.thumbnail || "../assets/images/thumb.png"}" alt="thumbnail" class="itemIcon" crossorigin="anonymous">
+				</div>
                 <div class="itemBody">
                     <div class="itemTitle">${job.title}</div>
                     <p>${i18n.__("Download pending...")}</p>
