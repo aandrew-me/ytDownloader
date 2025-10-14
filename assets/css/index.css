@@ -153,7 +153,8 @@ body {
 	color: var(--text);
 	transition: 0.4s;
 	font-size: large;
-	user-select: none
+	user-select: none;
+	direction: ltr; /* Ensures scrollbar on right side */
 }
 
 img {
@@ -526,6 +527,63 @@ input[type="number"]::-webkit-outer-spin-button {
 	width: 70px;
 	font-size: large;
 	margin: 5px;
+}
+
+.time-selector {
+	display: inline-flex;
+	margin: 5px 0;
+	align-items: center;
+}
+
+.time-dropdown {
+	margin: 0 2px;
+	width: 55px; /* Increased width to show both zeros */
+	text-align: center;
+	border-radius: 5px;
+	border: 1px solid var(--border);
+	background-color: var(--box-toggle);
+	color: var(--text);
+	padding: 5px 2px; /* Adjusted padding */
+	font-family: monospace; /* Use monospace font to ensure digits align properly */
+	font-size: 14px;
+	appearance: menulist-button;
+	vertical-align: middle;
+	letter-spacing: 1px; /* Add letter spacing to ensure digits don't overlap */
+}
+
+.time-range-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.start-time-controls {
+    display: flex;
+    align-items: center;
+}
+
+.end-time-container {
+    margin-left: 20px;
+    margin-top: 5px;
+}
+
+.time-range-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#start, #end {
+    min-width: 50px;
+}
+
+.time-label {
+	margin: 0 2px;
+	font-size: 12px;
+	color: var(--text);
+	opacity: 0.8;
 }
 
 #incorrectMsg,
