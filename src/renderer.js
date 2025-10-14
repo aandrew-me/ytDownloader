@@ -39,8 +39,12 @@ const CONSTANTS = {
 		EXTRACT_SELECTION: "extractSelection",
 		EXTRACT_QUALITY_SELECT: "extractQualitySelect",
 		// Advanced Options
-		START_TIME: "startTime",
-		END_TIME: "endTime",
+		START_HOUR: "startHour",
+		START_MINUTE: "startMinute",
+		START_SECOND: "startSecond",
+		END_HOUR: "endHour",
+		END_MINUTE: "endMinute",
+		END_SECOND: "endSecond",
 		SUB_CHECKED: "subChecked",
 		QUIT_CHECKED: "quitChecked",
 		// Popups
@@ -137,6 +141,7 @@ class YtDownloaderApp {
 			console.log("ffmpeg path:", this.state.ffmpegPath);
 
 			this._loadSettings();
+			this._initTimeDropdowns();
 			this._addEventListeners();
 
 			// Signal to the main process that the renderer is ready for links
@@ -496,6 +501,11 @@ class YtDownloaderApp {
 			};
 			this._populateFormatSelectors(metadata.formats || []);
 			this._displayInfoPanel();
+			
+			// Set end time to video duration automatically
+			if (metadata.duration) {
+				this._setTimeToVideoDuration(metadata.duration);
+			}
 		} catch (error) {
 			this._showError(error.message, url);
 		} finally {
@@ -851,11 +861,55 @@ class YtDownloaderApp {
 	}
 
 	/**
+	 * Initializes the time dropdown selectors.
+	 */
+	_initTimeDropdowns() {
+		// Populate hours (0-23)
+		const startHour = $("startHour");
+		const endHour = $("endHour");
+		startHour.innerHTML = "";
+		endHour.innerHTML = "";
+		for (let i = 0; i <= 23; i++) {
+			const value = i.toString().padStart(2, "0");
+			startHour.innerHTML += `<option value="${value}">${value}</option>`;
+			endHour.innerHTML += `<option value="${value}">${value}</option>`;
+		}
+		
+		// Populate minutes and seconds (0-59)
+		const startMinute = $("startMinute");
+		const endMinute = $("endMinute");
+		const startSecond = $("startSecond");
+		const endSecond = $("endSecond");
+		startMinute.innerHTML = "";
+		endMinute.innerHTML = "";
+		startSecond.innerHTML = "";
+		endSecond.innerHTML = "";
+		
+		for (let i = 0; i <= 59; i++) {
+			const value = i.toString().padStart(2, "0");
+			startMinute.innerHTML += `<option value="${value}">${value}</option>`;
+			endMinute.innerHTML += `<option value="${value}">${value}</option>`;
+			startSecond.innerHTML += `<option value="${value}">${value}</option>`;
+			endSecond.innerHTML += `<option value="${value}">${value}</option>`;
+		}
+	}
+
+	/**
 	 * Updates the download options state from the UI elements.
 	 */
 	_updateDownloadOptionsFromUI() {
-		const startTime = $(CONSTANTS.DOM_IDS.START_TIME).value;
-		const endTime = $(CONSTANTS.DOM_IDS.END_TIME).value;
+		const startHour = $("startHour").value;
+		const startMinute = $("startMinute").value;
+		const startSecond = $("startSecond").value;
+		const endHour = $("endHour").value;
+		const endMinute = $("endMinute").value;
+		const endSecond = $("endSecond").value;
+		
+		const startTime = startHour || startMinute || startSecond ? 
+			`${startHour}:${startMinute}:${startSecond}` : "";
+		const endTime = endHour || endMinute || endSecond ? 
+			`${endHour}:${endMinute}:${endSecond}` : "";
+		
 		const duration = this.state.videoInfo.duration;
 
 		if (startTime || endTime) {
@@ -892,6 +946,192 @@ class YtDownloaderApp {
 		}
 		ret += `${mins}:${secs < 10 ? "0" : ""}${secs}`;
 		return ret;
+	}
+	
+	/**
+	 * Sets the end time dropdowns to the video duration and adds validation listeners
+	 * @param {number} duration Video duration in seconds
+	 */
+	_setTimeToVideoDuration(duration) {
+		// Calculate hours, minutes, seconds from duration
+		const hours = Math.floor(duration / 3600);
+		const minutes = Math.floor((duration % 3600) / 60);
+		const seconds = Math.floor(duration % 60);
+		
+		// Store video duration for validation
+		this.state.videoInfo.durationHours = hours;
+		this.state.videoInfo.durationMinutes = minutes;
+		this.state.videoInfo.durationSeconds = seconds;
+		
+		// Restrict hour dropdown options based on video duration
+		this._populateHourDropdowns(hours);
+		
+		// Restrict minute dropdown options based on video duration
+		this._populateMinuteDropdowns(hours, minutes);
+		
+		// Restrict second dropdown options
+		this._populateSecondDropdowns(hours, minutes, seconds);
+		
+		// Set end time dropdowns to video duration
+		$(CONSTANTS.DOM_IDS.END_HOUR).value = hours.toString().padStart(2, '0');
+		$(CONSTANTS.DOM_IDS.END_MINUTE).value = minutes.toString().padStart(2, '0');
+		$(CONSTANTS.DOM_IDS.END_SECOND).value = seconds.toString().padStart(2, '0');
+		
+		// Add validation to time dropdowns
+		this._addTimeValidationListeners();
+	}
+	
+	/**
+	 * Populates hour dropdowns with options based on video duration
+	 * @param {number} maxHours Maximum hours from video duration
+	 */
+	_populateHourDropdowns(maxHours) {
+		const startHourDropdown = $(CONSTANTS.DOM_IDS.START_HOUR);
+		const endHourDropdown = $(CONSTANTS.DOM_IDS.END_HOUR);
+		
+		// Clear existing options
+		startHourDropdown.innerHTML = '';
+		endHourDropdown.innerHTML = '';
+		
+		// Always add 00 hour option
+		startHourDropdown.appendChild(new Option('00', '00', true, true));
+		endHourDropdown.appendChild(new Option('00', '00', true, true));
+		
+		// If video has hours, add hour options up to the max
+		if (maxHours > 0) {
+			for (let i = 1; i <= maxHours; i++) {
+				const hourStr = i.toString().padStart(2, '0');
+				startHourDropdown.appendChild(new Option(hourStr, hourStr));
+				endHourDropdown.appendChild(new Option(hourStr, hourStr));
+			}
+		}
+	}
+	
+	/**
+	 * Populates minute dropdowns with options based on video duration
+	 * @param {number} hours Hours from video duration
+	 * @param {number} maxMinutes Maximum minutes from video duration
+	 */
+	_populateMinuteDropdowns(hours, maxMinutes) {
+		const startMinuteDropdown = $(CONSTANTS.DOM_IDS.START_MINUTE);
+		const endMinuteDropdown = $(CONSTANTS.DOM_IDS.END_MINUTE);
+		
+		// Clear existing options
+		startMinuteDropdown.innerHTML = '';
+		endMinuteDropdown.innerHTML = '';
+		
+		// Add minute options
+		const minuteLimit = hours > 0 ? 59 : maxMinutes;
+		
+		for (let i = 0; i <= minuteLimit; i++) {
+			const minuteStr = i.toString().padStart(2, '0');
+			startMinuteDropdown.appendChild(new Option(minuteStr, minuteStr));
+			endMinuteDropdown.appendChild(new Option(minuteStr, minuteStr));
+		}
+	}
+	
+	/**
+	 * Populates second dropdowns with options based on video duration
+	 * @param {number} hours Hours from video duration
+	 * @param {number} minutes Minutes from video duration
+	 * @param {number} maxSeconds Maximum seconds from video duration
+	 */
+	_populateSecondDropdowns(hours, minutes, maxSeconds) {
+		const startSecondDropdown = $(CONSTANTS.DOM_IDS.START_SECOND);
+		const endSecondDropdown = $(CONSTANTS.DOM_IDS.END_SECOND);
+		
+		// Clear existing options
+		startSecondDropdown.innerHTML = '';
+		endSecondDropdown.innerHTML = '';
+		
+		// Add second options
+		const secondLimit = (hours > 0 || minutes > 0) ? 59 : maxSeconds;
+		
+		for (let i = 0; i <= secondLimit; i++) {
+			const secondStr = i.toString().padStart(2, '0');
+			startSecondDropdown.appendChild(new Option(secondStr, secondStr));
+			endSecondDropdown.appendChild(new Option(secondStr, secondStr));
+		}
+	}
+	
+	/**
+	 * Adds event listeners to validate time selection is within video duration
+	 */
+	_addTimeValidationListeners() {
+		const timeDropdowns = [
+			$(CONSTANTS.DOM_IDS.START_HOUR),
+			$(CONSTANTS.DOM_IDS.START_MINUTE),
+			$(CONSTANTS.DOM_IDS.START_SECOND),
+			$(CONSTANTS.DOM_IDS.END_HOUR),
+			$(CONSTANTS.DOM_IDS.END_MINUTE),
+			$(CONSTANTS.DOM_IDS.END_SECOND)
+		];
+		
+		timeDropdowns.forEach(dropdown => {
+			dropdown.addEventListener('change', () => {
+				this._validateTimeSelection();
+				
+				// If hour dropdown changes, update minute options
+				if (dropdown.id === CONSTANTS.DOM_IDS.START_HOUR || dropdown.id === CONSTANTS.DOM_IDS.END_HOUR) {
+					const { durationHours, durationMinutes } = this.state.videoInfo;
+					this._populateMinuteDropdowns(durationHours, durationMinutes);
+				}
+				
+				// If minute dropdown changes, update second options
+				if (dropdown.id === CONSTANTS.DOM_IDS.START_MINUTE || dropdown.id === CONSTANTS.DOM_IDS.END_MINUTE) {
+					const { durationHours, durationMinutes, durationSeconds } = this.state.videoInfo;
+					this._populateSecondDropdowns(durationHours, durationMinutes, durationSeconds);
+				}
+			});
+		});
+	}
+	
+	/**
+	 * Validates that time selection is within video duration and start time is before end time
+	 */
+	_validateTimeSelection() {
+		if (!this.state.videoInfo.duration) return;
+		
+		const startHour = parseInt($(CONSTANTS.DOM_IDS.START_HOUR).value) || 0;
+		const startMinute = parseInt($(CONSTANTS.DOM_IDS.START_MINUTE).value) || 0;
+		const startSecond = parseInt($(CONSTANTS.DOM_IDS.START_SECOND).value) || 0;
+		
+		const endHour = parseInt($(CONSTANTS.DOM_IDS.END_HOUR).value) || 0;
+		const endMinute = parseInt($(CONSTANTS.DOM_IDS.END_MINUTE).value) || 0;
+		const endSecond = parseInt($(CONSTANTS.DOM_IDS.END_SECOND).value) || 0;
+		
+		const { durationHours, durationMinutes, durationSeconds } = this.state.videoInfo;
+		
+		// Convert all to seconds for comparison
+		const startTimeInSeconds = startHour * 3600 + startMinute * 60 + startSecond;
+		const endTimeInSeconds = endHour * 3600 + endMinute * 60 + endSecond;
+		const durationInSeconds = durationHours * 3600 + durationMinutes * 60 + durationSeconds;
+		
+		// Validate end time doesn't exceed video duration
+		if (endTimeInSeconds > durationInSeconds) {
+			$(CONSTANTS.DOM_IDS.END_HOUR).value = durationHours.toString().padStart(2, '0');
+			$(CONSTANTS.DOM_IDS.END_MINUTE).value = durationMinutes.toString().padStart(2, '0');
+			$(CONSTANTS.DOM_IDS.END_SECOND).value = durationSeconds.toString().padStart(2, '0');
+			this._showPopup("End time cannot exceed video duration.");
+			
+			// Update dropdowns if selection changes
+			this._populateMinuteDropdowns(durationHours, durationMinutes);
+			this._populateSecondDropdowns(durationHours, durationMinutes, durationSeconds);
+		}
+		
+		// Validate start time is less than end time
+		if (startTimeInSeconds >= endTimeInSeconds) {
+			// Set start time to one second before end time
+			const newStartTimeInSeconds = Math.max(0, endTimeInSeconds - 1);
+			const newStartHours = Math.floor(newStartTimeInSeconds / 3600);
+			const newStartMinutes = Math.floor((newStartTimeInSeconds % 3600) / 60);
+			const newStartSeconds = Math.floor(newStartTimeInSeconds % 60);
+			
+			$(CONSTANTS.DOM_IDS.START_HOUR).value = newStartHours.toString().padStart(2, '0');
+			$(CONSTANTS.DOM_IDS.START_MINUTE).value = newStartMinutes.toString().padStart(2, '0');
+			$(CONSTANTS.DOM_IDS.START_SECOND).value = newStartSeconds.toString().padStart(2, '0');
+			this._showPopup("Start time must be less than end time.");
+		}
 	}
 
 	/**
