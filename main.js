@@ -217,6 +217,12 @@ ipcMain.on("get-version", () => {
 	secondaryWindow.webContents.send("version", version);
 });
 
+ipcMain.on("show-file", (_event, fullPath) => {
+	if (fullPath && fs.existsSync(fullPath)) {
+		shell.showItemInFolder(fullPath);
+	}
+});
+
 ipcMain.on("load-win", (event, file) => {
 	if (file.includes("playlist.html")) {
 		indexIsOpen = false;

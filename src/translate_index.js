@@ -26,15 +26,7 @@ getId("audioHeader").textContent = i18n.__("Audio");
 getId("advancedVideoToggle").textContent = i18n.__("More options");
 getId("advancedAudioToggle").textContent = i18n.__("More options");
 getId("rangeText").textContent = i18n.__("Download particular time-range");
-getId("startTime").title = i18n.__(
-	"If kept empty, it will start from the beginning"
-);
-getId("endTime").title = i18n.__(
-	"If kept empty, it will be downloaded to the end"
-);
 getId("processing").textContent = i18n.__("Processing");
-getId("start").textContent = i18n.__("Start");
-getId("end").textContent = i18n.__("End");
 getId("subHeader").textContent = i18n.__("Subtitles");
 getId("subTxt").textContent = i18n.__("Download subtitles if available");
 getId("extractHeader").textContent = i18n.__("Extract Audio");

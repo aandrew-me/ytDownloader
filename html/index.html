@@ -164,15 +164,23 @@
             </div>
 
             <div class="advancedItem">
-                <strong id="rangeText" title="DASH Webm not supported">Download particular time-range</strong>
+                <strong id="rangeText">Download particular time-range</strong>
                 <br><br>
-                <label id="start">Start</label>
-                <input type="text" id="startTime" class="time" placeholder="00:00"
-                    title="If kept empty, it will start from the beginning">
-                :
-                <input type="text" id="endTime" class="time" placeholder="10:00"
-                    title="If kept empty, it will be downloaded to the end">
-                <label id="end">End</label>
+
+                <div class="slider-wrapper">
+                    <input type="text" id="min-time" class="time-display" value="0:00:00">
+
+                    <div class="slider-container">
+                        <div class="track-background"></div>
+
+                        <div id="range-highlight"></div>
+
+                        <input type="range" id="min-slider" min="0" max="0" value="0">
+                        <input type="range" id="max-slider" min="0" max="0" value="0">
+                    </div>
+
+                    <input type="text" id="max-time" class="time-display" value="0:00:00">
+                </div>
             </div>
 
 
@@ -230,7 +238,6 @@
     <!-- Downloads list -->
     <div id="list"></div>
 
-    <!-- TODO: add translations -->
     <button class="blueBtn" id="clearBtn">Clear Downloads</button>
 
     <div id="goToTop"></div>

@@ -39,8 +39,11 @@ const CONSTANTS = {
 		EXTRACT_SELECTION: "extractSelection",
 		EXTRACT_QUALITY_SELECT: "extractQualitySelect",
 		// Advanced Options
-		START_TIME: "startTime",
-		END_TIME: "endTime",
+		START_TIME: "min-time",
+		END_TIME: "max-time",
+		MIN_SLIDER: "min-slider",
+		MAX_SLIDER: "max-slider",
+		SLIDER_RANGE_HIGHLIGHT: "range-highlight",
 		SUB_CHECKED: "subChecked",
 		QUIT_CHECKED: "quitChecked",
 		// Popups
@@ -464,6 +467,27 @@ class YtDownloaderApp {
 				ipcRenderer.send("load-win", path.join(__dirname, page));
 			});
 		});
+
+		const minSlider = $(CONSTANTS.DOM_IDS.MIN_SLIDER);
+		const maxSlider = $(CONSTANTS.DOM_IDS.MAX_SLIDER);
+
+		minSlider.addEventListener("input", () =>
+			this._updateSliderUI(minSlider)
+		);
+		maxSlider.addEventListener("input", () =>
+			this._updateSliderUI(maxSlider)
+		);
+
+		$(CONSTANTS.DOM_IDS.START_TIME).addEventListener(
+			"change",
+			this._handleTimeInputChange
+		);
+		$(CONSTANTS.DOM_IDS.END_TIME).addEventListener(
+			"change",
+			this._handleTimeInputChange
+		);
+
+		this._updateSliderUI(null);
 	}
 
 	// --- Public Methods ---
@@ -486,6 +510,7 @@ class YtDownloaderApp {
 
 		try {
 			const metadata = await this._fetchVideoMetadata(url);
+			console.log(metadata);
 			this.state.videoInfo = {
 				...this.state.videoInfo,
 				id: metadata.id,
@@ -494,6 +519,7 @@ class YtDownloaderApp {
 				duration: metadata.duration,
 				extractor_key: metadata.extractor_key,
 			};
+			this.setVideoLength(metadata.duration);
 			this._populateFormatSelectors(metadata.formats || []);
 			this._displayInfoPanel();
 		} catch (error) {
@@ -621,9 +647,9 @@ class YtDownloaderApp {
 
 		// Attach event listeners
 		downloadProcess
-			.on("progress", (progress) =>
-				this._updateProgressUI(randomId, progress)
-			)
+			.on("progress", (progress) => {
+				this._updateProgressUI(randomId, progress);
+			})
 			.once("ytDlpEvent", () => {
 				const el = $(`${randomId}_prog`);
 				if (el) el.textContent = i18n.__("Downloading...");
@@ -752,7 +778,8 @@ class YtDownloaderApp {
 		)}"`;
 		const commonArgs = [
 			"--no-playlist",
-			"--embed-chapters",
+			// TODO: only embed when range selection isn't used
+			// "--embed-chapters",
 			"--no-mtime",
 			rangeOption,
 			rangeCmd,
@@ -858,11 +885,20 @@ class YtDownloaderApp {
 		const endTime = $(CONSTANTS.DOM_IDS.END_TIME).value;
 		const duration = this.state.videoInfo.duration;
 
-		if (startTime || endTime) {
+		if ((startTime || endTime) && endTime != duration) {
 			const start = startTime || "0";
 			const end = endTime || this._formatTime(duration);
-			this.state.downloadOptions.rangeCmd = `*${start}-${end}`;
-			this.state.downloadOptions.rangeOption = "--download-sections";
+
+			const startSeconds = this.parseTime(start);
+			const endSeconds = this.parseTime(end);
+
+			if (startSeconds === 0 && endSeconds === duration) {
+				this.state.downloadOptions.rangeCmd = "";
+				this.state.downloadOptions.rangeOption = "";
+			} else {
+				this.state.downloadOptions.rangeCmd = `*${start}-${end}`;
+				this.state.downloadOptions.rangeOption = "--download-sections";
+			}
 		} else {
 			this.state.downloadOptions.rangeCmd = "";
 			this.state.downloadOptions.rangeOption = "";
@@ -875,23 +911,6 @@ class YtDownloaderApp {
 			this.state.downloadOptions.subs = "";
 			this.state.downloadOptions.subLangs = "";
 		}
-	}
-
-	/**
-	 * Formats seconds into HH:MM:SS format.
-	 * @param {number} duration in seconds.
-	 * @returns {string}
-	 */
-	_formatTime(duration) {
-		const hrs = ~~(duration / 3600);
-		const mins = ~~((duration % 3600) / 60);
-		const secs = ~~duration % 60;
-		let ret = "";
-		if (hrs > 0) {
-			ret += `${hrs}:${mins < 10 ? "0" : ""}`;
-		}
-		ret += `${mins}:${secs < 10 ? "0" : ""}${secs}`;
-		return ret;
 	}
 
 	/**
@@ -952,6 +971,7 @@ class YtDownloaderApp {
 			: [...availableCodecs].pop();
 
 		let isAVideoSelected = false;
+
 		formats.forEach((format) => {
 			const size = format.filesize || format.filesize_approx;
 			const displaySize = size
@@ -1121,7 +1141,9 @@ class YtDownloaderApp {
 		const link = document.createElement("b");
 		link.textContent = i18n.__("File saved. Click to Open");
 		link.style.cursor = "pointer";
-		link.onclick = () => shell.showItemInFolder(fullPath);
+		link.onclick = () => {
+			ipcRenderer.send("show-file", fullPath);
+		};
 		progressEl.appendChild(link);
 		$(`${randomId}_speed`).textContent = "";
 
@@ -1244,6 +1266,164 @@ class YtDownloaderApp {
 		} else {
 			selectAudio();
 		}
+	}
+
+	/**
+	 * @param {string} timeString
+	 */
+	parseTime(timeString) {
+		const parts = timeString.split(":").map((p) => parseInt(p.trim(), 10));
+
+		let totalSeconds = 0;
+
+		if (parts.length === 3) {
+			// H:MM:SS format
+			const [hrs, mins, secs] = parts;
+			if (
+				isNaN(hrs) ||
+				isNaN(mins) ||
+				isNaN(secs) ||
+				mins < 0 ||
+				mins > 59 ||
+				secs < 0 ||
+				secs > 59
+			)
+				return NaN;
+			totalSeconds = hrs * 3600 + mins * 60 + secs;
+		} else if (parts.length === 2) {
+			// MM:SS format
+			const [mins, secs] = parts;
+			if (isNaN(mins) || isNaN(secs) || secs < 0 || secs > 59) return NaN;
+			totalSeconds = mins * 60 + secs;
+		} else {
+			return NaN;
+		}
+
+		return totalSeconds;
+	}
+
+	_formatTime(duration) {
+		const hrs = Math.floor(duration / 3600);
+		const mins = Math.floor((duration % 3600) / 60);
+		const secs = Math.floor(duration % 60);
+
+		const paddedMins = String(mins).padStart(2, "0");
+		const paddedSecs = String(secs).padStart(2, "0");
+
+		if (hrs > 0) {
+			// H:MM:SS format
+			return `${hrs}:${paddedMins}:${paddedSecs}`;
+		} else {
+			// MM:SS format
+			return `${paddedMins}:${paddedSecs}`;
+		}
+	}
+
+	/**
+	 * @param {HTMLElement} movedSlider
+	 */
+	_updateSliderUI(movedSlider) {
+		const minSlider = $(CONSTANTS.DOM_IDS.MIN_SLIDER);
+		const maxSlider = $(CONSTANTS.DOM_IDS.MAX_SLIDER);
+		const minTimeDisplay = $(CONSTANTS.DOM_IDS.START_TIME);
+		const maxTimeDisplay = $(CONSTANTS.DOM_IDS.END_TIME);
+		const rangeHighlight = $(CONSTANTS.DOM_IDS.SLIDER_RANGE_HIGHLIGHT);
+
+		let minValue = parseInt(minSlider.value);
+		let maxValue = parseInt(maxSlider.value);
+		const minSliderVal = parseInt(minSlider.min);
+		const maxSliderVal = parseInt(minSlider.max);
+		const sliderRange = maxSliderVal - minSliderVal;
+
+		// Prevent sliders from crossing each other
+		if (minValue >= maxValue) {
+			if (movedSlider && movedSlider.id === "min-slider") {
+				// Min must be at least 1 second less than Max
+				minValue = Math.max(minSliderVal, maxValue - 1);
+				minSlider.value = minValue;
+			} else {
+				// Max must be at least 1 second more than Min
+				maxValue = Math.min(maxSliderVal, minValue + 1);
+				maxSlider.value = maxValue;
+			}
+		}
+
+		minTimeDisplay.value = this._formatTime(minValue);
+		maxTimeDisplay.value = this._formatTime(maxValue);
+
+		const minPercent = ((minValue - minSliderVal) / sliderRange) * 100;
+		const maxPercent = ((maxValue - minSliderVal) / sliderRange) * 100;
+
+		rangeHighlight.style.left = `${minPercent}%`;
+		rangeHighlight.style.width = `${maxPercent - minPercent}%`;
+	}
+
+	/**
+	 * @param {Event} e
+	 */
+	_handleTimeInputChange = (e) => {
+		const input = e.target;
+		let newSeconds = this.parseTime(input.value);
+		const minSlider = $("min-slider");
+		const maxSlider = $("max-slider");
+
+		if (isNaN(newSeconds)) {
+			input.value = this._formatTime(
+				input.id === "min-time" ? minSlider.value : maxSlider.value
+			);
+			return;
+		}
+
+		const minSliderVal = parseInt(minSlider.min);
+		const maxSliderVal = parseInt(minSlider.max);
+		newSeconds = Math.max(minSliderVal, Math.min(maxSliderVal, newSeconds));
+
+		if (input.id === "min-time") {
+			if (newSeconds >= parseInt(maxSlider.value)) {
+				newSeconds = Math.max(
+					minSliderVal,
+					parseInt(maxSlider.value) - 1
+				);
+			}
+			minSlider.value = newSeconds;
+		} else {
+			if (newSeconds <= parseInt(minSlider.value)) {
+				newSeconds = Math.min(
+					maxSliderVal,
+					parseInt(minSlider.value) + 1
+				);
+			}
+			maxSlider.value = newSeconds;
+		}
+
+		this._updateSliderUI(null);
+	};
+
+	/**
+	 * Sets the maximum duration for the video and updates the slider's max range.
+	 * @param {number} duration - The total length of the video in seconds (must be an integer >= 1).
+	 */
+	setVideoLength(duration) {
+		const minSlider = $(CONSTANTS.DOM_IDS.MIN_SLIDER);
+		const maxSlider = $(CONSTANTS.DOM_IDS.MAX_SLIDER);
+
+		if (typeof duration !== "number" || duration < 1) {
+			console.error(
+				"Invalid duration provided to setVideoLength. Must be a number greater than 0."
+			);
+			return;
+		}
+
+		minSlider.max = duration;
+		maxSlider.max = duration;
+
+		const defaultMin = 0;
+		const defaultMax = duration;
+
+		minSlider.value = defaultMin;
+		maxSlider.value = defaultMax;
+
+		this._updateSliderUI(null);
 	}
 }
 
