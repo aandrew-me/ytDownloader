@@ -468,11 +468,6 @@ function getItem(item, configPath) {
 	}
 }
 
-// Download History
-app.whenReady().then(() => {
-	downloadHistory = new DownloadHistory();
-});
-
 ipcMain.handle("get-download-history", async () => {
 	try {
 		if (!downloadHistory) {
