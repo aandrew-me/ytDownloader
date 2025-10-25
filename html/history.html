@@ -419,7 +419,6 @@
             loadTheme();
             loadHistory();
             setupEventListeners();
-            setupThemeListener();
         });
 
         function loadTheme() {
@@ -427,15 +426,6 @@
             if (storageTheme) {
                 document.documentElement.setAttribute("theme", storageTheme);
             }
-        }
-
-        function setupThemeListener() {
-            // Listen for theme changes from main app
-            window.addEventListener("storage", (event) => {
-                if (event.key === "theme") {
-                    document.documentElement.setAttribute("theme", event.newValue);
-                }
-            });
         }
 
         function setupEventListeners() {
