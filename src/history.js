@@ -10,22 +10,14 @@ const { app } = require("electron");
 class DownloadHistory {
 	constructor() {
 		this.historyFile = path.join(app.getPath("userData"), "download_history.json");
-		this.maxHistoryItems = 200;
+		this.maxHistoryItems = 800;
 		this.history = [];
 		this.initialized = this._loadHistory().then(history => {
 			this.history = history;
 		});
 	}
 	_generateUniqueId() {
-		// Use crypto.randomUUID() if available (Node.js 14.17.0+)
-		if (crypto.randomUUID) {
-			return crypto.randomUUID();
-		}
-		
-		// Fallback: combine timestamp with secure random bytes
-		const timestamp = Date.now();
-		const randomBytes = crypto.randomBytes(16).toString('hex');
-		return `${timestamp}-${randomBytes}`;
+		return crypto.randomUUID();
 	}
 
 	async _loadHistory() {

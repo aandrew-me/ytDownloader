@@ -1158,21 +1158,21 @@ class YtDownloaderApp {
 		};
 
 		// Add to download history
-		try {
-			const fileSize = fs.statSync(fullPath).size || 0;
-			ipcRenderer.invoke("add-to-history", {
-				title: this.state.videoInfo.title,
-				url: this.state.videoInfo.url,
-				filename: filename,
-				filePath: fullPath,
-				fileSize: fileSize,
-				format: ext,
-				thumbnail: thumbnail,
-				duration: this.state.videoInfo.duration,
-			}).catch(err => console.error("Error adding to history:", err));
-		} catch (error) {
-			console.error("Error saving to history:", error);
-		}
+		fs.promises.stat(fullPath)
+			.then(stat => {
+				const fileSize = stat.size || 0;
+				ipcRenderer.invoke("add-to-history", {
+					title: this.state.videoInfo.title,
+					url: this.state.videoInfo.url,
+					filename: filename,
+					filePath: fullPath,
+					fileSize: fileSize,
+					format: ext,
+					thumbnail: thumbnail,
+					duration: this.state.videoInfo.duration,
+				}).catch(err => console.error("Error adding to history:", err));
+			})
+			.catch(error => console.error("Error saving to history:", error));
 	}
 
 	/**

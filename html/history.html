@@ -660,14 +660,7 @@
         }
 
         function openFile(filePath) {
-            // Try to open the file with error handling
-            ipcRenderer.invoke("open-file-safe", filePath).then((result) => {
-                if (!result.success) {
-                    alert(`Error: ${result.error}\n\nFile path: ${filePath}\n\nThe file may have been deleted or moved.`);
-                }
-            }).catch((err) => {
-                alert(`Failed to open file: ${err.message}`);
-            });
+            ipcRenderer.send("show-file", filePath);
         }
 
         function deleteHistoryItem(id) {

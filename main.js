@@ -225,47 +225,6 @@ ipcMain.on("show-file", (_event, fullPath) => {
 	}
 });
 
-ipcMain.handle("open-file-safe", async (_event, fullPath) => {
-	try {
-		if (!fullPath || typeof fullPath !== "string") {
-			return { success: false, error: "Invalid file path" };
-		}
-
-		const normalizedPath = path.normalize(fullPath);
-		const resolvedPath = path.resolve(normalizedPath);
-
-		if (normalizedPath.includes("..") || fullPath.includes("..")) {
-			return { success: false, error: "Invalid file path: path traversal detected" };
-		}
-
-		if (!path.isAbsolute(resolvedPath)) {
-			return { success: false, error: "Invalid file path: must be absolute" };
-		}
-
-		let realPath;
-		try {
-			realPath = fs.realpathSync(resolvedPath);
-		} catch (error) {
-			return { success: false, error: "File not found - it may have been deleted or moved" };
-		}
-
-		if (!fs.existsSync(realPath)) {
-			return { success: false, error: "File not found - it may have been deleted or moved" };
-		}
-
-		const stats = fs.statSync(realPath);
-		if (!stats.isFile()) {
-			return { success: false, error: "Path does not point to a valid file" };
-		}
-
-		shell.showItemInFolder(realPath);
-		return { success: true };
-	} catch (error) {
-		console.error("Error opening file:", error);
-		return { success: false, error: error.message };
-	}
-});
-
 ipcMain.on("load-win", (event, file) => {
 	if (file.includes("playlist.html")) {
 		indexIsOpen = false;
