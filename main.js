@@ -219,9 +219,14 @@ ipcMain.on("get-version", () => {
 	secondaryWindow.webContents.send("version", version);
 });
 
-ipcMain.on("show-file", (_event, fullPath) => {
-	if (fullPath && fs.existsSync(fullPath)) {
-		shell.showItemInFolder(fullPath);
+ipcMain.on("show-file", async (_event, fullPath) => {
+	try {
+		const fileExists = await fs.promises.stat(fullPath);
+		if (fullPath && fileExists) {
+			shell.showItemInFolder(fullPath);
+		}
+	} catch (error) {
+		console.error("File not found or error opening file:", error.message);
 	}
 });
 
