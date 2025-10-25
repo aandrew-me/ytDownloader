@@ -12,6 +12,7 @@ const {autoUpdater} = require("electron-updater");
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = "true";
 const fs = require("fs");
 const path = require("path");
+const DownloadHistory = require("./src/history");
 autoUpdater.autoDownload = false;
 /**@type {BrowserWindow} */
 let win = null;
@@ -21,6 +22,7 @@ let isQuiting = false;
 let indexIsOpen = true;
 let trayEnabled = false;
 const configFile = path.join(app.getPath("userData"), "config.json");
+let downloadHistory = null;
 
 function createWindow() {
 	const bounds = JSON.parse((getItem("bounds", configFile) || "{}"));
@@ -220,6 +222,23 @@ ipcMain.on("get-version", () => {
 ipcMain.on("show-file", (_event, fullPath) => {
 	if (fullPath && fs.existsSync(fullPath)) {
 		shell.showItemInFolder(fullPath);
+	}
+});
+
+ipcMain.handle("open-file-safe", async (_event, fullPath) => {
+	try {
+		if (!fullPath || typeof fullPath !== "string") {
+			return { success: false, error: "Invalid file path" };
+		}
+
+		if (!fs.existsSync(fullPath)) {
+			return { success: false, error: "File not found - it may have been deleted or moved" };
+		}
+
+		shell.showItemInFolder(fullPath);
+		return { success: true };
+	} catch (error) {
+		return { success: false, error: error.message };
 	}
 });
 
@@ -460,3 +479,59 @@ function getItem(item, configPath) {
 		return "";
 	}
 }
+
+// Download History
+app.whenReady().then(() => {
+	downloadHistory = new DownloadHistory();
+});
+
+ipcMain.handle("get-download-history", async () => {
+	if (!downloadHistory) {
+		downloadHistory = new DownloadHistory();
+	}
+	return downloadHistory.getHistory();
+});
+
+ipcMain.handle("add-to-history", async (event, downloadInfo) => {
+	if (!downloadHistory) {
+		downloadHistory = new DownloadHistory();
+	}
+	return downloadHistory.addDownload(downloadInfo);
+});
+
+ipcMain.handle("get-download-stats", async () => {
+	if (!downloadHistory) {
+		downloadHistory = new DownloadHistory();
+	}
+	return downloadHistory.getStats();
+});
+
+ipcMain.handle("delete-history-item", async (event, id) => {
+	if (!downloadHistory) {
+		downloadHistory = new DownloadHistory();
+	}
+	return downloadHistory.removeHistoryItem(id);
+});
+
+ipcMain.handle("clear-all-history", async () => {
+	if (!downloadHistory) {
+		downloadHistory = new DownloadHistory();
+	}
+	downloadHistory.clearHistory();
+	return true;
+});
+
+ipcMain.handle("export-history-json", async () => {
+	if (!downloadHistory) {
+		downloadHistory = new DownloadHistory();
+	}
+	return downloadHistory.exportAsJSON();
+});
+
+ipcMain.handle("export-history-csv", async () => {
+	if (!downloadHistory) {
+		downloadHistory = new DownloadHistory();
+	}
+	return downloadHistory.exportAsCSV();
+});
+
