@@ -448,6 +448,9 @@
                 allHistory = history || [];
                 renderHistory(allHistory);
                 updateStats();
+            }).catch((error) => {
+                console.error("Failed to load history:", error);
+                alert("Failed to load download history. Please try again.");
             });
         }
 
@@ -471,59 +474,125 @@
 
         function renderHistory(historyItems) {
             const container = document.getElementById("historyListContainer");
+            
+            // Clear container first
+            container.innerHTML = '';
 
             if (historyItems.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon">📭</div>
-                        <h2>No Downloads Yet</h2>
-                        <p>Your download history will appear here</p>
-                    </div>
-                `;
+                const emptyState = document.createElement('div');
+                emptyState.className = 'empty-state';
+                
+                const icon = document.createElement('div');
+                icon.className = 'empty-state-icon';
+                icon.textContent = '📭';
+                
+                const heading = document.createElement('h2');
+                heading.textContent = 'No Downloads Yet';
+                
+                const text = document.createElement('p');
+                text.textContent = 'Your download history will appear here';
+                
+                emptyState.appendChild(icon);
+                emptyState.appendChild(heading);
+                emptyState.appendChild(text);
+                container.appendChild(emptyState);
                 return;
             }
 
-            container.innerHTML = historyItems
-                .map(
-                    (item) => `
-                <div class="history-item" data-id="${item.id}">
-                    ${item.thumbnail ? `<img src="${item.thumbnail}" alt="thumbnail" class="history-item-thumbnail">` : '<div class="history-item-thumbnail"></div>'}
-                    <div class="history-item-info">
-                        <div class="history-item-title" title="${item.title}">${item.title}</div>
-                        <div class="history-item-meta">
-                            <span>Format: <strong>${item.format}</strong></span>
-                            <span>Size: <strong>${formatFileSize(item.fileSize)}</strong></span>
-                            <span>Date: <strong>${new Date(item.downloadDate).toLocaleDateString()}</strong></span>
-                            ${item.duration ? `<span>Duration: <strong>${formatDuration(item.duration)}</strong></span>` : ""}
-                        </div>
-                    </div>
-                    <div class="history-item-actions">
-                        <button class="copy-url-btn" data-url="${item.url}">Copy URL</button>
-                        <button class="open-file-btn" data-filepath="${item.filePath}">Open</button>
-                        <button class="delete-btn" data-id="${item.id}">Delete</button>
-                    </div>
-                </div>
-            `
-                )
-                .join("");
-
-            // Add event listeners to the newly created buttons
-            container.querySelectorAll(".copy-url-btn").forEach((btn) => {
-                btn.addEventListener("click", (e) => {
-                    copyToClipboard(e.target.getAttribute("data-url"));
-                });
-            });
-
-            container.querySelectorAll(".open-file-btn").forEach((btn) => {
-                btn.addEventListener("click", (e) => {
-                    openFile(e.target.getAttribute("data-filepath"));
-                });
-            });
-
-            container.querySelectorAll(".delete-btn").forEach((btn) => {
-                btn.addEventListener("click", (e) => {
-                    deleteHistoryItem(e.target.getAttribute("data-id"));
-                });
+           
+            historyItems.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'history-item';
+                itemDiv.dataset.id = item.id;
+                
+               
+                const thumbnail = document.createElement(item.thumbnail ? 'img' : 'div');
+                thumbnail.className = 'history-item-thumbnail';
+                if (item.thumbnail) {
+                    thumbnail.src = item.thumbnail;
+                    thumbnail.alt = 'thumbnail';
+                }
+                itemDiv.appendChild(thumbnail);
+                
+             
+                const info = document.createElement('div');
+                info.className = 'history-item-info';
+                
+              
+                const title = document.createElement('div');
+                title.className = 'history-item-title';
+                title.title = item.title;
+                title.textContent = item.title; 
+                info.appendChild(title);
+                
+               
+                const meta = document.createElement('div');
+                meta.className = 'history-item-meta';
+                
+                
+                const formatSpan = document.createElement('span');
+                formatSpan.textContent = 'Format: ';
+                const formatStrong = document.createElement('strong');
+                formatStrong.textContent = item.format;
+                formatSpan.appendChild(formatStrong);
+                meta.appendChild(formatSpan);
+                
+               
+                const sizeSpan = document.createElement('span');
+                sizeSpan.textContent = 'Size: ';
+                const sizeStrong = document.createElement('strong');
+                sizeStrong.textContent = formatFileSize(item.fileSize);
+                sizeSpan.appendChild(sizeStrong);
+                meta.appendChild(sizeSpan);
+                
+               
+                const dateSpan = document.createElement('span');
+                dateSpan.textContent = 'Date: ';
+                const dateStrong = document.createElement('strong');
+                dateStrong.textContent = new Date(item.downloadDate).toLocaleDateString();
+                dateSpan.appendChild(dateStrong);
+                meta.appendChild(dateSpan);
+                
+               
+                if (item.duration) {
+                    const durationSpan = document.createElement('span');
+                    durationSpan.textContent = 'Duration: ';
+                    const durationStrong = document.createElement('strong');
+                    durationStrong.textContent = formatDuration(item.duration);
+                    durationSpan.appendChild(durationStrong);
+                    meta.appendChild(durationSpan);
+                }
+                
+                info.appendChild(meta);
+                itemDiv.appendChild(info);
+                
+              
+                const actions = document.createElement('div');
+                actions.className = 'history-item-actions';
+                
+               
+                const copyBtn = document.createElement('button');
+                copyBtn.className = 'copy-url-btn';
+                copyBtn.textContent = 'Copy URL';
+                copyBtn.addEventListener('click', () => copyToClipboard(item.url));
+                actions.appendChild(copyBtn);
+                
+              
+                const openBtn = document.createElement('button');
+                openBtn.className = 'open-file-btn';
+                openBtn.textContent = 'Open';
+                openBtn.addEventListener('click', () => openFile(item.filePath));
+                actions.appendChild(openBtn);
+                
+              
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.textContent = 'Delete';
+                deleteBtn.addEventListener('click', () => deleteHistoryItem(item.id));
+                actions.appendChild(deleteBtn);
+                
+                itemDiv.appendChild(actions);
+                container.appendChild(itemDiv);
             });
         }
 
@@ -546,6 +615,24 @@
                                 ? Object.entries(stats.byFormat).sort((a, b) => b[1] - a[1])[0][0].toUpperCase()
                                 : "N/A"
                         }</div>
+                    </div>
+                `;
+            }).catch((error) => {
+                console.error("Failed to load stats:", error);
+                // Display placeholder stats on error
+                const statsContainer = document.getElementById("statsContainer");
+                statsContainer.innerHTML = `
+                    <div class="stat-card">
+                        <h3>Total Downloads</h3>
+                        <div class="value">--</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Total Size</h3>
+                        <div class="value">--</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Most Common Format</h3>
+                        <div class="value">--</div>
                     </div>
                 `;
             });
@@ -590,6 +677,9 @@
                 ipcRenderer.invoke("delete-history-item", id).then(() => {
                     loadHistory();
                     filterHistory();
+                }).catch((error) => {
+                    console.error("Failed to delete history item:", error);
+                    alert("Failed to delete history item. Please try again.");
                 });
             }
         }
@@ -597,12 +687,18 @@
         function exportHistoryJSON() {
             ipcRenderer.invoke("export-history-json").then((data) => {
                 downloadFile(data, "download_history.json", "application/json");
+            }).catch((error) => {
+                console.error("Failed to export history as JSON:", error);
+                alert("Failed to export history as JSON. Please try again.");
             });
         }
 
         function exportHistoryCSV() {
             ipcRenderer.invoke("export-history-csv").then((data) => {
                 downloadFile(data, "download_history.csv", "text/csv");
+            }).catch((error) => {
+                console.error("Failed to export history as CSV:", error);
+                alert("Failed to export history as CSV. Please try again.");
             });
         }
 
@@ -625,6 +721,9 @@
                 ipcRenderer.invoke("clear-all-history").then(() => {
                     loadHistory();
                     filterHistory();
+                }).catch((error) => {
+                    console.error("Failed to clear history:", error);
+                    alert("Failed to clear history. Please try again.");
                 });
             }
         }

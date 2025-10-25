@@ -4,19 +4,34 @@
 
 const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto");
 const { app } = require("electron");
 
 class DownloadHistory {
 	constructor() {
 		this.historyFile = path.join(app.getPath("userData"), "download_history.json");
 		this.maxHistoryItems = 200;
-		this.history = this._loadHistory();
+		this.history = [];
+		this.initialized = this._loadHistory().then(history => {
+			this.history = history;
+		});
+	}
+	_generateUniqueId() {
+		// Use crypto.randomUUID() if available (Node.js 14.17.0+)
+		if (crypto.randomUUID) {
+			return crypto.randomUUID();
+		}
+		
+		// Fallback: combine timestamp with secure random bytes
+		const timestamp = Date.now();
+		const randomBytes = crypto.randomBytes(16).toString('hex');
+		return `${timestamp}-${randomBytes}`;
 	}
 
-	_loadHistory() {
+	async _loadHistory() {
 		try {
 			if (fs.existsSync(this.historyFile)) {
-				const data = fs.readFileSync(this.historyFile, "utf8");
+				const data = await fs.promises.readFile(this.historyFile, "utf8");
 				return JSON.parse(data) || [];
 			}
 		} catch (error) {
@@ -25,17 +40,19 @@ class DownloadHistory {
 		return [];
 	}
 
-	_saveHistory() {
+	async _saveHistory() {
 		try {
-			fs.writeFileSync(this.historyFile, JSON.stringify(this.history, null, 2));
+			await fs.promises.writeFile(this.historyFile, JSON.stringify(this.history, null, 2));
 		} catch (error) {
 			console.error("Error saving history:", error);
 		}
 	}
 
-	addDownload(downloadInfo) {
+	async addDownload(downloadInfo) {
+		await this.initialized;
+		
 		const historyItem = {
-			id: Date.now().toString(),
+			id: this._generateUniqueId(),
 			title: downloadInfo.title || "Unknown",
 			url: downloadInfo.url || "",
 			filename: downloadInfo.filename || "",
@@ -56,15 +73,18 @@ class DownloadHistory {
 			this.history = this.history.slice(0, this.maxHistoryItems);
 		}
 
-		this._saveHistory();
+		await this._saveHistory();
 		return historyItem;
 	}
 
-	getHistory() {
+	async getHistory() {
+		await this.initialized;
 		return this.history;
 	}
 
-	getFilteredHistory(options = {}) {
+	async getFilteredHistory(options = {}) {
+		await this.initialized;
+		
 		let filtered = [...this.history];
 
 		if (options.format) {
@@ -89,26 +109,33 @@ class DownloadHistory {
 		return filtered;
 	}
 
-	getHistoryItem(id) {
+	async getHistoryItem(id) {
+		await this.initialized;
 		return this.history.find((item) => item.id === id) || null;
 	}
 
-	removeHistoryItem(id) {
+	async removeHistoryItem(id) {
+		await this.initialized;
+		
 		const index = this.history.findIndex((item) => item.id === id);
 		if (index !== -1) {
 			this.history.splice(index, 1);
-			this._saveHistory();
+			await this._saveHistory();
 			return true;
 		}
 		return false;
 	}
 
-	clearHistory() {
+	async clearHistory() {
+		await this.initialized;
+		
 		this.history = [];
-		this._saveHistory();
+		await this._saveHistory();
 	}
 
-	getStats() {
+	async getStats() {
+		await this.initialized;
+		
 		const stats = {
 			totalDownloads: this.history.length,
 			totalSize: 0,
@@ -132,11 +159,31 @@ class DownloadHistory {
 		return stats;
 	}
 
-	exportAsJSON() {
+	async exportAsJSON() {
+		await this.initialized;
 		return JSON.stringify(this.history, null, 2);
 	}
 
-	exportAsCSV() {
+	_sanitizeCSVField(value) {
+		if (value == null) {
+			value = "";
+		}
+		
+		const stringValue = String(value);
+			
+		let sanitized = stringValue.replace(/"/g, '""');
+		
+		const dangerousChars = ['=', '+', '-', '@'];
+		if (sanitized.length > 0 && dangerousChars.includes(sanitized[0])) {
+			sanitized = "'" + sanitized;
+		}
+		
+		return `"${sanitized}"`;
+	}
+
+	async exportAsCSV() {
+		await this.initialized;
+		
 		if (this.history.length === 0) return "No history to export\n";
 
 		const headers = [
@@ -148,12 +195,12 @@ class DownloadHistory {
 			"Download Date",
 		];
 		const rows = this.history.map((item) => [
-			`"${item.title.replace(/"/g, '""')}"`,
-			`"${item.url.replace(/"/g, '""')}"`,
-			`"${item.filename.replace(/"/g, '""')}"`,
-			item.format,
-			item.fileSize,
-			item.downloadDate,
+			this._sanitizeCSVField(item.title),
+			this._sanitizeCSVField(item.url),
+			this._sanitizeCSVField(item.filename),
+			this._sanitizeCSVField(item.format),
+			this._sanitizeCSVField(item.fileSize),
+			this._sanitizeCSVField(item.downloadDate),
 		]);
 
 		return (

@@ -486,52 +486,87 @@ app.whenReady().then(() => {
 });
 
 ipcMain.handle("get-download-history", async () => {
-	if (!downloadHistory) {
-		downloadHistory = new DownloadHistory();
+	try {
+		if (!downloadHistory) {
+			downloadHistory = new DownloadHistory();
+		}
+		return downloadHistory.getHistory();
+	} catch (error) {
+		console.error("Error getting download history:", error);
+		throw new Error("Failed to retrieve download history");
 	}
-	return downloadHistory.getHistory();
 });
 
 ipcMain.handle("add-to-history", async (event, downloadInfo) => {
-	if (!downloadHistory) {
-		downloadHistory = new DownloadHistory();
+	try {
+		if (!downloadHistory) {
+			downloadHistory = new DownloadHistory();
+		}
+		return downloadHistory.addDownload(downloadInfo);
+	} catch (error) {
+		console.error("Error adding to history:", error);
+		throw new Error("Failed to add download to history");
 	}
-	return downloadHistory.addDownload(downloadInfo);
 });
 
 ipcMain.handle("get-download-stats", async () => {
-	if (!downloadHistory) {
-		downloadHistory = new DownloadHistory();
+	try {
+		if (!downloadHistory) {
+			downloadHistory = new DownloadHistory();
+		}
+		return downloadHistory.getStats();
+	} catch (error) {
+		console.error("Error getting download stats:", error);
+		throw new Error("Failed to retrieve download statistics");
 	}
-	return downloadHistory.getStats();
 });
 
 ipcMain.handle("delete-history-item", async (event, id) => {
-	if (!downloadHistory) {
-		downloadHistory = new DownloadHistory();
+	try {
+		if (!downloadHistory) {
+			downloadHistory = new DownloadHistory();
+		}
+		return downloadHistory.removeHistoryItem(id);
+	} catch (error) {
+		console.error("Error deleting history item:", error);
+		throw new Error("Failed to delete history item");
 	}
-	return downloadHistory.removeHistoryItem(id);
 });
 
 ipcMain.handle("clear-all-history", async () => {
-	if (!downloadHistory) {
-		downloadHistory = new DownloadHistory();
+	try {
+		if (!downloadHistory) {
+			downloadHistory = new DownloadHistory();
+		}
+		downloadHistory.clearHistory();
+		return true;
+	} catch (error) {
+		console.error("Error clearing history:", error);
+		throw new Error("Failed to clear download history");
 	}
-	downloadHistory.clearHistory();
-	return true;
 });
 
 ipcMain.handle("export-history-json", async () => {
-	if (!downloadHistory) {
-		downloadHistory = new DownloadHistory();
+	try {
+		if (!downloadHistory) {
+			downloadHistory = new DownloadHistory();
+		}
+		return downloadHistory.exportAsJSON();
+	} catch (error) {
+		console.error("Error exporting history as JSON:", error);
+		throw new Error("Failed to export history as JSON");
 	}
-	return downloadHistory.exportAsJSON();
 });
 
 ipcMain.handle("export-history-csv", async () => {
-	if (!downloadHistory) {
-		downloadHistory = new DownloadHistory();
+	try {
+		if (!downloadHistory) {
+			downloadHistory = new DownloadHistory();
+		}
+		return downloadHistory.exportAsCSV();
+	} catch (error) {
+		console.error("Error exporting history as CSV:", error);
+		throw new Error("Failed to export history as CSV");
 	}
-	return downloadHistory.exportAsCSV();
 });
 
