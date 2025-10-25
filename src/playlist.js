@@ -717,6 +717,12 @@ getId("aboutWin").addEventListener("click", () => {
 	closeMenu();
 	ipcRenderer.send("load-page", __dirname + "/about.html");
 });
+
+getId("historyWin").addEventListener("click", () => {
+	closeMenu();
+	ipcRenderer.send("load-page", __dirname + "/history.html");
+});
+
 getId("homeWin").addEventListener("click", () => {
 	closeMenu();
 	ipcRenderer.send("load-win", __dirname + "/index.html");

@@ -633,6 +633,13 @@ getId("aboutWin").addEventListener("click", () => {
 	menuIsOpen = false;
 	ipcRenderer.send("load-page", __dirname + "/about.html");
 });
+
+getId("historyWin").addEventListener("click", () => {
+	closeMenu();
+	menuIsOpen = false;
+	ipcRenderer.send("load-page", __dirname + "/history.html");
+});
+
 getId("homeWin").addEventListener("click", () => {
 	closeMenu();
 	menuIsOpen = false;
