@@ -262,6 +262,14 @@
             transform: translateY(0);
         }
 
+        .submitBtn.close-btn {
+            background: var(--redBtn, #ff6b6b);
+        }
+
+        .submitBtn.close-btn:hover {
+            background: var(--redBtn-bottom, #ff5252);
+        }
+
         .action-buttons {
             display: flex;
             gap: 12px;
@@ -379,7 +387,7 @@
     <div class="history-container">
         <div class="history-header">
             <h1 id="historyTitle">Download History</h1>
-            <button class="submitBtn" onclick="window.close()">Close</button>
+            <button class="submitBtn close-btn" onclick="window.close()">Close</button>
         </div>
 
         <div class="history-controls">
@@ -404,7 +412,7 @@
             <button class="danger-btn" onclick="clearAllHistory()">Clear All History</button>
         </div>
 
-        <div id="historyListContainer"></div>
+        <div id="historyListContainer" class="history-list"></div>
     </div>
 
     <script>
