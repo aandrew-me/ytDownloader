@@ -12,6 +12,7 @@ const {autoUpdater} = require("electron-updater");
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = "true";
 const fs = require("fs");
 const path = require("path");
+const DownloadHistory = require("./src/history");
 autoUpdater.autoDownload = false;
 /**@type {BrowserWindow} */
 let win = null;
@@ -21,6 +22,7 @@ let isQuiting = false;
 let indexIsOpen = true;
 let trayEnabled = false;
 const configFile = path.join(app.getPath("userData"), "config.json");
+let downloadHistory = null;
 
 function createWindow() {
 	const bounds = JSON.parse((getItem("bounds", configFile) || "{}"));
@@ -217,9 +219,14 @@ ipcMain.on("get-version", () => {
 	secondaryWindow.webContents.send("version", version);
 });
 
-ipcMain.on("show-file", (_event, fullPath) => {
-	if (fullPath && fs.existsSync(fullPath)) {
-		shell.showItemInFolder(fullPath);
+ipcMain.on("show-file", async (_event, fullPath) => {
+	try {
+		const fileExists = await fs.promises.stat(fullPath);
+		if (fullPath && fileExists) {
+			shell.showItemInFolder(fullPath);
+		}
+	} catch (error) {
+		console.error("File not found or error opening file:", error.message);
 	}
 });
 
@@ -460,3 +467,89 @@ function getItem(item, configPath) {
 		return "";
 	}
 }
+
+ipcMain.handle("get-download-history", async () => {
+	try {
+		if (!downloadHistory) {
+			downloadHistory = new DownloadHistory();
+		}
+		return downloadHistory.getHistory();
+	} catch (error) {
+		console.error("Error getting download history:", error);
+		throw new Error("Failed to retrieve download history");
+	}
+});
+
+ipcMain.handle("add-to-history", async (event, downloadInfo) => {
+	try {
+		if (!downloadHistory) {
+			downloadHistory = new DownloadHistory();
+		}
+		return downloadHistory.addDownload(downloadInfo);
+	} catch (error) {
+		console.error("Error adding to history:", error);
+		throw new Error("Failed to add download to history");
+	}
+});
+
+ipcMain.handle("get-download-stats", async () => {
+	try {
+		if (!downloadHistory) {
+			downloadHistory = new DownloadHistory();
+		}
+		return downloadHistory.getStats();
+	} catch (error) {
+		console.error("Error getting download stats:", error);
+		throw new Error("Failed to retrieve download statistics");
+	}
+});
+
+ipcMain.handle("delete-history-item", async (event, id) => {
+	try {
+		if (!downloadHistory) {
+			downloadHistory = new DownloadHistory();
+		}
+		return downloadHistory.removeHistoryItem(id);
+	} catch (error) {
+		console.error("Error deleting history item:", error);
+		throw new Error("Failed to delete history item");
+	}
+});
+
+ipcMain.handle("clear-all-history", async () => {
+	try {
+		if (!downloadHistory) {
+			downloadHistory = new DownloadHistory();
+		}
+		downloadHistory.clearHistory();
+		return true;
+	} catch (error) {
+		console.error("Error clearing history:", error);
+		throw new Error("Failed to clear download history");
+	}
+});
+
+ipcMain.handle("export-history-json", async () => {
+	try {
+		if (!downloadHistory) {
+			downloadHistory = new DownloadHistory();
+		}
+		return downloadHistory.exportAsJSON();
+	} catch (error) {
+		console.error("Error exporting history as JSON:", error);
+		throw new Error("Failed to export history as JSON");
+	}
+});
+
+ipcMain.handle("export-history-csv", async () => {
+	try {
+		if (!downloadHistory) {
+			downloadHistory = new DownloadHistory();
+		}
+		return downloadHistory.exportAsCSV();
+	} catch (error) {
+		console.error("Error exporting history as CSV:", error);
+		throw new Error("Failed to export history as CSV");
+	}
+});
+

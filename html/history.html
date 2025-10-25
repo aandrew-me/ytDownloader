@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en" theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download History - YtDownloader</title>
+    <link rel="stylesheet" href="../assets/css/index.css">
+    <style>
+        .history-container {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .history-header h1 {
+            margin: 0;
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .history-controls {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .search-box {
+            padding: 10px 15px;
+            border: 2px solid var(--box-toggle, #3a3a3a);
+            border-radius: 6px;
+            background: var(--box-main, #2a2a2a);
+            color: var(--text, #fff);
+            width: 300px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: var(--select, #54abde);
+        }
+
+        .filter-select {
+            padding: 10px 15px;
+            border: 2px solid var(--box-toggle, #3a3a3a);
+            border-radius: 6px;
+            background: var(--box-main, #2a2a2a);
+            color: var(--text, #fff);
+            font-size: 14px;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--select, #54abde);
+        }
+
+        .history-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            padding: 20px;
+            background: var(--box-main, #2a2a2a);
+            border-radius: 10px;
+            border: 2px solid var(--box-toggle, #3a3a3a);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-card h3 {
+            margin: 0 0 10px 0;
+            font-size: 13px;
+            opacity: 0.7;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text);
+        }
+
+        .stat-card .value {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--select, #54abde);
+            word-break: break-word;
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .history-item {
+            display: flex;
+            align-items: center;
+            padding: 18px;
+            background: var(--item-bg, #2a2a2a);
+            border-radius: 10px;
+            border: 2px solid var(--box-toggle, #3a3a3a);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            gap: 15px;
+        }
+
+        .history-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-color: var(--select, #54abde);
+        }
+
+        .history-item-thumbnail {
+            width: 80px;
+            height: 80px;
+            background: var(--box-toggle, #ddd);
+            border-radius: 8px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .history-item-info {
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .history-item-title {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 8px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--text);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            line-height: 1.4;
+            text-align: left;
+        }
+
+        .history-item-meta {
+            display: flex;
+            gap: 18px;
+            font-size: 13px;
+            opacity: 0.7;
+            flex-wrap: wrap;
+            color: var(--text);
+            text-align: left;
+        }
+
+        .history-item-meta span {
+            white-space: nowrap;
+        }
+
+        .history-item-actions {
+            display: flex;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .history-item-actions button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            background: var(--blueBtn, #54abde);
+            color: white;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .history-item-actions button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        .history-item-actions button:active {
+            transform: scale(0.98);
+        }
+
+        .history-item-actions .delete-btn {
+            background: var(--redBtn, #ff6b6b);
+        }
+
+        .history-item-actions .delete-btn:hover {
+            background: var(--redBtn-bottom, #ff5252);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: var(--text, #666);
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .empty-state h2 {
+            color: var(--text);
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: var(--text);
+            opacity: 0.7;
+        }
+
+        .submitBtn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 8px;
+            background: var(--greenBtn, #4caf50);
+            color: white;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .submitBtn:hover {
+            background: var(--greenBtn-bottom, #45a049);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .submitBtn:active {
+            transform: translateY(0);
+        }
+
+        .submitBtn.close-btn {
+            background: var(--redBtn, #ff6b6b);
+        }
+
+        .submitBtn.close-btn:hover {
+            background: var(--redBtn-bottom, #ff5252);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .action-buttons button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            background: var(--blueBtn, #54abde);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .action-buttons button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .action-buttons button:active {
+            transform: translateY(0);
+        }
+
+        .action-buttons .danger-btn {
+            background: var(--redBtn, #ff6b6b);
+        }
+
+        .action-buttons .danger-btn:hover {
+            background: var(--redBtn-bottom, #ff5252);
+        }
+
+        @media (max-width: 768px) {
+            .history-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .history-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .history-item-thumbnail {
+                margin-right: 0;
+                margin-bottom: 0;
+                align-self: center;
+            }
+
+            .history-item-info {
+                width: 100%;
+            }
+
+            .history-item-title {
+                text-align: center;
+                white-space: normal;
+                word-break: break-word;
+            }
+
+            .history-item-meta {
+                justify-content: center;
+                text-align: center;
+            }
+
+            .history-item-actions {
+                margin-left: 0;
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .history-item-actions button {
+                flex: 1;
+                min-width: 100px;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+
+            .filter-select {
+                width: 100%;
+            }
+
+            .history-header h1 {
+                font-size: 24px;
+            }
+
+            .action-buttons {
+                width: 100%;
+            }
+
+            .action-buttons button {
+                flex: 1;
+                min-width: 120px;
+            }
+        }
+
+        @media (max-width: 1024px) and (min-width: 769px) {
+            .history-item-title {
+                white-space: normal;
+                word-break: break-word;
+                max-width: 500px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="history-container">
+        <div class="history-header">
+            <h1 id="historyTitle">Download History</h1>
+            <button id="closeBtn" class="submitBtn close-btn" onclick="window.close()">Close</button>
+        </div>
+
+        <div class="history-controls">
+            <input type="text" class="search-box" id="searchBox" placeholder="Search by title or URL...">
+            <select class="filter-select" id="formatFilter">
+                <option value="">All Formats</option>
+                <option value="mp4">MP4</option>
+                <option value="mp3">MP3</option>
+                <option value="m4a">M4A</option>
+                <option value="webm">WEBM</option>
+                <option value="opus">Opus</option>
+                <option value="wav">WAV</option>
+                <option value="flac">FLAC</option>
+            </select>
+        </div>
+
+        <div class="history-stats" id="statsContainer"></div>
+
+        <div class="action-buttons">
+            <button id="exportJsonBtn" onclick="exportHistoryJSON()">Export as JSON</button>
+            <button id="exportCsvBtn" onclick="exportHistoryCSV()">Export as CSV</button>
+            <button id="clearAllBtn" class="danger-btn" onclick="clearAllHistory()">Clear All History</button>
+        </div>
+
+        <div id="historyListContainer" class="history-list"></div>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require("electron");
+        const i18n = new (require("../translations/i18n"))();
+
+        let allHistory = [];
+        let filteredHistory = [];
+
+        // Load history on page open
+        document.addEventListener("DOMContentLoaded", () => {
+            loadTheme();
+            loadHistory();
+            setupEventListeners();
+        });
+
+        function loadTheme() {
+            const storageTheme = localStorage.getItem("theme");
+            if (storageTheme) {
+                document.documentElement.setAttribute("theme", storageTheme);
+            }
+        }
+
+        function setupEventListeners() {
+            document.getElementById("searchBox").addEventListener("input", filterHistory);
+            document.getElementById("formatFilter").addEventListener("change", filterHistory);
+        }
+
+        function loadHistory() {
+            ipcRenderer.invoke("get-download-history").then((history) => {
+                allHistory = history || [];
+                renderHistory(allHistory);
+                updateStats();
+            }).catch((error) => {
+                console.error("Failed to load history:", error);
+                alert("Failed to load download history. Please try again.");
+            });
+        }
+
+        function filterHistory() {
+            const searchTerm = document.getElementById("searchBox").value;
+            const format = document.getElementById("formatFilter").value;
+
+            filteredHistory = allHistory.filter((item) => {
+                const matchesSearch =
+                    !searchTerm ||
+                    item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    item.url.toLowerCase().includes(searchTerm.toLowerCase());
+
+                const matchesFormat = !format || item.format.toLowerCase() === format.toLowerCase();
+
+                return matchesSearch && matchesFormat;
+            });
+
+            renderHistory(filteredHistory);
+        }
+
+        function renderHistory(historyItems) {
+            const container = document.getElementById("historyListContainer");
+            
+            // Clear container first
+            container.innerHTML = '';
+
+            if (historyItems.length === 0) {
+                const emptyState = document.createElement('div');
+                emptyState.className = 'empty-state';
+                
+                const icon = document.createElement('div');
+                icon.className = 'empty-state-icon';
+                icon.textContent = '📭';
+                
+                const heading = document.createElement('h2');
+                heading.textContent = 'No Downloads Yet';
+                
+                const text = document.createElement('p');
+                text.textContent = 'Your download history will appear here';
+                
+                emptyState.appendChild(icon);
+                emptyState.appendChild(heading);
+                emptyState.appendChild(text);
+                container.appendChild(emptyState);
+                return;
+            }
+
+           
+            historyItems.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'history-item';
+                itemDiv.dataset.id = item.id;
+                
+               
+                const thumbnail = document.createElement(item.thumbnail ? 'img' : 'div');
+                thumbnail.className = 'history-item-thumbnail';
+                if (item.thumbnail) {
+                    thumbnail.src = item.thumbnail;
+                    thumbnail.alt = 'thumbnail';
+                }
+                itemDiv.appendChild(thumbnail);
+                
+             
+                const info = document.createElement('div');
+                info.className = 'history-item-info';
+                
+              
+                const title = document.createElement('div');
+                title.className = 'history-item-title';
+                title.title = item.title;
+                title.textContent = item.title; 
+                info.appendChild(title);
+                
+               
+                const meta = document.createElement('div');
+                meta.className = 'history-item-meta';
+                
+                
+                const formatSpan = document.createElement('span');
+                formatSpan.textContent = 'Format: ';
+                const formatStrong = document.createElement('strong');
+                formatStrong.textContent = item.format;
+                formatSpan.appendChild(formatStrong);
+                meta.appendChild(formatSpan);
+                
+               
+                const sizeSpan = document.createElement('span');
+                sizeSpan.textContent = 'Size: ';
+                const sizeStrong = document.createElement('strong');
+                sizeStrong.textContent = formatFileSize(item.fileSize);
+                sizeSpan.appendChild(sizeStrong);
+                meta.appendChild(sizeSpan);
+                
+               
+                const dateSpan = document.createElement('span');
+                dateSpan.textContent = 'Date: ';
+                const dateStrong = document.createElement('strong');
+                dateStrong.textContent = new Date(item.downloadDate).toLocaleDateString();
+                dateSpan.appendChild(dateStrong);
+                meta.appendChild(dateSpan);
+                
+               
+                if (item.duration) {
+                    const durationSpan = document.createElement('span');
+                    durationSpan.textContent = 'Duration: ';
+                    const durationStrong = document.createElement('strong');
+                    durationStrong.textContent = formatDuration(item.duration);
+                    durationSpan.appendChild(durationStrong);
+                    meta.appendChild(durationSpan);
+                }
+                
+                info.appendChild(meta);
+                itemDiv.appendChild(info);
+                
+              
+                const actions = document.createElement('div');
+                actions.className = 'history-item-actions';
+                
+               
+                const copyBtn = document.createElement('button');
+                copyBtn.className = 'copy-url-btn';
+                copyBtn.textContent = 'Copy URL';
+                copyBtn.addEventListener('click', () => copyToClipboard(item.url));
+                actions.appendChild(copyBtn);
+                
+              
+                const openBtn = document.createElement('button');
+                openBtn.className = 'open-file-btn';
+                openBtn.textContent = 'Open';
+                openBtn.addEventListener('click', () => openFile(item.filePath));
+                actions.appendChild(openBtn);
+                
+              
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.textContent = 'Delete';
+                deleteBtn.addEventListener('click', () => deleteHistoryItem(item.id));
+                actions.appendChild(deleteBtn);
+                
+                itemDiv.appendChild(actions);
+                container.appendChild(itemDiv);
+            });
+        }
+
+        function updateStats() {
+            ipcRenderer.invoke("get-download-stats").then((stats) => {
+                const statsContainer = document.getElementById("statsContainer");
+                statsContainer.innerHTML = `
+                    <div class="stat-card">
+                        <h3>Total Downloads</h3>
+                        <div class="value">${stats.totalDownloads}</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Total Size</h3>
+                        <div class="value">${formatFileSize(stats.totalSize)}</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Most Common Format</h3>
+                        <div class="value">${
+                            Object.keys(stats.byFormat).length > 0
+                                ? Object.entries(stats.byFormat).sort((a, b) => b[1] - a[1])[0][0].toUpperCase()
+                                : "N/A"
+                        }</div>
+                    </div>
+                `;
+            }).catch((error) => {
+                console.error("Failed to load stats:", error);
+                // Display placeholder stats on error
+                const statsContainer = document.getElementById("statsContainer");
+                statsContainer.innerHTML = `
+                    <div class="stat-card">
+                        <h3>Total Downloads</h3>
+                        <div class="value">--</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Total Size</h3>
+                        <div class="value">--</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Most Common Format</h3>
+                        <div class="value">--</div>
+                    </div>
+                `;
+            });
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return "0 B";
+            const k = 1024;
+            const sizes = ["B", "KB", "MB", "GB"];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + " " + sizes[i];
+        }
+
+        function formatDuration(seconds) {
+            const h = Math.floor(seconds / 3600);
+            const m = Math.floor((seconds % 3600) / 60);
+            const s = Math.floor(seconds % 60);
+            if (h > 0) return `${h}h ${m}m`;
+            if (m > 0) return `${m}m ${s}s`;
+            return `${s}s`;
+        }
+
+        function copyToClipboard(text) {
+            const { clipboard } = require("electron");
+            clipboard.writeText(text);
+            alert("URL copied to clipboard!");
+        }
+
+        function openFile(filePath) {
+            ipcRenderer.send("show-file", filePath);
+        }
+
+        function deleteHistoryItem(id) {
+            if (confirm("Are you sure you want to delete this item from history?")) {
+                ipcRenderer.invoke("delete-history-item", id).then(() => {
+                    loadHistory();
+                    filterHistory();
+                }).catch((error) => {
+                    console.error("Failed to delete history item:", error);
+                    alert("Failed to delete history item. Please try again.");
+                });
+            }
+        }
+
+        function exportHistoryJSON() {
+            ipcRenderer.invoke("export-history-json").then((data) => {
+                downloadFile(data, "download_history.json", "application/json");
+            }).catch((error) => {
+                console.error("Failed to export history as JSON:", error);
+                alert("Failed to export history as JSON. Please try again.");
+            });
+        }
+
+        function exportHistoryCSV() {
+            ipcRenderer.invoke("export-history-csv").then((data) => {
+                downloadFile(data, "download_history.csv", "text/csv");
+            }).catch((error) => {
+                console.error("Failed to export history as CSV:", error);
+                alert("Failed to export history as CSV. Please try again.");
+            });
+        }
+
+        function downloadFile(content, filename, type) {
+            const element = document.createElement("a");
+            element.setAttribute("href", "data:" + type + ";charset=utf-8," + encodeURIComponent(content));
+            element.setAttribute("download", filename);
+            element.style.display = "none";
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+        }
+
+        function clearAllHistory() {
+            if (
+                confirm(
+                    "Are you sure you want to clear all download history? This cannot be undone!"
+                )
+            ) {
+                ipcRenderer.invoke("clear-all-history").then(() => {
+                    loadHistory();
+                    filterHistory();
+                }).catch((error) => {
+                    console.error("Failed to clear history:", error);
+                    alert("Failed to clear history. Please try again.");
+                });
+            }
+        }
+    </script>
+
+    <script>
+        require("../src/translate_history");
+    </script>
+</body>
+
+</html>

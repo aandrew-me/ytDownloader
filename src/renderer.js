@@ -57,6 +57,7 @@ const CONSTANTS = {
 		PREFERENCE_WIN: "preferenceWin",
 		ABOUT_WIN: "aboutWin",
 		PLAYLIST_WIN: "playlistWin",
+		HISTORY_WIN: "historyWin",
 		COMPRESSOR_WIN: "compressorWin",
 	},
 	LOCAL_STORAGE_KEYS: {
@@ -448,6 +449,7 @@ class YtDownloaderApp {
 		const menuMapping = {
 			[CONSTANTS.DOM_IDS.PREFERENCE_WIN]: "/preferences.html",
 			[CONSTANTS.DOM_IDS.ABOUT_WIN]: "/about.html",
+			[CONSTANTS.DOM_IDS.HISTORY_WIN]: "/history.html",
 		};
 		const windowMapping = {
 			[CONSTANTS.DOM_IDS.PLAYLIST_WIN]: "/playlist.html",
@@ -1154,6 +1156,23 @@ class YtDownloaderApp {
 		}).onclick = () => {
 			shell.showItemInFolder(fullPath);
 		};
+
+		// Add to download history
+		fs.promises.stat(fullPath)
+			.then(stat => {
+				const fileSize = stat.size || 0;
+				ipcRenderer.invoke("add-to-history", {
+					title: this.state.videoInfo.title,
+					url: this.state.videoInfo.url,
+					filename: filename,
+					filePath: fullPath,
+					fileSize: fileSize,
+					format: ext,
+					thumbnail: thumbnail,
+					duration: this.state.videoInfo.duration,
+				}).catch(err => console.error("Error adding to history:", err));
+			})
+			.catch(error => console.error("Error saving to history:", error));
 	}
 
 	/**
