@@ -387,7 +387,7 @@
     <div class="history-container">
         <div class="history-header">
             <h1 id="historyTitle">Download History</h1>
-            <button class="submitBtn close-btn" onclick="window.close()">Close</button>
+            <button id="closeBtn" class="submitBtn close-btn" onclick="window.close()">Close</button>
         </div>
 
         <div class="history-controls">
@@ -407,9 +407,9 @@
         <div class="history-stats" id="statsContainer"></div>
 
         <div class="action-buttons">
-            <button onclick="exportHistoryJSON()">Export as JSON</button>
-            <button onclick="exportHistoryCSV()">Export as CSV</button>
-            <button class="danger-btn" onclick="clearAllHistory()">Clear All History</button>
+            <button id="exportJsonBtn" onclick="exportHistoryJSON()">Export as JSON</button>
+            <button id="exportCsvBtn" onclick="exportHistoryCSV()">Export as CSV</button>
+            <button id="clearAllBtn" class="danger-btn" onclick="clearAllHistory()">Clear All History</button>
         </div>
 
         <div id="historyListContainer" class="history-list"></div>
@@ -721,7 +721,7 @@
     </script>
 
     <script>
-        require("../src/translate_about");
+        require("../src/translate_history");
     </script>
 </body>
 
