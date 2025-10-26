@@ -14,7 +14,7 @@ const fs = require("fs");
 const path = require("path");
 const DownloadHistory = require("./src/history");
 autoUpdater.autoDownload = false;
-/**@type {BrowserWindow} */
+/**@type {Electron.CrossProcessExports.BrowserWindow} */
 let win = null;
 let secondaryWindow = null;
 let tray = null;
@@ -57,7 +57,7 @@ function createWindow() {
 	win.show();
 
 	autoUpdater.checkForUpdates().then(result => {
-		// Removing unnecesary files for windows
+		// Removing unnecessary files for windows
 		if (result && process.platform === "win32") {
 			if (result.updateInfo.version === app.getVersion()) {
 				fs.readdir(path.join(process.env.LOCALAPPDATA, "ytdownloader-updater"), {encoding: "utf-8", withFileTypes: true}, (err, files) => {
@@ -171,9 +171,9 @@ app.whenReady().then(() => {
 	let trayInUse = false;
 	// TODO: Find why tray icon isn't showing properly on gnome
 	let icon;
-	if (process.platform == "win32") {
+	if (process.platform === "win32") {
 		icon = path.join(__dirname, "resources/icon.ico");
-	} else if (process.platform == "darwin") {
+	} else if (process.platform === "darwin") {
 		icon = path.join(__dirname, "resources/icons/16x16.png");
 	} else {
 		icon = path.join(__dirname, "resources/icons/256x256.png");

@@ -433,6 +433,7 @@ class YtDownloaderApp {
 
 		// Error details
 		$(CONSTANTS.DOM_IDS.ERROR_DETAILS).addEventListener("click", (e) => {
+            // @ts-ignore
 			clipboard.writeText(e.target.innerText);
 			this._showPopup("Copied error details to clipboard.");
 		});
