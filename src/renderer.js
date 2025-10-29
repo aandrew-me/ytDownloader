@@ -1,10 +1,10 @@
-const cp = require("child_process");
-const os = require("os");
-const fs = require("fs");
-const path = require("path");
 const {shell, ipcRenderer, clipboard} = require("electron");
 const {default: YTDlpWrap} = require("yt-dlp-wrap-plus");
 const {constants} = require("fs/promises");
+const { homedir, platform } = require("os");
+const { join } = require("path");
+const { mkdirSync, accessSync, promises, existsSync } = require("fs");
+const { execSync, spawn } = require("child_process");
 
 const i18n = new (require("../translations/i18n"))();
 
@@ -156,15 +156,14 @@ class YtDownloaderApp {
 	 * Sets up the application's hidden directory and the default download directory.
 	 */
 	_setupDirectories() {
-		const homedir = os.homedir();
-		const hiddenDir = path.join(homedir, ".ytDownloader");
-		fs.mkdirSync(hiddenDir, {recursive: true});
+		const userHomeDir = homedir();
+		const hiddenDir = join(userHomeDir, ".ytDownloader");
+		mkdirSync(hiddenDir, {recursive: true});
 
-		let defaultDownloadDir = path.join(homedir, "Downloads");
-		if (os.platform() === "linux") {
+		let defaultDownloadDir = join(userHomeDir, "Downloads");
+		if (platform() === "linux") {
 			try {
-				const xdgDownloadDir = cp
-					.execSync("xdg-user-dir DOWNLOAD")
+				const xdgDownloadDir = execSync("xdg-user-dir DOWNLOAD")
 					.toString()
 					.trim();
 				if (xdgDownloadDir) {
@@ -180,7 +179,7 @@ class YtDownloaderApp {
 		);
 		if (savedPath) {
 			try {
-				fs.accessSync(savedPath, constants.W_OK);
+				accessSync(savedPath, constants.W_OK);
 				this.state.downloadDir = savedPath;
 			} catch {
 				console.warn(
@@ -197,7 +196,7 @@ class YtDownloaderApp {
 		}
 
 		$(CONSTANTS.DOM_IDS.PATH_DISPLAY).textContent = this.state.downloadDir;
-		fs.mkdirSync(this.state.downloadDir, {recursive: true});
+		mkdirSync(this.state.downloadDir, {recursive: true});
 	}
 
 	/**
@@ -238,14 +237,14 @@ class YtDownloaderApp {
 	 * @returns {Promise<string>} A promise that resolves with the path to yt-dlp.
 	 */
 	async _findOrDownloadYtDlp() {
-		const hiddenDir = path.join(os.homedir(), ".ytDownloader");
+		const hiddenDir = join(homedir(), ".ytDownloader");
 		const defaultYtDlpName =
-			os.platform() === "win32" ? "ytdlp.exe" : "ytdlp";
-		const defaultYtDlpPath = path.join(hiddenDir, defaultYtDlpName);
+			platform() === "win32" ? "ytdlp.exe" : "ytdlp";
+		const defaultYtDlpPath = join(hiddenDir, defaultYtDlpName);
 
 		// Priority 1: Environment Variable
 		if (process.env.YTDOWNLOADER_YTDLP_PATH) {
-			if (fs.existsSync(process.env.YTDOWNLOADER_YTDLP_PATH)) {
+			if (existsSync(process.env.YTDOWNLOADER_YTDLP_PATH)) {
 				return process.env.YTDOWNLOADER_YTDLP_PATH;
 			}
 			throw new Error(
@@ -254,17 +253,17 @@ class YtDownloaderApp {
 		}
 
 		// Priority 2: System-installed versions (macOS, BSD)
-		if (os.platform() === "darwin") {
+		if (platform() === "darwin") {
 			const possiblePaths = [
 				"/opt/homebrew/bin/yt-dlp",
 				"/usr/local/bin/yt-dlp",
 			];
-			const foundPath = possiblePaths.find((p) => fs.existsSync(p));
+			const foundPath = possiblePaths.find((p) => existsSync(p));
 			if (foundPath) return foundPath;
 			$(CONSTANTS.DOM_IDS.POPUP_BOX_MAC).style.display = "block";
-		} else if (os.platform() === "freebsd") {
+		} else if (platform() === "freebsd") {
 			try {
-				return cp.execSync("which yt-dlp").toString().trim();
+				return execSync("which yt-dlp").toString().trim();
 			} catch {
 				throw new Error(
 					"No yt-dlp found in PATH on FreeBSD. Please install it."
@@ -276,8 +275,8 @@ class YtDownloaderApp {
 		const storedPath = localStorage.getItem(
 			CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_PATH
 		);
-		if (storedPath && fs.existsSync(storedPath)) {
-			cp.spawn(`"${storedPath}"`, ["-U"], {shell: true})
+		if (storedPath && existsSync(storedPath)) {
+			spawn(`"${storedPath}"`, ["-U"], {shell: true})
 				.on("error", (err) =>
 					console.error(
 						"Failed to run background yt-dlp update:",
@@ -292,7 +291,7 @@ class YtDownloaderApp {
 
 		// Priority 4: Default location or download
 		try {
-			await fs.promises.access(defaultYtDlpPath);
+			await promises.access(defaultYtDlpPath);
 			return defaultYtDlpPath;
 		} catch {
 			console.log("yt-dlp not found, downloading...");
@@ -328,7 +327,7 @@ class YtDownloaderApp {
 	async _findFfmpeg() {
 		// Priority 1: Environment Variable
 		if (process.env.YTDOWNLOADER_FFMPEG_PATH) {
-			if (fs.existsSync(process.env.YTDOWNLOADER_FFMPEG_PATH)) {
+			if (existsSync(process.env.YTDOWNLOADER_FFMPEG_PATH)) {
 				return process.env.YTDOWNLOADER_FFMPEG_PATH;
 			}
 			throw new Error(
@@ -337,9 +336,9 @@ class YtDownloaderApp {
 		}
 
 		// Priority 2: System-installed (FreeBSD)
-		if (os.platform() === "freebsd") {
+		if (platform() === "freebsd") {
 			try {
-				return cp.execSync("which ffmpeg").toString().trim();
+				return execSync("which ffmpeg").toString().trim();
 			} catch {
 				throw new Error(
 					"No ffmpeg found in PATH on FreeBSD. App may not work correctly."
@@ -348,9 +347,9 @@ class YtDownloaderApp {
 		}
 
 		// Priority 3: Bundled ffmpeg
-		return os.platform() === "win32"
-			? path.join(__dirname, "..", "ffmpeg.exe")
-			: path.join(__dirname, "..", "ffmpeg");
+		return platform() === "win32"
+			? join(__dirname, "..", "ffmpeg.exe")
+			: join(__dirname, "..", "ffmpeg");
 	}
 
 	/**
@@ -460,14 +459,14 @@ class YtDownloaderApp {
 		Object.entries(menuMapping).forEach(([id, page]) => {
 			$(id)?.addEventListener("click", () => {
 				this._closeMenu();
-				ipcRenderer.send("load-page", path.join(__dirname, page));
+				ipcRenderer.send("load-page", join(__dirname, page));
 			});
 		});
 
 		Object.entries(windowMapping).forEach(([id, page]) => {
 			$(id)?.addEventListener("click", () => {
 				this._closeMenu();
-				ipcRenderer.send("load-win", path.join(__dirname, page));
+				ipcRenderer.send("load-win", join(__dirname, page));
 			});
 		});
 
@@ -760,7 +759,7 @@ class YtDownloaderApp {
 
 		// Sanitize filename
 		const invalidChars =
-			os.platform() === "win32" ? /[<>:"/\\|?*[\]`#]/g : /["/`#]/g;
+			platform() === "win32" ? /[<>:"/\\|?*[\]`#]/g : /["/`#]/g;
 		let finalFilename = title
 			.replace(invalidChars, "")
 			.trim()
@@ -770,12 +769,12 @@ class YtDownloaderApp {
 		}
 		if (rangeCmd) {
 			let rangeTxt = rangeCmd.replace("*", "");
-			if (os.platform() === "win32")
+			if (platform() === "win32")
 				rangeTxt = rangeTxt.replace(/:/g, "_");
 			finalFilename += ` [${rangeTxt}]`;
 		}
 
-		const outputPath = `"${path.join(
+		const outputPath = `"${join(
 			this.state.downloadDir,
 			`${finalFilename}.${ext}`
 		)}"`;
@@ -1138,7 +1137,7 @@ class YtDownloaderApp {
 		if (!progressEl) return;
 
 		const fullFilename = `${filename}.${ext}`;
-		const fullPath = path.join(this.state.downloadDir, fullFilename);
+		const fullPath = join(this.state.downloadDir, fullFilename);
 
 		progressEl.innerHTML = ""; // Clear progress bar
 		const link = document.createElement("b");
@@ -1159,7 +1158,7 @@ class YtDownloaderApp {
 		};
 
 		// Add to download history
-		fs.promises.stat(fullPath)
+		promises.stat(fullPath)
 			.then(stat => {
 				const fileSize = stat.size || 0;
 				ipcRenderer.invoke("add-to-history", {
