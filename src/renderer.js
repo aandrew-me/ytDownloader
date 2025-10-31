@@ -1,10 +1,10 @@
 const {shell, ipcRenderer, clipboard} = require("electron");
 const {default: YTDlpWrap} = require("yt-dlp-wrap-plus");
-const {constants} = require("fs/promises");
-const { homedir, platform } = require("os");
-const { join } = require("path");
-const { mkdirSync, accessSync, promises, existsSync } = require("fs");
-const { execSync, spawn } = require("child_process");
+const {constants, access} = require("fs/promises");
+const {homedir, platform} = require("os");
+const {join} = require("path");
+const {mkdirSync, accessSync, promises, existsSync} = require("fs");
+const {execSync, spawn} = require("child_process");
 
 const i18n = new (require("../translations/i18n"))();
 
@@ -238,9 +238,9 @@ class YtDownloaderApp {
 	 */
 	async _findOrDownloadYtDlp() {
 		const hiddenDir = join(homedir(), ".ytDownloader");
-		const defaultYtDlpName =
-			platform() === "win32" ? "ytdlp.exe" : "ytdlp";
+		const defaultYtDlpName = platform() === "win32" ? "ytdlp.exe" : "ytdlp";
 		const defaultYtDlpPath = join(hiddenDir, defaultYtDlpName);
+		const isMacOS = platform() === "darwin";
 
 		// Priority 1: Environment Variable
 		if (process.env.YTDOWNLOADER_YTDLP_PATH) {
@@ -253,13 +253,15 @@ class YtDownloaderApp {
 		}
 
 		// Priority 2: System-installed versions (macOS, BSD)
-		if (platform() === "darwin") {
+		if (isMacOS) {
 			const possiblePaths = [
 				"/opt/homebrew/bin/yt-dlp",
 				"/usr/local/bin/yt-dlp",
 			];
 			const foundPath = possiblePaths.find((p) => existsSync(p));
+
 			if (foundPath) return foundPath;
+
 			$(CONSTANTS.DOM_IDS.POPUP_BOX_MAC).style.display = "block";
 		} else if (platform() === "freebsd") {
 			try {
@@ -275,18 +277,62 @@ class YtDownloaderApp {
 		const storedPath = localStorage.getItem(
 			CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_PATH
 		);
-		if (storedPath && existsSync(storedPath)) {
-			spawn(`"${storedPath}"`, ["-U"], {shell: true})
-				.on("error", (err) =>
+
+		if (isMacOS) {
+			const brewPaths = ["/opt/homebrew/bin/brew", "/usr/local/bin/brew"];
+
+			let brewFound = false;
+
+			for (const brewPath of brewPaths) {
+				try {
+					await access(brewPath, constants.X_OK);
+
+					const brewUpdate = spawn(brewPath, ["upgrade", "yt-dlp"], {
+						shell: true,
+					});
+
+					brewUpdate.on("error", (err) =>
+						console.error(
+							"Failed to run 'brew upgrade yt-dlp':",
+							err
+						)
+					);
+
+					brewUpdate.stdout.on("data", (data) =>
+						console.log("yt-dlp brew update:", data.toString())
+					);
+
+					brewFound = true;
+					break;
+				} catch {}
+			}
+
+			if (!brewFound) {
+				console.error(
+					"Homebrew not found in expected locations (/opt/homebrew/bin/brew or /usr/local/bin/brew)."
+				);
+			}
+		} else if (storedPath) {
+			try {
+				await access(storedPath, constants.F_OK);
+
+				const updateProc = spawn(`"${storedPath}"`, ["-U"], {
+					shell: true,
+				});
+
+				updateProc.on("error", (err) =>
 					console.error(
 						"Failed to run background yt-dlp update:",
 						err
 					)
-				)
-				.stdout.on("data", (data) =>
+				);
+
+				updateProc.stdout.on("data", (data) =>
 					console.log("yt-dlp update check:", data.toString())
 				);
-			return storedPath;
+			} catch {
+				console.warn("yt-dlp path not found, no update performed.");
+			}
 		}
 
 		// Priority 4: Default location or download
@@ -432,7 +478,7 @@ class YtDownloaderApp {
 
 		// Error details
 		$(CONSTANTS.DOM_IDS.ERROR_DETAILS).addEventListener("click", (e) => {
-            // @ts-ignore
+			// @ts-ignore
 			clipboard.writeText(e.target.innerText);
 			this._showPopup("Copied error details to clipboard.");
 		});
@@ -769,8 +815,7 @@ class YtDownloaderApp {
 		}
 		if (rangeCmd) {
 			let rangeTxt = rangeCmd.replace("*", "");
-			if (platform() === "win32")
-				rangeTxt = rangeTxt.replace(/:/g, "_");
+			if (platform() === "win32") rangeTxt = rangeTxt.replace(/:/g, "_");
 			finalFilename += ` [${rangeTxt}]`;
 		}
 
@@ -1158,21 +1203,26 @@ class YtDownloaderApp {
 		};
 
 		// Add to download history
-		promises.stat(fullPath)
-			.then(stat => {
+		promises
+			.stat(fullPath)
+			.then((stat) => {
 				const fileSize = stat.size || 0;
-				ipcRenderer.invoke("add-to-history", {
-					title: this.state.videoInfo.title,
-					url: this.state.videoInfo.url,
-					filename: filename,
-					filePath: fullPath,
-					fileSize: fileSize,
-					format: ext,
-					thumbnail: thumbnail,
-					duration: this.state.videoInfo.duration,
-				}).catch(err => console.error("Error adding to history:", err));
+				ipcRenderer
+					.invoke("add-to-history", {
+						title: this.state.videoInfo.title,
+						url: this.state.videoInfo.url,
+						filename: filename,
+						filePath: fullPath,
+						fileSize: fileSize,
+						format: ext,
+						thumbnail: thumbnail,
+						duration: this.state.videoInfo.duration,
+					})
+					.catch((err) =>
+						console.error("Error adding to history:", err)
+					);
 			})
-			.catch(error => console.error("Error saving to history:", error));
+			.catch((error) => console.error("Error saving to history:", error));
 	}
 
 	/**
