@@ -841,6 +841,16 @@ class YtDownloaderApp {
 			`"${url}"`,
 		].filter(Boolean);
 
+		if (type === "audio") {
+			if (ext === "m4a" || ext === "mp3" || ext === "mp4") {
+				commonArgs.unshift("--embed-thumbnail");
+			}
+		} else if (type === "extract") {
+			if (ext === "mp3" || ext === "m4a") {
+				commonArgs.unshift("--embed-thumbnail");
+			}
+		}
+
 		let downloadArgs;
 		if (type === "extract") {
 			downloadArgs = [
