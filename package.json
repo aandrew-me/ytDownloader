@@ -19,7 +19,14 @@
 		"publish-mac": "cp ../ffmpeg-bin/mac/ffmpeg . && electron-builder -m --publish=always",
 		"gh-windows": "electron-builder -w --publish=always",
 		"gh-linux": "electron-builder -l --publish=always",
-		"gh-mac": "electron-builder -m --publish=always"
+		"gh-mac": "electron-builder -m --publish=always",
+		"docker:build": "docker build -t ytdownloader:latest .",
+		"docker:run": "docker-compose up -d",
+		"docker:stop": "docker-compose down",
+		"docker:test": "docker-test.sh",
+		"docker:dev": "docker-compose -f docker-compose.dev.yml up -d",
+		"docker:logs": "docker-compose logs -f",
+		"docker:clean": "docker-compose down -v && docker system prune -f"
 	},
 	"author": {
 		"name": "Andrew",

@@ -3,8 +3,8 @@
 # ytDownloader
 
 [![Flathub](https://img.shields.io/flathub/downloads/io.github.aandrew_me.ytdn?label=Flathub%20downloads)](https://flathub.org/apps/details/me.aandrew.ytdownloader)
-[![GitHub downloads](https://img.shields.io/github/downloads/aandrew-me/ytdownloader/total?label=Github%20downloads)](https://github.com/aandrew-me/ytDownloader/releases)
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/aandrew-me/ytdownloader?label=latest%20release)](https://github.com/aandrew-me/ytDownloader/releases/latest)
+[![GitHub downloads](https://img.shields.io/github/downloads/aandrew-me/ytdownloader/total?label=Github%20downloads)](https://github.com/aandrew-me/ytdownloader/releases)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/aandrew-me/ytdownloader?label=latest%20release)](https://github.com/aandrew-me/ytdownloader/releases/latest)
 [![Flathub](https://img.shields.io/flathub/v/io.github.aandrew_me.ytdn)](https://flathub.org/apps/io.github.aandrew_me.ytdn)
 [![Snapcraft](https://badgen.net/snapcraft/v/ytdownloader)](https://snapcraft.io/ytdownloader)
 ![Chocolatey Version](https://img.shields.io/chocolatey/v/ytdownloader)
@@ -104,19 +104,79 @@ Flatpak is recommended. For arm processors, download from flathub.
     sudo snap install ytdownloader
     ```
 
+-   ### Docker 🐳
+
+    ytDownloader can be run in Docker containers in different modes:
+
+    **Prerequisites:**
+    - Docker installed on your system
+    - For GUI mode: X11 forwarding configured
+
+    **Quick Start - Headless/CLI Mode (Recommended for servers):**
+    ```bash
+    # Start CLI service (no GUI required)
+    docker-compose up ytdownloader-cli -d
+
+    # Check logs
+    docker-compose logs -f ytdownloader-cli
+    ```
+
+    **GUI Mode (Requires X11 forwarding):**
+    ```bash
+    # Allow X11 forwarding
+    xhost +local:docker
+
+    # Start GUI service
+    docker-compose up ytdownloader -d
+
+    # Access the GUI at http://localhost:3000 (if web interface is configured)
+    ```
+
+    **Development Mode:**
+    ```bash
+    docker-compose -f docker-compose.dev.yml up -d
+    ```
+
+    **Docker Commands:**
+    ```bash
+    # View all logs
+    docker-compose logs -f
+
+    # Stop services
+    docker-compose down
+
+    # Build images manually
+    docker build -f Dockerfile.cli -t ytdownloader-cli .
+    docker build -t ytdownloader .
+
+    # Clean up
+    make docker-clean
+    ```
+
+    **Volume Mounts:**
+    - `./downloads:/app/downloads` - Downloaded files location
+    - `./config:/app/config` - Configuration files
+
+    **Environment Variables:**
+    - `HEADLESS=true` - Force headless mode
+    - `DISPLAY=:99` - Display for GUI mode
+    - `NODE_ENV` - Set to "production" or "development"
+
+    **Note:** For GUI mode, you'll need to configure X11 forwarding on your host system.
+
 ## macOS 🍎
 
 Since the app is not signed, when you will try to open the app, macOS will not allow you to open it. 
 
 You need to open terminal and execute:
-```
+
 sudo xattr -r -d com.apple.quarantine /Applications/YTDownloader.app 
-```
+
 
 You will also need to install `yt-dlp` with [homebrew](https://brew.sh/)
-```
+
 brew install yt-dlp
-```
+
 
 ## Internationalization (Localization) 🌍
 
@@ -163,38 +223,82 @@ Thanks to [nxjosephofficial](https://github.com/nxjosephofficial), [LINUX-SAUNA]
 
 Required commands to get started.
 
-```
+
 git clone https://github.com/aandrew-me/ytDownloader.git
 cd ytDownloader
 npm i
-```
+
 
 To run with [Electron](https://www.electronjs.org/) :
 
-```
+
 npm start
-```
+
 
 You need to download ffmpeg and put it in the root directory of the project. If you don't need to build for arm processor, you can download ffmpeg by executing any of the files - linux.sh / mac.sh / windows.sh depending on the platform. Otherwise you need to download ffmpeg from [here](https://github.com/yt-dlp/FFmpeg-Builds/releases) for windows/linux and from [here](http://www.osxexperts.net/) for mac (not tested)
 
 To build for Linux (It will create packages as specified in package.json). The builds are stored in **release** folder.
-```
+
 npm run linux
-```
+
 
 To build for Windows
 
-```
+
 npm run windows
-```
+
 
 To build for macOS
 
-```
+
 npm run mac
-```
+
 If you only want to build for one format, you can do
-```
+
 npx electron-builder -l appimage
-```
+
 It will just create a linux appimage build.
+
+## Docker Usage
+
+### Headless/CLI Mode (Recommended)
+
+# Start CLI service
+docker-compose up ytdownloader-cli -d
+
+# View logs
+docker-compose logs -f ytdownloader-cli
+
+# Use yt-dlp directly in container
+docker-compose exec ytdownloader-cli yt-dlp --help
+
+
+### GUI Mode (Requires X11)
+
+# Setup X11 forwarding (Linux)
+xhost +local:docker
+
+# Start GUI service
+docker-compose up ytdownloader -d
+
+# View logs
+docker-compose logs -f ytdownloader
+
+
+### Makefile Commands
+
+make docker-build    # Build Docker images
+make docker-run      # Start application
+make docker-stop     # Stop application  
+make docker-dev      # Development mode
+make docker-test     # Run tests
+make docker-clean    # Clean up
+make docker-logs     # View logs
+
+
+### NPM Scripts
+
+npm run docker:build  # Build image
+npm run docker:run    # Start with compose
+npm run docker:test   # Run tests
+npm run docker:dev    # Development mode

@@ -1,0 +1,38 @@
+# Lightweight CLI-only version
+FROM node:18-alpine AS builder
+
+# Install build dependencies
+RUN apk add --no-cache \
+    python3 \
+    make \
+    g++ \
+    && update-ca-certificates
+
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+
+# Production CLI stage
+FROM node:18-alpine AS production
+
+# Install only runtime dependencies
+RUN apk add --no-cache \
+    ffmpeg \
+    ca-certificates \
+    && update-ca-certificates
+
+WORKDIR /app
+COPY --from=builder /app /app
+
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S ytdownloader -u 1001 -G nodejs && \
+    chown -R ytdownloader:nodejs /app
+
+USER ytdownloader
+
+ENV NODE_ENV=production
+
+# CLI-only entrypoint
+CMD ["node", "-e", "console.log('ytDownloader CLI mode - Electron GUI not available in CLI mode')"]

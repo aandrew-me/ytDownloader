@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  ytdownloader:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: ytdownloader
+    volumes:
+      - ./downloads:/app/downloads
+      - ./config:/app/config
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    environment:
+      - NODE_ENV=production
+      - DISPLAY=${DISPLAY:-:99}
+      - QT_X11_NO_MITSHM=1
+    ports:
+      - "3000:3000"
+    devices:
+      - /dev/dri:/dev/dri
+    # Uncomment if you want to run in background
+    # restart: unless-stopped
+    # Remove the tty and stdin_open if you want to run without GUI
+    stdin_open: true
+    tty: true
+    # For headless mode without GUI, uncomment:
+    # command: ["node", "-e", "console.log('ytDownloader running in headless mode')"]
+
+  # CLI-only service for development/automation
+  ytdownloader-cli:
+    build: 
+      context: .
+      dockerfile: Dockerfile.cli
+    container_name: ytdownloader-cli
+    volumes:
+      - ./downloads:/app/downloads
+    environment:
+      - NODE_ENV=production
+    command: ["node", "-e", "console.log('ytDownloader CLI ready. Install yt-dlp via npm: npm install -g yt-dlp')"]
+    restart: unless-stopped

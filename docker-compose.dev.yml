@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  ytdownloader-dev:
+    build: .
+    container_name: ytdownloader-dev
+    volumes:
+      - .:/app
+      - ./downloads:/app/downloads
+      - ./config:/app/config
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - DISPLAY=${DISPLAY}
+    ports:
+      - "3000:3000"
+      - "5858:5858" # For debugging
+    command: ["npm", "run", "debug"]
+    # For GUI support (Linux X11)
+    devices:
+      - /dev/dri:/dev/dri
+      - /dev/snd:/dev/snd
+    network_mode: host
+    restart: unless-stopped
