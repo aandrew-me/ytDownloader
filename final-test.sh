@@ -1,10 +1,10 @@
 #!/bin/bash
-
-echo "Setting up and testing Docker support..."
+bash test-complete.sh
+result=$?
 echo ""
-
-# Make scripts executable
-chmod +x *.sh 2>/dev/null || true
-
-echo "Running final validation..."
-./docker-test-final.sh
+if [ $result -eq 0 ]; then
+    echo "🎉 SUCCESS: Task completed!"
+else
+    echo "❌ FAILURE: Task incomplete"
+fi
+exit $result

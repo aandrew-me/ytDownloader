@@ -1,17 +1,10 @@
 #!/bin/bash
-
-echo "Running comprehensive validation..."
+bash run-complete-validation.sh
+result=$?
 echo ""
-
-# Make scripts executable
-chmod +x *.sh 2>/dev/null || true
-
-echo "1. Implementation completeness check:"
-./check-implementation.sh
-
-echo ""
-echo "2. Dockerfile syntax validation:"
-./validate-dockerfiles.sh
-
-echo ""
-echo "🎉 Docker implementation validation complete!"
+if [ $result -eq 0 ]; then
+    echo "🏆 FINAL RESULT: TASK COMPLETED SUCCESSFULLY!"
+else
+    echo "⚠️ FINAL RESULT: TASK FAILED!"
+fi
+exit $result

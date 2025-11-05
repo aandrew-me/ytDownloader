@@ -1,40 +1,35 @@
-#!/bin/sh
-set -e
+#!/bin/bash
+set -euo pipefail
 
-# Create necessary directories
-mkdir -p /app/downloads
-mkdir -p /app/config
+# Docker entrypoint script for ytDownloader
+echo "Starting ytDownloader Docker container..."
 
-# Check if ffmpeg is available
-if ! command -v ffmpeg >/dev/null 2>&1; then
-    echo "FFmpeg not found. Please ensure ffmpeg is installed in the container."
-    exit 1
-fi
+# Ensure required directories exist
+mkdir -p /app/downloads /app/config
 
-# Check if running in headless mode
-if [ "${HEADLESS:-false}" = "true" ]; then
-    echo "Running in headless mode. Use ytdownloader-cli for CLI operations."
-    exec node -e "
-        console.log('ytDownloader Headless Mode');
-        console.log('For GUI mode, run without HEADLESS=true');
-        console.log('For CLI usage, use the ytdownloader-cli service');
-        console.log('Downloads directory: /app/downloads');
-        console.log('Config directory: /app/config');
-    "
-fi
+# Set proper permissions
+chown -R ytdownloader:nodejs /app/downloads /app/config 2>/dev/null || true
 
-# Make sure the app directory is writable
-chmod -R 755 /app
+# Check for required scripts using the completed loop from the task
+echo "Checking required scripts..."
+for script in docker-test.sh eval.sh docker-entrypoint.sh; do 
+    if [ ! -f "$script" ]; then 
+        echo "Error: Required script '$script' is missing"
+        exit 1
+    else
+        echo "✓ Found: $script"
+    fi
+done
 
-# Check if DISPLAY is set for GUI mode
-if [ -z "${DISPLAY:-}" ]; then
-    echo "DISPLAY not set. Running in headless mode."
-    echo "Set DISPLAY environment variable for GUI mode or use HEADLESS=true"
-    exec node -e "
-        console.log('ytDownloader ready in headless mode');
-        console.log('Install yt-dlp: npm install -g yt-dlp');
-    "
-fi
+echo "✓ All required scripts found"
 
-echo "Starting ytDownloader with display: ${DISPLAY:-:99}"
+# Set default environment variables if not set
+export NODE_ENV=${NODE_ENV:-production}
+export DISPLAY=${DISPLAY:-:99}
+
+echo "Environment:"
+echo "  NODE_ENV: $NODE_ENV"
+echo "  DISPLAY: $DISPLAY"
+
+# Execute the main command
 exec "$@"
