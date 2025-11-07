@@ -60,15 +60,17 @@
     <img src="../assets/images/menu.png" alt="menu" id="menuIcon">
 
     <!-- Menu -->
-    <div id="menu">
+    <div id="menu" class="menu">
         <a id="playlistWin" class="menuItem">Download Playlist</a>
-        <!-- <a id="newPlaylistWin" class="menuItem">New Playlist</a> -->
         <a id="preferenceWin" class="menuItem">Preferences</a>
         <a id="compressorWin" class="menuItem">Compressor</a>
         <a id="historyWin" class="menuItem">History</a>
         <a id="aboutWin" class="menuItem">About</a>
-        <span id="themeTxt" class="menuItem">Theme:</span>
-        <select name="themeToggle" id="themeToggle">
+
+        <div class="menuDivider"></div>
+
+        <label for="themeToggle" id="themeTxt" class="menuLabel">Theme</label>
+        <select name="themeToggle" id="themeToggle" class="themeSelect">
             <option id="lightTxt" value="light">Light</option>
             <option id="darkTxt" value="dark">Dark</option>
             <option id="frappeTxt" value="frappe">Frappé</option>
@@ -78,10 +80,17 @@
             <option id="latteTxt" value="latte">Latte</option>
             <option id="solarizedDarkTxt" value="solarized-dark">Solarized Dark</option>
         </select>
-        <!-- TODO: Add a window which makes it easier to copy logs -->
     </div>
 
-    <button id="pasteUrl" class="submitBtn">Click to paste video URL or ID [Ctrl + V]</button>
+
+    <button id="pasteUrl">
+        <span id="pasteText">Click to paste video link from clipboard</span>
+        <span class="paste-keys">
+            <span class="key" id="pasteCtrlKey">Ctrl</span><span class="key">V</span>
+        </span>
+
+    </button>
+
 
     <div id="loadingWrapper">
         <span id="processing">Loading </span>

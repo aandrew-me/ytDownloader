@@ -8,21 +8,26 @@
 	src: url("../fonts/Ubuntu-Regular.ttf") format("truetype");
 }
 
+@font-face {
+	font-family: "Inter";
+	src: url("../fonts/Inter.ttf") format("truetype");
+}
+
 :root[theme="light"] {
-	--background: #fff;
-	--text: rgb(45, 45, 45);
-	--box-main: #eef4f3;
+	--background: #f9fafb;
+	--text: #1f2937;
+	--box-main: #f3f4f6;
 	--box-toggle: rgb(215 238 233);
-	--box-separation: rgb(215 238 233);
-	--box-toggleOn: rgb(28 232 138);
+	--box-separation: #e5e7eb;
+	--box-toggleOn: rgb(127, 250, 172);
 	--item-bg: #dddddd;
 	--box-shadow: none;
-	--select: rgb(127, 253, 127);
-	--greenBtn: #6ade1d;
-	--greenBtn-bottom: #54a31f;
+	--select: #a7f3d0;
+	--greenBtn: #22c55e;
+	--greenBtn-bottom: #16a34a;
 	--redBtn: #d64d4f;
 	--redBtn-bottom: #854243;
-	--blueBtn: rgb(80, 128, 230);
+	--blueBtn: #3b82f6;
 	--blueBtn-bottom: rgb(44, 78, 180);
 }
 
@@ -211,49 +216,85 @@ img {
 #menu {
 	display: none;
 	flex-direction: column;
-	backdrop-filter: blur(16px) saturate(160%);
-	-webkit-backdrop-filter: blur(16px) saturate(160%);
-	background-color: rgba(17, 25, 40, 0.75);
-	border-radius: 12px;
+	backdrop-filter: blur(18px) saturate(180%);
+	-webkit-backdrop-filter: blur(18px) saturate(180%);
+	background: rgba(15, 23, 42, 0.85);
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	border-radius: 16px;
 	position: absolute;
-	top: 40px;
+	top: 45px;
 	right: 50px;
-	padding: 15px;
+	padding: 12px;
+	width: 220px;
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 	text-align: left;
-	opacity: 1;
-	font-size: large;
+	font-family: "Inter", sans-serif;
+	font-size: medium;
+	color: #e2e8f0;
 	z-index: 2;
-	font-family: "Ubuntu";
+	animation: fadeIn 0.25s ease-out;
 }
 
-#themeToggle {
-	backdrop-filter: blur(16px) saturate(160%);
-	-webkit-backdrop-filter: blur(16px) saturate(160%);
-	background-color: rgb(17, 25, 40);
-	color: white;
-	padding: 10px;
-	border-radius: 5px;
-	outline: none;
-	border: none;
-	font-family: "Ubuntu";
-	font-size: large;
-}
 .menuItem {
-	font-family: "Ubuntu";
-	color: white;
-	text-decoration: none;
-	padding: 8px;
 	cursor: pointer;
-	border-bottom: 1px solid #303142;
-}
-.menuItem:active,
-.menuItem:link {
-	color: white;
+	padding: 10px 12px;
+	border-radius: 8px;
+	margin-bottom: 6px;
+	text-decoration: none;
+	color: #d6dadf;
+	transition: all 0.15s ease-in-out;
+	border-bottom: none;
+	background: rgba(25, 37, 66, 0.223);
 }
 
-#pasteUrl {
-	margin-top: 15px;
-	font-weight: bold;
+.menuItem:hover {
+	background: rgba(255, 255, 255, 0.08);
+	color: #38bdf8;
+	transform: translateX(2px);
+}
+
+.menuDivider {
+	height: 1px;
+	background: rgba(255, 255, 255, 0.08);
+	margin: 4px 0;
+}
+
+.menuLabel {
+	margin-top: 5px;
+	font-size: 0.9rem;
+	color: #94a3b8;
+	padding: 4px 0;
+}
+
+.themeSelect {
+	margin-top: 4px;
+	background: rgba(30, 41, 59, 0.9);
+	color: #f8fafc;
+	border: 1px solid rgba(255, 255, 255, 0.15);
+	border-radius: 8px;
+	padding: 8px;
+	font-family: "Inter", sans-serif;
+	transition: border 0.2s, background 0.2s;
+	width: 100%;
+	cursor: pointer;
+}
+
+.themeSelect:hover,
+.themeSelect:focus {
+	border-color: #38bdf8;
+	background: rgba(51, 65, 85, 0.9);
+	outline: none;
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(-6px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
 }
 
 .item {
@@ -499,6 +540,66 @@ input[type="number"]::-webkit-outer-spin-button {
 .submitBtn:active {
 	background-color: var(--greenBtn-bottom);
 	border: none;
+}
+
+#pasteUrl, #pasteLink {
+	--greenTop: #34d399;
+	--greenBottom: #059669;
+	--greenHover: #10b981;
+	--greenActive: #047857;
+
+	background: linear-gradient(
+		to bottom right,
+		var(--greenTop),
+		var(--greenBottom)
+	);
+	color: #fff;
+	font-size: 1.1rem;
+	padding: 16px 28px;
+	border: none;
+	border-radius: 16px;
+	cursor: pointer;
+	outline: none;
+	position: relative;
+	transition: all 0.25s ease;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+	margin-top: 15px;
+	font-weight: bold;
+}
+
+#pasteUrl:hover, #pasteLink:hover  {
+	background: linear-gradient(
+		to bottom right,
+		var(--greenHover),
+		var(--greenBottom)
+	);
+	transform: translateY(-2px);
+}
+
+#pasteUrl:active,
+#pasteUrl.active, #pasteLink:active {
+	background: linear-gradient(
+		to bottom right,
+		var(--greenActive),
+		var(--greenBottom)
+	);
+	transform: translateY(0);
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) inset;
+}
+
+.paste-keys {
+	margin-left: 4px;
+}
+
+.paste-keys .key {
+	background: rgba(255, 255, 255, 0.128);
+	border-radius: 8px;
+	padding: 6px 10px;
+	font-size: 15px;
+	font-family: "Inter", sans-serif;
+	color: #e5e5e5;
+	margin: 0 3px;
+	border-bottom: 3px solid rgba(2, 107, 72, 0.6);
 }
 
 .resumeBtn {

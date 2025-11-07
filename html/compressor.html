@@ -12,28 +12,31 @@
     <!-- Popup message -->
     <span id="popupText">Text copied</span>
 
-     <!-- Menu icon -->
-     <img src="../assets/images/menu.png" alt="menu" id="menuIcon">
+    <!-- Menu icon -->
+    <img src="../assets/images/menu.png" alt="menu" id="menuIcon">
 
-     <!-- Menu -->
-     <div id="menu">
-         <a id="homeWin" class="menuItem">Homepage</a>
-         <a id="playlistWin" class="menuItem">Download Playlist</a>
-         <a id="preferenceWin" class="menuItem">Preferences</a>
-         <a id="historyWin" class="menuItem">History</a>
-         <a id="aboutWin" class="menuItem">About</a>
-         <span id="themeTxt" class="menuItem">Theme:</span>
-         <select class="select compress-select" name="themeToggle" id="themeToggle">
-             <option id="lightTxt" value="light">Light</option>
-             <option id="darkTxt" value="dark">Dark</option>
-             <option id="frappeTxt" value="frappe">Frappé</option>
-             <option id="onedarkTxt" value="onedark">One dark</option>
-             <option id="matrixTxt" value="matrix">Matrix</option>
-             <option id="githubTxt" value="github">Github</option>
-             <option id="latteTxt" value="latte">Latte</option>
-             <option id="solarizedDarkTxt" value="solarized-dark">Solarized Dark</option>
-         </select>
-     </div>
+    <!-- Menu -->
+    <div id="menu" class="menu">
+        <a id="homeWin" class="menuItem">Homepage</a>
+        <a id="playlistWin" class="menuItem">Download Playlist</a>
+        <a id="preferenceWin" class="menuItem">Preferences</a>
+        <a id="historyWin" class="menuItem">History</a>
+        <a id="aboutWin" class="menuItem">About</a>
+
+        <div class="menuDivider"></div>
+
+        <label for="themeToggle" id="themeTxt" class="menuLabel">Theme</label>
+        <select name="themeToggle" id="themeToggle" class="themeSelect">
+            <option id="lightTxt" value="light">Light</option>
+            <option id="darkTxt" value="dark">Dark</option>
+            <option id="frappeTxt" value="frappe">Frappé</option>
+            <option id="onedarkTxt" value="onedark">One dark</option>
+            <option id="matrixTxt" value="matrix">Matrix</option>
+            <option id="githubTxt" value="github">Github</option>
+            <option id="latteTxt" value="latte">Latte</option>
+            <option id="solarizedDarkTxt" value="solarized-dark">Solarized Dark</option>
+        </select>
+    </div>
 
     <div class="container">
         <h1 id="compressor-header">Video Compressor</h1>
@@ -61,27 +64,29 @@
                 <select class="select compress-select" id="encoder">
                     <option value="x264">x264</option>
                     <option value="x265">x265</option>
-    
+
                     <option class="qsv_opt" value="qsv">x264 (Intel QSV Hardware Acceleration)</option>
                     <option class="qsv_opt" value="hevc_qsv">x264 (Intel QSV Hardware Acceleration)</option>
-    
+
                     <option class="amf_opt" value="amf">x264 (AMD Hardware Acceleration)</option>
                     <option class="amf_opt" value="hevc_amf">x265 (AMD Hardware Acceleration)</option>
-    
+
                     <option class="nvidia_opt" value="nvenc">x264 (NVIDIA Hardware Acceleration)</option>
                     <option class="nvidia_opt" value="hevc_nvenc">x265 (NVIDIA Hardware Acceleration)</option>
-    
+
                     <option class="vaapi_opt" value="vaapi">x264 (VA-API Hardware Acceleration)</option>
                     <option class="vaapi_opt" value="hevc_vaapi">x265 (VA-API Hardware Acceleration)</option>
-    
-                    <option class="videotoolbox_opt" value="videotoolbox">x264 (VideoToolbox Hardware Acceleration)</option>
-                    <option class="videotoolbox_opt" value="hevc_videotoolbox">x265 (VideoToolbox Hardware Acceleration)</option>
-    
-    
+
+                    <option class="videotoolbox_opt" value="videotoolbox">x264 (VideoToolbox Hardware Acceleration)
+                    </option>
+                    <option class="videotoolbox_opt" value="hevc_videotoolbox">x265 (VideoToolbox Hardware Acceleration)
+                    </option>
+
+
                     <option value="copy">Copy video</option>
                 </select>
             </div>
-    
+
             <div class="settings-group">
                 <label class="compress-label" for="compression-speed">Compression Speed</label>
                 <select class="select compress-select" id="compression-speed">
@@ -90,7 +95,7 @@
                     <option value="slow">Slow</option>
                 </select>
             </div>
-    
+
             <div class="settings-group">
                 <label class="compress-label" for="video-quality">Video Quality
                 </label>
@@ -130,9 +135,9 @@
                     <option value="50">50</option>
                     <option value="51">51 (Worst quality)</option>
                 </select>
-    
+
             </div>
-    
+
             <div class="settings-group">
                 <label class="compress-label" for="audio-format">Audio Format</label>
                 <select class="select compress-select" id="audio-format">
@@ -145,7 +150,8 @@
 
             <div class="settings-group">
                 <div class="compress-label">Output suffix</div>
-                <input type="text" name="suffix" id="output-suffix" class="select compress-select" placeholder="No suffix needs different output folder" value="_compressed">
+                <input type="text" name="suffix" id="output-suffix" class="select compress-select"
+                    placeholder="No suffix needs different output folder" value="_compressed">
             </div>
         </div>
 
@@ -157,7 +163,7 @@
             </div>
             <div class="output-folder-conf">
                 <button class="blueBtn" id="custom-folder-select">Select Custom Folder</button>
-            <span id="custom-folder-path"></span>
+                <span id="custom-folder-path"></span>
             </div>
         </div>
 
@@ -166,9 +172,9 @@
             <button class="advancedToggle" id="cancel-btn">Cancel</button>
         </div>
 
-        </div>
+    </div>
 
-        <div id="compression-status"></div>
+    <div id="compression-status"></div>
     </div>
 
     <script src="../src/compressor.js">

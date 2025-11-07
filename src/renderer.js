@@ -446,10 +446,16 @@ class YtDownloaderApp {
 		);
 		document.addEventListener("keydown", (event) => {
 			if (
-				event.ctrlKey &&
-				event.key === "v" &&
+				((event.ctrlKey && event.key === "v") ||
+					(event.metaKey && event.key === "v")) &&
 				document.activeElement.tagName !== "INPUT"
 			) {
+				$(CONSTANTS.DOM_IDS.PASTE_URL_BTN).classList.add("active");
+
+				setTimeout(() => {
+					$(CONSTANTS.DOM_IDS.PASTE_URL_BTN).classList.remove("active");
+				}, 150);
+
 				this.pasteAndGetInfo();
 			}
 		});
@@ -559,15 +565,18 @@ class YtDownloaderApp {
 		try {
 			const metadata = await this._fetchVideoMetadata(url);
 			console.log(metadata);
+
+			const durationInt = Math.ceil(metadata.duration);
+
 			this.state.videoInfo = {
 				...this.state.videoInfo,
 				id: metadata.id,
 				title: metadata.title,
 				thumbnail: metadata.thumbnail,
-				duration: metadata.duration,
+				duration: durationInt,
 				extractor_key: metadata.extractor_key,
 			};
-			this.setVideoLength(metadata.duration);
+			this.setVideoLength(durationInt);
 			this._populateFormatSelectors(metadata.formats || []);
 			this._displayInfoPanel();
 		} catch (error) {
@@ -942,23 +951,17 @@ class YtDownloaderApp {
 		const endTime = $(CONSTANTS.DOM_IDS.END_TIME).value;
 		const duration = this.state.videoInfo.duration;
 
-		if ((startTime || endTime) && endTime != duration) {
-			const start = startTime || "0";
-			const end = endTime || this._formatTime(duration);
+		const startSeconds = this.parseTime(startTime);
+		const endSeconds = this.parseTime(endTime);
 
-			const startSeconds = this.parseTime(start);
-			const endSeconds = this.parseTime(end);
-
-			if (startSeconds === 0 && endSeconds === duration) {
-				this.state.downloadOptions.rangeCmd = "";
-				this.state.downloadOptions.rangeOption = "";
-			} else {
-				this.state.downloadOptions.rangeCmd = `*${start}-${end}`;
-				this.state.downloadOptions.rangeOption = "--download-sections";
-			}
-		} else {
+		if (startSeconds === 0 && endSeconds === duration) {
 			this.state.downloadOptions.rangeCmd = "";
 			this.state.downloadOptions.rangeOption = "";
+		} else {
+			const start = startTime || "0";
+			const end = endTime || this._formatTime(duration);
+			this.state.downloadOptions.rangeCmd = `*${start}-${end}`;
+			this.state.downloadOptions.rangeOption = "--download-sections";
 		}
 
 		if ($(CONSTANTS.DOM_IDS.SUB_CHECKED).checked) {
@@ -1374,6 +1377,10 @@ class YtDownloaderApp {
 			const [mins, secs] = parts;
 			if (isNaN(mins) || isNaN(secs) || secs < 0 || secs > 59) return NaN;
 			totalSeconds = mins * 60 + secs;
+		} else if (parts.length === 1) {
+			const [secs] = parts;
+			if (isNaN(secs)) return NaN;
+			totalSeconds = secs;
 		} else {
 			return NaN;
 		}
