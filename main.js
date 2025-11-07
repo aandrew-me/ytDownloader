@@ -9,547 +9,499 @@ const {
 	clipboard,
 } = require("electron");
 const {autoUpdater} = require("electron-updater");
-process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = "true";
-const fs = require("fs");
+const fs = require("fs").promises;
 const path = require("path");
 const DownloadHistory = require("./src/history");
+
+process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = "true";
 autoUpdater.autoDownload = false;
-/**@type {Electron.CrossProcessExports.BrowserWindow} */
-let win = null;
-let secondaryWindow = null;
-let tray = null;
-let isQuiting = false;
-let indexIsOpen = true;
-let trayEnabled = false;
-const configFile = path.join(app.getPath("userData"), "config.json");
-let downloadHistory = null;
 
-function createWindow() {
-	const bounds = JSON.parse((getItem("bounds", configFile) || "{}"));
-	console.log("bounds:", bounds)
+const USER_DATA_PATH = app.getPath("userData");
+const CONFIG_FILE_PATH = path.join(USER_DATA_PATH, "config.json");
 
-	win = new BrowserWindow({
-		autoHideMenuBar: true,
-		show: false,
-		icon: __dirname + "/assets/images/icon.png",
-		webPreferences: {
-			nodeIntegration: true,
-			contextIsolation: false,
-			spellcheck: false,
-		},
-	});
-	win.setBounds(bounds)
-	win.on("close", (event) => {
-		if (!isQuiting && trayEnabled) {
-			event.preventDefault();
-			win.hide();
-			if (app.dock) app.dock.hide();
-		}
-		return false;
-	});
-
-	win.on("resize", (event) => {
-		setItem("bounds", JSON.stringify(win.getBounds()), configFile);
-	});
-
-	win.loadFile("html/index.html");
-	// win.setMenu(null)
-	win.show();
-
-	autoUpdater.checkForUpdates().then(result => {
-		// Removing unnecessary files for windows
-		if (result && process.platform === "win32") {
-			if (result.updateInfo.version === app.getVersion()) {
-				fs.readdir(path.join(process.env.LOCALAPPDATA, "ytdownloader-updater"), {encoding: "utf-8", withFileTypes: true}, (err, files) => {
-					if (err) {
-						console.log("No update directory to clear")
-					} else {
-						files.forEach(file => {
-							if (file.isFile()) {
-								fs.rm(path.join(file.path, file.name), (_err) => {
-									console.log("Removed file:", file.name)
-								})
-							} else {
-								fs.rm(path.join(file.path, file.name), { recursive: true}, (err) => {
-									console.log("Removed directory:", file.name)
-								})
-							}
-						})
-					}
-				})
-
-			}
-		}
-	});
-}
-let loadedLanguage;
+const appState = {
+	/** @type {BrowserWindow | null} */
+	mainWindow: null,
+	/** @type {BrowserWindow | null} */
+	secondaryWindow: null,
+	/** @type {Tray | null} */
+	tray: null,
+	isQuitting: false,
+	indexPageIsOpen: true,
+	trayEnabled: false,
+	loadedLanguage: {},
+	config: {},
+	downloadHistory: new DownloadHistory(),
+	autoUpdateEnabled: false,
+};
 
 const gotTheLock = app.requestSingleInstanceLock();
 
 if (!gotTheLock) {
 	app.quit();
 } else {
-	app.on("second-instance", (event, commandLine, workingDirectory) => {
-		if (win) {
-			win.show();
+	app.on("second-instance", () => {
+		if (appState.mainWindow) {
+			if (appState.mainWindow.isMinimized())
+				appState.mainWindow.restore();
+			appState.mainWindow.show();
+			appState.mainWindow.focus();
 		}
 	});
 }
 
-app.whenReady().then(() => {
-	// Logging
-	console.log("Locale:" + app.getLocale());
-	console.log("Version: " + app.getVersion());
+app.whenReady().then(async () => {
+	await initialize();
 
-	let locale = app.getLocale();
-
-	if (fs.existsSync(path.join(__dirname, "translations", locale + ".json"))) {
-		loadedLanguage = JSON.parse(
-			fs.readFileSync(
-				path.join(__dirname, "translations", locale + ".json"),
-				"utf8"
-			)
-		);
-	} else {
-		loadedLanguage = JSON.parse(
-			fs.readFileSync(
-				path.join(__dirname, "translations", "en.json"),
-				"utf8"
-			)
-		);
-	}
-
-	// Tray context menu
-	const contextMenu = Menu.buildFromTemplate([
-		{
-			label: i18n("Open app"),
-			click() {
-				win.show();
-				if (app.dock) app.dock.show();
-			},
-		},
-		{
-			label: i18n("Paste video link"),
-			click() {
-				const text = clipboard.readText();
-				if (indexIsOpen) {
-					win.show();
-					if (app.dock) app.dock.show();
-					win.webContents.send("link", text);
-				} else {
-					win.loadFile("html/index.html");
-					win.show();
-					indexIsOpen = true;
-					let sent = false;
-					ipcMain.on("ready-for-links", () => {
-						if (!sent) {
-							win.webContents.send("link", text);
-							sent = true;
-						}
-					});
-				}
-			},
-		},
-		{
-			label: i18n("Download playlist"),
-			click() {
-				indexIsOpen = false;
-				win.loadFile("html/playlist.html");
-				win.show();
-				if (app.dock) app.dock.show();
-			},
-		},
-		{
-			label: i18n("Quit"),
-			click() {
-				isQuiting = true;
-				app.quit();
-			},
-		},
-	]);
-
-	let trayInUse = false;
-	// TODO: Find why tray icon isn't showing properly on gnome
-	let icon;
-	if (process.platform === "win32") {
-		icon = path.join(__dirname, "resources/icon.ico");
-	} else if (process.platform === "darwin") {
-		icon = path.join(__dirname, "resources/icons/16x16.png");
-	} else {
-		icon = path.join(__dirname, "resources/icons/256x256.png");
-	}
-	ipcMain.on("useTray", (_, enabled) => {
-		if (enabled && !trayInUse) {
-			trayEnabled = true;
-			trayInUse = true;
-			tray = new Tray(icon);
-			tray.setToolTip("ytDownloader");
-			tray.setContextMenu(contextMenu);
-			tray.on("click", () => {
-				win.show();
-				if (app.dock) app.dock.show();
-			});
-		} else if (!enabled) {
-			trayEnabled = false;
-		}
-	});
-
-	createWindow();
 	app.on("activate", () => {
 		if (BrowserWindow.getAllWindows().length === 0) {
 			createWindow();
 		}
 	});
+});
+
+app.on("before-quit", async () => {
+	appState.isQuitting = true;
+	try {
+		// Save the final config state before exiting.
+		await saveConfiguration();
+	} catch (error) {
+		console.error("Failed to save configuration during quit:", error);
+	}
+});
+
+app.on("window-all-closed", () => {
+	if (process.platform !== "darwin") {
+		app.quit();
+	}
+});
+
+/**
+ * Initializes the application by loading config, translations,
+ * and setting up handlers.
+ */
+async function initialize() {
+	await loadConfiguration();
+	await loadTranslations();
+
+	registerIpcHandlers();
+	registerAutoUpdaterEvents();
+
+	createWindow();
+
 	if (process.platform === "win32") {
 		app.setAppUserModelId(app.name);
 	}
-});
+}
 
-ipcMain.on("reload", () => {
-	if (win) {
-		win.reload();
-	}
-	if (secondaryWindow) {
-		secondaryWindow.reload();
-	}
-});
+function createWindow() {
+	const bounds = appState.config.bounds || {};
 
-ipcMain.on("get-version", () => {
-	const version = app.getVersion();
-	secondaryWindow.webContents.send("version", version);
-});
+	appState.mainWindow = new BrowserWindow({
+		...bounds,
+		minWidth: 800,
+		minHeight: 600,
+		autoHideMenuBar: true,
+		show: false,
+		icon: path.join(__dirname, "/assets/images/icon.png"),
+		webPreferences: {
+			nodeIntegration: true,
+			contextIsolation: false,
+			spellcheck: false,
+		},
+	});
 
-ipcMain.on("show-file", async (_event, fullPath) => {
-	try {
-		const fileExists = await fs.promises.stat(fullPath);
-		if (fullPath && fileExists) {
-			shell.showItemInFolder(fullPath);
+	appState.mainWindow.loadFile("html/index.html");
+
+	appState.mainWindow.once("ready-to-show", () => {
+		if (appState.config.isMaximized) {
+			appState.mainWindow.maximize();
 		}
-	} catch (error) {
-		console.error("File not found or error opening file:", error.message);
-	}
-});
+		appState.mainWindow.show();
+	});
 
-ipcMain.on("load-win", (event, file) => {
-	if (file.includes("playlist.html")) {
-		indexIsOpen = false;
-	} else {
-		indexIsOpen = true;
+	const saveBounds = () => {
+		if (appState.mainWindow && !appState.mainWindow.isMaximized()) {
+			appState.config.bounds = appState.mainWindow.getBounds();
+		}
+	};
+
+	appState.mainWindow.on("resize", saveBounds);
+	appState.mainWindow.on("move", saveBounds);
+
+	appState.mainWindow.on("maximize", () => {
+		appState.config.isMaximized = true;
+	});
+
+	appState.mainWindow.on("unmaximize", () => {
+		appState.config.isMaximized = false;
+	});
+
+	appState.mainWindow.on("close", (event) => {
+		if (!appState.isQuitting && appState.trayEnabled) {
+			event.preventDefault();
+			appState.mainWindow.hide();
+			if (app.dock) app.dock.hide();
+		}
+	});
+}
+
+/**
+ * @param {string} file The HTML file to load.
+ */
+function createSecondaryWindow(file) {
+	if (appState.secondaryWindow) {
+		appState.secondaryWindow.focus();
+		return;
 	}
-	win.loadFile(file);
-});
-ipcMain.on("load-page", (event, file) => {
-	secondaryWindow = new BrowserWindow({
+
+	appState.secondaryWindow = new BrowserWindow({
+		parent: appState.mainWindow,
+		modal: true,
+		show: false,
 		webPreferences: {
 			nodeIntegration: true,
 			contextIsolation: false,
 		},
-		parent: win,
-		modal: true,
-		show: false,
-	});
-	secondaryWindow.loadFile(file);
-	secondaryWindow.setMenu(null);
-	// secondaryWindow.maximize();
-	// secondaryWindow.webContents.openDevTools()
-	secondaryWindow.show();
-	
-});
-
-ipcMain.on("close-secondary", () => {
-	secondaryWindow.close();
-	secondaryWindow = null;
-});
-
-ipcMain.on("select-location-main", () => {
-	const location = dialog.showOpenDialogSync({
-		properties: ["openDirectory"],
 	});
 
-	if (location) {
-		win.webContents.send("downloadPath", location);
-	}
-});
-
-ipcMain.on("select-location-secondary", () => {
-	const location = dialog.showOpenDialogSync({
-		properties: ["openDirectory"],
+	appState.secondaryWindow.loadFile(file);
+	appState.secondaryWindow.setMenu(null);
+	appState.secondaryWindow.once("ready-to-show", () => {
+		appState.secondaryWindow.show();
 	});
 
-	if (location) {
-		secondaryWindow.webContents.send("downloadPath", location);
-	}
-});
-
-ipcMain.on("get-directory", () => {
-	const location = dialog.showOpenDialogSync({
-		properties: ["openDirectory"],
+	appState.secondaryWindow.on("closed", () => {
+		appState.secondaryWindow = null;
 	});
-
-	if (location) {
-		win.webContents.send("directory-path", location);
-	}
-});
-
-ipcMain.on("select-config", () => {
-	const location = dialog.showOpenDialogSync({
-		properties: ["openFile"],
-	});
-
-	if (location) {
-		secondaryWindow.webContents.send("configPath", location);
-	}
-});
-
-ipcMain.on("quit", () => {
-	isQuiting = true;
-	app.quit();
-});
-
-// ipcMain.handle('get-proxy', async (event, url) => {
-//   const sess = event.sender.session; // get session from sender
-//   const proxy = await sess.resolveProxy(url);
-//   return proxy;
-// });
-// Auto update
-let autoUpdate = false;
-
-ipcMain.on("autoUpdate", (event, status) => {
-	autoUpdate = status;
-	console.log("Auto update:", status);
-
-	if (autoUpdate === true) {
-		// Auto updater events
-		autoUpdater.on(
-			"update-available",
-			(_event, releaseNotes, releaseName) => {
-				// For macOS
-				if (process.platform === "darwin") {
-					/**
-					 * @type {Electron.MessageBoxOptions}
-					 */
-					const dialogOpts = {
-						type: "info",
-						buttons: [i18n("Download"), i18n("No")],
-						title: "Update Available",
-						detail: releaseName,
-						message: i18n(
-							"A new version is available, do you want to download it?"
-						),
-					};
-					dialog.showMessageBox(dialogOpts).then((returnValue) => {
-						if (returnValue.response === 0) {
-							if (process.arch === 'x64') {
-								shell.openExternal(
-									"https://github.com/aandrew-me/ytDownloader/releases/latest/download/YTDownloader_Mac_x64.dmg"
-								);
-							} else {
-								shell.openExternal(
-									"https://github.com/aandrew-me/ytDownloader/releases/latest/download/YTDownloader_Mac_arm64.dmg"
-								);
-							}
-						}
-					});
-				}
-				// For Windows and Linux
-				else {
-					/**
-					 * @type {Electron.MessageBoxOptions}
-					 */
-					const dialogOpts = {
-						type: "info",
-						buttons: [i18n("Update"), i18n("No")],
-						title: "Update Available",
-						detail:
-							process.platform === "win32"
-								? releaseNotes
-								: releaseName,
-						message: i18n(
-							"A new version is available, do you want to update?"
-						),
-					};
-					dialog.showMessageBox(dialogOpts).then((returnValue) => {
-						if (returnValue.response === 0) {
-							autoUpdater.downloadUpdate();
-						}
-					});
-				}
-			}
-		);
-	}
-});
-
-ipcMain.on("progress", (_event, percentage) => {
-	if (win) {
-		win.setProgressBar(percentage)
-	}
-})
-
-ipcMain.on("error_dialog", (_event, message) => {
-	dialog.showMessageBox(win, {
-		type: "error",
-		title: "Error",
-		message: message,
-		buttons: [
-			"Ok", "Copy error"
-		]
-	}).then((result) => {
-		if (result.response == 1) {
-			clipboard.writeText(message)
-		}
-	})
-})
-
-autoUpdater.on("update-downloaded", (_event, releaseNotes, releaseName) => {
-	/**
-	 * @type {Electron.MessageBoxOptions}
-	 */
-	const dialogOpts = {
-		type: "info",
-		buttons: [i18n("Restart"), i18n("Later")],
-		title: "Update Ready",
-		message: i18n("Install and restart now?"),
-	};
-	dialog.showMessageBox(dialogOpts).then((returnValue) => {
-		if (returnValue.response === 0) {
-			autoUpdater.quitAndInstall();
-		} else {
-			autoUpdater.autoInstallOnAppQuit;
-		}
-	});
-});
-
-// Translation
-function i18n(phrase) {
-	let translation = loadedLanguage[phrase];
-	if (translation === undefined) {
-		translation = phrase;
-	}
-	return translation;
 }
 
 /**
- * @param {string} itemName
- * @param {string} itemContent
- * @param {string} configPath
+ * Creates the system tray icon
  */
-function setItem(itemName, itemContent, configPath) {
-	let config = {};
-	if (fs.existsSync(configPath)) {
-		const fileContent = fs.readFileSync(configPath).toString();
+function createTray() {
+	if (appState.tray) return;
+
+	let iconPath;
+	if (process.platform === "win32") {
+		iconPath = path.join(__dirname, "resources/icon.ico");
+	} else if (process.platform === "darwin") {
+		iconPath = path.join(__dirname, "resources/icons/16x16.png");
+	} else {
+		iconPath = path.join(__dirname, "resources/icons/256x256.png");
+	}
+
+	appState.tray = new Tray(iconPath);
+
+	const contextMenu = Menu.buildFromTemplate([
+		{
+			label: i18n("Open app"),
+			click: () => {
+				appState.mainWindow?.show();
+				if (app.dock) app.dock.show();
+			},
+		},
+		{
+			label: i18n("Paste video link"),
+			click: async () => {
+				const text = clipboard.readText();
+				appState.mainWindow?.show();
+				if (app.dock) app.dock.show();
+				if (appState.indexPageIsOpen) {
+					appState.mainWindow.webContents.send("link", text);
+				} else {
+					await appState.mainWindow.loadFile("html/index.html");
+					appState.indexPageIsOpen = true;
+					appState.mainWindow.webContents.once(
+						"did-finish-load",
+						() => {
+							appState.mainWindow.webContents.send("link", text);
+						}
+					);
+				}
+			},
+		},
+		{
+			label: i18n("Download playlist"),
+			click: () => {
+				appState.indexPageIsOpen = false;
+				appState.mainWindow?.loadFile("html/playlist.html");
+				appState.mainWindow?.show();
+				if (app.dock) app.dock.show();
+			},
+		},
+		{
+			label: i18n("Quit"),
+			click: () => {
+				app.quit();
+			},
+		},
+	]);
+
+	appState.tray.setToolTip("ytDownloader");
+	appState.tray.setContextMenu(contextMenu);
+	appState.tray.on("click", () => {
+		appState.mainWindow?.show();
+
+		if (app.dock) app.dock.show();
+	});
+}
+
+function registerIpcHandlers() {
+	ipcMain.on("autoUpdate", (_event, status) => {
+		appState.autoUpdateEnabled = status;
+
+		if (status) {
+			autoUpdater.checkForUpdates();
+		}
+	});
+
+	ipcMain.on("reload", () => {
+		appState.mainWindow?.reload();
+		appState.secondaryWindow?.reload();
+	});
+
+	ipcMain.on("get-version", (event) => {
+		event.sender.send("version", app.getVersion());
+	});
+
+	ipcMain.on("show-file", async (_event, fullPath) => {
 		try {
-			config = fileContent ? JSON.parse(fileContent) : {};
-			config[itemName] = itemContent;
+			await fs.stat(fullPath);
+			shell.showItemInFolder(fullPath);
 		} catch (error) {
-			console.log("Error has occured trying to save window info", error)
+			console.error("Error showing file:", error.message);
+			dialog.showErrorBox(
+				"File Error",
+				`Could not find or open the file: ${fullPath}`
+			);
 		}
-	} else {
-		config[itemName] = itemContent;
-	}
+	});
 
-	fs.writeFileSync(configPath, JSON.stringify(config));
+	ipcMain.on("load-win", (_event, file) => {
+		appState.indexPageIsOpen = file.includes("index.html");
+		appState.mainWindow?.loadFile(file);
+	});
+
+	ipcMain.on("load-page", (_event, file) => {
+		createSecondaryWindow(file);
+	});
+
+	ipcMain.on("close-secondary", () => {
+		appState.secondaryWindow?.close();
+	});
+
+	ipcMain.on("quit", () => {
+		app.quit();
+	});
+
+	ipcMain.on("select-location-main", async () => {
+		if (!appState.mainWindow) return;
+		const {canceled, filePaths} = await dialog.showOpenDialog(
+			appState.mainWindow,
+			{properties: ["openDirectory"]}
+		);
+		if (!canceled && filePaths.length > 0) {
+			appState.mainWindow.webContents.send("downloadPath", filePaths);
+		}
+	});
+
+	ipcMain.on("select-location-secondary", async () => {
+		if (!appState.secondaryWindow) return;
+		const {canceled, filePaths} = await dialog.showOpenDialog(
+			appState.secondaryWindow,
+			{properties: ["openDirectory"]}
+		);
+		if (!canceled && filePaths.length > 0) {
+			appState.secondaryWindow.webContents.send(
+				"downloadPath",
+				filePaths
+			);
+		}
+	});
+
+	ipcMain.on("get-directory", async () => {
+		if (!appState.mainWindow) return;
+		const {canceled, filePaths} = await dialog.showOpenDialog(
+			appState.mainWindow,
+			{properties: ["openDirectory"]}
+		);
+		if (!canceled && filePaths.length > 0) {
+			appState.mainWindow.webContents.send("directory-path", filePaths);
+		}
+	});
+
+	ipcMain.on("select-config", async () => {
+		if (!appState.secondaryWindow) return;
+		const {canceled, filePaths} = await dialog.showOpenDialog(
+			appState.secondaryWindow,
+			{properties: ["openFile"]}
+		);
+		if (!canceled && filePaths.length > 0) {
+			appState.secondaryWindow.webContents.send("configPath", filePaths);
+		}
+	});
+
+	ipcMain.on("useTray", (_event, enabled) => {
+		appState.trayEnabled = enabled;
+		if (enabled) createTray();
+		else {
+			appState.tray?.destroy();
+			appState.tray = null;
+		}
+	});
+
+	ipcMain.on("progress", (_event, percentage) => {
+		if (appState.mainWindow) appState.mainWindow.setProgressBar(percentage);
+	});
+
+	ipcMain.on("error_dialog", async (_event, message) => {
+		const {response} = await dialog.showMessageBox(appState.mainWindow, {
+			type: "error",
+			title: "Error",
+			message: message,
+			buttons: ["Ok", "Copy error"],
+		});
+		if (response === 1) clipboard.writeText(message);
+	});
+
+	ipcMain.handle("get-download-history", () =>
+		appState.downloadHistory.getHistory()
+	);
+	ipcMain.handle("add-to-history", (_, info) =>
+		appState.downloadHistory.addDownload(info)
+	);
+	ipcMain.handle("get-download-stats", () =>
+		appState.downloadHistory.getStats()
+	);
+	ipcMain.handle("delete-history-item", (_, id) =>
+		appState.downloadHistory.removeHistoryItem(id)
+	);
+	ipcMain.handle("clear-all-history", async () => {
+		await appState.downloadHistory.clearHistory();
+		return true;
+	});
+	ipcMain.handle("export-history-json", () =>
+		appState.downloadHistory.exportAsJSON()
+	);
+	ipcMain.handle("export-history-csv", () =>
+		appState.downloadHistory.exportAsCSV()
+	);
+}
+
+function registerAutoUpdaterEvents() {
+	autoUpdater.on("update-available", async (info) => {
+		const dialogOpts = {
+			type: "info",
+			buttons: [i18n("Update"), i18n("No")],
+			title: "Update Available",
+			message: `A new version (${info.version}) is available. Do you want to update?`,
+			detail:
+				info.releaseNotes?.toString().replace(/<[^>]*>?/gm, "") ||
+				"No details available.",
+		};
+		const {response} = await dialog.showMessageBox(
+			appState.mainWindow,
+			dialogOpts
+		);
+		if (response === 0) {
+			autoUpdater.downloadUpdate();
+		}
+	});
+
+	autoUpdater.on("update-downloaded", async () => {
+		const dialogOpts = {
+			type: "info",
+			buttons: [i18n("Restart"), i18n("Later")],
+			title: "Update Ready",
+			message: "The update has been downloaded. Install and restart now?",
+		};
+		const {response} = await dialog.showMessageBox(
+			appState.mainWindow,
+			dialogOpts
+		);
+		if (response === 0) {
+			autoUpdater.quitAndInstall();
+		}
+	});
+
+	autoUpdater.on("error", (error) => {
+		console.error("Auto-update error:", error);
+		dialog.showErrorBox(
+			"Update Error",
+			`An error occurred during the update process: ${error.message}`
+		);
+	});
 }
 
 /**
- * @param {string} item
- * @param {string} configPath
- * @returns {string}
+ * @param {string} phrase The key to translate.
+ * @returns {string} The translated string or the key itself.
  */
-function getItem(item, configPath) {
-	if (fs.existsSync(configPath)) {
-		try {
-			const configData = JSON.parse(fs.readFileSync(configPath, "utf8"));
-			return configData[item] || "";
-		} catch (err) {
-			return "";
+function i18n(phrase) {
+	return appState.loadedLanguage[phrase] || phrase;
+}
+
+/**
+ * Loads the configuration from the config file.
+ */
+async function loadConfiguration() {
+	try {
+		const fileContent = await fs.readFile(CONFIG_FILE_PATH, "utf8");
+		appState.config = JSON.parse(fileContent);
+
+		if (appState.config && typeof appState.config.bounds === "string") {
+			console.log(
+				"Old config format detected. Migrating..."
+			);
+
+			try {
+				appState.config.bounds = JSON.parse(appState.config.bounds);
+			} catch (migrationError) {
+				console.error(
+					"Failed to migrate from old config. Resetting to default.",
+					migrationError
+				);
+
+				appState.config.bounds = {width: 1024, height: 768};
+			}
 		}
-	} else {
-		return "";
+	} catch (error) {
+		console.log(
+			"Could not load config file, using defaults.",
+			error.message
+		);
+		appState.config = {
+			bounds: {width: 1024, height: 768},
+			isMaximized: false,
+		};
 	}
 }
 
-ipcMain.handle("get-download-history", async () => {
+async function saveConfiguration() {
 	try {
-		if (!downloadHistory) {
-			downloadHistory = new DownloadHistory();
-		}
-		return downloadHistory.getHistory();
+		await fs.writeFile(CONFIG_FILE_PATH, JSON.stringify(appState.config));
 	} catch (error) {
-		console.error("Error getting download history:", error);
-		throw new Error("Failed to retrieve download history");
+		console.error("Failed to save configuration:", error);
 	}
-});
+}
 
-ipcMain.handle("add-to-history", async (event, downloadInfo) => {
+async function loadTranslations() {
+	const locale = app.getLocale();
+	const defaultLangPath = path.join(__dirname, "translations", "en.json");
+	let langPath = path.join(__dirname, "translations", `${locale}.json`);
+
 	try {
-		if (!downloadHistory) {
-			downloadHistory = new DownloadHistory();
-		}
-		return downloadHistory.addDownload(downloadInfo);
-	} catch (error) {
-		console.error("Error adding to history:", error);
-		throw new Error("Failed to add download to history");
+		await fs.access(langPath);
+	} catch {
+		langPath = defaultLangPath;
 	}
-});
 
-ipcMain.handle("get-download-stats", async () => {
 	try {
-		if (!downloadHistory) {
-			downloadHistory = new DownloadHistory();
-		}
-		return downloadHistory.getStats();
+		const fileContent = await fs.readFile(langPath, "utf8");
+		appState.loadedLanguage = JSON.parse(fileContent);
 	} catch (error) {
-		console.error("Error getting download stats:", error);
-		throw new Error("Failed to retrieve download statistics");
+		console.error("Failed to load translation file:", error);
+		appState.loadedLanguage = {};
 	}
-});
-
-ipcMain.handle("delete-history-item", async (event, id) => {
-	try {
-		if (!downloadHistory) {
-			downloadHistory = new DownloadHistory();
-		}
-		return downloadHistory.removeHistoryItem(id);
-	} catch (error) {
-		console.error("Error deleting history item:", error);
-		throw new Error("Failed to delete history item");
-	}
-});
-
-ipcMain.handle("clear-all-history", async () => {
-	try {
-		if (!downloadHistory) {
-			downloadHistory = new DownloadHistory();
-		}
-		downloadHistory.clearHistory();
-		return true;
-	} catch (error) {
-		console.error("Error clearing history:", error);
-		throw new Error("Failed to clear download history");
-	}
-});
-
-ipcMain.handle("export-history-json", async () => {
-	try {
-		if (!downloadHistory) {
-			downloadHistory = new DownloadHistory();
-		}
-		return downloadHistory.exportAsJSON();
-	} catch (error) {
-		console.error("Error exporting history as JSON:", error);
-		throw new Error("Failed to export history as JSON");
-	}
-});
-
-ipcMain.handle("export-history-csv", async () => {
-	try {
-		if (!downloadHistory) {
-			downloadHistory = new DownloadHistory();
-		}
-		return downloadHistory.exportAsCSV();
-	} catch (error) {
-		console.error("Error exporting history as CSV:", error);
-		throw new Error("Failed to export history as CSV");
-	}
-});
-
+}
