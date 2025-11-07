@@ -1,3 +1,5 @@
+const {platform} = require("os");
+
 function getId(id) {
 	return document.getElementById(id);
 }
@@ -7,9 +9,13 @@ function querySelector(element) {
 const i18n = new (require("../translations/i18n"))();
 
 // Translating texts
-getId("pasteUrl").textContent = i18n.__(
-	"Click to paste video link from clipboard [Ctrl + V]"
+getId("pasteText").textContent = i18n.__(
+	"Click to paste video link from clipboard"
 );
+
+if (platform() === "darwin") {
+	getId("pasteCtrlKey").textContent = "⌘";
+}
 querySelector("#popup p").textContent = i18n.__("yt-dlp is being downloaded");
 getId("preferenceWin").textContent = i18n.__("Preferences");
 getId("aboutWin").textContent = i18n.__("About");

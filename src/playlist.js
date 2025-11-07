@@ -734,9 +734,12 @@ getId("compressorWin").addEventListener("click", () => {
 });
 
 // Translations
-getId("pasteLink").textContent = i18n.__(
-	"Click to paste playlist link from clipboard [Ctrl + V]"
+getId("pasteText").textContent = i18n.__(
+	"Click to paste playlist link from clipboard"
 );
+if (os.platform() === "darwin") {
+	getId("pasteCtrlKey").textContent = "⌘";
+}
 getId("preferenceWin").textContent = i18n.__("Preferences");
 getId("aboutWin").textContent = i18n.__("About");
 getId("homeWin").textContent = i18n.__("Homepage");
