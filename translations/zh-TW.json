@@ -106,7 +106,7 @@
 	"Frappé": "Frappé",
 	"One Dark": "One Dark",
 	"Matrix": "Matrix",
-	"Solarized Dark": "Solarized Dark",
+	"Solarized Dark": "暗青色",
 	"Preferred video codec": "偏好視訊編碼器",
 	"Show more format options": "顯示更多格式選項",
 	"You need to give the app permission to access home directory to use this. You can do it with Flatseal by enabling the permission with text 'filesystem=home'": "您需要授予應用程式存取家目錄的權限才能使用此功能。您可以使用 Flatseal 並透過 'filesystem=home' 文字來啟用權限",
