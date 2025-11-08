@@ -1,6 +1,6 @@
 const storageTheme = localStorage.getItem("theme");
-if (storageTheme){
-	document.documentElement.setAttribute("theme", storageTheme)
+if (storageTheme) {
+	document.documentElement.setAttribute("theme", storageTheme);
 }
 
 let rightToLeft = "false";
@@ -8,22 +8,26 @@ if (localStorage.getItem("rightToLeft")) {
 	rightToLeft = localStorage.getItem("rightToLeft");
 }
 if (rightToLeft == "true") {
-	document.querySelectorAll(".prefBox").forEach((/** @type {HTMLElement} */ item) => {
-		item.style.flexDirection = "row-reverse";
-	});
+	document
+		.querySelectorAll(".prefBox")
+		.forEach((/** @type {HTMLElement} */ item) => {
+			item.style.flexDirection = "row-reverse";
+		});
 } else {
 	console.log("Change to left to right");
-	document.querySelectorAll(".prefBox").forEach((/** @type {HTMLElement} */ item) => {
-		item.style.flexDirection = "row";
-	});
+	document
+		.querySelectorAll(".prefBox")
+		.forEach((/** @type {HTMLElement} */ item) => {
+			item.style.flexDirection = "row";
+		});
 }
 let downloadPath = localStorage.getItem("downloadPath");
 getId("path").textContent = downloadPath;
 
-const { ipcRenderer } = require("electron");
+const {ipcRenderer} = require("electron");
 /**
- * 
- * @param {string} id 
+ *
+ * @param {string} id
  * @returns {any}
  */
 function getId(id) {
@@ -44,7 +48,6 @@ ipcRenderer.on("downloadPath", (event, downloadPath) => {
 	localStorage.setItem("downloadPath", downloadPath[0]);
 	getId("path").textContent = downloadPath[0];
 });
-
 
 // Selecting config directory
 
@@ -77,14 +80,19 @@ if (configPath) {
 
 // Language settings
 
-const language = localStorage.getItem("language");
+const language = localStorage.getItem("locale");
 
 if (language) {
-	getId("select").value = language;
+	if (language.startsWith("en")) {
+		getId("select").value = "en";
+	} else {
+		getId("select").value = language;
+	}
 }
+
 function changeLanguage() {
 	const language = getId("select").value;
-	localStorage.setItem("language", language);
+	localStorage.setItem("locale", language);
 	if (language === "fa" || language === "ar") {
 		rightToLeft = "true";
 		localStorage.setItem("rightToLeft", "true");
@@ -148,7 +156,6 @@ getId("proxyTxt").addEventListener("change", () => {
 	localStorage.setItem("proxy", proxy);
 });
 
-
 // Reload
 function reload() {
 	ipcRenderer.send("reload");
@@ -191,19 +198,18 @@ getId("resetFoldernameFormat").addEventListener("click", () => {
 });
 
 // Max active downloads
-getId("maxDownloads").addEventListener("input", ()=>{
-	const number = Number(getId("maxDownloads").value)
+getId("maxDownloads").addEventListener("input", () => {
+	const number = Number(getId("maxDownloads").value);
 
-	if (number < 1){
-		localStorage.setItem("maxActiveDownloads", "1")
+	if (number < 1) {
+		localStorage.setItem("maxActiveDownloads", "1");
+	} else {
+		localStorage.setItem("maxActiveDownloads", String(number));
 	}
-	else{
-		localStorage.setItem("maxActiveDownloads", String(number))
-	}
-})
+});
 
-if (localStorage.getItem("maxActiveDownloads")){
-	getId("maxDownloads").value = localStorage.getItem("maxActiveDownloads")
+if (localStorage.getItem("maxActiveDownloads")) {
+	getId("maxDownloads").value = localStorage.getItem("maxActiveDownloads");
 }
 
 // Closing app to system tray
@@ -211,17 +217,16 @@ const closeToTray = getId("closeToTray");
 closeToTray.addEventListener("change", (event) => {
 	if (closeToTray.checked) {
 		localStorage.setItem("closeToTray", "true");
-		ipcRenderer.send("useTray", true)
+		ipcRenderer.send("useTray", true);
 	} else {
 		localStorage.setItem("closeToTray", "false");
-		ipcRenderer.send("useTray", false)
-
+		ipcRenderer.send("useTray", false);
 	}
 });
-const trayEnabled = localStorage.getItem("closeToTray")
-if(trayEnabled == "true"){
+const trayEnabled = localStorage.getItem("closeToTray");
+if (trayEnabled == "true") {
 	closeToTray.checked = true;
-	ipcRenderer.send("useTray", true)
+	ipcRenderer.send("useTray", true);
 }
 
 // Auto updates
@@ -231,11 +236,10 @@ autoUpdateDisabled.addEventListener("change", (event) => {
 		localStorage.setItem("autoUpdate", "false");
 	} else {
 		localStorage.setItem("autoUpdate", "true");
-
 	}
 });
-const autoUpdate = localStorage.getItem("autoUpdate")
-if (autoUpdate == "false"){
+const autoUpdate = localStorage.getItem("autoUpdate");
+if (autoUpdate == "false") {
 	autoUpdateDisabled.checked = true;
 }
 
@@ -246,11 +250,10 @@ showMoreFormats.addEventListener("change", (event) => {
 		localStorage.setItem("showMoreFormats", "true");
 	} else {
 		localStorage.setItem("showMoreFormats", "false");
-
 	}
 });
-const showMoreFormatOpts = localStorage.getItem("showMoreFormats")
-if (showMoreFormatOpts == "true"){
+const showMoreFormatOpts = localStorage.getItem("showMoreFormats");
+if (showMoreFormatOpts == "true") {
 	showMoreFormats.checked = true;
 }
 // Translation file

@@ -794,7 +794,6 @@ body::-webkit-scrollbar-thumb {
 	padding: 10px;
 	border-radius: 2px;
 	color: white;
-	background-color: rgb(80, 80, 224);
 	cursor: pointer;
 	transition: 0.5s all;
 	z-index: 2;

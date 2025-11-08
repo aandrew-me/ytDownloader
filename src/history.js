@@ -5,14 +5,17 @@
 const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
-const { app } = require("electron");
+const {app} = require("electron");
 
 class DownloadHistory {
 	constructor() {
-		this.historyFile = path.join(app.getPath("userData"), "download_history.json");
+		this.historyFile = path.join(
+			app.getPath("userData"),
+			"download_history.json"
+		);
 		this.maxHistoryItems = 800;
 		this.history = [];
-		this.initialized = this._loadHistory().then(history => {
+		this.initialized = this._loadHistory().then((history) => {
 			this.history = history;
 		});
 	}
@@ -23,7 +26,10 @@ class DownloadHistory {
 	async _loadHistory() {
 		try {
 			if (fs.existsSync(this.historyFile)) {
-				const data = await fs.promises.readFile(this.historyFile, "utf8");
+				const data = await fs.promises.readFile(
+					this.historyFile,
+					"utf8"
+				);
 				return JSON.parse(data) || [];
 			}
 		} catch (error) {
@@ -34,7 +40,10 @@ class DownloadHistory {
 
 	async _saveHistory() {
 		try {
-			await fs.promises.writeFile(this.historyFile, JSON.stringify(this.history, null, 2));
+			await fs.promises.writeFile(
+				this.historyFile,
+				JSON.stringify(this.history, null, 2)
+			);
 		} catch (error) {
 			console.error("Error saving history:", error);
 		}
@@ -42,7 +51,7 @@ class DownloadHistory {
 
 	async addDownload(downloadInfo) {
 		await this.initialized;
-		
+
 		const historyItem = {
 			id: this._generateUniqueId(),
 			title: downloadInfo.title || "Unknown",
@@ -76,12 +85,13 @@ class DownloadHistory {
 
 	async getFilteredHistory(options = {}) {
 		await this.initialized;
-		
+
 		let filtered = [...this.history];
 
 		if (options.format) {
 			filtered = filtered.filter(
-				(item) => item.format.toLowerCase() === options.format.toLowerCase()
+				(item) =>
+					item.format.toLowerCase() === options.format.toLowerCase()
 			);
 		}
 
@@ -108,7 +118,7 @@ class DownloadHistory {
 
 	async removeHistoryItem(id) {
 		await this.initialized;
-		
+
 		const index = this.history.findIndex((item) => item.id === id);
 		if (index !== -1) {
 			this.history.splice(index, 1);
@@ -120,14 +130,14 @@ class DownloadHistory {
 
 	async clearHistory() {
 		await this.initialized;
-		
+
 		this.history = [];
 		await this._saveHistory();
 	}
 
 	async getStats() {
 		await this.initialized;
-		
+
 		const stats = {
 			totalDownloads: this.history.length,
 			totalSize: 0,
@@ -160,22 +170,22 @@ class DownloadHistory {
 		if (value == null) {
 			value = "";
 		}
-		
+
 		const stringValue = String(value);
-			
+
 		let sanitized = stringValue.replace(/"/g, '""');
-		
-		const dangerousChars = ['=', '+', '-', '@'];
+
+		const dangerousChars = ["=", "+", "-", "@"];
 		if (sanitized.length > 0 && dangerousChars.includes(sanitized[0])) {
 			sanitized = "'" + sanitized;
 		}
-		
+
 		return `"${sanitized}"`;
 	}
 
 	async exportAsCSV() {
 		await this.initialized;
-		
+
 		if (this.history.length === 0) return "No history to export\n";
 
 		const headers = [
