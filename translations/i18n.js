@@ -1,42 +1,87 @@
 const path = require("path");
-const electron = require("electron");
 const fs = require("fs");
-let loadedLanguage;
-let userSelectedLanguage = false;
-let locale;
-if (electron.app) {
-	locale = electron.app.getLocale();
-} else {
-	locale = navigator.language
+const {ipcRenderer} = require("electron");
+
+function normalizeLocale(locale) {
+	if (!locale) return "en";
+	const parts = locale.split("-");
+	const lang = parts[0].toLowerCase();
+	const region = parts[1] ? parts[1].toUpperCase() : null;
+
+	const defaultRegions = {
+		zh: "CN",
+		en: "US",
+		ru: "RU",
+		pt: "BR",
+		fi: "FI",
+		fr: "FR",
+		es: "ES",
+		de: "DE",
+		it: "IT",
+		ja: "JP",
+		ar: "SA",
+	};
+
+	if (!region && defaultRegions[lang]) {
+		return `${lang}-${defaultRegions[lang]}`;
+	}
+
+	return region ? `${lang}-${region}` : lang;
 }
 
-// Check localstorage for language
-if (localStorage.getItem("language")){
-	locale =  localStorage.getItem("language")
-	userSelectedLanguage = true;
-}
-else{
-	localStorage.setItem("language", locale.slice(0, 2))
+function getLocaleSync() {
+	try {
+		const saved = localStorage.getItem("locale");
+		if (saved) return saved;
+	} catch (e) {}
+
+	let locale = null;
+	try {
+		locale = ipcRenderer.sendSync("get-system-locale");
+	} catch (e) {}
+
+	if (!locale && typeof navigator !== "undefined") {
+		locale = navigator.language || (navigator.languages && navigator.languages[0]);
+	}
+
+	const normalized = normalizeLocale(locale || "en");
+
+	try {
+		localStorage.setItem("locale", normalized);
+	} catch (e) {}
+
+	return normalized;
 }
 
-module.exports = i18n;
+function I18n() {
+	this.locale = getLocaleSync();
 
-function i18n() {
-	if (fs.existsSync(path.join(__dirname, locale + ".json"))) {
-		loadedLanguage = JSON.parse(
-			fs.readFileSync(path.join(__dirname, locale + ".json"), "utf8")
-		);
+	const localeFile = path.join(__dirname, `${this.locale}.json`);
+	const fallbackFile = path.join(__dirname, "en.json");
+
+	if (fs.existsSync(localeFile)) {
+		this.loadedLanguage = JSON.parse(fs.readFileSync(localeFile, "utf8"));
 	} else {
-		loadedLanguage = JSON.parse(
-			fs.readFileSync(path.join(__dirname, "en.json"), "utf8")
-		);
+		this.loadedLanguage = JSON.parse(fs.readFileSync(fallbackFile, "utf8"));
 	}
+
+	this.__ = function (phrase) {
+		return this.loadedLanguage[phrase] !== undefined
+			? this.loadedLanguage[phrase]
+			: phrase;
+	};
+
+
+	this.setLocale = function (newLocale) {
+		const normalized = normalizeLocale(newLocale);
+		localStorage.setItem("locale", normalized);
+		const file = path.join(__dirname, `${normalized}.json`);
+		const data = fs.existsSync(file)
+			? fs.readFileSync(file, "utf8")
+			: fs.readFileSync(path.join(__dirname, "en.json"), "utf8");
+		this.loadedLanguage = JSON.parse(data);
+		this.locale = normalized;
+	};
 }
 
-i18n.prototype.__ = function (phrase) {
-	let translation = loadedLanguage[phrase];
-	if (translation === undefined) {
-		translation = phrase;
-	}
-	return translation;
-};
+module.exports = I18n;

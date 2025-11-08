@@ -165,6 +165,7 @@ function createSecondaryWindow(file) {
 		},
 	});
 
+	// appState.secondaryWindow.webContents.openDevTools();
 	appState.secondaryWindow.loadFile(file);
 	appState.secondaryWindow.setMenu(null);
 	appState.secondaryWindow.once("ready-to-show", () => {
@@ -265,16 +266,14 @@ function registerIpcHandlers() {
 		event.sender.send("version", app.getVersion());
 	});
 
-	ipcMain.on("show-file", async (_event, fullPath) => {
+	ipcMain.handle("show-file", async (_event, fullPath) => {
 		try {
 			await fs.stat(fullPath);
 			shell.showItemInFolder(fullPath);
+
+			return {success: true};
 		} catch (error) {
-			console.error("Error showing file:", error.message);
-			dialog.showErrorBox(
-				"File Error",
-				`Could not find or open the file: ${fullPath}`
-			);
+			return {success: false, error: error.message};
 		}
 	});
 
@@ -365,6 +364,10 @@ function registerIpcHandlers() {
 		if (response === 1) clipboard.writeText(message);
 	});
 
+	ipcMain.on("get-system-locale", (event) => {
+		event.returnValue = app.getSystemLocale();
+	});
+
 	ipcMain.handle("get-download-history", () =>
 		appState.downloadHistory.getHistory()
 	);
@@ -451,9 +454,7 @@ async function loadConfiguration() {
 		appState.config = JSON.parse(fileContent);
 
 		if (appState.config && typeof appState.config.bounds === "string") {
-			console.log(
-				"Old config format detected. Migrating..."
-			);
+			console.log("Old config format detected. Migrating...");
 
 			try {
 				appState.config.bounds = JSON.parse(appState.config.bounds);
@@ -487,7 +488,8 @@ async function saveConfiguration() {
 }
 
 async function loadTranslations() {
-	const locale = app.getLocale();
+	const locale = app.getSystemLocale();
+	console.log({locale});
 	const defaultLangPath = path.join(__dirname, "translations", "en.json");
 	let langPath = path.join(__dirname, "translations", `${locale}.json`);
 

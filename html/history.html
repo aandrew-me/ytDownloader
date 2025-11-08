@@ -380,8 +380,34 @@
                 max-width: 500px;
             }
         }
+
+        .popup-container {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            z-index: 9999;
+
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .popup-item {
+            display: inline-block;
+
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            font-weight: 600;
+            font-size: 15px;
+
+            opacity: 1;
+            transition: opacity 0.4s;
+        }
     </style>
 </head>
+
 
 <body>
     <div class="history-container">
@@ -414,6 +440,8 @@
 
         <div id="historyListContainer" class="history-list"></div>
     </div>
+
+    <div id="popupContainer" class="popup-container"></div>
 
     <script>
         const { ipcRenderer } = require("electron");
@@ -448,7 +476,7 @@
                 updateStats();
             }).catch((error) => {
                 console.error("Failed to load history:", error);
-                alert("Failed to load download history. Please try again.");
+                showPopup("Failed to load download history. Please try again.", true);
             });
         }
 
@@ -472,24 +500,24 @@
 
         function renderHistory(historyItems) {
             const container = document.getElementById("historyListContainer");
-            
+
             // Clear container first
             container.innerHTML = '';
 
             if (historyItems.length === 0) {
                 const emptyState = document.createElement('div');
                 emptyState.className = 'empty-state';
-                
+
                 const icon = document.createElement('div');
                 icon.className = 'empty-state-icon';
                 icon.textContent = '📭';
-                
+
                 const heading = document.createElement('h2');
                 heading.textContent = 'No Downloads Yet';
-                
+
                 const text = document.createElement('p');
                 text.textContent = 'Your download history will appear here';
-                
+
                 emptyState.appendChild(icon);
                 emptyState.appendChild(heading);
                 emptyState.appendChild(text);
@@ -497,13 +525,13 @@
                 return;
             }
 
-           
+
             historyItems.forEach(item => {
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'history-item';
                 itemDiv.dataset.id = item.id;
-                
-               
+
+
                 const thumbnail = document.createElement(item.thumbnail ? 'img' : 'div');
                 thumbnail.className = 'history-item-thumbnail';
                 if (item.thumbnail) {
@@ -511,47 +539,47 @@
                     thumbnail.alt = 'thumbnail';
                 }
                 itemDiv.appendChild(thumbnail);
-                
-             
+
+
                 const info = document.createElement('div');
                 info.className = 'history-item-info';
-                
-              
+
+
                 const title = document.createElement('div');
                 title.className = 'history-item-title';
                 title.title = item.title;
-                title.textContent = item.title; 
+                title.textContent = item.title;
                 info.appendChild(title);
-                
-               
+
+
                 const meta = document.createElement('div');
                 meta.className = 'history-item-meta';
-                
-                
+
+
                 const formatSpan = document.createElement('span');
                 formatSpan.textContent = 'Format: ';
                 const formatStrong = document.createElement('strong');
                 formatStrong.textContent = item.format;
                 formatSpan.appendChild(formatStrong);
                 meta.appendChild(formatSpan);
-                
-               
+
+
                 const sizeSpan = document.createElement('span');
                 sizeSpan.textContent = 'Size: ';
                 const sizeStrong = document.createElement('strong');
                 sizeStrong.textContent = formatFileSize(item.fileSize);
                 sizeSpan.appendChild(sizeStrong);
                 meta.appendChild(sizeSpan);
-                
-               
+
+
                 const dateSpan = document.createElement('span');
                 dateSpan.textContent = 'Date: ';
                 const dateStrong = document.createElement('strong');
                 dateStrong.textContent = new Date(item.downloadDate).toLocaleDateString();
                 dateSpan.appendChild(dateStrong);
                 meta.appendChild(dateSpan);
-                
-               
+
+
                 if (item.duration) {
                     const durationSpan = document.createElement('span');
                     durationSpan.textContent = 'Duration: ';
@@ -560,35 +588,35 @@
                     durationSpan.appendChild(durationStrong);
                     meta.appendChild(durationSpan);
                 }
-                
+
                 info.appendChild(meta);
                 itemDiv.appendChild(info);
-                
-              
+
+
                 const actions = document.createElement('div');
                 actions.className = 'history-item-actions';
-                
-               
+
+
                 const copyBtn = document.createElement('button');
                 copyBtn.className = 'copy-url-btn';
-                copyBtn.textContent = 'Copy URL';
+                copyBtn.textContent = i18n.__('Copy URL');
                 copyBtn.addEventListener('click', () => copyToClipboard(item.url));
                 actions.appendChild(copyBtn);
-                
-              
+
+
                 const openBtn = document.createElement('button');
                 openBtn.className = 'open-file-btn';
-                openBtn.textContent = 'Open';
+                openBtn.textContent = i18n.__('Open');
                 openBtn.addEventListener('click', () => openFile(item.filePath));
                 actions.appendChild(openBtn);
-                
-              
+
+
                 const deleteBtn = document.createElement('button');
                 deleteBtn.className = 'delete-btn';
-                deleteBtn.textContent = 'Delete';
+                deleteBtn.textContent = i18n.__('Delete');
                 deleteBtn.addEventListener('click', () => deleteHistoryItem(item.id));
                 actions.appendChild(deleteBtn);
-                
+
                 itemDiv.appendChild(actions);
                 container.appendChild(itemDiv);
             });
@@ -597,42 +625,61 @@
         function updateStats() {
             ipcRenderer.invoke("get-download-stats").then((stats) => {
                 const statsContainer = document.getElementById("statsContainer");
-                statsContainer.innerHTML = `
-                    <div class="stat-card">
-                        <h3>Total Downloads</h3>
-                        <div class="value">${stats.totalDownloads}</div>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Total Size</h3>
-                        <div class="value">${formatFileSize(stats.totalSize)}</div>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Most Common Format</h3>
-                        <div class="value">${
-                            Object.keys(stats.byFormat).length > 0
-                                ? Object.entries(stats.byFormat).sort((a, b) => b[1] - a[1])[0][0].toUpperCase()
-                                : "N/A"
-                        }</div>
-                    </div>
-                `;
+                statsContainer.innerHTML = "";
+
+                const createStatCard = (title, value) => {
+                    const card = document.createElement("div");
+                    card.className = "stat-card";
+
+                    const titleElement = document.createElement("h3");
+                    titleElement.textContent = title;
+
+                    const valueElement = document.createElement("div");
+                    valueElement.className = "value";
+                    valueElement.textContent = value;
+
+                    card.appendChild(titleElement);
+                    card.appendChild(valueElement);
+
+                    return card;
+                };
+
+                const mostCommonFormat = Object.keys(stats.byFormat).length > 0
+                    ? Object.entries(stats.byFormat).sort((a, b) => b[1] - a[1])[0][0].toUpperCase()
+                    : "N/A";
+
+                statsContainer.appendChild(createStatCard(i18n.__("Total Downloads"), stats.totalDownloads));
+                statsContainer.appendChild(createStatCard(i18n.__("Total Size"), formatFileSize(stats.totalSize)));
+                statsContainer.appendChild(createStatCard(i18n.__("Most Common Format"), mostCommonFormat));
+
             }).catch((error) => {
                 console.error("Failed to load stats:", error);
-                // Display placeholder stats on error
                 const statsContainer = document.getElementById("statsContainer");
-                statsContainer.innerHTML = `
-                    <div class="stat-card">
-                        <h3>Total Downloads</h3>
-                        <div class="value">--</div>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Total Size</h3>
-                        <div class="value">--</div>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Most Common Format</h3>
-                        <div class="value">--</div>
-                    </div>
-                `;
+                // Clear any previous content
+                statsContainer.innerHTML = "";
+
+                // Helper function for creating placeholder cards
+                const createPlaceholderCard = (title) => {
+                    const card = document.createElement("div");
+                    card.className = "stat-card";
+
+                    const titleElement = document.createElement("h3");
+                    titleElement.textContent = title;
+
+                    const valueElement = document.createElement("div");
+                    valueElement.className = "value";
+                    valueElement.textContent = "--";
+
+                    card.appendChild(titleElement);
+                    card.appendChild(valueElement);
+
+                    return card;
+                };
+
+                // Display placeholder stats on error
+                statsContainer.appendChild(createPlaceholderCard("Total Downloads"));
+                statsContainer.appendChild(createPlaceholderCard("Total Size"));
+                statsContainer.appendChild(createPlaceholderCard("Most Common Format"));
             });
         }
 
@@ -656,11 +703,15 @@
         function copyToClipboard(text) {
             const { clipboard } = require("electron");
             clipboard.writeText(text);
-            alert("URL copied to clipboard!");
+            showPopup("URL copied to clipboard!");
         }
 
         function openFile(filePath) {
-            ipcRenderer.send("show-file", filePath);
+            const result = ipcRenderer.invoke("show-file", filePath).then(result => {
+                if (result.success === false) {
+                    showPopup("The file doesn't exist anymore", true)
+                }
+            })
         }
 
         function deleteHistoryItem(id) {
@@ -670,7 +721,7 @@
                     filterHistory();
                 }).catch((error) => {
                     console.error("Failed to delete history item:", error);
-                    alert("Failed to delete history item. Please try again.");
+                    showPopup("Failed to delete history item. Please try again.", true);
                 });
             }
         }
@@ -680,7 +731,7 @@
                 downloadFile(data, "download_history.json", "application/json");
             }).catch((error) => {
                 console.error("Failed to export history as JSON:", error);
-                alert("Failed to export history as JSON. Please try again.");
+                showPopup("Failed to export history as JSON. Please try again.", true);
             });
         }
 
@@ -689,7 +740,7 @@
                 downloadFile(data, "download_history.csv", "text/csv");
             }).catch((error) => {
                 console.error("Failed to export history as CSV:", error);
-                alert("Failed to export history as CSV. Please try again.");
+                showPopup("Failed to export history as CSV. Please try again.", true);
             });
         }
 
@@ -714,9 +765,42 @@
                     filterHistory();
                 }).catch((error) => {
                     console.error("Failed to clear history:", error);
-                    alert("Failed to clear history. Please try again.");
+                    showPopup("Failed to clear history. Please try again.", true);
                 });
             }
+        }
+
+        function showPopup(text, isError = false) {
+            let popupContainer = document.getElementById("popupContainer");
+
+            if (!popupContainer) {
+                popupContainer = document.createElement("div");
+                popupContainer.id = "popupContainer";
+                popupContainer.className = "popup-container";
+                document.body.appendChild(popupContainer);
+            }
+
+            const popup = document.createElement("span");
+            popup.textContent = text;
+            popup.classList.add("popup-item");
+
+            popup.style.background = isError ? "#ff6b6b" : "#54abde";
+
+            if (isError) {
+                popup.classList.add("popup-error");
+            }
+
+            popupContainer.appendChild(popup);
+
+            setTimeout(() => {
+                popup.style.opacity = "0";
+                setTimeout(() => {
+                    popup.remove();
+                    if (popupContainer.childElementCount === 0) {
+                        popupContainer.remove();
+                    }
+                }, 400);
+            }, 2200);
         }
     </script>
 

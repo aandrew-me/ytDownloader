@@ -20,6 +20,8 @@ querySelector("#popup p").textContent = i18n.__("yt-dlp is being downloaded");
 getId("preferenceWin").textContent = i18n.__("Preferences");
 getId("aboutWin").textContent = i18n.__("About");
 getId("playlistWin").textContent = i18n.__("Download playlist");
+getId("compressorWin").textContent = i18n.__("Compressor");
+getId("historyWin").textContent = i18n.__("Download History");
 document.querySelectorAll(".formatSelect").forEach((element) => {
 	element.textContent = i18n.__("Select Format ");
 });
