@@ -164,6 +164,8 @@ function createSecondaryWindow(file) {
 			nodeIntegration: true,
 			contextIsolation: false,
 		},
+		width: 1000,
+		height: 800,
 	});
 
 	// appState.secondaryWindow.webContents.openDevTools();
@@ -282,6 +284,14 @@ function registerIpcHandlers() {
 			return {success: true};
 		} catch (error) {
 			return {success: false, error: error.message};
+		}
+	});
+
+	ipcMain.on("open-folder", async (_event, folderPath) => {
+		try {
+			await fs.stat(folderPath);
+			shell.openPath(folderPath);
+		} catch (error) {
 		}
 	});
 

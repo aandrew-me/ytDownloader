@@ -1,18 +1,23 @@
+@font-face {
+	font-family: "JetBrains";
+	src: url("../fonts/JetBrainsMono-Regular.ttf") format("truetype");
+}
+
 :root[theme="light"] {
-	--background: #fff;
-	--text: rgb(45, 45, 45);
-	--box-main: #eef4f3;
+	--background: #f9fafb;
+	--text: #1f2937;
+	--box-main: #f3f4f6;
 	--box-toggle: rgb(215 238 233);
-	--box-separation: rgb(215 238 233);
-	--box-toggleOn: rgb(28 232 138);
+	--box-separation: #e5e7eb;
+	--box-toggleOn: rgb(127, 250, 172);
 	--item-bg: #dddddd;
 	--box-shadow: none;
-	--select: rgb(127, 253, 127);
-	--greenBtn: #6ade1d;
-	--greenBtn-bottom: #54a31f;
+	--select: #a7f3d0;
+	--greenBtn: #22c55e;
+	--greenBtn-bottom: #16a34a;
 	--redBtn: #d64d4f;
 	--redBtn-bottom: #854243;
-	--blueBtn: rgb(80, 128, 230);
+	--blueBtn: #3b82f6;
 	--blueBtn-bottom: rgb(44, 78, 180);
 }
 
@@ -23,14 +28,14 @@
 	--box-toggle: #191919;
 	--box-separation: #2e2e2e;
 	--box-toggleOn: #2e2e2e;
-	--item-bg: #191919;
+	--item-bg: #2c2e31;
 	--box-shadow: none;
-	--select: rgb(68 214 141);
-	--greenBtn: #24D166;
-	--greenBtn-bottom: #3e6c20;
+	--select: #252426;
+	--greenBtn: #05aa76;
+	--greenBtn-bottom: #047652;
 	--redBtn: #c82b2d;
 	--redBtn-bottom: #803334;
-	--blueBtn: rgb(80, 128, 230);
+	--blueBtn: rgb(80, 140, 230);
 	--blueBtn-bottom: rgb(44, 78, 180);
 	--border: none;
 }
@@ -43,7 +48,7 @@
 	--box-separation: #414559;
 	--box-toggleOn: #607dc1;
 	--item-bg: #414559;
-	--select: #8caaee;
+	--select: #3b3e4a;
 	--greenBtn: #78c346;
 	--greenBtn-bottom: #597844;
 	--redBtn: #d64d4f;
@@ -54,12 +59,12 @@
 :root[theme="onedark"] {
 	--background: #282c34;
 	--text: #d2d6df;
-	--box-main: #4d515d;
+	--box-main: #3a3d46;
 	--box-toggle: #2f333d;
 	--box-separation: #2f333d;
 	--box-toggleOn: #13a3b7;
 	--item-bg: #4d515d;
-	--select: #57b6c2;
+	--select: #262c33;
 	--greenBtn: #85cf50;
 	--greenBtn-bottom: #406923;
 	--redBtn: #be2d39;
@@ -75,7 +80,7 @@
 	--box-separation: #214338;
 	--box-toggleOn: #24782e;
 	--item-bg: #214338;
-	--select: #00ff41;
+	--select: #08180f;
 	--greenBtn: #19b42b;
 	--greenBtn-bottom: #10701c;
 	--redBtn: #19b42b;
@@ -126,7 +131,7 @@
 	--box-separation: #2e4c52;
 	--box-toggleOn: #005a6f;
 	--item-bg: #003745;
-	--select: #2aa198;
+	--select: rgb(9, 57, 53);
 	--greenBtn: #859900;
 	--greenBtn-bottom: rgb(73, 84, 1);
 	--redBtn: #dc322f;
@@ -179,6 +184,11 @@ input[type="text"],
 	padding: 20px 15px;
 	border-radius: 15px;
 	background-color: var(--box-main);
+}
+
+#path {
+	font-family: "JetBrains";
+	font-size: medium;
 }
 
 #flatpakTxt {
@@ -289,12 +299,14 @@ input[type="checkbox"] {
 select {
 	padding: 15px;
 	background-color: var(--select);
+	color: var(--text);
 	border: none;
 	border-radius: 8px;
 	cursor: pointer;
 	font-size: large;
 	outline: none;
 	position: relative;
+	width: 160px;
 }
 #browserInfo {
 	cursor: pointer;

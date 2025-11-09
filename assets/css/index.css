@@ -40,12 +40,12 @@
 	--box-toggleOn: #2e2e2e;
 	--item-bg: #2c2e31;
 	--box-shadow: none;
-	--select: rgb(68 214 141);
-	--greenBtn: #24d166;
-	--greenBtn-bottom: #3e6c20;
+	--select: #252426;
+	--greenBtn: #05aa76;
+	--greenBtn-bottom: #047652;
 	--redBtn: #c82b2d;
 	--redBtn-bottom: #803334;
-	--blueBtn: rgb(80, 128, 230);
+	--blueBtn: rgb(80, 140, 230);
 	--blueBtn-bottom: rgb(44, 78, 180);
 	--border: none;
 }
@@ -58,7 +58,7 @@
 	--box-separation: #414559;
 	--box-toggleOn: #607dc1;
 	--item-bg: #414559;
-	--select: #8caaee;
+	--select: #3b3e4a;
 	--greenBtn: #78c346;
 	--greenBtn-bottom: #597844;
 	--redBtn: #d64d4f;
@@ -74,7 +74,7 @@
 	--box-separation: #2f333d;
 	--box-toggleOn: #13a3b7;
 	--item-bg: #4d515d;
-	--select: #57b6c2;
+	--select: #262c33;
 	--greenBtn: #85cf50;
 	--greenBtn-bottom: #406923;
 	--redBtn: #be2d39;
@@ -90,7 +90,7 @@
 	--box-separation: #214338;
 	--box-toggleOn: #24782e;
 	--item-bg: #214338;
-	--select: #00ff41;
+	--select: #08180f;
 	--greenBtn: #19b42b;
 	--greenBtn-bottom: #10701c;
 	--redBtn: #19b42b;
@@ -141,7 +141,7 @@
 	--box-separation: #2e4c52;
 	--box-toggleOn: #005a6f;
 	--item-bg: #003745;
-	--select: #2aa198;
+	--select: rgb(9, 57, 53);
 	--greenBtn: #859900;
 	--greenBtn-bottom: rgb(73, 84, 1);
 	--redBtn: #dc322f;
@@ -464,6 +464,7 @@ img {
 .select {
 	padding: 12px 15px;
 	background-color: var(--select);
+	color: var(--text);
 	border: none;
 	border-radius: 12px;
 	cursor: pointer;
@@ -742,6 +743,11 @@ button {
 	padding: 20px;
 	margin: 10px;
 	background-color: var(--item-bg);
+}
+
+#path {
+	font-family: "JetBrains";
+	font-size: medium;
 }
 
 #subHeader {
@@ -1062,7 +1068,7 @@ body::-webkit-scrollbar-thumb {
 #range-highlight {
 	position: absolute;
 	height: 0.25rem;
-	background-color: #2dd4bf;
+	background-color: var(--blueBtn);
 	border-radius: 9999px;
 	z-index: 1;
 }
@@ -1093,7 +1099,7 @@ input[type="range"]::-webkit-slider-thumb {
 	appearance: none;
 	width: 12px;
 	height: 32px;
-	background-color: #2dd4bf;
+	background-color: var(--blueBtn);;
 	border-radius: 9999px;
 	cursor: pointer;
 	pointer-events: auto;

@@ -262,5 +262,3 @@ const showMoreFormatOpts = localStorage.getItem("showMoreFormats");
 if (showMoreFormatOpts == "true") {
 	showMoreFormats.checked = true;
 }
-// Translation file
-require("../src/translate_preferences");

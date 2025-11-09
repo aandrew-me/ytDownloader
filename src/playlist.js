@@ -641,7 +641,7 @@ ipcRenderer.on("downloadPath", (event, downloadPath) => {
 });
 
 function openFolder(location) {
-	shell.openPath(location);
+	ipcRenderer.send("open-folder", location);
 }
 
 function closeMenu() {

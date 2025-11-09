@@ -200,7 +200,7 @@ async function startCompression() {
 				const fileSavedElement = document.createElement("b");
 				fileSavedElement.textContent = "File saved. Click to open";
 				fileSavedElement.onclick = () => {
-					shell.showItemInFolder(outputPath);
+					ipcRenderer.send("show-file", outputPath);
 				};
 				getId(itemId + "_prog").appendChild(fileSavedElement);
 				currentItemId = "";
