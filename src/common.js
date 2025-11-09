@@ -129,7 +129,6 @@ function copyErrorToClipboard() {
 
 // Popup message
 function showPopup(text) {
-	console.log("Triggered showpopup");
 	getId("popupText").textContent = text;
 	getId("popupText").style.display = "inline-block";
 	setTimeout(() => {

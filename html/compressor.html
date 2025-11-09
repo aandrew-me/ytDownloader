@@ -4,91 +4,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Compressor</title>
+    <title data-translate="compressor">Video Compressor</title>
     <link rel="stylesheet" href="../assets/css/index.css">
+    <script src="../translations/i18n-init.js" defer></script>
+    <script src="../src/compressor.js" defer></script>
 </head>
 
 <body id="compressor_body">
     <!-- Popup message -->
-    <span id="popupText">Text copied</span>
+    <span id="popupText" data-translate="copiedText">Text copied</span>
 
     <!-- Menu icon -->
     <img src="../assets/images/menu.png" alt="menu" id="menuIcon">
 
     <!-- Menu -->
     <div id="menu" class="menu">
-        <a id="homeWin" class="menuItem">Homepage</a>
-        <a id="playlistWin" class="menuItem">Download Playlist</a>
-        <a id="preferenceWin" class="menuItem">Preferences</a>
-        <a id="historyWin" class="menuItem">History</a>
-        <a id="aboutWin" class="menuItem">About</a>
+        <a id="homeWin" class="menuItem" data-translate="homepage">Homepage</a>
+        <a id="playlistWin" class="menuItem" data-translate="downloadPlaylistButton">Download Playlist</a>
+        <a id="preferenceWin" class="menuItem" data-translate="preferences">Preferences</a>
+        <a id="historyWin" class="menuItem" data-translate="downloadHistory">History</a>
+        <a id="aboutWin" class="menuItem" data-translate="about">About</a>
 
         <div class="menuDivider"></div>
 
-        <label for="themeToggle" id="themeTxt" class="menuLabel">Theme</label>
+        <label for="themeToggle" id="themeTxt" class="menuLabel" data-translate="theme">Theme</label>
         <select name="themeToggle" id="themeToggle" class="themeSelect">
-            <option id="lightTxt" value="light">Light</option>
-            <option id="darkTxt" value="dark">Dark</option>
-            <option id="frappeTxt" value="frappe">Frappé</option>
-            <option id="onedarkTxt" value="onedark">One dark</option>
-            <option id="matrixTxt" value="matrix">Matrix</option>
+            <option id="lightTxt" value="light" data-translate="themeLight">Light</option>
+            <option id="darkTxt" value="dark" data-translate="themeDark">Dark</option>
+            <option id="frappeTxt" value="frappe" data-translate="themeFrappe">Frappé</option>
+            <option id="onedarkTxt" value="onedark" data-translate="themeOneDark">One dark</option>
+            <option id="matrixTxt" value="matrix" data-translate="themeMatrix">Matrix</option>
             <option id="githubTxt" value="github">Github</option>
             <option id="latteTxt" value="latte">Latte</option>
-            <option id="solarizedDarkTxt" value="solarized-dark">Solarized Dark</option>
+            <option id="solarizedDarkTxt" value="solarized-dark" data-translate="themeSolarizedDark">Solarized Dark
+            </option>
         </select>
     </div>
 
     <div class="container">
-        <h1 id="compressor-header">Video Compressor</h1>
+        <h1 id="compressor-header" data-translate="compressor">Video Compressor</h1>
 
         <div class="drop-zone">
-            <p>Drag and drop file(s)</p>
+            <p data-translate="dragAndDropFiles">Drag and drop file(s)</p>
             <input type="file" id="fileInput" multiple hidden>
-            <label for="fileInput" class="fileinput-btn">Choose File(s)</label>
-            <div id="selected-files">No files selected</div>
+            <label for="fileInput" class="fileinput-btn" data-translate="chooseFiles">Choose File(s)</label>
+            <div id="selected-files" data-translate="noFilesSelected">No files selected</div>
         </div>
 
         <div id="settings-group-container">
             <div class="settings-group">
-                <label class="compress-label" for="extension">Video format</label>
+                <label class="compress-label" for="extension" data-translate="videoFormat">Video format</label>
                 <select class="select compress-select" id="file_extension">
                     <option value="unchanged">Unchanged</option>
                     <option value="mp4">mp4</option>
                     <option value="mkv">mkv</option>
-                    <!-- <option value="webm">webm</option> -->
                 </select>
             </div>
 
             <div class="settings-group">
-                <label class="compress-label" for="encoder">Video Encoder</label>
+                <label class="compress-label" for="encoder" data-translate="videoEncoder">Video Encoder</label>
                 <select class="select compress-select" id="encoder">
                     <option value="x264">x264</option>
                     <option value="x265">x265</option>
-
                     <option class="qsv_opt" value="qsv">x264 (Intel QSV Hardware Acceleration)</option>
-                    <option class="qsv_opt" value="hevc_qsv">x264 (Intel QSV Hardware Acceleration)</option>
-
+                    <option class="qsv_opt" value="hevc_qsv">x265 (Intel QSV Hardware Acceleration)</option>
                     <option class="amf_opt" value="amf">x264 (AMD Hardware Acceleration)</option>
                     <option class="amf_opt" value="hevc_amf">x265 (AMD Hardware Acceleration)</option>
-
                     <option class="nvidia_opt" value="nvenc">x264 (NVIDIA Hardware Acceleration)</option>
                     <option class="nvidia_opt" value="hevc_nvenc">x265 (NVIDIA Hardware Acceleration)</option>
-
                     <option class="vaapi_opt" value="vaapi">x264 (VA-API Hardware Acceleration)</option>
                     <option class="vaapi_opt" value="hevc_vaapi">x265 (VA-API Hardware Acceleration)</option>
-
                     <option class="videotoolbox_opt" value="videotoolbox">x264 (VideoToolbox Hardware Acceleration)
                     </option>
                     <option class="videotoolbox_opt" value="hevc_videotoolbox">x265 (VideoToolbox Hardware Acceleration)
                     </option>
-
-
                     <option value="copy">Copy video</option>
                 </select>
             </div>
 
             <div class="settings-group">
-                <label class="compress-label" for="compression-speed">Compression Speed</label>
+                <label class="compress-label" for="compression-speed" data-translate="compressionSpeed">Compression
+                    Speed</label>
                 <select class="select compress-select" id="compression-speed">
                     <option value="fast">Fast</option>
                     <option selected value="medium">Medium</option>
@@ -97,8 +93,7 @@
             </div>
 
             <div class="settings-group">
-                <label class="compress-label" for="video-quality">Video Quality
-                </label>
+                <label class="compress-label" for="video-quality" data-translate="videoQuality">Video Quality</label>
                 <select class="select compress-select" id="video-quality">
                     <option value="18">18 (Best quality)</option>
                     <option value="19">19</option>
@@ -139,17 +134,16 @@
             </div>
 
             <div class="settings-group">
-                <label class="compress-label" for="audio-format">Audio Format</label>
+                <label class="compress-label" for="audio-format" data-translate="audioFormat">Audio Format</label>
                 <select class="select compress-select" id="audio-format">
                     <option value="copy">Unchanged</option>
                     <option value="aac">aac</option>
                     <option value="mp3">mp3</option>
-                    <!-- <option value="libopus">opus</option> -->
                 </select>
             </div>
 
             <div class="settings-group">
-                <div class="compress-label">Output suffix</div>
+                <div class="compress-label" data-translate="outputSuffix">Output suffix</div>
                 <input type="text" name="suffix" id="output-suffix" class="select compress-select"
                     placeholder="No suffix needs different output folder" value="_compressed">
             </div>
@@ -157,19 +151,20 @@
 
         <div id="output-folder-box">
             <div class="output-folder-conf">
-                <span class="compress-label">Output in same folder</span>
+                <span class="compress-label" data-translate="outputInSameFolder">Output in same folder</span>
                 <input checked type="checkbox" name="output-folder" id="output-folder-input">
 
             </div>
             <div class="output-folder-conf">
-                <button class="blueBtn" id="custom-folder-select">Select Custom Folder</button>
+                <button class="blueBtn" id="custom-folder-select" data-translate="selectCustomFolder">Select Custom
+                    Folder</button>
                 <span id="custom-folder-path"></span>
             </div>
         </div>
 
         <div class="button-group">
-            <button class="blueBtn" id="compress-btn">Start Compression</button>
-            <button class="advancedToggle" id="cancel-btn">Cancel</button>
+            <button class="blueBtn" id="compress-btn" data-translate="startCompression">Start Compression</button>
+            <button class="advancedToggle" id="cancel-btn" data-translate="cancel">Cancel</button>
         </div>
 
     </div>
@@ -177,8 +172,6 @@
     <div id="compression-status"></div>
     </div>
 
-    <script src="../src/compressor.js">
-    </script>
 </body>
 
 </html>

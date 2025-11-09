@@ -1,5 +1,3 @@
-const path = require("path");
-const fs = require("fs");
 const {ipcRenderer} = require("electron");
 
 function normalizeLocale(locale) {
@@ -29,7 +27,7 @@ function normalizeLocale(locale) {
 	return region ? `${lang}-${region}` : lang;
 }
 
-function getLocaleSync() {
+async function getLocale() {
 	try {
 		const saved = localStorage.getItem("locale");
 		if (saved) return saved;
@@ -37,11 +35,13 @@ function getLocaleSync() {
 
 	let locale = null;
 	try {
-		locale = ipcRenderer.sendSync("get-system-locale");
+		locale = await ipcRenderer.invoke("get-system-locale");
 	} catch (e) {}
 
 	if (!locale && typeof navigator !== "undefined") {
-		locale = navigator.language || (navigator.languages && navigator.languages[0]);
+		locale =
+			navigator.language ||
+			(navigator.languages && navigator.languages[0]);
 	}
 
 	const normalized = normalizeLocale(locale || "en");
@@ -54,16 +54,21 @@ function getLocaleSync() {
 }
 
 function I18n() {
-	this.locale = getLocaleSync();
+	this.loadedLanguage = {};
+	this.locale = "en";
 
-	const localeFile = path.join(__dirname, `${this.locale}.json`);
-	const fallbackFile = path.join(__dirname, "en.json");
-
-	if (fs.existsSync(localeFile)) {
-		this.loadedLanguage = JSON.parse(fs.readFileSync(localeFile, "utf8"));
-	} else {
-		this.loadedLanguage = JSON.parse(fs.readFileSync(fallbackFile, "utf8"));
-	}
+	this.init = async () => {
+		try {
+			this.locale = await getLocale();
+			this.loadedLanguage = await ipcRenderer.invoke(
+				"get-translation",
+				this.locale
+			);
+		} catch (error) {
+			console.error("Error loading translations:", error);
+			this.loadedLanguage = {};
+		}
+	};
 
 	this.__ = function (phrase) {
 		return this.loadedLanguage[phrase] !== undefined
@@ -71,16 +76,37 @@ function I18n() {
 			: phrase;
 	};
 
+	this.translatePage = () => {
+		document.querySelectorAll("[data-translate]").forEach((element) => {
+			const key = element.getAttribute("data-translate");
+			element.textContent = this.__(key);
+		});
 
-	this.setLocale = function (newLocale) {
+		document
+			.querySelectorAll("[data-translate-placeholder]")
+			.forEach((element) => {
+				const key = element.getAttribute("data-translate-placeholder");
+				element.placeholder = this.__(key);
+			});
+
+		document
+			.querySelectorAll("[data-translate-title]")
+			.forEach((element) => {
+				const key = element.getAttribute("data-translate-title");
+				element.title = this.__(key);
+			});
+	};
+
+	this.setLocale = async function (newLocale) {
 		const normalized = normalizeLocale(newLocale);
 		localStorage.setItem("locale", normalized);
-		const file = path.join(__dirname, `${normalized}.json`);
-		const data = fs.existsSync(file)
-			? fs.readFileSync(file, "utf8")
-			: fs.readFileSync(path.join(__dirname, "en.json"), "utf8");
-		this.loadedLanguage = JSON.parse(data);
+		this.loadedLanguage = await ipcRenderer.invoke(
+			"get-translation",
+			normalized
+		);
 		this.locale = normalized;
+
+		this.translatePage();
 	};
 }
 

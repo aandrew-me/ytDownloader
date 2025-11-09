@@ -412,14 +412,16 @@
 <body>
     <div class="history-container">
         <div class="history-header">
-            <h1 id="historyTitle">Download History</h1>
-            <button id="closeBtn" class="submitBtn close-btn" onclick="window.close()">Close</button>
+            <h1 id="historyTitle" data-translate="downloadHistory">Download History</h1>
+            <button id="closeBtn" class="submitBtn close-btn" onclick="window.close()"
+                data-translate="close">Close</button>
         </div>
 
         <div class="history-controls">
-            <input type="text" class="search-box" id="searchBox" placeholder="Search by title or URL...">
+            <input type="text" class="search-box" id="searchBox" placeholder="Search by title or URL..."
+                data-translate-placeholder="searchByTitleOrUrl">
             <select class="filter-select" id="formatFilter">
-                <option value="">All Formats</option>
+                <option value="" data-translate="allFormats">All Formats</option>
                 <option value="mp4">MP4</option>
                 <option value="mp3">MP3</option>
                 <option value="m4a">M4A</option>
@@ -433,9 +435,11 @@
         <div class="history-stats" id="statsContainer"></div>
 
         <div class="action-buttons">
-            <button id="exportJsonBtn" onclick="exportHistoryJSON()">Export as JSON</button>
-            <button id="exportCsvBtn" onclick="exportHistoryCSV()">Export as CSV</button>
-            <button id="clearAllBtn" class="danger-btn" onclick="clearAllHistory()">Clear All History</button>
+            <button id="exportJsonBtn" onclick="exportHistoryJSON()" data-translate="exportAsJson">Export as
+                JSON</button>
+            <button id="exportCsvBtn" onclick="exportHistoryCSV()" data-translate="exportAsCsv">Export as CSV</button>
+            <button id="clearAllBtn" class="danger-btn" onclick="clearAllHistory()"
+                data-translate="clearAllHistory">Clear All History</button>
         </div>
 
         <div id="historyListContainer" class="history-list"></div>
@@ -443,9 +447,15 @@
 
     <div id="popupContainer" class="popup-container"></div>
 
+    <script src="../translations/i18n-init.js"></script>
+
     <script>
         const { ipcRenderer } = require("electron");
-        const i18n = new (require("../translations/i18n"))();
+
+        document.addEventListener('translations-loaded', () => {
+            window.i18n.translatePage();
+            document.title = window.i18n.__("downloadHistory")
+        });
 
         let allHistory = [];
         let filteredHistory = [];
@@ -648,9 +658,9 @@
                     ? Object.entries(stats.byFormat).sort((a, b) => b[1] - a[1])[0][0].toUpperCase()
                     : "N/A";
 
-                statsContainer.appendChild(createStatCard(i18n.__("Total Downloads"), stats.totalDownloads));
-                statsContainer.appendChild(createStatCard(i18n.__("Total Size"), formatFileSize(stats.totalSize)));
-                statsContainer.appendChild(createStatCard(i18n.__("Most Common Format"), mostCommonFormat));
+                statsContainer.appendChild(createStatCard(i18n.__("totalDownloads"), stats.totalDownloads));
+                statsContainer.appendChild(createStatCard(i18n.__("totalSize"), formatFileSize(stats.totalSize)));
+                statsContainer.appendChild(createStatCard(i18n.__("mostCommonFormat"), mostCommonFormat));
 
             }).catch((error) => {
                 console.error("Failed to load stats:", error);
@@ -703,24 +713,25 @@
         function copyToClipboard(text) {
             const { clipboard } = require("electron");
             clipboard.writeText(text);
-            showPopup("URL copied to clipboard!");
+            showPopup(i18n.__("urlCopiedToClipboard"));
         }
 
         function openFile(filePath) {
             const result = ipcRenderer.invoke("show-file", filePath).then(result => {
                 if (result.success === false) {
-                    showPopup("The file doesn't exist anymore", true)
+                    showPopup(i18n.__("fileDoesNotExist"), true)
                 }
             })
         }
 
         function deleteHistoryItem(id) {
-            if (confirm("Are you sure you want to delete this item from history?")) {
+            if (confirm(i18n.__("confirmDeleteHistoryItem"))) {
                 ipcRenderer.invoke("delete-history-item", id).then(() => {
                     loadHistory();
                     filterHistory();
                 }).catch((error) => {
                     console.error("Failed to delete history item:", error);
+                    // TODO: Translate
                     showPopup("Failed to delete history item. Please try again.", true);
                 });
             }
@@ -757,7 +768,7 @@
         function clearAllHistory() {
             if (
                 confirm(
-                    "Are you sure you want to clear all download history? This cannot be undone!"
+                    i18n.__("confirmClearAllHistory")
                 )
             ) {
                 ipcRenderer.invoke("clear-all-history").then(() => {
@@ -802,10 +813,6 @@
                 }, 400);
             }, 2200);
         }
-    </script>
-
-    <script>
-        require("../src/translate_history");
     </script>
 </body>
 

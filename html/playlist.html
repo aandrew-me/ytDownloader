@@ -5,12 +5,13 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Playlist download</title>
+    <title data-translate="downloadPlaylistButton">Playlist download</title>
     <link rel="stylesheet" href="../assets/css/index.css">
+
+    <script src="../translations/i18n-init.js" defer></script>
     <script src="../src/playlist.js" defer></script>
     <script src="../src/common.js" defer></script>
-    <!-- Translating -->
-    <script>window.i18n = new (require('../translations/i18n'));</script>
+
     <style>
         #playlistName {
             padding: 30px;
@@ -39,58 +40,60 @@
 
 <body>
     <!-- Popup message -->
-    <span id="popupText">Text copied</span>
+    <span id="popupText" data-translate="copiedText">Text copied</span>
 
     <!-- Menu icon -->
     <img src="../assets/images/menu.png" alt="menu" id="menuIcon">
 
     <!-- Menu -->
     <div id="menu" class="menu">
-        <a id="homeWin" class="menuItem">Homepage</a>
-        <a id="preferenceWin" class="menuItem">Preferences</a>
-        <a id="compressorWin" class="menuItem">Compressor</a>
-        <a id="historyWin" class="menuItem">History</a>
-        <a id="aboutWin" class="menuItem">About</a>
+        <a id="homeWin" class="menuItem" data-translate="homepage">Homepage</a>
+        <a id="preferenceWin" class="menuItem" data-translate="preferences">Preferences</a>
+        <a id="compressorWin" class="menuItem" data-translate="compressor">Compressor</a>
+        <a id="historyWin" class="menuItem" data-translate="downloadHistory">History</a>
+        <a id="aboutWin" class="menuItem" data-translate="about">About</a>
 
         <div class="menuDivider"></div>
 
-        <label for="themeToggle" id="themeTxt" class="menuLabel">Theme</label>
+        <label for="themeToggle" id="themeTxt" class="menuLabel" data-translate="theme">Theme</label>
         <select name="themeToggle" id="themeToggle" class="themeSelect">
-            <option id="lightTxt" value="light">Light</option>
-            <option id="darkTxt" value="dark">Dark</option>
-            <option id="frappeTxt" value="frappe">Frappé</option>
-            <option id="onedarkTxt" value="onedark">One dark</option>
-            <option id="matrixTxt" value="matrix">Matrix</option>
+            <option id="lightTxt" value="light" data-translate="themeLight">Light</option>
+            <option id="darkTxt" value="dark" data-translate="themeDark">Dark</option>
+            <option id="frappeTxt" value="frappe" data-translate="themeFrappe">Frappé</option>
+            <option id="onedarkTxt" value="onedark" data-translate="themeOneDark">One dark</option>
+            <option id="matrixTxt" value="matrix" data-translate="themeMatrix">Matrix</option>
             <option id="githubTxt" value="github">Github</option>
             <option id="latteTxt" value="latte">Latte</option>
-            <option id="solarizedDarkTxt" value="solarized-dark">Solarized Dark</option>
+            <option id="solarizedDarkTxt" value="solarized-dark" data-translate="themeSolarizedDark">Solarized Dark
+            </option>
         </select>
     </div>
 
     <button id="pasteLink">
-        <span id="pasteText">Click to paste video link from clipboard</span>
+        <span id="pasteText" data-translate="pastePlaylistLinkTooltip">Click to paste playlist link from
+            clipboard</span>
         <span class="paste-keys">
             <span class="key" id="pasteCtrlKey">Ctrl</span><span class="key">V</span>
         </span>
-
     </button>
 
     <div id="options">
         <img src="../assets/images/close.png" alt="close" id="closeHidden">
         <div id="btnContainer">
-            <button class="toggleBtn" id="videoToggle">Video</button>
-            <button class="toggleBtn" id="audioToggle">Audio</button>
+            <button class="toggleBtn" id="videoToggle" data-translate="video">Video</button>
+            <button class="toggleBtn" id="audioToggle" data-translate="audio">Audio</button>
         </div>
         <br>
-        <strong id="linkTitle">Link:</strong>
+        <strong id="linkTitle" data-translate="link">Link:</strong>
         <span id="link"></span>
         <br><br>
         <div id="videoBox">
-            <label id="videoFormat">Select Video Format </label>
+            <label id="videoFormat" data-translate="selectVideoFormat">Select Video Format </label>
             <select id="select" class="select">
-                <option value="best" id="bestVideoOption">Best</option>
-                <option value="worst" id="worstVideoOption">Worst</option>
-                <option value="useConfig" id="useConfigTxt">Use config file</option>
+                <option value="best" id="bestVideoOption" data-translate="best">Best</option>
+                <option value="worst" id="worstVideoOption" data-translate="qualityWorst">Worst</option>
+                <option value="useConfig" id="useConfigTxt" data-translate="useConfigFileCheckbox">Use config file
+                </option>
                 <option value="144">144p</option>
                 <option value="240">240p</option>
                 <option value="360">360p</option>
@@ -102,21 +105,21 @@
             </select>
             <br>
             <div id="typeSelectBox">
-                <label id="videoQualityTxt">Select video quality</label>
+                <label id="videoQualityTxt" data-translate="videoQuality">Select video quality</label>
                 <select id="videoTypeSelect" class="select">
-                    <option value="auto" id="autoTxt">Auto</option>
+                    <option value="auto" id="autoTxt" data-translate="auto">Auto</option>
                     <option value="mp4">Mp4</option>
                     <option value="webm">WebM</option>
                 </select>
             </div>
             <br>
-            <button class="submitBtn" id="download">Download</button>
+            <button class="submitBtn" id="download" data-translate="download">Download</button>
             <br><br>
         </div>
 
         <div id="audioBox">
 
-            <label id="audioFormat">Select Audio format </label>
+            <label id="audioFormat" data-translate="selectAudioFormat">Select Audio format </label>
             <select id="audioSelect" class="select">
                 <option value="mp3">Mp3</option>
                 <option value="m4a">M4a</option>
@@ -128,65 +131,69 @@
             </select>
             <br>
 
-            <label class="audioQualitySelect" id="audioQualitySelectTxt">Select Quality</label>
+            <label class="audioQualitySelect" id="audioQualitySelectTxt" data-translate="selectQuality">Select
+                Quality</label>
             <select id="audioQualitySelect" class="select">
-                <option id="audioQualityAuto" value="auto">Auto</option>
-                <option id="audioQualityNormal" value="5">Normal</option>
-                <option id="audioQualityBest" value="0">Best</option>
-                <option id="audioQualityGood" value="2">Good</option>
-                <option id="audioQualityBad" value="8">Bad</option>
-                <option id="audioQualityWorst" value="10">Worst</option>
+                <option id="audioQualityAuto" value="auto" data-translate="auto">Auto</option>
+                <option id="audioQualityNormal" value="5" data-translate="qualityNormal">Normal</option>
+                <option id="audioQualityBest" value="0" data-translate="best">Best</option>
+                <option id="audioQualityGood" value="2" data-translate="qualityGood">Good</option>
+                <option id="audioQualityBad" value="8" data-translate="qualityBad">Bad</option>
+                <option id="audioQualityWorst" value="10" data-translate="qualityWorst">Worst</option>
             </select>
             <br><br>
 
-            <button class="submitBtn" id="audioDownload">Download</button>
+            <button class="submitBtn" id="audioDownload" data-translate="download">Download</button>
             <br><br>
 
         </div>
 
         <br>
-        <button id="advancedToggle" class="blueBtn">More options</button>
+        <button id="advancedToggle" class="blueBtn" data-translate="moreOptions">More options</button>
         <br>
 
         <!-- Hidden -->
         <div id="advancedMenu">
             <div class="advancedItem">
-                <span id="rangeTxt">Playlist range</span>
+                <span id="rangeTxt" data-translate="playlistRange">Playlist range</span>
                 <input type="number" id="playlistIndex" class="input" placeholder="Start">:
                 <input type="number" id="playlistEnd" class="input" placeholder="End">
                 <br><br>
             </div>
 
             <div class="advancedItem">
-                <div><span id="clText">Current download location - </span><span id="path"></span></div>
+                <div><span id="clText" data-translate="currentDownloadLocation">Current download location - </span><span
+                        id="path"></span></div>
                 <br>
-                <button id="selectLocation" class="submitBtn">Select Download Location</button>
+                <button id="selectLocation" class="submitBtn" data-translate="selectDownloadLocation">Select Download
+                    Location</button>
             </div>
 
             <div class="advancedItem">
-                <p id="subHeader">Subtitles</p>
-                <span id="subTxt">Download subtitles if available</span>
+                <p id="subHeader" data-translate="subtitles">Subtitles</p>
+                <span id="subTxt" data-translate="downloadSubtitlesAvailable">Download subtitles if available</span>
                 <input id="subChecked" class="cb" type="checkbox">
             </div>
             <br>
 
-            <button class="submitBtn" id="downloadThumbnails">Download thumbnails</button>
-            <button class="submitBtn" id="saveLinks">Save video links</button>
+            <button class="submitBtn" id="downloadThumbnails" data-translate="downloadThumbnails">Download
+                thumbnails</button>
+            <button class="submitBtn" id="saveLinks" data-translate="saveVideoLinksToFile">Save video links</button>
         </div>
 
         <p id="incorrectMsgPlaylist"></p>
         <!-- Error button -->
-        <button class="advancedToggle" id="errorBtn" onclick="toggleErrorDetails()">Error Details ▼</button>
+        <button class="advancedToggle" id="errorBtn" onclick="toggleErrorDetails()" data-translate="errorDetails">Error
+            Details ▼</button>
         <div id="errorDetails" onclick="copyErrorToClipboard()"></div>
 
     </div>
 
     <h2 id="playlistName"></h2>
-    <button class="submitBtn" id="openDownloads">Open download folder</button>
+    <button class="submitBtn" id="openDownloads" data-translate="openDownloadFolder">Open download folder</button>
     <div id="list">
     </div>
 
-    <!-- <button class="advancedToggle" id="finishBtn">Finish downloading</button> -->
     <div id="goToTop"></div>
 </body>
 
