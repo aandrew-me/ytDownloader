@@ -3,7 +3,12 @@ const path = require("path");
 const {ipcRenderer, shell} = require("electron");
 const os = require("os");
 const si = require("systeminformation");
-const { existsSync } = require("fs");
+const {existsSync} = require("fs");
+
+
+document.addEventListener("translations-loaded", () => {
+	window.i18n.translatePage();
+});
 
 let menuIsOpen = false;
 
@@ -45,7 +50,7 @@ if (os.platform() === "win32") {
 			.split("\n")[0]
 			.trim();
 	} catch (error) {
-		showPopup("No ffmpeg found in PATH")
+		showPopup("No ffmpeg found in PATH");
 	}
 } else {
 	ffmpeg = `"${__dirname}/../ffmpeg"`;
@@ -57,7 +62,9 @@ if (process.env.YTDOWNLOADER_FFMPEG_PATH) {
 	if (existsSync(process.env.YTDOWNLOADER_FFMPEG_PATH)) {
 		console.log("Using YTDOWNLOADER_FFMPEG_PATH");
 	} else {
-		showPopup("You have specified YTDOWNLOADER_FFMPEG_PATH, but no file exists there.")
+		showPopup(
+			"You have specified YTDOWNLOADER_FFMPEG_PATH, but no file exists there."
+		);
 	}
 }
 

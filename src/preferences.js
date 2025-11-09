@@ -34,6 +34,12 @@ function getId(id) {
 	return document.getElementById(id);
 }
 
+document.addEventListener("translations-loaded", () => {
+	window.i18n.translatePage();
+
+	document.title = window.i18n.__("preferences");
+});
+
 getId("back").addEventListener("click", () => {
 	ipcRenderer.send("close-secondary");
 });

@@ -5,49 +5,56 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About</title>
+    <title data-translate="about">About</title>
     <link rel="stylesheet" href="../assets/css/extra.css">
 
-    <!-- Translating -->
-    <script>window.i18n = new (require('../translations/i18n'));</script>
+    <script src="../translations/i18n-init.js" defer></script>
 </head>
 
 <body>
     <div id="top">
-        <a id="back">Homepage</a>
+        <a id="back" data-translate="homepage">Homepage</a>
     </div>
     <h1>ytDownloader </h1><span id="version"></span>
 
-    <p id="txt1">ytDownloader lets you download videos and audios from hundreds of sites like Youtube, Facebook,
+    <p id="txt1" data-translate="appDescription">ytDownloader lets you download videos and audios from hundreds of sites
+        like Youtube, Facebook,
         Instagram, Tiktok, Twitter and so on</p>
 
-    <p id="txt2">It's a Free and Open Source app built on top of Node.js and Electron. yt-dlp has been used for
+    <p id="txt2" data-translate="aboutAppDescription">It's a Free and Open Source app built on top of Node.js and
+        Electron. yt-dlp has been used for
         downloading</p>
 
-    <span id="txt3">Source Code is available </span><a id="sourceLink">here</a>
+    <span id="txt3" data-translate="sourceCodeAvailable">Source Code is available </span><a id="sourceLink"
+        data-translate="here">here</a>
 
     <script>
-        require("../src/translate_about")
+        const { ipcRenderer, shell } = require("electron");
 
-        const { ipcRenderer, shell } = require("electron")
 
-        const storageTheme = localStorage.getItem("theme");
-        if (storageTheme) {
-            document.documentElement.setAttribute("theme", storageTheme)
-        }
-        ipcRenderer.send("get-version")
-        ipcRenderer.once("version", (event, version) => {
-            document.getElementById("version").textContent = version;
-        })
+        document.addEventListener('translations-loaded', () => {
+            window.i18n.translatePage();
+            
+            const storageTheme = localStorage.getItem("theme");
+            if (storageTheme) {
+                document.documentElement.setAttribute("theme", storageTheme);
+            }
 
-        document.getElementById("back").addEventListener("click", () => {
-            ipcRenderer.send("close-secondary")
-        })
-        document.getElementById("sourceLink").addEventListener("click", () => {
-            shell.openExternal("https://github.com/aandrew-me/ytDownloader")
-        })
+            ipcRenderer.send("get-version");
+            ipcRenderer.once("version", (event, version) => {
+                document.getElementById("version").textContent = version;
+            });
 
+            document.getElementById("back").addEventListener("click", () => {
+                ipcRenderer.send("close-secondary");
+            });
+
+            document.getElementById("sourceLink").addEventListener("click", () => {
+                shell.openExternal("https://github.com/aandrew-me/ytDownloader");
+            });
+        });
     </script>
+
 </body>
 
 </html>

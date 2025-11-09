@@ -7,10 +7,15 @@ const {execSync} = require("child_process");
 const {constants} = require("fs/promises");
 let url;
 const ytDlp = localStorage.getItem("ytdlp");
-console.log(`yt-dlp: ${ytDlp}`)
+console.log(`yt-dlp: ${ytDlp}`);
 const ytdlp = new YTDlpWrap(`"${ytDlp}"`);
 const downloadsDir = path.join(os.homedir(), "Downloads");
 let downloadDir = localStorage.getItem("downloadPath") || downloadsDir;
+
+
+document.addEventListener("translations-loaded", () => {
+	window.i18n.translatePage();
+});
 
 try {
 	fs.accessSync(downloadDir, constants.W_OK);
@@ -25,7 +30,6 @@ try {
 }
 
 getId("path").textContent = downloadDir;
-const i18n = new (require("../translations/i18n"))();
 let cookieArg = "";
 let browser = "";
 const formats = {
@@ -68,11 +72,9 @@ if (process.env.YTDOWNLOADER_FFMPEG_PATH) {
 	}
 }
 
-ffmpeg = `"${ffmpegPath}"`
+ffmpeg = `"${ffmpegPath}"`;
 
 console.log("ffmpeg:", ffmpeg);
-
-
 
 if (localStorage.getItem("preferredVideoQuality")) {
 	const preferredVideoQuality = localStorage.getItem("preferredVideoQuality");
@@ -732,58 +734,3 @@ getId("compressorWin").addEventListener("click", () => {
 	closeMenu();
 	ipcRenderer.send("load-win", __dirname + "/compressor.html");
 });
-
-// Translations
-getId("pasteText").textContent = i18n.__(
-	"Click to paste playlist link from clipboard"
-);
-if (os.platform() === "darwin") {
-	getId("pasteCtrlKey").textContent = "⌘";
-}
-getId("preferenceWin").textContent = i18n.__("Preferences");
-getId("aboutWin").textContent = i18n.__("About");
-getId("homeWin").textContent = i18n.__("Homepage");
-getId("linkTitle").textContent = i18n.__("Link:");
-getId("videoFormat").textContent = i18n.__("Select Quality");
-getId("audioFormat").textContent = i18n.__("Select Audio Format ");
-
-getId("download").textContent = i18n.__("Download");
-getId("audioDownload").textContent = i18n.__("Download");
-getId("bestVideoOption").textContent = i18n.__("Best");
-getId("worstVideoOption").textContent = i18n.__("Worst");
-getId("openDownloads").textContent = i18n.__("Open download folder");
-getId("videoToggle").textContent = i18n.__("Video");
-getId("audioToggle").textContent = i18n.__("Audio");
-getId("advancedToggle").textContent = i18n.__("More options");
-getId("rangeTxt").textContent = i18n.__("Playlist range");
-getId("playlistIndex").placeholder = i18n.__("Start");
-getId("playlistEnd").placeholder = i18n.__("End");
-getId("downloadThumbnails").textContent = i18n.__("Download thumbnails");
-getId("saveLinks").textContent = i18n.__("Save video links to a file");
-getId("useConfigTxt").textContent = i18n.__("Use config file");
-getId("errorBtn").textContent = i18n.__("Error Details") + " ▼";
-getId("clText").textContent = i18n.__("Current download location - ");
-getId("selectLocation").textContent = i18n.__("Select Download Location");
-getId("themeTxt").textContent = i18n.__("Theme");
-getId("autoTxt").textContent = i18n.__("Auto");
-getId("videoQualityTxt").textContent = i18n.__("Select Video Format ");
-
-getId("lightTxt").textContent = i18n.__("Light");
-getId("darkTxt").textContent = i18n.__("Dark");
-getId("frappeTxt").textContent = i18n.__("Frappé");
-getId("onedarkTxt").textContent = i18n.__("One Dark");
-getId("matrixTxt").textContent = i18n.__("Matrix");
-getId("githubTxt").textContent = i18n.__("Github");
-getId("latteTxt").textContent = i18n.__("Latte");
-getId("solarizedDarkTxt").textContent = i18n.__("Solarized Dark");
-
-getId("audioQualitySelectTxt").textContent = i18n.__("Select Quality");
-getId("audioQualityAuto").textContent = i18n.__("Auto");
-getId("audioQualityNormal").textContent = i18n.__("Normal");
-getId("audioQualityBest").textContent = i18n.__("Best");
-getId("audioQualityGood").textContent = i18n.__("Good");
-getId("audioQualityBad").textContent = i18n.__("Bad");
-getId("audioQualityWorst").textContent = i18n.__("Worst");
-
-getId("subHeader").textContent = i18n.__("Subtitles");
-getId("subTxt").textContent = i18n.__("Download subtitles if available");

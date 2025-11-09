@@ -8,92 +8,87 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>YtDownloader</title>
     <link rel="stylesheet" href="../assets/css/index.css">
+
+    <script src="../translations/i18n-init.js" defer></script>
     <script src="../src/renderer.js" defer></script>
     <script src="../src/index.js" defer></script>
     <script src="../src/common.js" defer></script>
-    <!-- Translating -->
-    <script>window.i18n = new (require('../translations/i18n'));</script>
-
 </head>
 
-<div id="popupBox">
-    <div id="popup">
-        <p>Please wait, necessary files are being downloaded</p>
-        <svg id="popupSvg" version="1.1" id="L4" xmlns="http://www.w3.org/2000/svg"
-            xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 100 100"
-            enable-background="new 0 0 0 0" xml:space="preserve">
-            <circle fill="rgb(84, 171, 222)" stroke="none" cx="6" cy="50" r="6">
-                <animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite" begin="0.1" />
-            </circle>
-            <circle fill="rgb(84, 171, 222)" stroke="none" cx="26" cy="50" r="6">
-                <animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite" begin="0.2" />
-            </circle>
-            <circle fill="rgb(84, 171, 222)" stroke="none" cx="46" cy="50" r="6">
-                <animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite" begin="0.3" />
-            </circle>
-        </svg>
-    </div>
-</div>
-
-<div id="popupBoxMac">
-    <div id="popupMac">
-        <p id="popupMacTxt">You need to download yt-dlp from homebrew first</p>
-
-        <div style="display: flex;">
-            <a class="blueBtn" id="openHomebrew" target="_blank" href="https://formulae.brew.sh/formula/yt-dlp">Open
-                Homebrew</a>
-
-            <button class="advancedToggle" onclick="quitApp()">Close App</button>
-
-        </div>
-
-
-    </div>
-</div>
-
-<!-- Popup message -->
-<span id="popupText">Text copied</span>
-
 <body>
+
+    <div id="popupBox">
+        <div id="popup">
+            <p data-translate="downloadingNecessaryFilesWait">Please wait, necessary files are being downloaded</p>
+            <svg id="popupSvg" version="1.1" id="L4" xmlns="http://www.w3.org/2000/svg"
+                xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 100 100"
+                enable-background="new 0 0 0 0" xml:space="preserve">
+                <circle fill="rgb(84, 171, 222)" stroke="none" cx="6" cy="50" r="6">
+                    <animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite" begin="0.1" />
+                </circle>
+                <circle fill="rgb(84, 171, 222)" stroke="none" cx="26" cy="50" r="6">
+                    <animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite" begin="0.2" />
+                </circle>
+                <circle fill="rgb(84, 171, 222)" stroke="none" cx="46" cy="50" r="6">
+                    <animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite" begin="0.3" />
+                </circle>
+            </svg>
+        </div>
+    </div>
+
+    <div id="popupBoxMac">
+        <div id="popupMac">
+            <p id="popupMacTxt" data-translate="homebrewYtDlpWarning">You need to download yt-dlp from homebrew first
+            </p>
+            <div style="display: flex;">
+                <a class="blueBtn" id="openHomebrew" target="_blank" href="https://formulae.brew.sh/formula/yt-dlp"
+                    data-translate="openHomebrew">Open Homebrew</a>
+                <button class="advancedToggle" onclick="quitApp()" data-translate="close">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Popup message -->
+    <span id="popupText" data-translate="copiedText">Text copied</span>
 
     <!-- Menu icon -->
     <img src="../assets/images/menu.png" alt="menu" id="menuIcon">
 
     <!-- Menu -->
     <div id="menu" class="menu">
-        <a id="playlistWin" class="menuItem">Download Playlist</a>
-        <a id="preferenceWin" class="menuItem">Preferences</a>
-        <a id="compressorWin" class="menuItem">Compressor</a>
-        <a id="historyWin" class="menuItem">History</a>
-        <a id="aboutWin" class="menuItem">About</a>
+        <a id="playlistWin" class="menuItem" data-translate="downloadPlaylistButton">Download Playlist</a>
+        <a id="preferenceWin" class="menuItem" data-translate="preferences">Preferences</a>
+        <a id="compressorWin" class="menuItem" data-translate="compressor">Compressor</a>
+        <a id="historyWin" class="menuItem" data-translate="downloadHistory">History</a>
+        <a id="aboutWin" class="menuItem" data-translate="about">About</a>
 
         <div class="menuDivider"></div>
 
-        <label for="themeToggle" id="themeTxt" class="menuLabel">Theme</label>
+        <label for="themeToggle" id="themeTxt" class="menuLabel" data-translate="theme">Theme</label>
         <select name="themeToggle" id="themeToggle" class="themeSelect">
-            <option id="lightTxt" value="light">Light</option>
-            <option id="darkTxt" value="dark">Dark</option>
-            <option id="frappeTxt" value="frappe">Frappé</option>
-            <option id="onedarkTxt" value="onedark">One dark</option>
-            <option id="matrixTxt" value="matrix">Matrix</option>
+            <option id="lightTxt" value="light" data-translate="themeLight">Light</option>
+            <option id="darkTxt" value="dark" data-translate="themeDark">Dark</option>
+            <option id="frappeTxt" value="frappe" data-translate="themeFrappe">Frappé</option>
+            <option id="onedarkTxt" value="onedark" data-translate="themeOneDark">One dark</option>
+            <option id="matrixTxt" value="matrix" data-translate="themeMatrix">Matrix</option>
             <option id="githubTxt" value="github">Github</option>
             <option id="latteTxt" value="latte">Latte</option>
-            <option id="solarizedDarkTxt" value="solarized-dark">Solarized Dark</option>
+            <option id="solarizedDarkTxt" value="solarized-dark" data-translate="themeSolarizedDark">Solarized Dark
+            </option>
         </select>
     </div>
 
 
     <button id="pasteUrl">
-        <span id="pasteText">Click to paste video link from clipboard</span>
+        <span id="pasteText" data-translate="pasteText">Click to paste video link from clipboard</span>
         <span class="paste-keys">
             <span class="key" id="pasteCtrlKey">Ctrl</span><span class="key">V</span>
         </span>
-
     </button>
 
 
     <div id="loadingWrapper">
-        <span id="processing">Loading </span>
+        <span id="processing" data-translate="processing">Loading </span>
         <svg version="1.1" id="L4" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
             y="0px" viewBox="0 0 100 100" enable-background="new 0 0 0 0" xml:space="preserve">
             <circle fill="rgb(84, 171, 222)" stroke="none" cx="6" cy="50" r="6">
@@ -108,24 +103,25 @@
         </svg>
     </div>
     <p id="incorrectMsg"></p>
-    <button class="advancedToggle" id="errorBtn" onclick="toggleErrorDetails()">Error Details ▼</button>
+    <button class="advancedToggle" id="errorBtn" onclick="toggleErrorDetails()" data-translate="errorDetails">Error
+        Details ▼</button>
     <div id="errorDetails" onclick="copyErrorToClipboard()"></div>
     <br>
 
     <div id="hidden">
         <img src="../assets/images/close.png" alt="close" id="closeHidden">
         <div id="btnContainer">
-            <button class="toggleBtn" id="videoToggle">Video</button>
-            <button class="toggleBtn" id="audioToggle">Audio</button>
+            <button class="toggleBtn" id="videoToggle" data-translate="video">Video</button>
+            <button class="toggleBtn" id="audioToggle" data-translate="audio">Audio</button>
         </div>
-        <p id="title">Title </p>
+        <p id="title" data-translate="title">Title </p>
 
         <div class="videoAudioContainer">
             <!-- Video tab -->
             <div id="videoList">
                 <div class="separationBox">
-                    <h2 id="videoHeader">Video</h2>
-                    <label class="formatSelect">Select Format </label>
+                    <h2 id="videoHeader" data-translate="video">Video</h2>
+                    <label class="formatSelect" data-translate="selectFormat">Select Format </label>
                     <select id="videoFormatSelect" class="select">
                     </select>
                     <br>
@@ -133,8 +129,8 @@
 
                     <!-- Audio options for video -->
                     <div id="audioForVideo">
-                        <h2 id="audioHeader">Audio</h2>
-                        <label class="formatSelect">Select Audio Format </label>
+                        <h2 id="audioHeader" data-translate="audio">Audio</h2>
+                        <label class="formatSelect" data-translate="selectAudioFormat">Select Audio Format </label>
                         <select id="audioForVideoFormatSelect" class="select">
                         </select>
                         <br>
@@ -143,77 +139,69 @@
                     <br>
                 </div>
 
-
                 <br>
-                <button class="submitBtn" id="videoDownload">Download</button>
-                <button id="advancedVideoToggle" class="blueBtn" onClick="advancedToggle()">More options</button>
+                <button class="submitBtn" id="videoDownload" data-translate="download">Download</button>
+                <button id="advancedVideoToggle" class="blueBtn" onClick="advancedToggle()"
+                    data-translate="moreOptions">More options</button>
             </div>
 
             <!-- Audio tab -->
             <div id="audioList">
                 <div id="audioPresent">
-                    <label class="formatSelect">Select Format </label>
+                    <label class="formatSelect" data-translate="selectFormat">Select Format </label>
                     <select id="audioFormatSelect" class="select">
                     </select>
                     <br>
                     <input type="hidden" name="url" class="url">
-                    <button class="submitBtn" id="audioDownload">Download</button>
-                    <button id="advancedAudioToggle" class="blueBtn" onClick="advancedToggle()">More options</button>
+                    <button class="submitBtn" id="audioDownload" data-translate="download">Download</button>
+                    <button id="advancedAudioToggle" class="blueBtn" onClick="advancedToggle()"
+                        data-translate="moreOptions">More options</button>
                 </div>
             </div>
         </div>
 
         <div id="advanced">
-            <!-- <div class="advancedItem">
-                <p>Custom yt-dlp arguments</p>
-                <input type="text" id="argInput">
-            </div> -->
             <div class="advancedItem">
-                <span id="quitTxt">Close app when download finishes</span>
+                <span id="quitTxt" data-translate="closeAppOnFinish">Close app when download finishes</span>
                 <input type="checkbox" id="quitChecked" class="cb">
             </div>
 
             <div class="advancedItem">
-                <strong id="rangeText">Download particular time-range</strong>
+                <strong id="rangeText" data-translate="downloadTimeRange">Download particular time-range</strong>
                 <br><br>
-
                 <div class="slider-wrapper">
                     <input type="text" id="min-time" class="time-display" value="0:00:00">
-
                     <div class="slider-container">
                         <div class="track-background"></div>
-
                         <div id="range-highlight"></div>
-
                         <input type="range" id="min-slider" min="0" max="0" value="0">
                         <input type="range" id="max-slider" min="0" max="0" value="0">
                     </div>
-
                     <input type="text" id="max-time" class="time-display" value="0:00:00">
                 </div>
             </div>
 
-
             <div class="advancedItem">
-                <div><span id="clText">Current download location - </span><span id="path"></span></div>
+                <div><span id="clText" data-translate="currentDownloadLocation">Current download location - </span><span
+                        id="path"></span></div>
                 <br>
-                <button id="selectLocation" class="submitBtn">Select Download Location</button>
+                <button id="selectLocation" class="submitBtn" data-translate="selectDownloadLocation">Select Download
+                    Location</button>
             </div>
 
             <div class="advancedItem">
-                <p id="subHeader">Subtitles</p>
-                <span id="subTxt">Download subtitles if available</span>
+                <p id="subHeader" data-translate="subtitles">Subtitles</p>
+                <span id="subTxt" data-translate="downloadSubtitlesAvailable">Download subtitles if available</span>
                 <input id="subChecked" class="cb" type="checkbox">
             </div>
-
         </div>
 
         <!-- Extraction options start -->
         <div id="audioExtract">
-            <h2 id="extractHeader">Extract Audio</h2>
+            <h2 id="extractHeader" data-translate="extractAudio">Extract Audio</h2>
             <div>
                 <div>
-                    <label class="formatSelect">Select Format </label>
+                    <label class="formatSelect" data-translate="selectFormat">Select Format </label>
                     <select id="extractSelection" class="select audioSelect">
                         <option value="mp3">Mp3</option>
                         <option value="m4a">M4a</option>
@@ -226,34 +214,38 @@
                 </div>
 
                 <div>
-                    <label class="extractQualitySelect" id="extractQualitySelectTxt">Select Quality</label>
+                    <label class="extractQualitySelect" id="extractQualitySelectTxt"
+                        data-translate="selectQuality">Select
+                        Quality</label>
                     <select id="extractQualitySelect" class="select audioSelect">
-                        <option id="extractQualityNormal" value="5">Normal</option>
-                        <option id="extractQualityBest" value="0">Best</option>
-                        <option id="extractQualityGood" value="2">Good</option>
-                        <option id="extractQualityBad" value="8">Bad</option>
-                        <option id="extractQualityWorst" value="10">Worst</option>
+                        <option id="extractQualityNormal" value="5" data-translate="qualityNormal">Normal</option>
+                        <option id="extractQualityBest" value="0" data-translate="best">Best</option>
+                        <option id="extractQualityGood" value="2" data-translate="qualityGood">Good</option>
+                        <option id="extractQualityBad" value="8" data-translate="qualityBad">Bad</option>
+                        <option id="extractQualityWorst" value="10" data-translate="qualityWorst">Worst</option>
                     </select>
                 </div>
             </div>
 
-
             <br>
-            <button id="extractBtn">Extract</button>
+            <button id="extractBtn" data-translate="extract">Extract</button>
         </div>
-
         <!-- Extraction options end -->
-
     </div>
+
     <!-- Downloads list -->
     <div id="list"></div>
 
-    <button class="blueBtn" id="clearBtn">Clear Downloads</button>
+    <button class="blueBtn" id="clearBtn" data-translate="clearDownloads">Clear Downloads</button>
 
     <div id="goToTop"></div>
 
     <script>
-        require("../src/translate_index")
+        const os = require("os")
+
+        if (os.platform() === "darwin") {
+            document.getElementById("pasteCtrlKey").textContent = "⌘";
+        }
     </script>
 
 </body>

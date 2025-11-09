@@ -10,6 +10,7 @@ const {
 } = require("electron");
 const {autoUpdater} = require("electron-updater");
 const fs = require("fs").promises;
+const {existsSync, readFileSync} = require("fs");
 const path = require("path");
 const DownloadHistory = require("./src/history");
 
@@ -266,6 +267,13 @@ function registerIpcHandlers() {
 		event.sender.send("version", app.getVersion());
 	});
 
+	ipcMain.on("show-file", async (_event, fullPath) => {
+		try {
+			await fs.stat(fullPath);
+			shell.showItemInFolder(fullPath);
+		} catch (error) {}
+	});
+
 	ipcMain.handle("show-file", async (_event, fullPath) => {
 		try {
 			await fs.stat(fullPath);
@@ -366,6 +374,30 @@ function registerIpcHandlers() {
 
 	ipcMain.on("get-system-locale", (event) => {
 		event.returnValue = app.getSystemLocale();
+	});
+
+	ipcMain.handle("get-translation", (_event, locale) => {
+		const fallbackFile = path.join(__dirname, "translations", "en.json");
+		const localeFile = path.join(
+			__dirname,
+			"translations",
+			`${locale}.json`
+		);
+
+		const fallbackData = JSON.parse(readFileSync(fallbackFile, "utf8"));
+
+		let localeData = {};
+		if (locale !== "en" && existsSync(localeFile)) {
+			try {
+				localeData = JSON.parse(readFileSync(localeFile, "utf8"));
+			} catch (e) {
+				console.error(`Could not parse ${localeFile}`, e);
+			}
+		}
+
+		const mergedTranslations = {...fallbackData, ...localeData};
+
+		return mergedTranslations;
 	});
 
 	ipcMain.handle("get-download-history", () =>

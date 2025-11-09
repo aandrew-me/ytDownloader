@@ -6,8 +6,6 @@ const {join} = require("path");
 const {mkdirSync, accessSync, promises, existsSync} = require("fs");
 const {execSync, spawn} = require("child_process");
 
-const i18n = new (require("../translations/i18n"))();
-
 const CONSTANTS = {
 	DOM_IDS: {
 		// Main UI
@@ -128,6 +126,8 @@ class YtDownloaderApp {
 	 * and attaching event listeners.
 	 */
 	async initialize() {
+		await this._initializeTranslations();
+		
 		this._setupDirectories();
 		this._configureTray();
 		this._configureAutoUpdate();
@@ -230,6 +230,18 @@ class YtDownloaderApp {
 			autoUpdate = false;
 		}
 		ipcRenderer.send("autoUpdate", autoUpdate);
+	}
+
+	/**
+	 * Waits for the i18n module to load and then translates the static page content.
+	 */
+	async _initializeTranslations() {
+		return new Promise(resolve => {
+			document.addEventListener('translations-loaded', () => {
+				window.i18n.translatePage();
+				resolve();
+			}, { once: true });
+		});
 	}
 
 	/**
@@ -344,7 +356,7 @@ class YtDownloaderApp {
 			$(CONSTANTS.DOM_IDS.POPUP_BOX).style.display = "block";
 			$(CONSTANTS.DOM_IDS.POPUP_SVG).style.display = "inline";
 			document.querySelector("#popupBox p").textContent = i18n.__(
-				"Please wait, necessary files are being downloaded"
+				"downloadingNecessaryFilesWait"
 			);
 
 			try {
@@ -358,7 +370,7 @@ class YtDownloaderApp {
 			} catch (downloadError) {
 				console.error("Failed to download yt-dlp:", downloadError);
 				document.querySelector("#popupBox p").textContent = i18n.__(
-					"Failed to download necessary files. Please check your network and try again"
+					"errorFailedFileDownload"
 				);
 				$(CONSTANTS.DOM_IDS.POPUP_SVG).style.display = "none";
 				throw new Error("Failed to download yt-dlp.");
@@ -453,7 +465,9 @@ class YtDownloaderApp {
 				$(CONSTANTS.DOM_IDS.PASTE_URL_BTN).classList.add("active");
 
 				setTimeout(() => {
-					$(CONSTANTS.DOM_IDS.PASTE_URL_BTN).classList.remove("active");
+					$(CONSTANTS.DOM_IDS.PASTE_URL_BTN).classList.remove(
+						"active"
+					);
 				}, 150);
 
 				this.pasteAndGetInfo();
@@ -709,7 +723,7 @@ class YtDownloaderApp {
 			})
 			.once("ytDlpEvent", () => {
 				const el = $(`${randomId}_prog`);
-				if (el) el.textContent = i18n.__("Downloading...");
+				if (el) el.textContent = i18n.__("downloading");
 			})
 			.once("close", (code) => {
 				this._handleDownloadCompletion(
@@ -739,12 +753,12 @@ class YtDownloaderApp {
 						job.thumbnail || "../assets/images/thumb.png"
 					}" alt="thumbnail" class="itemIcon" crossorigin="anonymous">
                     <span class="itemType">${i18n.__(
-						job.type === "video" ? "Video" : "Audio"
+						job.type === "video" ? "video" : "audio"
 					)}</span>
                 </div>
                 <div class="itemBody">
                     <div class="itemTitle">${job.title}</div>
-                    <p>${i18n.__("Download pending...")}</p>
+                    <p>${i18n.__("preparing")}</p>
                 </div>
             </div>`;
 		$(CONSTANTS.DOM_IDS.DOWNLOAD_LIST).insertAdjacentHTML(
@@ -937,7 +951,7 @@ class YtDownloaderApp {
 		console.error("Download Error:", error);
 		const progressEl = $(`${randomId}_prog`);
 		if (progressEl) {
-			progressEl.textContent = i18n.__("Error. Hover for details.");
+			progressEl.textContent = i18n.__("errorHoverForDetails");
 			progressEl.title = error.message;
 		}
 		this._processQueue();
@@ -1036,7 +1050,7 @@ class YtDownloaderApp {
 			const size = format.filesize || format.filesize_approx;
 			const displaySize = size
 				? `${(size / 1000000).toFixed(2)} MB`
-				: i18n.__("Unknown size");
+				: i18n.__("unknownSize");
 
 			if (format.video_ext !== "none" && format.vcodec !== "none") {
 				if (
@@ -1080,7 +1094,7 @@ class YtDownloaderApp {
 
 				const audioExt = format.ext === "webm" ? "opus" : format.ext;
 				const formatNote =
-					i18n.__(format.format_note) || i18n.__("Unknown quality");
+					i18n.__(format.format_note) || i18n.__("unknownQuality");
 				const option = `<option value="${
 					format.format_id
 				}|${audioExt}">${formatNote.padEnd(
@@ -1111,7 +1125,7 @@ class YtDownloaderApp {
 		titleContainer.innerHTML = ""; // Clear previous content
 		titleContainer.append(
 			Object.assign(document.createElement("b"), {
-				textContent: i18n.__("Title ") + ": ",
+				textContent: i18n.__("title") + ": ",
 			}),
 			Object.assign(document.createElement("input"), {
 				className: "title",
@@ -1144,7 +1158,7 @@ class YtDownloaderApp {
 						job.thumbnail || "../assets/images/thumb.png"
 					}" alt="thumbnail" class="itemIcon" crossorigin="anonymous">
                     <span class="itemType">${i18n.__(
-						job.type === "video" ? "Video" : "Audio"
+						job.type === "video" ? "video" : "audio"
 					)}</span>
                 </div>
                 <img src="../assets/images/close.png" class="itemClose" id="${randomId}_close">
@@ -1152,7 +1166,7 @@ class YtDownloaderApp {
                     <div class="itemTitle">${job.title}</div>
                     <strong class="itemSpeed" id="${randomId}_speed"></strong>
                     <div id="${randomId}_prog" class="itemProgress">${i18n.__(
-			"Preparing..."
+			"preparing"
 		)}</div>
                 </div>
             </div>`;
@@ -1176,10 +1190,10 @@ class YtDownloaderApp {
 
 		if (progress.percent === 100) {
 			speedEl.textContent = "";
-			progEl.textContent = i18n.__("Processing...");
+			progEl.textContent = i18n.__("processing");
 			ipcRenderer.send("progress", 0);
 		} else {
-			speedEl.textContent = `${i18n.__("Speed")}: ${
+			speedEl.textContent = `${i18n.__("speed")}: ${
 				progress.currentSpeed || "0 B/s"
 			}`;
 			progEl.innerHTML = `<progress class="progressBar" value="${progress.percent}" max="100"></progress>`;
@@ -1199,7 +1213,7 @@ class YtDownloaderApp {
 
 		progressEl.innerHTML = ""; // Clear progress bar
 		const link = document.createElement("b");
-		link.textContent = i18n.__("File saved. Click to Open");
+		link.textContent = i18n.__("fileSavedClickToOpen");
 		link.style.cursor = "pointer";
 		link.onclick = () => {
 			ipcRenderer.send("show-file", fullPath);
@@ -1242,13 +1256,12 @@ class YtDownloaderApp {
 	 * Shows an error message in the main UI.
 	 */
 	_showError(errorMessage, url) {
-		$(CONSTANTS.DOM_IDS.INCORRECT_MSG).textContent = i18n.__(
-			"An error occurred. Check your network and URL."
-		);
+		$(CONSTANTS.DOM_IDS.INCORRECT_MSG).textContent =
+			i18n.__("errorNetworkOrUrl");
 		$(CONSTANTS.DOM_IDS.ERROR_BTN).style.display = "inline-block";
 		const errorDetails = $(CONSTANTS.DOM_IDS.ERROR_DETAILS);
 		errorDetails.innerHTML = `<strong>URL: ${url}</strong><br><br>${errorMessage}`;
-		errorDetails.title = i18n.__("Click to copy details");
+		errorDetails.title = i18n.__("clickToCopy");
 	}
 
 	/**
