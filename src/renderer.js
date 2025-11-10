@@ -127,7 +127,7 @@ class YtDownloaderApp {
 	 */
 	async initialize() {
 		await this._initializeTranslations();
-		
+
 		this._setupDirectories();
 		this._configureTray();
 		this._configureAutoUpdate();
@@ -236,11 +236,15 @@ class YtDownloaderApp {
 	 * Waits for the i18n module to load and then translates the static page content.
 	 */
 	async _initializeTranslations() {
-		return new Promise(resolve => {
-			document.addEventListener('translations-loaded', () => {
-				window.i18n.translatePage();
-				resolve();
-			}, { once: true });
+		return new Promise((resolve) => {
+			document.addEventListener(
+				"translations-loaded",
+				() => {
+					window.i18n.translatePage();
+					resolve();
+				},
+				{once: true}
+			);
 		});
 	}
 
@@ -998,8 +1002,9 @@ class YtDownloaderApp {
 		$(CONSTANTS.DOM_IDS.ERROR_DETAILS).style.display = "none";
 		$(CONSTANTS.DOM_IDS.VIDEO_FORMAT_SELECT).innerHTML = "";
 		$(CONSTANTS.DOM_IDS.AUDIO_FORMAT_SELECT).innerHTML = "";
+		const noAudioTxt = i18n.__("noAudio");
 		$(CONSTANTS.DOM_IDS.AUDIO_FOR_VIDEO_FORMAT_SELECT).innerHTML =
-			'<option value="none|none">No Audio</option>';
+			`<option value="none|none">${noAudioTxt}</option>`;
 	}
 
 	/**
@@ -1013,11 +1018,42 @@ class YtDownloaderApp {
 			CONSTANTS.DOM_IDS.AUDIO_FOR_VIDEO_FORMAT_SELECT
 		);
 
+		const NBSP = " ";
+
+		let maxVideoQualityLen = 0;
+		let maxAudioQualityLen = 0;
+
+		formats.forEach((format) => {
+			if (format.video_ext !== "none" && format.vcodec !== "none") {
+				const quality = `${format.height || "???"}p${
+					format.fps === 60 ? "60" : ""
+				}`;
+				if (quality.length > maxVideoQualityLen) {
+					maxVideoQualityLen = quality.length;
+				}
+			} else if (
+				format.acodec !== "none" &&
+				format.video_ext === "none"
+			) {
+				const formatNote =
+					i18n.__(format.format_note) || i18n.__("unknownQuality");
+				if (formatNote.length > maxAudioQualityLen) {
+					maxAudioQualityLen = formatNote.length;
+				}
+			}
+		});
+
+		const videoQualityPadding = maxVideoQualityLen;
+		const audioQualityPadding = maxAudioQualityLen;
+
+		const extPadding = 5; // "mp4", "webm"
+		const vcodecPadding = 5; // "avc1", "vp9"
+		const filesizePadding = 10; // "12.48 MB"
+
 		const {videoQuality, videoCodec, showMoreFormats} =
 			this.state.preferences;
 		let bestMatchHeight = 0;
 
-		// Find the best available video height based on preference
 		formats.forEach((f) => {
 			if (
 				f.height &&
@@ -1033,8 +1069,6 @@ class YtDownloaderApp {
 				...formats.filter((f) => f.height).map((f) => f.height)
 			);
 		}
-
-		// Determine preferred codec for the best height
 		const availableCodecs = new Set(
 			formats
 				.filter((f) => f.height === bestMatchHeight && f.vcodec)
@@ -1043,7 +1077,6 @@ class YtDownloaderApp {
 		const finalCodec = availableCodecs.has(videoCodec)
 			? videoCodec
 			: [...availableCodecs].pop();
-
 		let isAVideoSelected = false;
 
 		formats.forEach((format) => {
@@ -1073,18 +1106,21 @@ class YtDownloaderApp {
 					format.fps === 60 ? "60" : ""
 				}`;
 				const vcodec = showMoreFormats
-					? `| ${format.vcodec?.split(".")[0]}`
+					? format.vcodec?.split(".")[0] || ""
 					: "";
 				const hasAudio = format.acodec !== "none" ? " 🔊" : "";
+
+				const col1 = quality.padEnd(videoQualityPadding + 1, NBSP);
+				const col2 = format.ext.padEnd(extPadding, NBSP);
+				const col3 = vcodec.padEnd(vcodecPadding, NBSP);
+				const col4 = displaySize.padEnd(filesizePadding, NBSP);
 
 				const option = `<option value="${format.format_id}|${
 					format.ext
 				}|${format.height}" ${
 					isSelected ? "selected" : ""
-				}>${quality.padEnd(9, " ")} | ${format.ext.padEnd(
-					5,
-					" "
-				)} ${vcodec} | ${displaySize} ${hasAudio}</option>`;
+				}>${col1} | ${col2} | ${col3} | ${col4}${hasAudio}</option>`;
+
 				videoSelect.innerHTML += option;
 			} else if (
 				format.acodec !== "none" &&
@@ -1095,14 +1131,25 @@ class YtDownloaderApp {
 				const audioExt = format.ext === "webm" ? "opus" : format.ext;
 				const formatNote =
 					i18n.__(format.format_note) || i18n.__("unknownQuality");
-				const option = `<option value="${
-					format.format_id
-				}|${audioExt}">${formatNote.padEnd(
-					15,
-					" "
-				)} | ${audioExt.padEnd(5, " ")} | ${displaySize}</option>`;
-				audioSelect.innerHTML += option;
-				audioForVideoSelect.innerHTML += option;
+
+				const audioExtPadded = audioExt.padEnd(
+					extPadding,
+					NBSP
+				);
+
+				const audioQualityPadded = formatNote.padEnd(
+					audioQualityPadding,
+					NBSP
+				);
+				const audioSizePadded = displaySize.padEnd(
+					filesizePadding,
+					NBSP
+				);
+
+				const option_audio = `<option value="${format.format_id}| ${audioExt}">${audioQualityPadded} | ${audioExtPadded} | ${audioSizePadded}</option>`;
+
+				audioSelect.innerHTML += option_audio;
+				audioForVideoSelect.innerHTML += option_audio;
 			}
 		});
 
