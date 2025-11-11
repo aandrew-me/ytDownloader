@@ -343,9 +343,15 @@ class YtDownloaderApp {
 					)
 				);
 
-				updateProc.stdout.on("data", (data) =>
-					console.log("yt-dlp update check:", data.toString())
-				);
+				updateProc.stdout.on("data", (data) => {
+					console.log("yt-dlp update check:", data.toString());
+
+					if (data.toString().toLowerCase().includes("updating to")) {
+						this._showPopup(i18n.__("updatingYtdlp"))
+					} else if (data.toString().toLowerCase().includes("updated yt-dlp to")) {
+						this._showPopup(i18n.__("updatedYtdlp"))
+					}
+				});
 			} catch {
 				console.warn("yt-dlp path not found, no update performed.");
 			}
@@ -504,7 +510,7 @@ class YtDownloaderApp {
 		$(CONSTANTS.DOM_IDS.ERROR_DETAILS).addEventListener("click", (e) => {
 			// @ts-ignore
 			clipboard.writeText(e.target.innerText);
-			this._showPopup("Copied error details to clipboard.");
+			this._showPopup(i18n.__("copiedText"), false);
 		});
 
 		// IPC listeners
@@ -1003,8 +1009,9 @@ class YtDownloaderApp {
 		$(CONSTANTS.DOM_IDS.VIDEO_FORMAT_SELECT).innerHTML = "";
 		$(CONSTANTS.DOM_IDS.AUDIO_FORMAT_SELECT).innerHTML = "";
 		const noAudioTxt = i18n.__("noAudio");
-		$(CONSTANTS.DOM_IDS.AUDIO_FOR_VIDEO_FORMAT_SELECT).innerHTML =
-			`<option value="none|none">${noAudioTxt}</option>`;
+		$(
+			CONSTANTS.DOM_IDS.AUDIO_FOR_VIDEO_FORMAT_SELECT
+		).innerHTML = `<option value="none|none">${noAudioTxt}</option>`;
 	}
 
 	/**
@@ -1132,10 +1139,7 @@ class YtDownloaderApp {
 				const formatNote =
 					i18n.__(format.format_note) || i18n.__("unknownQuality");
 
-				const audioExtPadded = audioExt.padEnd(
-					extPadding,
-					NBSP
-				);
+				const audioExtPadded = audioExt.padEnd(extPadding, NBSP);
 
 				const audioQualityPadded = formatNote.padEnd(
 					audioQualityPadding,
@@ -1329,12 +1333,36 @@ class YtDownloaderApp {
 	/**
 	 * Displays a temporary popup message.
 	 */
-	_showPopup(text) {
-		const popup = $(CONSTANTS.DOM_IDS.POPUP_TEXT);
+	_showPopup(text, isError = false) {
+		let popupContainer = document.getElementById("popupContainer");
+
+		if (!popupContainer) {
+			popupContainer = document.createElement("div");
+			popupContainer.id = "popupContainer";
+			popupContainer.className = "popup-container";
+			document.body.appendChild(popupContainer);
+		}
+
+		const popup = document.createElement("span");
 		popup.textContent = text;
-		popup.style.display = "inline-block";
+		popup.classList.add("popup-item");
+
+		popup.style.background = isError ? "#ff6b6b" : "#54abde";
+
+		if (isError) {
+			popup.classList.add("popup-error");
+		}
+
+		popupContainer.appendChild(popup);
+
 		setTimeout(() => {
-			popup.style.display = "none";
+			popup.style.opacity = "0";
+			setTimeout(() => {
+				popup.remove();
+				if (popupContainer.childElementCount === 0) {
+					popupContainer.remove();
+				}
+			}, 400);
 		}, 2200);
 	}
 

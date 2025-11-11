@@ -543,7 +543,8 @@ input[type="number"]::-webkit-outer-spin-button {
 	border: none;
 }
 
-#pasteUrl, #pasteLink {
+#pasteUrl,
+#pasteLink {
 	--greenTop: #34d399;
 	--greenBottom: #059669;
 	--greenHover: #10b981;
@@ -568,7 +569,8 @@ input[type="number"]::-webkit-outer-spin-button {
 	font-weight: bold;
 }
 
-#pasteUrl:hover, #pasteLink:hover  {
+#pasteUrl:hover,
+#pasteLink:hover {
 	background: linear-gradient(
 		to bottom right,
 		var(--greenHover),
@@ -578,7 +580,8 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 #pasteUrl:active,
-#pasteUrl.active, #pasteLink:active {
+#pasteUrl.active,
+#pasteLink:active {
 	background: linear-gradient(
 		to bottom right,
 		var(--greenActive),
@@ -792,19 +795,31 @@ body::-webkit-scrollbar-thumb {
 	cursor: pointer;
 }
 
-#popupText {
-	display: none;
+.popup-container {
 	position: fixed;
-	left: 25px;
-	bottom: 20px;
-	padding: 10px;
-	border-radius: 2px;
-	color: white;
-	cursor: pointer;
-	transition: 0.5s all;
-	z-index: 2;
-	scale: 100%;
+	bottom: 30px;
+	left: 30px;
+	z-index: 9999;
+
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
 }
+
+.popup-item {
+	display: inline-block;
+
+	color: #fff;
+	padding: 12px 24px;
+	border-radius: 8px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+	font-weight: 600;
+	font-size: 15px;
+
+	opacity: 1;
+	transition: opacity 0.4s;
+}
+
 .scale {
 	animation-name: scale;
 	animation-duration: 0.4s;
@@ -1099,7 +1114,7 @@ input[type="range"]::-webkit-slider-thumb {
 	appearance: none;
 	width: 12px;
 	height: 32px;
-	background-color: var(--blueBtn);;
+	background-color: var(--blueBtn);
 	border-radius: 9999px;
 	cursor: pointer;
 	pointer-events: auto;

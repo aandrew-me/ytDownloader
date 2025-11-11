@@ -152,5 +152,7 @@
 	"urlCopiedToClipboard": "URL copied to clipboard!",
 	"confirmDeleteHistoryItem": "Are you sure you want to delete this item from history?",
 	"confirmClearAllHistory": "Are you sure you want to clear all download history? This cannot be undone!",
-	"fileDoesNotExist": "File does not exist anymore"
+	"fileDoesNotExist": "File does not exist anymore",
+	"updatingYtdlp": "Updating yt-dlp",
+	"updatedYtdlp": "Updated yt-dlp"
 }
