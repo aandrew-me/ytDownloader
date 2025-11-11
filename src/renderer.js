@@ -1150,7 +1150,7 @@ class YtDownloaderApp {
 					NBSP
 				);
 
-				const option_audio = `<option value="${format.format_id}| ${audioExt}">${audioQualityPadded} | ${audioExtPadded} | ${audioSizePadded}</option>`;
+				const option_audio = `<option value="${format.format_id}|${audioExt}">${audioQualityPadded} | ${audioExtPadded} | ${audioSizePadded}</option>`;
 
 				audioSelect.innerHTML += option_audio;
 				audioForVideoSelect.innerHTML += option_audio;
