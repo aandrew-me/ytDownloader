@@ -620,6 +620,7 @@ class YtDownloaderApp {
 	 * @param {string} url The video URL.
 	 */
 	async getInfo(url) {
+		this._loadSettings();
 		this._defaultVideoToggle();
 		this._resetUIForNewLink();
 		this.state.videoInfo.url = url;
@@ -1169,21 +1170,26 @@ class YtDownloaderApp {
 				const quality = `${format.height || "???"}p${
 					format.fps === 60 ? "60" : ""
 				}`;
-				const vcodec = showMoreFormats
-					? format.vcodec?.split(".")[0] || ""
-					: "";
 				const hasAudio = format.acodec !== "none" ? " 🔊" : "";
 
 				const col1 = quality.padEnd(videoQualityPadding + 1, NBSP);
 				const col2 = format.ext.padEnd(extPadding, NBSP);
-				const col3 = vcodec.padEnd(vcodecPadding, NBSP);
 				const col4 = displaySize.padEnd(filesizePadding, NBSP);
+
+				let optionText;
+				if (showMoreFormats) {
+					const vcodec = format.vcodec?.split(".")[0] || "";
+					const col3 = vcodec.padEnd(vcodecPadding, NBSP);
+					optionText = `${col1} | ${col2} | ${col3} | ${col4}${hasAudio}`;
+				} else {
+					optionText = `${col1} | ${col2} | ${col4}${hasAudio}`;
+				}
 
 				const option = `<option value="${format.format_id}|${
 					format.ext
 				}|${format.height}" ${
 					isSelected ? "selected" : ""
-				}>${col1} | ${col2} | ${col3} | ${col4}${hasAudio}</option>`;
+				}>${optionText}</option>`;
 
 				videoSelect.innerHTML += option;
 			} else if (
