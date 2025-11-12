@@ -39,9 +39,6 @@
 </head>
 
 <body>
-    <!-- Popup message -->
-    <span id="popupText" data-translate="copiedText">Text copied</span>
-
     <!-- Menu icon -->
     <img src="../assets/images/menu.png" alt="menu" id="menuIcon">
 
@@ -88,7 +85,7 @@
         <span id="link"></span>
         <br><br>
         <div id="videoBox">
-            <label id="videoFormat" data-translate="selectVideoFormat">Select Video Format </label>
+            <label id="videoFormat" data-translate="videoQuality">Select Video Quality </label>
             <select id="select" class="select">
                 <option value="best" id="bestVideoOption" data-translate="best">Best</option>
                 <option value="worst" id="worstVideoOption" data-translate="qualityWorst">Worst</option>
@@ -105,7 +102,7 @@
             </select>
             <br>
             <div id="typeSelectBox">
-                <label id="videoQualityTxt" data-translate="videoQuality">Select video quality</label>
+                <label id="videoQualityTxt" data-translate="selectVideoFormat">Select video quality</label>
                 <select id="videoTypeSelect" class="select">
                     <option value="auto" id="autoTxt" data-translate="auto">Auto</option>
                     <option value="mp4">Mp4</option>
@@ -185,7 +182,7 @@
         <!-- Error button -->
         <button class="advancedToggle" id="errorBtn" onclick="toggleErrorDetails()" data-translate="errorDetails">Error
             Details ▼</button>
-        <div id="errorDetails" onclick="copyErrorToClipboard()"></div>
+        <div id="errorDetails"></div>
 
     </div>
 

@@ -110,28 +110,10 @@ function toggleErrorDetails() {
 	if (status === "none") {
 		getId("errorDetails").style.display = "block";
 		// @ts-ignore
-		getId("errorBtn").textContent = i18n.__("Error Details") + " ▲";
+		getId("errorBtn").textContent = i18n.__("errorDetails") + " ▲";
 	} else {
 		getId("errorDetails").style.display = "none";
 		// @ts-ignore
-		getId("errorBtn").textContent = i18n.__("Error Details") + " ▼";
+		getId("errorBtn").textContent = i18n.__("errorDetails") + " ▼";
 	}
-}
-
-// Copying error txt
-
-function copyErrorToClipboard() {
-	const error = getId("errorDetails").textContent;
-	electron.clipboard.writeText(error);
-	// @ts-ignore
-	showPopup(i18n.__("Copied text"));
-}
-
-// Popup message
-function showPopup(text) {
-	getId("popupText").textContent = text;
-	getId("popupText").style.display = "inline-block";
-	setTimeout(() => {
-		getId("popupText").style.display = "none";
-	}, 2200);
 }

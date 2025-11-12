@@ -87,6 +87,7 @@ class YtDownloaderApp {
 			ytDlp: null,
 			ytDlpPath: "",
 			ffmpegPath: "",
+			jsRuntimePath: "",
 			downloadDir: "",
 			maxActiveDownloads: 5,
 			currentDownloads: 0,
@@ -136,9 +137,11 @@ class YtDownloaderApp {
 			this.state.ytDlpPath = await this._findOrDownloadYtDlp();
 			this.state.ytDlp = new YTDlpWrap(this.state.ytDlpPath);
 			this.state.ffmpegPath = await this._findFfmpeg();
+			this.state.jsRuntimePath = await this._getJsRuntimePath();
 
 			console.log("yt-dlp path:", this.state.ytDlpPath);
 			console.log("ffmpeg path:", this.state.ffmpegPath);
+			console.log("JS runtime path:", this.state.jsRuntimePath);
 
 			this._loadSettings();
 			this._addEventListeners();
@@ -347,9 +350,14 @@ class YtDownloaderApp {
 					console.log("yt-dlp update check:", data.toString());
 
 					if (data.toString().toLowerCase().includes("updating to")) {
-						this._showPopup(i18n.__("updatingYtdlp"))
-					} else if (data.toString().toLowerCase().includes("updated yt-dlp to")) {
-						this._showPopup(i18n.__("updatedYtdlp"))
+						this._showPopup(i18n.__("updatingYtdlp"));
+					} else if (
+						data
+							.toString()
+							.toLowerCase()
+							.includes("updated yt-dlp to")
+					) {
+						this._showPopup(i18n.__("updatedYtdlp"));
 					}
 				});
 			} catch {
@@ -418,6 +426,36 @@ class YtDownloaderApp {
 		return platform() === "win32"
 			? join(__dirname, "..", "ffmpeg.exe")
 			: join(__dirname, "..", "ffmpeg");
+	}
+
+	/**
+	 * Determines the JavaScript runtime path for yt-dlp.
+	 * @returns {Promise<string>} A promise that resolves with the JS runtime path.
+	 */
+	async _getJsRuntimePath() {
+		if (process.env.YTDOWNLOADER_DENO_PATH) {
+			if (existsSync(process.env.YTDOWNLOADER_DENO_PATH)) {
+				return `deno:"${process.env.YTDOWNLOADER_DENO_PATH}"`;
+			}
+
+			return "";
+		}
+
+		if (platform() === "darwin") {
+			return "";
+		}
+
+		let denoPath = join(__dirname, "..", "deno");
+
+		if (platform() === "win32") {
+			denoPath = join(__dirname, "..", "deno.exe");
+		}
+
+		if (existsSync(denoPath)) {
+			return `deno:"${denoPath}"`;
+		} else {
+			return "";
+		}
 	}
 
 	/**
@@ -604,7 +642,14 @@ class YtDownloaderApp {
 			this._populateFormatSelectors(metadata.formats || []);
 			this._displayInfoPanel();
 		} catch (error) {
-			this._showError(error.message, url);
+			if (
+				error.message.includes("js-runtimes") &&
+				error.message.includes("no such option")
+			) {
+				this._showError(i18n.__("ytDlpUpdateRequired"), url);
+			} else {
+				this._showError(error.message, url);
+			}
 		} finally {
 			$(CONSTANTS.DOM_IDS.LOADING_WRAPPER).style.display = "none";
 		}
@@ -661,6 +706,9 @@ class YtDownloaderApp {
 				proxy,
 				browserForCookies ? "--cookies-from-browser" : "",
 				browserForCookies,
+				this.state.jsRuntimePath
+					? `--no-js-runtimes --js-runtime ${this.state.jsRuntimePath}`
+					: "",
 				configPath ? "--config-location" : "",
 				configPath ? `"${configPath}"` : "",
 				`"${url}"`,
@@ -671,7 +719,9 @@ class YtDownloaderApp {
 			let stdout = "";
 			let stderr = "";
 
-			process.ytDlpProcess.stdout.on("data", (data) => (stdout += data));
+			process.ytDlpProcess.stdout.on("data", (data) => {
+				stdout += data;
+			});
 			process.ytDlpProcess.stderr.on("data", (data) => (stderr += data));
 
 			process.on("close", () => {
@@ -735,6 +785,9 @@ class YtDownloaderApp {
 				const el = $(`${randomId}_prog`);
 				if (el) el.textContent = i18n.__("downloading");
 			})
+			// .on("ytDlpEvent", (eventType, eventData) => {
+			// 	console.log(eventData)
+			// })
 			.once("close", (code) => {
 				this._handleDownloadCompletion(
 					code,
@@ -871,6 +924,10 @@ class YtDownloaderApp {
 			configPath ? `"${configPath}"` : "",
 			"--ffmpeg-location",
 			`"${this.state.ffmpegPath}"`,
+			this.state.jsRuntimePath
+				? `--no-js-runtimes --js-runtime ${this.state.jsRuntimePath}`
+				: "",
+
 			`"${url}"`,
 		].filter(Boolean);
 
@@ -1362,7 +1419,7 @@ class YtDownloaderApp {
 				if (popupContainer.childElementCount === 0) {
 					popupContainer.remove();
 				}
-			}, 400);
+			}, 1000);
 		}, 2200);
 	}
 

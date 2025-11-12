@@ -12,7 +12,6 @@ const ytdlp = new YTDlpWrap(`"${ytDlp}"`);
 const downloadsDir = path.join(os.homedir(), "Downloads");
 let downloadDir = localStorage.getItem("downloadPath") || downloadsDir;
 
-
 document.addEventListener("translations-loaded", () => {
 	window.i18n.translatePage();
 });
@@ -61,6 +60,8 @@ if (os.platform() === "win32") {
 } else {
 	ffmpegPath = `${__dirname}/../ffmpeg`;
 }
+
+let denoPath = getJsRuntimePath();
 
 if (process.env.YTDOWNLOADER_FFMPEG_PATH) {
 	ffmpegPath = `${process.env.YTDOWNLOADER_FFMPEG_PATH}`;
@@ -207,6 +208,9 @@ function download(type) {
 			`"${playlistIndex}:${playlistEnd}"`,
 			"--ffmpeg-location",
 			ffmpeg,
+			denoPath
+				? `--no-js-runtimes --js-runtime ${denoPath}`
+				: "",
 			cookieArg,
 			browser,
 			configArg,
@@ -252,6 +256,9 @@ function download(type) {
 				`"${playlistIndex}:${playlistEnd}"`,
 				"--ffmpeg-location",
 				ffmpeg,
+				denoPath
+					? `--no-js-runtimes --js-runtime ${denoPath}`
+					: "",
 				cookieArg,
 				browser,
 				configArg,
@@ -290,6 +297,9 @@ function download(type) {
 				`"${playlistIndex}:${playlistEnd}"`,
 				"--ffmpeg-location",
 				ffmpeg,
+				denoPath
+					? `--no-js-runtimes --js-runtime ${denoPath}`
+					: "",
 				cookieArg,
 				browser,
 				configArg,
@@ -482,6 +492,9 @@ function downloadThumbnails() {
 		`"${playlistIndex}:${playlistEnd}"`,
 		"--ffmpeg-location",
 		ffmpeg,
+		denoPath
+			? `--no-js-runtimes --js-runtime ${denoPath}`
+			: "",
 		proxy ? "--no-check-certificate" : "",
 		proxy ? "--proxy" : "",
 		proxy,
@@ -607,6 +620,32 @@ function saveLinks() {
 	downloadProcess.on("error", (error) => {
 		showErrorTxt(error);
 	});
+}
+
+function getJsRuntimePath() {
+	if (process.env.YTDOWNLOADER_DENO_PATH) {
+		if (fs.existsSync(process.env.YTDOWNLOADER_DENO_PATH)) {
+			return `deno:"${process.env.YTDOWNLOADER_DENO_PATH}"`;
+		}
+
+		return "";
+	}
+
+	let denoPath = path.join(__dirname, "..", "deno");
+
+	if (os.platform() === "win32") {
+		denoPath = path.join(__dirname, "..", "deno.exe");
+	}
+
+	if (os.platform() === "darwin") {
+		return "";
+	} else {
+		if (fs.existsSync(denoPath)) {
+			return `deno:"${denoPath}"`;
+		} else {
+			return "";
+		}
+	}
 }
 
 // Downloading video
