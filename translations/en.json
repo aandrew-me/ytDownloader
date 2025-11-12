@@ -154,5 +154,6 @@
 	"confirmClearAllHistory": "Are you sure you want to clear all download history? This cannot be undone!",
 	"fileDoesNotExist": "File does not exist anymore",
 	"updatingYtdlp": "Updating yt-dlp",
-	"updatedYtdlp": "Updated yt-dlp"
+	"updatedYtdlp": "Updated yt-dlp",
+	"ytDlpUpdateRequired": "If yt-dlp is updating, wait for the update to finish. If you have installed yt-dlp by yourself, please update it."
 }
