@@ -91,6 +91,7 @@ let filenameFormat = "%(playlist_index)s.%(title)s.%(ext)s";
 let playlistIndex = 1;
 let playlistEnd = "";
 let proxy = "";
+let playlistName = "";
 
 /**
  *
@@ -155,7 +156,6 @@ function download(type) {
 	}
 	let count = 0;
 	let subs, subLangs;
-	let playlistName;
 
 	// If subtitles are checked
 	if (getId("subChecked").checked) {
@@ -166,6 +166,8 @@ function download(type) {
 		subs = "";
 		subLangs = "";
 	}
+
+	playlistName = "";
 
 	hideOptions();
 
@@ -208,9 +210,7 @@ function download(type) {
 			`"${playlistIndex}:${playlistEnd}"`,
 			"--ffmpeg-location",
 			ffmpeg,
-			denoPath
-				? `--no-js-runtimes --js-runtime ${denoPath}`
-				: "",
+			denoPath ? `--no-js-runtimes --js-runtime ${denoPath}` : "",
 			cookieArg,
 			browser,
 			configArg,
@@ -256,9 +256,7 @@ function download(type) {
 				`"${playlistIndex}:${playlistEnd}"`,
 				"--ffmpeg-location",
 				ffmpeg,
-				denoPath
-					? `--no-js-runtimes --js-runtime ${denoPath}`
-					: "",
+				denoPath ? `--no-js-runtimes --js-runtime ${denoPath}` : "",
 				cookieArg,
 				browser,
 				configArg,
@@ -297,9 +295,7 @@ function download(type) {
 				`"${playlistIndex}:${playlistEnd}"`,
 				"--ffmpeg-location",
 				ffmpeg,
-				denoPath
-					? `--no-js-runtimes --js-runtime ${denoPath}`
-					: "",
+				denoPath ? `--no-js-runtimes --js-runtime ${denoPath}` : "",
 				cookieArg,
 				browser,
 				configArg,
@@ -343,7 +339,7 @@ function download(type) {
 		if (eventData.includes(playlistTxt)) {
 			playlistName = eventData.split("playlist:")[1].slice(1);
 			getId("playlistName").textContent =
-				i18n.__("Downloading playlist:") + " " + playlistName;
+				i18n.__("downloadingPlaylist") + " " + playlistName;
 			console.log(playlistName);
 		}
 
@@ -356,18 +352,18 @@ function download(type) {
 			originalCount += 1;
 			let itemTitle;
 			if (type === "video") {
-				itemTitle = i18n.__("Video") + " " + originalCount;
+				itemTitle = i18n.__("video") + " " + originalCount;
 			} else {
-				itemTitle = i18n.__("Audio") + " " + originalCount;
+				itemTitle = i18n.__("audio") + " " + originalCount;
 			}
 
 			if (count > 1) {
-				getId(`p${count - 1}`).textContent = i18n.__("File saved.");
+				getId(`p${count - 1}`).textContent = i18n.__("fileSaved");
 			}
 
 			const item = `<div class="playlistItem">
 			<p class="itemTitle">${itemTitle}</p>
-			<p class="itemProgress" id="p${count}">${i18n.__("Downloading...")}</p>
+			<p class="itemProgress" id="p${count}">${i18n.__("downloading")}</p>
 			</div>`;
 			getId("list").innerHTML += item;
 
@@ -378,13 +374,13 @@ function download(type) {
 	downloadProcess.on("progress", (progress) => {
 		if (progress.percent == 100) {
 			if (getId(`p${count}`)) {
-				getId(`p${count}`).textContent = i18n.__("Processing") + "...";
+				getId(`p${count}`).textContent = i18n.__("processing") + "...";
 			}
 		} else {
 			if (getId(`p${count}`)) {
-				getId(`p${count}`).textContent = `${i18n.__("Progress")} ${
+				getId(`p${count}`).textContent = `${i18n.__("progress")} ${
 					progress.percent
-				}% | ${i18n.__("Speed")} ${progress.currentSpeed || 0}`;
+				}% | ${i18n.__("speed")} ${progress.currentSpeed || 0}`;
 			}
 		}
 	});
@@ -413,16 +409,20 @@ function managePlaylistRange() {
 }
 
 function afterClose(count) {
-	getId(`p${count}`).textContent = i18n.__("File saved.");
+	getId(`p${count}`).textContent = i18n.__("fileSaved");
 	getId("pasteLink").style.display = "inline-block";
 
 	const notify = new Notification("ytDownloader", {
-		body: i18n.__("Playlist downloaded"),
+		body: i18n.__("playlistDownloaded"),
 		icon: "../assets/images/icon.png",
 	});
 
 	notify.onclick = () => {
-		openFolder(downloadDir);
+		if (playlistName != "") {
+			openFolder(path.join(downloadDir, playlistName));
+		} else {
+			openFolder(downloadDir);
+		}
 	};
 }
 // Error handling
@@ -432,9 +432,7 @@ function showErrorTxt(error) {
 	getId("openDownloads").style.display = "none";
 	getId("options").style.display = "block";
 	getId("playlistName").textContent = "";
-	getId("incorrectMsgPlaylist").textContent = i18n.__(
-		"Some error has occurred. Check your network and use correct URL"
-	);
+	getId("incorrectMsgPlaylist").textContent = i18n.__("errorNetworkOrUrl");
 	getId("incorrectMsgPlaylist").style.display = "block";
 	getId("incorrectMsgPlaylist").title = error;
 	getId("errorBtn").style.display = "inline-block";
@@ -465,7 +463,7 @@ function hideOptions(justHide = false) {
 	getId("errorDetails").textContent = "";
 	getId("incorrectMsgPlaylist").style.display = "none";
 	if (!justHide) {
-		getId("playlistName").textContent = i18n.__("Processing") + "...";
+		getId("playlistName").textContent = i18n.__("processing") + "...";
 		getId("pasteLink").style.display = "none";
 		getId("openDownloads").style.display = "inline-block";
 	}
@@ -473,7 +471,6 @@ function hideOptions(justHide = false) {
 
 function downloadThumbnails() {
 	let count = 0;
-	let playlistName;
 	hideOptions();
 	nameFormatting();
 	managePlaylistRange();
@@ -492,9 +489,7 @@ function downloadThumbnails() {
 		`"${playlistIndex}:${playlistEnd}"`,
 		"--ffmpeg-location",
 		ffmpeg,
-		denoPath
-			? `--no-js-runtimes --js-runtime ${denoPath}`
-			: "",
+		denoPath ? `--no-js-runtimes --js-runtime ${denoPath}` : "",
 		proxy ? "--no-check-certificate" : "",
 		proxy ? "--proxy" : "",
 		proxy,
@@ -513,7 +508,7 @@ function downloadThumbnails() {
 		if (eventData.includes(playlistTxt)) {
 			playlistName = eventData.split("playlist:")[1].slice(1);
 			getId("playlistName").textContent =
-				i18n.__("Downloading playlist:") + " " + playlistName;
+				i18n.__("downloadingPlaylist") + " " + playlistName;
 			console.log(playlistName);
 		}
 
@@ -526,7 +521,7 @@ function downloadThumbnails() {
 			originalCount++;
 
 			let itemTitle;
-			itemTitle = i18n.__("Thumbnail") + " " + originalCount;
+			itemTitle = i18n.__("thumbnail") + " " + originalCount;
 
 			if (count > 1) {
 				getId(`p${count - 1}`).textContent = i18n.__("File saved.");
@@ -553,7 +548,6 @@ function downloadThumbnails() {
 // Download video links
 function saveLinks() {
 	let count = 0;
-	let playlistName;
 	hideOptions();
 	nameFormatting();
 	managePlaylistRange();
@@ -586,7 +580,7 @@ function saveLinks() {
 		if (eventData.includes(playlistTxt)) {
 			playlistName = eventData.split("playlist:")[1].slice(1);
 			getId("playlistName").textContent =
-				i18n.__("Downloading playlist:") + " " + playlistName;
+				i18n.__("downloadingPlaylist") + " " + playlistName;
 			console.log(playlistName);
 		}
 
@@ -600,12 +594,12 @@ function saveLinks() {
 			itemTitle = i18n.__("Link") + " " + count;
 
 			if (count > 1) {
-				getId(`p${count - 1}`).textContent = i18n.__("Link added");
+				getId(`p${count - 1}`).textContent = i18n.__("linkAdded");
 			}
 
 			const item = `<div class="playlistItem">
 			<p class="itemTitle">${itemTitle}</p>
-			<p class="itemProgress" id="p${count}">${i18n.__("Downloading...")}</p>
+			<p class="itemProgress" id="p${count}">${i18n.__("downloading")}</p>
 			</div>`;
 			getId("list").innerHTML += item;
 
@@ -685,17 +679,10 @@ function openFolder(location) {
 
 function closeMenu() {
 	getId("menuIcon").style.transform = "rotate(0deg)";
-	let count = 0;
-	let opacity = 1;
-	const fade = setInterval(() => {
-		if (count >= 10) {
-			clearInterval(fade);
-		} else {
-			opacity -= 0.1;
-			getId("menu").style.opacity = String(opacity);
-			count++;
-		}
-	}, 50);
+	getId("menu").style.opacity = "0";
+	setTimeout(() => {
+		getId("menu").style.display = "none";
+	}, 500);
 }
 
 // Video and audio toggle
@@ -746,7 +733,11 @@ getId("advancedToggle").addEventListener("click", () => {
 
 // Menu
 getId("openDownloads").addEventListener("click", () => {
-	openFolder(downloadDir);
+	if (playlistName != "") {
+		openFolder(path.join(downloadDir, playlistName));
+	} else {
+		openFolder(downloadDir);
+	}
 });
 
 getId("preferenceWin").addEventListener("click", () => {
