@@ -396,8 +396,25 @@ const playlistDownloader = {
 			if (eventData.includes(playlistTxt)) {
 				this.state.playlistName = eventData
 					.split(playlistTxt)[1]
-					.trim()
-                    .replaceAll("|", "｜")
+					.trim();
+
+				this.state.playlistName = this.state.playlistName
+					.replaceAll("|", "｜")
+					.replaceAll(`"`, `＂`)
+					.replaceAll("*", "＊")
+					.replaceAll("/", "⧸")
+					.replaceAll("\\", "⧹")
+					.replaceAll(":", "：")
+					.replaceAll("?", "？");
+
+				if (
+					os.platform() === "win32" &&
+					this.state.playlistName.endsWith(".")
+				) {
+					this.state.playlistName =
+						this.state.playlistName.slice(0, -1) + "#";
+				}
+
 				this.ui.playlistNameDisplay.textContent = `${window.i18n.__(
 					"downloadingPlaylist"
 				)} ${this.state.playlistName}`;
@@ -569,7 +586,12 @@ const playlistDownloader = {
 			)
 				? path.join(this.state.downloadDir, this.state.playlistName)
 				: this.state.downloadDir;
-		ipcRenderer.send("open-folder", openPath);
+
+		ipcRenderer.invoke("open-folder", openPath).then((result) => {
+			if (!result.success) {
+				ipcRenderer.invoke("open-folder", this.state.downloadDir);
+			}
+		});
 	},
 
 	toggleDownloadType(type) {
