@@ -1,766 +1,655 @@
-const {clipboard, shell, ipcRenderer} = require("electron");
+const {clipboard, ipcRenderer} = require("electron");
 const {default: YTDlpWrap} = require("yt-dlp-wrap-plus");
 const path = require("path");
 const os = require("os");
 const fs = require("fs");
 const {execSync} = require("child_process");
 const {constants} = require("fs/promises");
-let url;
-const ytDlp = localStorage.getItem("ytdlp");
-console.log(`yt-dlp: ${ytDlp}`);
-const ytdlp = new YTDlpWrap(`"${ytDlp}"`);
-const downloadsDir = path.join(os.homedir(), "Downloads");
-let downloadDir = localStorage.getItem("downloadPath") || downloadsDir;
 
-document.addEventListener("translations-loaded", () => {
-	window.i18n.translatePage();
-});
+const playlistDownloader = {
+	// State and config
+	state: {
+		url: null,
+		downloadDir: null,
+		ytDlpPath: null,
+		ytDlpWrap: null,
+		ffmpegPath: null,
+		denoPath: null,
+		playlistName: "",
+		originalCount: 0,
+		currentDownloadProcess: null,
+	},
 
-try {
-	fs.accessSync(downloadDir, constants.W_OK);
-	downloadDir = downloadDir;
-} catch (err) {
-	console.log(
-		"Unable to write to download directory. Switching to default one."
-	);
-	console.log("Err:", err);
-	downloadDir = downloadsDir;
-	localStorage.setItem("downloadPath", downloadsDir);
-}
+	config: {
+		foldernameFormat: "%(playlist_title)s",
+		filenameFormat: "%(playlist_index)s.%(title)s.%(ext)s",
+		proxy: "",
+		cookie: {
+			browser: "",
+			arg: "",
+		},
+		configFile: {
+			arg: "",
+			path: "",
+		},
+		playlistRange: {
+			start: 1,
+			end: "",
+		},
+	},
 
-getId("path").textContent = downloadDir;
-let cookieArg = "";
-let browser = "";
-const formats = {
-	144: 160,
-	240: 133,
-	360: 134,
-	480: 135,
-	720: 136,
-	1080: 299,
-	1440: 400,
-	2160: 401,
-	4320: 571,
-};
-let originalCount = 0;
-let ffmpeg;
-let ffmpegPath;
+	// DOM elements
+	ui: {
+		pasteLinkBtn: document.getElementById("pasteLink"),
+		linkDisplay: document.getElementById("link"),
+		optionsContainer: document.getElementById("options"),
+		downloadList: document.getElementById("list"),
 
-if (os.platform() === "win32") {
-	ffmpegPath = `${__dirname}\\..\\ffmpeg.exe`;
-} else if (os.platform() === "freebsd") {
-	try {
-		ffmpegPath = execSync("which ffmpeg")
-			.toString("utf8")
-			.split("\n")[0]
-			.trim();
-	} catch (error) {
-		console.log(error);
-	}
-} else {
-	ffmpegPath = `${__dirname}/../ffmpeg`;
-}
+		downloadVideoBtn: document.getElementById("download"),
+		downloadAudioBtn: document.getElementById("audioDownload"),
+		downloadThumbnailsBtn: document.getElementById("downloadThumbnails"),
+		saveLinksBtn: document.getElementById("saveLinks"),
 
-let denoPath = getJsRuntimePath();
+		selectLocationBtn: document.getElementById("selectLocation"),
+		pathDisplay: document.getElementById("path"),
+		openDownloadsBtn: document.getElementById("openDownloads"),
 
-if (process.env.YTDOWNLOADER_FFMPEG_PATH) {
-	ffmpegPath = `${process.env.YTDOWNLOADER_FFMPEG_PATH}`;
+		videoToggle: document.getElementById("videoToggle"),
+		audioToggle: document.getElementById("audioToggle"),
+		advancedToggle: document.getElementById("advancedToggle"),
+		videoBox: document.getElementById("videoBox"),
+		audioBox: document.getElementById("audioBox"),
+		videoQualitySelect: document.getElementById("select"),
+		videoTypeSelect: document.getElementById("videoTypeSelect"),
+		typeSelectBox: document.getElementById("typeSelectBox"),
+		audioTypeSelect: document.getElementById("audioSelect"),
+		audioQualitySelect: document.getElementById("audioQualitySelect"),
 
-	if (fs.existsSync(process.env.YTDOWNLOADER_FFMPEG_PATH)) {
-		console.log("Using YTDOWNLOADER_FFMPEG_PATH");
-	} else {
-		console.error("No ffmpeg found in " + ffmpeg);
-	}
-}
+		advancedMenu: document.getElementById("advancedMenu"),
+		playlistIndexInput: document.getElementById("playlistIndex"),
+		playlistEndInput: document.getElementById("playlistEnd"),
+		subtitlesCheckbox: document.getElementById("subChecked"),
+		closeHiddenBtn: document.getElementById("closeHidden"),
 
-ffmpeg = `"${ffmpegPath}"`;
+		playlistNameDisplay: document.getElementById("playlistName"),
+		errorMsgDisplay: document.getElementById("incorrectMsgPlaylist"),
+		errorBtn: document.getElementById("errorBtn"),
+		errorDetails: document.getElementById("errorDetails"),
 
-console.log("ffmpeg:", ffmpeg);
+		menuIcon: document.getElementById("menuIcon"),
+		menu: document.getElementById("menu"),
+		preferenceWinBtn: document.getElementById("preferenceWin"),
+		aboutWinBtn: document.getElementById("aboutWin"),
+		historyWinBtn: document.getElementById("historyWin"),
+		homeWinBtn: document.getElementById("homeWin"),
+		compressorWinBtn: document.getElementById("compressorWin"),
+	},
 
-if (localStorage.getItem("preferredVideoQuality")) {
-	const preferredVideoQuality = localStorage.getItem("preferredVideoQuality");
-	getId("select").value = preferredVideoQuality;
-}
-if (localStorage.getItem("preferredAudioQuality")) {
-	const preferredAudioQuality = localStorage.getItem("preferredAudioQuality");
-	getId("audioSelect").value = preferredAudioQuality;
-}
+	init() {
+		this.loadInitialConfig();
+		this.initEventListeners();
 
-let foldernameFormat = "%(playlist_title)s";
-let filenameFormat = "%(playlist_index)s.%(title)s.%(ext)s";
-let playlistIndex = 1;
-let playlistEnd = "";
-let proxy = "";
-let playlistName = "";
+		// Set initial UI state
+		this.ui.pathDisplay.textContent = this.state.downloadDir;
+		this.ui.videoToggle.style.backgroundColor = "var(--box-toggleOn)";
+		this.updateVideoTypeVisibility();
 
-/**
- *
- * @param {string} id
- * @returns {any}
- */
-function getId(id) {
-	return document.getElementById(id);
-}
+		// Load translations when ready
+		document.addEventListener("translations-loaded", () => {
+			window.i18n.translatePage();
+		});
 
-function pasteLink() {
-	url = clipboard.readText();
-	getId("link").textContent = " " + url;
-	getId("options").style.display = "block";
-	getId("incorrectMsgPlaylist").textContent = "";
-	getId("errorBtn").style.display = "none";
-}
+		console.log(`yt-dlp path: ${this.state.ytDlpPath}`);
+		console.log(`ffmpeg path: ${this.state.ffmpegPath}`);
+	},
 
-getId("pasteLink").addEventListener("click", () => {
-	pasteLink();
-});
+	loadInitialConfig() {
+		// yt-dlp path
+		this.state.ytDlpPath = localStorage.getItem("ytdlp");
+		this.state.ytDlpWrap = new YTDlpWrap(this.state.ytDlpPath);
 
-document.addEventListener("keydown", (event) => {
-	if (event.ctrlKey && event.key == "v") {
-		pasteLink();
-	}
-});
-
-// Patterns
-const playlistTxt = "Downloading playlist: ";
-const videoIndex = "Downloading item ";
-const oldVideoIndex = "Downloading video ";
-
-/**
- * @param {string} type
- */
-function download(type) {
-	// Config file
-	let configArg = "";
-	let configTxt = "";
-	if (localStorage.getItem("configPath")) {
-		configArg = "--config-location";
-		configTxt = `"${localStorage.getItem("configPath")}"`;
-	}
-	proxy = localStorage.getItem("proxy") || "";
-	console.log("Proxy:", proxy);
-
-	nameFormatting();
-	originalCount = 0;
-
-	// Playlist download range
-	managePlaylistRange();
-
-	// Whether to use browser cookies or not
-	if (localStorage.getItem("browser")) {
-		browser = localStorage.getItem("browser");
-	}
-	if (browser) {
-		cookieArg = "--cookies-from-browser";
-	} else {
-		cookieArg = "";
-	}
-	let count = 0;
-	let subs, subLangs;
-
-	// If subtitles are checked
-	if (getId("subChecked").checked) {
-		subs = "--write-subs";
-		subLangs = "--sub-langs all";
-		console.log("Downloading with subtitles");
-	} else {
-		subs = "";
-		subLangs = "";
-	}
-
-	playlistName = "";
-
-	hideOptions();
-
-	let quality, format, downloadProcess, videoType, audioQuality;
-	if (type === "video") {
-		quality = getId("select").value;
-		videoType = getId("videoTypeSelect").value;
-		const formatId = formats[quality];
-		if (quality === "best") {
-			format = "-f bv*+ba/best";
-		} else if (quality === "worst") {
-			format = "-f wv+wa/worst";
-		} else if (quality === "useConfig") {
-			format = "";
-		} else {
-			if (videoType === "mp4") {
-				format = `-f "bestvideo[height<=1080]+bestaudio[ext=m4a]/best[height<=1080]/best" --merge-output-format "mp4" --recode-video "mp4"`;
-			} else if (videoType === "webm") {
-				format = `-f "bestvideo[height<=1080]+bestaudio[ext=webm]/best[height<=1080]/best" --merge-output-format "webm" --recode-video "webm"`;
-			} else {
-				format = `-f "bv*[height=${quality}]+ba/best[height=${quality}]/best[height<=${quality}]"`;
-			}
+		const defaultDownloadsDir = path.join(os.homedir(), "Downloads");
+		let preferredDir =
+			localStorage.getItem("downloadPath") || defaultDownloadsDir;
+		try {
+			fs.accessSync(preferredDir, constants.W_OK);
+			this.state.downloadDir = preferredDir;
+		} catch (err) {
+			console.error(
+				"Unable to write to preferred download directory. Reverting to default.",
+				err
+			);
+			this.state.downloadDir = defaultDownloadsDir;
+			localStorage.setItem("downloadPath", defaultDownloadsDir);
 		}
-	} else {
-		format = getId("audioSelect").value;
-		audioQuality = getId("audioQualitySelect").value;
-		console.log("Quality:", audioQuality);
-	}
-	console.log("Format:", format);
 
-	const controller = new AbortController();
+		// ffmpeg and deno path setup
+		this.state.ffmpegPath = this.getFfmpegPath();
+		this.state.denoPath = this.getJsRuntimePath();
 
-	if (type === "video") {
-		const args = [
-			format,
-			"--yes-playlist",
-			"-o",
-			`"${path.join(downloadDir, foldernameFormat, filenameFormat)}"`,
-			"-I",
-			`"${playlistIndex}:${playlistEnd}"`,
-			"--ffmpeg-location",
-			ffmpeg,
-			denoPath ? `--no-js-runtimes --js-runtime ${denoPath}` : "",
-			cookieArg,
-			browser,
-			configArg,
-			configTxt,
-			"--embed-metadata",
-			subs,
-			subLangs,
-			videoType == "mp4" &&
-			(url.includes("youtube.com/") || url.includes("youtu.be/")) &&
-			os.platform() !== "darwin"
-				? "--embed-thumbnail"
-				: "",
-			proxy ? "--no-check-certificate" : "",
-			proxy ? "--proxy" : "",
-			proxy,
-			"--compat-options",
-			"no-youtube-unavailable-videos",
-			`"${url}"`,
-		].filter((item) => item);
+		if (localStorage.getItem("preferredVideoQuality")) {
+			this.ui.videoQualitySelect.value = localStorage.getItem(
+				"preferredVideoQuality"
+			);
+		}
+		if (localStorage.getItem("preferredAudioQuality")) {
+			this.ui.audioQualitySelect.value = localStorage.getItem(
+				"preferredAudioQuality"
+			);
+		}
+	},
 
-		downloadProcess = ytdlp.exec(
-			args,
+	initEventListeners() {
+		this.ui.pasteLinkBtn.addEventListener("click", () => this.pasteLink());
+		document.addEventListener("keydown", (event) => {
+			if (event.ctrlKey && event.key === "v") this.pasteLink();
+		});
+
+		this.ui.downloadVideoBtn.addEventListener("click", () =>
+			this.startDownload("video")
+		);
+		this.ui.downloadAudioBtn.addEventListener("click", () =>
+			this.startDownload("audio")
+		);
+		this.ui.downloadThumbnailsBtn.addEventListener("click", () =>
+			this.startDownload("thumbnails")
+		);
+		this.ui.saveLinksBtn.addEventListener("click", () =>
+			this.startDownload("links")
+		);
+
+		this.ui.videoToggle.addEventListener("click", () =>
+			this.toggleDownloadType("video")
+		);
+		this.ui.audioToggle.addEventListener("click", () =>
+			this.toggleDownloadType("audio")
+		);
+		this.ui.advancedToggle.addEventListener("click", () =>
+			this.toggleAdvancedMenu()
+		);
+		this.ui.videoQualitySelect.addEventListener("change", () =>
+			this.updateVideoTypeVisibility()
+		);
+		this.ui.selectLocationBtn.addEventListener("click", () =>
+			ipcRenderer.send("select-location-main", "")
+		);
+		this.ui.openDownloadsBtn.addEventListener("click", () =>
+			this.openDownloadsFolder()
+		);
+		this.ui.closeHiddenBtn.addEventListener("click", () =>
+			this.hideOptions(true)
+		);
+
+		this.ui.preferenceWinBtn.addEventListener("click", () =>
+			this.navigate("page", "/preferences.html")
+		);
+		this.ui.aboutWinBtn.addEventListener("click", () =>
+			this.navigate("page", "/about.html")
+		);
+		this.ui.historyWinBtn.addEventListener("click", () =>
+			this.navigate("page", "/history.html")
+		);
+		this.ui.homeWinBtn.addEventListener("click", () =>
+			this.navigate("win", "/index.html")
+		);
+		this.ui.compressorWinBtn.addEventListener("click", () =>
+			this.navigate("win", "/compressor.html")
+		);
+
+		ipcRenderer.on("downloadPath", (_event, downloadPath) => {
+			if (downloadPath && downloadPath[0]) {
+				this.ui.pathDisplay.textContent = downloadPath[0];
+				this.state.downloadDir = downloadPath[0];
+			}
+		});
+	},
+
+	startDownload(type) {
+		if (!this.state.url) {
+			this.showError("URL is missing. Please paste a link first.");
+			return;
+		}
+		this.updateDynamicConfig();
+		this.hideOptions();
+
+		const controller = new AbortController();
+		const baseArgs = this.buildBaseArgs();
+		let specificArgs = [];
+
+		switch (type) {
+			case "video":
+				specificArgs = this.getVideoArgs();
+				break;
+			case "audio":
+				specificArgs = this.getAudioArgs();
+				break;
+			case "thumbnails":
+				specificArgs = this.getThumbnailArgs();
+				break;
+			case "links":
+				specificArgs = this.getLinkArgs();
+				break;
+		}
+
+		const allArgs = [
+			...baseArgs,
+			...specificArgs,
+			`"${this.state.url}"`,
+		].filter(Boolean);
+
+		console.log(`Command: ${this.state.ytDlpPath}`, allArgs.join(" "));
+		this.state.currentDownloadProcess = this.state.ytDlpWrap.exec(
+			allArgs,
 			{shell: true, detached: false},
 			controller.signal
 		);
-	} else {
-		// Youtube provides m4a as audio, so no need to convert
-		if (
-			(url.includes("youtube.com/") || url.includes("youtu.be/")) &&
-			format === "m4a" &&
-			audioQuality === "auto"
-		) {
-			console.log("Downloading m4a without extracting");
 
-			const args = [
-				"--yes-playlist",
-				"--no-warnings",
+		this.handleDownloadEvents(this.state.currentDownloadProcess, type);
+	},
+
+	buildBaseArgs() {
+		const {start, end} = this.config.playlistRange;
+		const outputPath = `"${path.join(
+			this.state.downloadDir,
+			this.config.foldernameFormat,
+			this.config.filenameFormat
+		)}"`;
+
+		return [
+			"--yes-playlist",
+			"-o",
+			outputPath,
+			"-I",
+			`"${start}:${end}"`,
+			"--ffmpeg-location",
+			`"${this.state.ffmpegPath}"`,
+			...(this.state.denoPath
+				? ["--no-js-runtimes", "--js-runtime", this.state.denoPath]
+				: []),
+			this.config.cookie.arg,
+			this.config.cookie.browser,
+			this.config.configFile.arg,
+			this.config.configFile.path,
+			...(this.config.proxy
+				? ["--no-check-certificate", "--proxy", this.config.proxy]
+				: []),
+			"--compat-options",
+			"no-youtube-unavailable-videos",
+		].filter(Boolean);
+	},
+
+	getVideoArgs() {
+		const quality = this.ui.videoQualitySelect.value;
+		const videoType = this.ui.videoTypeSelect.value;
+		let formatArgs = [];
+
+		if (quality === "best") {
+			formatArgs = ["-f", "bv*+ba/best"];
+		} else if (quality === "worst") {
+			formatArgs = ["-f", "wv+wa/worst"];
+		} else if (quality === "useConfig") {
+			formatArgs = [];
+		} else {
+			if (videoType === "mp4") {
+				formatArgs = [
+					"-f",
+					`"bestvideo[height<=1080]+bestaudio[ext=m4a]/best[height<=1080]/best"`,
+					"--merge-output-format",
+					"mp4",
+					"--recode-video",
+					"mp4",
+				];
+			} else if (videoType === "webm") {
+				formatArgs = [
+					"-f",
+					`"bestvideo[height<=1080]+bestaudio[ext=webm]/best[height<=1080]/best"`,
+					"--merge-output-format",
+					"webm",
+					"--recode-video",
+					"webm",
+				];
+			} else {
+				formatArgs = [
+					"-f",
+					`"bv*[height=${quality}]+ba/best[height=${quality}]/best[height<=${quality}]"`,
+				];
+			}
+		}
+
+		const isYouTube =
+			this.state.url.includes("youtube.com/") ||
+			this.state.url.includes("youtu.be/");
+		const canEmbedThumb = os.platform() !== "darwin";
+
+		return [
+			...formatArgs,
+			"--embed-metadata",
+			this.ui.subtitlesCheckbox.checked ? "--write-subs" : "",
+			this.ui.subtitlesCheckbox.checked ? "--sub-langs" : "",
+			this.ui.subtitlesCheckbox.checked ? "all" : "",
+			videoType === "mp4" && isYouTube && canEmbedThumb
+				? "--embed-thumbnail"
+				: "",
+		].filter(Boolean);
+	},
+
+	getAudioArgs() {
+		const format = this.ui.audioTypeSelect.value;
+		const quality = this.ui.audioQualitySelect.value;
+		const isYouTube =
+			this.state.url.includes("youtube.com/") ||
+			this.state.url.includes("youtu.be/");
+		const canEmbedThumb = os.platform() !== "darwin";
+
+		if (isYouTube && format === "m4a" && quality === "auto") {
+			return [
 				"-f",
 				`ba[ext=${format}]/ba`,
-				"-o",
-				`"${path.join(downloadDir, foldernameFormat, filenameFormat)}"`,
-				"-I",
-				`"${playlistIndex}:${playlistEnd}"`,
-				"--ffmpeg-location",
-				ffmpeg,
-				denoPath ? `--no-js-runtimes --js-runtime ${denoPath}` : "",
-				cookieArg,
-				browser,
-				configArg,
-				configTxt,
 				"--embed-metadata",
-				subs,
-				subLangs,
-				os.platform() !== "darwin" ? "--embed-thumbnail" : "",
-				proxy ? "--no-check-certificate" : "",
-				proxy ? "--proxy" : "",
-				proxy,
-				"--compat-options",
-				"no-youtube-unavailable-videos",
-				`"${url}"`,
-			].filter((item) => item);
-
-			downloadProcess = ytdlp.exec(
-				args,
-				{shell: true, detached: false},
-				controller.signal
-			);
-		} else {
-			console.log("Extracting audio");
-
-			const args = [
-				"--yes-playlist",
-				"--no-warnings",
-				"-x",
-				"--audio-format",
-				format,
-				"--audio-quality",
-				audioQuality,
-				"-o",
-				`"${path.join(downloadDir, foldernameFormat, filenameFormat)}"`,
-				"-I",
-				`"${playlistIndex}:${playlistEnd}"`,
-				"--ffmpeg-location",
-				ffmpeg,
-				denoPath ? `--no-js-runtimes --js-runtime ${denoPath}` : "",
-				cookieArg,
-				browser,
-				configArg,
-				configTxt,
-				"--embed-metadata",
-				subs,
-				subLangs,
-				format === "mp3" ||
-				(format === "m4a" &&
-					(url.includes("youtube.com/") ||
-						url.includes("youtu.be/")) &&
-					os.platform() !== "darwin")
-					? "--embed-thumbnail"
-					: "",
-				proxy ? "--no-check-certificate" : "",
-				proxy ? "--proxy" : "",
-				proxy,
-				"--compat-options",
-				"no-youtube-unavailable-videos",
-				`"${url}"`,
-			].filter((item) => item);
-
-			downloadProcess = ytdlp.exec(
-				args,
-				{shell: true, detached: false},
-				controller.signal
-			);
-		}
-	}
-
-	// getId("finishBtn").addEventListener("click", () => {
-	// 	controller.abort("user_finished")
-	// 	try {
-	// 		process.kill(downloadProcess.ytDlpProcess.pid, 'SIGINT')
-	// 	} catch (_error) {}
-	// })
-
-	downloadProcess.on("ytDlpEvent", (_eventType, eventData) => {
-		// console.log(eventData);
-
-		if (eventData.includes(playlistTxt)) {
-			playlistName = eventData.split("playlist:")[1].slice(1);
-			getId("playlistName").textContent =
-				i18n.__("downloadingPlaylist") + " " + playlistName;
-			console.log(playlistName);
+				canEmbedThumb ? "--embed-thumbnail" : "",
+			];
 		}
 
-		if (
-			(eventData.includes(videoIndex) ||
-				eventData.includes(oldVideoIndex)) &&
-			!eventData.includes("thumbnail")
-		) {
-			count += 1;
-			originalCount += 1;
-			let itemTitle;
-			if (type === "video") {
-				itemTitle = i18n.__("video") + " " + originalCount;
+		return [
+			"-x",
+			"--audio-format",
+			format,
+			"--audio-quality",
+			quality,
+			"--embed-metadata",
+			(format === "mp3" || (format === "m4a" && isYouTube)) &&
+			canEmbedThumb
+				? "--embed-thumbnail"
+				: "",
+		];
+	},
+
+	getThumbnailArgs() {
+		return [
+			"--write-thumbnail",
+			"--convert-thumbnails",
+			"png",
+			"--skip-download",
+		];
+	},
+
+	getLinkArgs() {
+		const linksFilePath = `"${path.join(
+			this.state.downloadDir,
+			this.config.foldernameFormat,
+			"links.txt"
+		)}"`;
+		return [
+			"--skip-download",
+			"--print-to-file",
+			"webpage_url",
+			linksFilePath,
+		];
+	},
+
+	// yt-dlp event handling
+	handleDownloadEvents(process, type) {
+		let count = 0;
+
+		process.on("ytDlpEvent", (_eventType, eventData) => {
+			const playlistTxt = "Downloading playlist: ";
+			if (eventData.includes(playlistTxt)) {
+				this.state.playlistName = eventData
+					.split(playlistTxt)[1]
+					.trim()
+                    .replaceAll("|", "｜")
+				this.ui.playlistNameDisplay.textContent = `${window.i18n.__(
+					"downloadingPlaylist"
+				)} ${this.state.playlistName}`;
+			}
+
+			const videoIndexTxt = "Downloading item ";
+			const oldVideoIndexTxt = "Downloading video ";
+			if (
+				(eventData.includes(videoIndexTxt) ||
+					eventData.includes(oldVideoIndexTxt)) &&
+				!eventData.includes("thumbnail")
+			) {
+				count++;
+				this.state.originalCount++;
+				this.updatePlaylistUI(count, type);
+			}
+		});
+
+		process.on("progress", (progress) => {
+			const progressElement = document.getElementById(`p${count}`);
+			if (!progressElement) return;
+
+			if (progress.percent === 100) {
+				progressElement.textContent = `${window.i18n.__(
+					"processing"
+				)}...`;
 			} else {
-				itemTitle = i18n.__("audio") + " " + originalCount;
-			}
-
-			if (count > 1) {
-				getId(`p${count - 1}`).textContent = i18n.__("fileSaved");
-			}
-
-			const item = `<div class="playlistItem">
-			<p class="itemTitle">${itemTitle}</p>
-			<p class="itemProgress" id="p${count}">${i18n.__("downloading")}</p>
-			</div>`;
-			getId("list").innerHTML += item;
-
-			window.scrollTo(0, document.body.scrollHeight);
-		}
-	});
-
-	downloadProcess.on("progress", (progress) => {
-		if (progress.percent == 100) {
-			if (getId(`p${count}`)) {
-				getId(`p${count}`).textContent = i18n.__("processing") + "...";
-			}
-		} else {
-			if (getId(`p${count}`)) {
-				getId(`p${count}`).textContent = `${i18n.__("progress")} ${
+				progressElement.textContent = `${window.i18n.__("progress")} ${
 					progress.percent
-				}% | ${i18n.__("speed")} ${progress.currentSpeed || 0}`;
+				}% | ${window.i18n.__("speed")} ${
+					progress.currentSpeed || "N/A"
+				}`;
 			}
-		}
-	});
+		});
 
-	downloadProcess.on("error", (error) => {
-		showErrorTxt(error);
-	});
+		process.on("error", (error) => this.showError(error));
+		process.on("close", () => this.finishDownload(count));
+	},
 
-	downloadProcess.on("close", () => {
-		afterClose(count);
-	});
-}
+	pasteLink() {
+		this.state.url = clipboard.readText();
+		this.ui.linkDisplay.textContent = ` ${this.state.url}`;
+		this.ui.optionsContainer.style.display = "block";
+		this.ui.errorMsgDisplay.textContent = "";
+		this.ui.errorBtn.style.display = "none";
+	},
 
-function managePlaylistRange() {
-	if (getId("playlistIndex").value) {
-		playlistIndex = Number(getId("playlistIndex").value);
-	}
-	if (getId("playlistEnd").value) {
-		playlistEnd = getId("playlistEnd").value;
-	}
-	console.log(`Range: ${playlistIndex}:${playlistEnd}`);
-	if (playlistIndex > 0) {
-		originalCount = playlistIndex - 1;
-		console.log(`Starting download from ${originalCount + 1}`);
-	}
-}
-
-function afterClose(count) {
-	getId(`p${count}`).textContent = i18n.__("fileSaved");
-	getId("pasteLink").style.display = "inline-block";
-
-	const notify = new Notification("ytDownloader", {
-		body: i18n.__("playlistDownloaded"),
-		icon: "../assets/images/icon.png",
-	});
-
-	notify.onclick = () => {
-		if (playlistName != "") {
-			openFolder(path.join(downloadDir, playlistName));
-		} else {
-			openFolder(downloadDir);
-		}
-	};
-}
-// Error handling
-function showErrorTxt(error) {
-	console.log("Error " + error);
-	getId("pasteLink").style.display = "inline-block";
-	getId("openDownloads").style.display = "none";
-	getId("options").style.display = "block";
-	getId("playlistName").textContent = "";
-	getId("incorrectMsgPlaylist").textContent = i18n.__("errorNetworkOrUrl");
-	getId("incorrectMsgPlaylist").style.display = "block";
-	getId("incorrectMsgPlaylist").title = error;
-	getId("errorBtn").style.display = "inline-block";
-	getId("errorDetails").innerHTML = `
-	<strong>URL: ${url}</strong>
-	<br><br>
-	${error}
-	`;
-	getId("errorDetails").title = i18n.__("Click to copy");
-}
-
-// File and folder name patterns
-function nameFormatting() {
-	// Handling folder and file names
-	if (localStorage.getItem("foldernameFormat")) {
-		foldernameFormat = localStorage.getItem("foldernameFormat");
-	}
-	if (localStorage.getItem("filenameFormat")) {
-		filenameFormat = localStorage.getItem("filenameFormat");
-	}
-}
-
-function hideOptions(justHide = false) {
-	getId("options").style.display = "none";
-	getId("list").innerHTML = "";
-	getId("errorBtn").style.display = "none";
-	getId("errorDetails").style.display = "none";
-	getId("errorDetails").textContent = "";
-	getId("incorrectMsgPlaylist").style.display = "none";
-	if (!justHide) {
-		getId("playlistName").textContent = i18n.__("processing") + "...";
-		getId("pasteLink").style.display = "none";
-		getId("openDownloads").style.display = "inline-block";
-	}
-}
-
-function downloadThumbnails() {
-	let count = 0;
-	hideOptions();
-	nameFormatting();
-	managePlaylistRange();
-
-	const args = [
-		"--yes-playlist",
-		"--no-warnings",
-		"-o",
-		`"${path.join(downloadDir, foldernameFormat, filenameFormat)}"`,
-		cookieArg,
-		browser,
-		"--write-thumbnail",
-		"--convert-thumbnails png",
-		"--skip-download",
-		"-I",
-		`"${playlistIndex}:${playlistEnd}"`,
-		"--ffmpeg-location",
-		ffmpeg,
-		denoPath ? `--no-js-runtimes --js-runtime ${denoPath}` : "",
-		proxy ? "--no-check-certificate" : "",
-		proxy ? "--proxy" : "",
-		proxy,
-		"--compat-options",
-		"no-youtube-unavailable-videos",
-		`"${url}"`,
-	].filter((item) => item);
-
-	const downloadProcess = ytdlp.exec(args, {shell: true, detached: false});
-
-	// console.log(downloadProcess.ytDlpProcess.spawnargs[2])
-
-	downloadProcess.on("ytDlpEvent", (eventType, eventData) => {
-		// console.log(eventData);
-
-		if (eventData.includes(playlistTxt)) {
-			playlistName = eventData.split("playlist:")[1].slice(1);
-			getId("playlistName").textContent =
-				i18n.__("downloadingPlaylist") + " " + playlistName;
-			console.log(playlistName);
+	updatePlaylistUI(count, type) {
+		let itemTitle = "";
+		switch (type) {
+			case "thumbnails":
+				itemTitle = `${window.i18n.__("thumbnail")} ${
+					this.state.originalCount
+				}`;
+				break;
+			case "links":
+				itemTitle = `${window.i18n.__("link")} ${
+					this.state.originalCount
+				}`;
+				break;
+			default:
+				itemTitle = `${window.i18n.__(type)} ${
+					this.state.originalCount
+				}`;
 		}
 
+		if (count > 1) {
+			const prevProgress = document.getElementById(`p${count - 1}`);
+			if (prevProgress)
+				prevProgress.textContent = window.i18n.__("fileSaved");
+		}
+
+		const itemHTML = `
+            <div class="playlistItem">
+                <p class="itemTitle">${itemTitle}</p>
+                <p class="itemProgress" id="p${count}">${window.i18n.__(
+			"downloading"
+		)}</p>
+            </div>`;
+		this.ui.downloadList.innerHTML += itemHTML;
+		window.scrollTo(0, document.body.scrollHeight);
+	},
+
+	updateDynamicConfig() {
+		// Naming formats from localStorage
+		this.config.foldernameFormat =
+			localStorage.getItem("foldernameFormat") || "%(playlist_title)s";
+		this.config.filenameFormat =
+			localStorage.getItem("filenameFormat") ||
+			"%(playlist_index)s.%(title)s.%(ext)s";
+
+		// Proxy, cookies, config file
+		this.config.proxy = localStorage.getItem("proxy") || "";
+		this.config.cookie.browser = localStorage.getItem("browser") || "";
+		this.config.cookie.arg = this.config.cookie.browser
+			? "--cookies-from-browser"
+			: "";
+		const configPath = localStorage.getItem("configPath");
+		this.config.configFile.path = configPath ? `"${configPath}"` : "";
+		this.config.configFile.arg = configPath ? "--config-location" : "";
+
+		// Playlist range from UI inputs
+		this.config.playlistRange.start =
+			Number(this.ui.playlistIndexInput.value) || 1;
+		this.config.playlistRange.end = this.ui.playlistEndInput.value || "";
+		this.state.originalCount =
+			this.config.playlistRange.start > 1
+				? this.config.playlistRange.start - 1
+				: 0;
+
+		// Reset playlist name for new download
+		this.state.playlistName = "";
+	},
+
+	hideOptions(justHide = false) {
+		this.ui.optionsContainer.style.display = "none";
+		this.ui.downloadList.innerHTML = "";
+		this.ui.errorBtn.style.display = "none";
+		this.ui.errorDetails.style.display = "none";
+		this.ui.errorDetails.textContent = "";
+		this.ui.errorMsgDisplay.style.display = "none";
+
+		if (!justHide) {
+			this.ui.playlistNameDisplay.textContent = `${window.i18n.__(
+				"processing"
+			)}...`;
+			this.ui.pasteLinkBtn.style.display = "none";
+			this.ui.openDownloadsBtn.style.display = "inline-block";
+		}
+	},
+
+	finishDownload(count) {
+		const lastProgress = document.getElementById(`p${count}`);
+		if (lastProgress)
+			lastProgress.textContent = window.i18n.__("fileSaved");
+		this.ui.pasteLinkBtn.style.display = "inline-block";
+		this.ui.openDownloadsBtn.style.display = "inline-block";
+
+		const notify = new Notification("ytDownloader", {
+			body: window.i18n.__("playlistDownloaded"),
+			icon: "../assets/images/icon.png",
+		});
+
+		notify.onclick = () => this.openDownloadsFolder();
+	},
+
+	showError(error) {
+		console.error("Download Error:", error.toString());
+		this.ui.pasteLinkBtn.style.display = "inline-block";
+		this.ui.openDownloadsBtn.style.display = "none";
+		this.ui.optionsContainer.style.display = "block";
+		this.ui.playlistNameDisplay.textContent = "";
+		this.ui.errorMsgDisplay.textContent =
+			window.i18n.__("errorNetworkOrUrl");
+		this.ui.errorMsgDisplay.style.display = "block";
+		this.ui.errorMsgDisplay.title = error.toString();
+		this.ui.errorBtn.style.display = "inline-block";
+		this.ui.errorDetails.innerHTML = `<strong>URL: ${
+			this.state.url
+		}</strong><br><br>${error.toString()}`;
+		// this.ui.errorDetails.title = window.i18n.__("clickToCopy");
+	},
+
+	openDownloadsFolder() {
+		const openPath =
+			this.state.playlistName &&
+			fs.existsSync(
+				path.join(this.state.downloadDir, this.state.playlistName)
+			)
+				? path.join(this.state.downloadDir, this.state.playlistName)
+				: this.state.downloadDir;
+		ipcRenderer.send("open-folder", openPath);
+	},
+
+	toggleDownloadType(type) {
+		const isVideo = type === "video";
+		this.ui.videoToggle.style.backgroundColor = isVideo
+			? "var(--box-toggleOn)"
+			: "var(--box-toggle)";
+		this.ui.audioToggle.style.backgroundColor = isVideo
+			? "var(--box-toggle)"
+			: "var(--box-toggleOn)";
+		this.ui.videoBox.style.display = isVideo ? "block" : "none";
+		this.ui.audioBox.style.display = isVideo ? "none" : "block";
+	},
+
+	updateVideoTypeVisibility() {
+		const value = this.ui.videoQualitySelect.value;
+		const show = !["best", "worst", "useConfig"].includes(value);
+		this.ui.typeSelectBox.style.display = show ? "block" : "none";
+	},
+
+	toggleAdvancedMenu() {
+		const isHidden =
+			this.ui.advancedMenu.style.display === "none" ||
+			this.ui.advancedMenu.style.display === "";
+		this.ui.advancedMenu.style.display = isHidden ? "block" : "none";
+	},
+
+	closeMenu() {
+		this.ui.menuIcon.style.transform = "rotate(0deg)";
+		this.ui.menu.style.opacity = "0";
+		setTimeout(() => {
+			this.ui.menu.style.display = "none";
+		}, 300);
+	},
+
+	navigate(type, page) {
+		this.closeMenu();
+		const event = type === "page" ? "load-page" : "load-win";
+		ipcRenderer.send(event, path.join(__dirname, page));
+	},
+
+	getFfmpegPath() {
 		if (
-			(eventData.includes(videoIndex) ||
-				eventData.includes(oldVideoIndex)) &&
-			!eventData.includes("thumbnail")
+			process.env.YTDOWNLOADER_FFMPEG_PATH &&
+			fs.existsSync(process.env.YTDOWNLOADER_FFMPEG_PATH)
 		) {
-			count += 1;
-			originalCount++;
-
-			let itemTitle;
-			itemTitle = i18n.__("thumbnail") + " " + originalCount;
-
-			if (count > 1) {
-				getId(`p${count - 1}`).textContent = i18n.__("File saved.");
-			}
-
-			const item = `<div class="playlistItem">
-			<p class="itemTitle">${itemTitle}</p>
-			<p class="itemProgress" id="p${count}">${i18n.__("Downloading...")}</p>
-			</div>`;
-			getId("list").innerHTML += item;
-
-			window.scrollTo(0, document.body.scrollHeight);
-		}
-	});
-
-	downloadProcess.on("error", (error) => {
-		showErrorTxt(error);
-	});
-	downloadProcess.on("close", () => {
-		afterClose(count);
-	});
-}
-
-// Download video links
-function saveLinks() {
-	let count = 0;
-	hideOptions();
-	nameFormatting();
-	managePlaylistRange();
-
-	const args = [
-		"--yes-playlist",
-		"--no-warnings",
-		cookieArg,
-		browser,
-		"--skip-download",
-		"--print-to-file",
-		"webpage_url",
-		`"${path.join(downloadDir, foldernameFormat, "links.txt")}"`,
-		"--skip-download",
-		"-I",
-		`"${playlistIndex}:${playlistEnd}"`,
-		proxy ? "--no-check-certificate" : "",
-		proxy ? "--proxy" : "",
-		proxy,
-		"--compat-options",
-		"no-youtube-unavailable-videos",
-		`"${url}"`,
-	].filter((item) => item);
-
-	const downloadProcess = ytdlp.exec(args, {shell: true, detached: false});
-
-	downloadProcess.on("ytDlpEvent", (eventType, eventData) => {
-		// console.log(eventData);
-
-		if (eventData.includes(playlistTxt)) {
-			playlistName = eventData.split("playlist:")[1].slice(1);
-			getId("playlistName").textContent =
-				i18n.__("downloadingPlaylist") + " " + playlistName;
-			console.log(playlistName);
+			console.log("Using FFMPEG from YTDOWNLOADER_FFMPEG_PATH");
+			return process.env.YTDOWNLOADER_FFMPEG_PATH;
 		}
 
+		switch (os.platform()) {
+			case "win32":
+				return path.join(__dirname, "..", "ffmpeg.exe");
+			case "freebsd":
+				try {
+					return execSync("which ffmpeg").toString("utf8").trim();
+				} catch (error) {
+					console.error("ffmpeg not found on FreeBSD:", error);
+					return "";
+				}
+			default:
+				return path.join(__dirname, "..", "ffmpeg");
+		}
+	},
+
+	getJsRuntimePath() {
 		if (
-			(eventData.includes(videoIndex) ||
-				eventData.includes(oldVideoIndex)) &&
-			!eventData.includes("thumbnail")
+			process.env.YTDOWNLOADER_DENO_PATH &&
+			fs.existsSync(process.env.YTDOWNLOADER_DENO_PATH)
 		) {
-			count += 1;
-			let itemTitle;
-			itemTitle = i18n.__("Link") + " " + count;
-
-			if (count > 1) {
-				getId(`p${count - 1}`).textContent = i18n.__("linkAdded");
-			}
-
-			const item = `<div class="playlistItem">
-			<p class="itemTitle">${itemTitle}</p>
-			<p class="itemProgress" id="p${count}">${i18n.__("downloading")}</p>
-			</div>`;
-			getId("list").innerHTML += item;
-
-			window.scrollTo(0, document.body.scrollHeight);
-		}
-	});
-
-	downloadProcess.on("close", () => {
-		afterClose(count);
-	});
-
-	downloadProcess.on("error", (error) => {
-		showErrorTxt(error);
-	});
-}
-
-function getJsRuntimePath() {
-	if (process.env.YTDOWNLOADER_DENO_PATH) {
-		if (fs.existsSync(process.env.YTDOWNLOADER_DENO_PATH)) {
 			return `deno:"${process.env.YTDOWNLOADER_DENO_PATH}"`;
 		}
 
-		return "";
-	}
+		if (os.platform() === "darwin") return "";
 
-	let denoPath = path.join(__dirname, "..", "deno");
+		let denoExe = os.platform() === "win32" ? "deno.exe" : "deno";
+		const denoPath = path.join(__dirname, "..", denoExe);
 
-	if (os.platform() === "win32") {
-		denoPath = path.join(__dirname, "..", "deno.exe");
-	}
+		return fs.existsSync(denoPath) ? `deno:"${denoPath}"` : "";
+	},
+};
 
-	if (os.platform() === "darwin") {
-		return "";
-	} else {
-		if (fs.existsSync(denoPath)) {
-			return `deno:"${denoPath}"`;
-		} else {
-			return "";
-		}
-	}
-}
-
-// Downloading video
-getId("download").addEventListener("click", () => {
-	download("video");
-});
-
-// Downloading audio
-getId("audioDownload").addEventListener("click", () => {
-	download("audio");
-});
-
-// Downloading thumbnails
-getId("downloadThumbnails").addEventListener("click", () => {
-	downloadThumbnails();
-});
-
-// Saving video links to a text file
-getId("saveLinks").addEventListener("click", () => {
-	saveLinks();
-});
-
-// Selecting download directory
-getId("selectLocation").addEventListener("click", () => {
-	ipcRenderer.send("select-location-main", "");
-});
-
-ipcRenderer.on("downloadPath", (event, downloadPath) => {
-	console.log(downloadPath);
-	getId("path").textContent = downloadPath[0];
-	downloadDir = downloadPath[0];
-});
-
-function openFolder(location) {
-	ipcRenderer.send("open-folder", location);
-}
-
-function closeMenu() {
-	getId("menuIcon").style.transform = "rotate(0deg)";
-	getId("menu").style.opacity = "0";
-	setTimeout(() => {
-		getId("menu").style.display = "none";
-	}, 500);
-}
-
-// Video and audio toggle
-const videoToggle = getId("videoToggle");
-const audioToggle = getId("audioToggle");
-
-videoToggle.style.backgroundColor = "var(--box-toggleOn)";
-
-videoToggle.addEventListener("click", (event) => {
-	videoToggle.style.backgroundColor = "var(--box-toggleOn)";
-	audioToggle.style.backgroundColor = "var(--box-toggle)";
-	getId("audioBox").style.display = "none";
-	getId("videoBox").style.display = "block";
-});
-
-audioToggle.addEventListener("click", (event) => {
-	audioToggle.style.backgroundColor = "var(--box-toggleOn)";
-	videoToggle.style.backgroundColor = "var(--box-toggle)";
-	getId("videoBox").style.display = "none";
-	getId("audioBox").style.display = "block";
-});
-
-getId("select").addEventListener("change", () => {
-	const value = getId("select").value;
-	if (value == "best" || value == "worst" || value == "useConfig") {
-		getId("typeSelectBox").style.display = "none";
-	} else {
-		getId("typeSelectBox").style.display = "block";
-	}
-});
-
-getId("closeHidden").addEventListener("click", () => {
-	hideOptions(true);
-});
-
-// More options
-
-let moreOptions = true;
-getId("advancedToggle").addEventListener("click", () => {
-	if (moreOptions) {
-		getId("advancedMenu").style.display = "block";
-		moreOptions = false;
-	} else {
-		getId("advancedMenu").style.display = "none";
-		moreOptions = true;
-	}
-});
-
-// Menu
-getId("openDownloads").addEventListener("click", () => {
-	if (playlistName != "") {
-		openFolder(path.join(downloadDir, playlistName));
-	} else {
-		openFolder(downloadDir);
-	}
-});
-
-getId("preferenceWin").addEventListener("click", () => {
-	closeMenu();
-	ipcRenderer.send("load-page", __dirname + "/preferences.html");
-});
-
-getId("aboutWin").addEventListener("click", () => {
-	closeMenu();
-	ipcRenderer.send("load-page", __dirname + "/about.html");
-});
-
-getId("historyWin").addEventListener("click", () => {
-	closeMenu();
-	ipcRenderer.send("load-page", __dirname + "/history.html");
-});
-
-getId("homeWin").addEventListener("click", () => {
-	closeMenu();
-	ipcRenderer.send("load-win", __dirname + "/index.html");
-});
-
-getId("compressorWin").addEventListener("click", () => {
-	closeMenu();
-	ipcRenderer.send("load-win", __dirname + "/compressor.html");
-});
+playlistDownloader.init();
