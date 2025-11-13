@@ -287,11 +287,18 @@ function registerIpcHandlers() {
 		}
 	});
 
-	ipcMain.on("open-folder", async (_event, folderPath) => {
+
+	ipcMain.handle("open-folder", async (_event, folderPath) => {
 		try {
 			await fs.stat(folderPath);
-			shell.openPath(folderPath);
+			const result = await shell.openPath(folderPath);
+			if (result) {
+				return {success: false, error: result};
+			} else {
+				return {success: true};
+			}
 		} catch (error) {
+			return {success: false, error: error.message};
 		}
 	});
 
