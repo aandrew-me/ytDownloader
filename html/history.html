@@ -609,21 +609,21 @@
 
                 const copyBtn = document.createElement('button');
                 copyBtn.className = 'copy-url-btn';
-                copyBtn.textContent = i18n.__('Copy URL');
+                copyBtn.textContent = i18n.__('copyUrl');
                 copyBtn.addEventListener('click', () => copyToClipboard(item.url));
                 actions.appendChild(copyBtn);
 
 
                 const openBtn = document.createElement('button');
                 openBtn.className = 'open-file-btn';
-                openBtn.textContent = i18n.__('Open');
+                openBtn.textContent = i18n.__('open');
                 openBtn.addEventListener('click', () => openFile(item.filePath));
                 actions.appendChild(openBtn);
 
 
                 const deleteBtn = document.createElement('button');
                 deleteBtn.className = 'delete-btn';
-                deleteBtn.textContent = i18n.__('Delete');
+                deleteBtn.textContent = i18n.__('delete');
                 deleteBtn.addEventListener('click', () => deleteHistoryItem(item.id));
                 actions.appendChild(deleteBtn);
 
@@ -731,8 +731,7 @@
                     filterHistory();
                 }).catch((error) => {
                     console.error("Failed to delete history item:", error);
-                    // TODO: Translate
-                    showPopup("Failed to delete history item. Please try again.", true);
+                    showPopup(i18n.__("failedToDeleteHistoryItem"), true);
                 });
             }
         }
