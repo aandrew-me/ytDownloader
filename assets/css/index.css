@@ -1126,3 +1126,13 @@ input[type="range"]::-webkit-slider-thumb {
 input[type="range"]::-webkit-slider-thumb:hover {
 	transform: scale(1.1);
 }
+
+#customArgsInput {
+	padding: 8px;
+	width: 94%;
+	margin: auto;
+	outline: none;
+	font-family: "JetBrains";
+	border-radius: 8px;
+	resize: vertical;
+}

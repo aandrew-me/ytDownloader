@@ -644,7 +644,7 @@ const playlistDownloader = {
 
 		switch (os.platform()) {
 			case "win32":
-				return path.join(__dirname, "..", "ffmpeg.exe");
+				return path.join(__dirname, "..", "ffmpeg", "bin");
 			case "freebsd":
 				try {
 					return execSync("which ffmpeg").toString("utf8").trim();
@@ -653,7 +653,7 @@ const playlistDownloader = {
 					return "";
 				}
 			default:
-				return path.join(__dirname, "..", "ffmpeg");
+				return path.join(__dirname, "..", "ffmpeg", "bin");
 		}
 	},
 
