@@ -799,6 +799,9 @@ class YtDownloaderApp {
 				);
 			})
 			.once("error", (error) => {
+				this.state.downloadedItems.add(randomId);
+				this._updateClearAllButton();
+
 				this._handleDownloadError(error, randomId);
 			});
 	}
@@ -1452,7 +1455,12 @@ class YtDownloaderApp {
 		this.state.downloadQueue = this.state.downloadQueue.filter(
 			(job) => job.queueId !== id
 		);
+
+		// If it has been downloaded, remove from the set
+		this.state.downloadedItems.delete(id);
+
 		this._fadeAndRemoveItem(id);
+		this._updateClearAllButton();
 	}
 
 	/**
