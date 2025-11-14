@@ -9,12 +9,18 @@ permissions:
 jobs:
     build_and_release:
         runs-on: ${{ matrix.os }}
-        env: 
-          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        env:
+            SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_TOKEN }}
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         strategy:
             matrix:
-                os: [macos-latest, macos-15-intel, ubuntu-latest, windows-latest]
+                os:
+                    [
+                        macos-latest,
+                        macos-15-intel,
+                        ubuntu-latest,
+                        windows-latest,
+                    ]
 
         steps:
             - name: Checkout code
@@ -23,38 +29,55 @@ jobs:
             - name: Install Node.js, NPM and Yarn
               uses: actions/setup-node@v4
               with:
-                  node-version: 20
+                  node-version: 24
+
             - name: Linux Build
               if: matrix.os == 'ubuntu-latest'
+              run: |
+                  sudo snap install snapcraft --classic
+                  wget "https://github.com/aandrew-me/ffmpeg-builds/releases/download/v8/ffmpeg_linux_amd64.tar.xz"
+                  wget "https://github.com/aandrew-me/ffmpeg-builds/releases/download/v8/deno_linux_amd64" -O deno
+                  chmod +x deno
+                  tar -xf ffmpeg_linux_amd64.tar.xz
+                  mv ffmpeg_linux_amd64 ffmpeg
+                  chmod +x ffmpeg/bin/ffmpeg
+                  chmod +x ffmpeg/bin/ffprobe
+                  chmod +x ffmpeg/bin/ffplay
+                  rm ffmpeg_linux_amd64.tar.xz
+                  npm i
+                  npx electron-builder -l --publish=always
+                  npm run gh-linux
 
-              run: |
-                sudo snap install snapcraft --classic
-                wget "https://github.com/aandrew-me/ffmpeg-builds/releases/download/v6/ffmpeg_linux_amd64"
-                mv ffmpeg_linux_amd64 ffmpeg
-                chmod +x ffmpeg
-                npm i
-                npx electron-builder -l --publish=always
-                npm run gh-linux
-            
             - name: Macos Intel Build
-              if: matrix.os == 'macos-13'
+              if: matrix.os == 'macos-15-intel'
               run: |
-                curl -L https://github.com/aandrew-me/ffmpeg-builds/releases/download/v6/ffmpeg_mac_amd64 -o ffmpeg
-                chmod +x ffmpeg
-                npm i
-                npm run gh-mac
-            
+                  mkdir -p ffmpeg/bin
+                  curl -L https://github.com/aandrew-me/ffmpeg-builds/releases/download/v8/ffmpeg_mac_amd64 -o ffmpeg/bin/ffmpeg
+                  curl -L https://github.com/aandrew-me/ffmpeg-builds/releases/download/v8/ffprobe_mac_amd64 -o ffmpeg/bin/ffprobe
+                  chmod +x ffmpeg/bin/ffmpeg
+                  chmod +x ffmpeg/bin/ffprobe
+                  npm i
+                  npm run gh-mac
+
             - name: Macos Arm Build
               if: matrix.os == 'macos-latest'
               run: |
-                curl -L https://github.com/aandrew-me/ffmpeg-builds/releases/download/v6/ffmpeg_mac_arm64 -o ffmpeg
-                chmod +x ffmpeg
-                npm i
-                npm run gh-mac
-            
+                  mkdir -p ffmpeg/bin
+                  curl -L https://github.com/aandrew-me/ffmpeg-builds/releases/download/v8/ffmpeg_mac_arm64 -o ffmpeg/bin/ffmpeg
+                  curl -L https://github.com/aandrew-me/ffmpeg-builds/releases/download/v8/ffprobe_mac_arm64 -o ffmpeg/bin/ffprobe
+                  chmod +x ffmpeg/bin/ffmpeg
+                  chmod +x ffmpeg/bin/ffprobe
+                  npm i
+                  npm run gh-mac
+
             - name: Windows Build
               if: matrix.os == 'windows-latest'
+              shell: powershell
               run: |
-                Invoke-WebRequest -Uri "https://github.com/aandrew-me/ffmpeg-builds/releases/download/v6/ffmpeg.exe" -OutFile ffmpeg.exe
-                npm i
-                npm run gh-windows
+                  Invoke-WebRequest -Uri "https://github.com/aandrew-me/ffmpeg-builds/releases/download/v8/deno.exe" -OutFile deno.exe
+                  Invoke-WebRequest -Uri "https://github.com/aandrew-me/ffmpeg-builds/releases/download/v8/ffmpeg_win64.zip" -OutFile ffmpeg_win64.zip
+                  Expand-Archive -Path ffmpeg_win64.zip -DestinationPath .
+                  Move-Item -Path .\ffmpeg_win64 -Destination .\ffmpeg
+                  Remove-Item -Path ffmpeg_win64.zip
+                  npm i
+                  npm run gh-windows

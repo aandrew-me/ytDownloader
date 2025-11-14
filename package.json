@@ -14,9 +14,6 @@
 		"windows": "electron-builder -w",
 		"linux": "electron-builder -l",
 		"mac": "electron-builder -m",
-		"publish-linux": "cp ../ffmpeg-bin/ffmpeg . && electron-builder -l --publish=always",
-		"publish-windows": "cp ../ffmpeg-bin/ffmpeg.exe . && electron-builder -w --publish=always",
-		"publish-mac": "cp ../ffmpeg-bin/mac/ffmpeg . && electron-builder -m --publish=always",
 		"gh-windows": "electron-builder -w --publish=always",
 		"gh-linux": "electron-builder -l --publish=always",
 		"gh-mac": "electron-builder -m --publish=always"
@@ -51,7 +48,7 @@
 			"package.json",
 			"./assets/**/*",
 			"./src/*.js",
-			"ffmpeg*",
+			"./ffmpeg/**/*",
 			"!ffmpeg.patch",
 			"translations",
 			"deno*"

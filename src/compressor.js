@@ -5,7 +5,6 @@ const os = require("os");
 const si = require("systeminformation");
 const {existsSync} = require("fs");
 
-
 document.addEventListener("translations-loaded", () => {
 	window.i18n.translatePage();
 });
@@ -39,34 +38,7 @@ getId("menuIcon").addEventListener("click", () => {
 	}
 });
 
-let ffmpeg;
-// Ffmpeg check
-if (os.platform() === "win32") {
-	ffmpeg = `"${__dirname}\\..\\ffmpeg.exe"`;
-} else if (os.platform() === "freebsd") {
-	try {
-		ffmpeg = execSync("which ffmpeg")
-			.toString("utf8")
-			.split("\n")[0]
-			.trim();
-	} catch (error) {
-		showPopup("No ffmpeg found in PATH");
-	}
-} else {
-	ffmpeg = `"${__dirname}/../ffmpeg"`;
-}
-
-if (process.env.YTDOWNLOADER_FFMPEG_PATH) {
-	ffmpeg = `"${process.env.YTDOWNLOADER_FFMPEG_PATH}"`;
-
-	if (existsSync(process.env.YTDOWNLOADER_FFMPEG_PATH)) {
-		console.log("Using YTDOWNLOADER_FFMPEG_PATH");
-	} else {
-		showPopup(
-			"You have specified YTDOWNLOADER_FFMPEG_PATH, but no file exists there."
-		);
-	}
-}
+const ffmpeg = `"${getFfmpegPath()}"`;
 
 console.log(ffmpeg);
 
@@ -575,6 +547,30 @@ function timeToSeconds(timeStr) {
 
 	const [hh, mm, ss] = timeStr.split(":").map(parseFloat);
 	return hh * 3600 + mm * 60 + ss;
+}
+
+function getFfmpegPath() {
+	if (
+		process.env.YTDOWNLOADER_FFMPEG_PATH &&
+		existsSync(process.env.YTDOWNLOADER_FFMPEG_PATH)
+	) {
+		console.log("Using FFMPEG from YTDOWNLOADER_FFMPEG_PATH");
+		return process.env.YTDOWNLOADER_FFMPEG_PATH;
+	}
+
+	switch (os.platform()) {
+		case "win32":
+			return path.join(__dirname, "..", "ffmpeg", "bin", "ffmpeg.exe");
+		case "freebsd":
+			try {
+				return execSync("which ffmpeg").toString("utf8").trim();
+			} catch (error) {
+				console.error("ffmpeg not found on FreeBSD:", error);
+				return "";
+			}
+		default:
+			return path.join(__dirname, "..", "ffmpeg", "bin", "ffmpeg");
+	}
 }
 
 getId("themeToggle").addEventListener("change", () => {
