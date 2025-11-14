@@ -50,6 +50,7 @@ const CONSTANTS = {
 		POPUP_BOX_MAC: "popupBoxMac",
 		POPUP_TEXT: "popupText",
 		POPUP_SVG: "popupSvg",
+		YTDLP_DOWNLOAD_PROGRESS: "ytDlpDownloadProgress",
 		// Menu
 		MENU_ICON: "menuIcon",
 		MENU: "menu",
@@ -379,19 +380,37 @@ class YtDownloaderApp {
 			);
 
 			try {
-				await YTDlpWrap.downloadFromGithub(defaultYtDlpPath);
+				await YTDlpWrap.downloadFromGithub(
+					defaultYtDlpPath,
+					undefined,
+					undefined,
+					(progress, _d, _t) => {
+						$(
+							CONSTANTS.DOM_IDS.YTDLP_DOWNLOAD_PROGRESS
+						).textContent =
+							i18n.__("progress") +
+							`: ${(progress * 100).toFixed(2)}%`;
+					}
+				);
+
 				$(CONSTANTS.DOM_IDS.POPUP_BOX).style.display = "none";
+
 				localStorage.setItem(
 					CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_PATH,
 					defaultYtDlpPath
 				);
+
 				return defaultYtDlpPath;
 			} catch (downloadError) {
+				$(CONSTANTS.DOM_IDS.YTDLP_DOWNLOAD_PROGRESS).textContent = "";
+
 				console.error("Failed to download yt-dlp:", downloadError);
+
 				document.querySelector("#popupBox p").textContent = i18n.__(
 					"errorFailedFileDownload"
 				);
 				$(CONSTANTS.DOM_IDS.POPUP_SVG).style.display = "none";
+
 				throw new Error("Failed to download yt-dlp.");
 			}
 		}
