@@ -15,7 +15,7 @@ A modern GUI video and audio downloader supporting [hundreds of sites](https://g
 
 [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/ytdownloader)
 [![Get AppImage](https://raw.githubusercontent.com/srevinsaju/get-appimage/master/static/badges/get-appimage-branding-blue.png)](https://github.com/aandrew-me/ytDownloader/releases/latest/download/YTDownloader_Linux.AppImage)
-<a href="https://flathub.org/apps/io.github.aandrew_me.ytdn"><img src="https://flathub.org/assets/badges/flathub-badge-en.svg" style="width:180px;"></a>
+<a href="https://flathub.org/apps/io.github.aandrew_me.ytdn"><img src="https://flathub.org/api/badge?svg&locale=en" style="width:180px;"></a>
 <a href="https://github.com/aandrew-me/ytDownloader/releases/latest/download/YTDownloader_Win.exe
 "><img src="https://user-images.githubusercontent.com/66430340/187172806-a8edd12a-ef58-4a05-96a3-99d7490b42f6.png" style="width:190px;"></a>
 <a href="https://github.com/aandrew-me/ytDownloader/releases/latest/download/YTDownloader_Mac_arm64.dmg"><img src="https://cdn.jsdelivr.net/gh/aandrew-me/badges/download_mac_apple_silicon.png" style="width:200px;"></a>
