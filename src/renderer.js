@@ -73,6 +73,7 @@ const CONSTANTS = {
 		CONFIG_PATH: "configPath",
 		AUTO_UPDATE: "autoUpdate",
 		CLOSE_TO_TRAY: "closeToTray",
+		YT_DLP_CUSTOM_ARGS: "customYtDlpArgs",
 	},
 };
 
@@ -116,7 +117,7 @@ class YtDownloaderApp {
 				showMoreFormats: false,
 				proxy: "",
 				browserForCookies: "",
-				configPath: "",
+				customYtDlpArgs: "",
 			},
 			downloadControllers: new Map(),
 			downloadedItems: new Set(),
@@ -368,11 +369,25 @@ class YtDownloaderApp {
 		}
 
 		// Priority 4: Default location or download
+		const ytDlpPath = await this.ensureYtDlpBinary(defaultYtDlpPath)
+		return ytDlpPath
+	}
+
+	/**
+	 * Checks for the presence of the yt-dlp binary at the default path.
+	 * If not found, it attempts to download it from GitHub.
+	 *
+	 * @param {string} defaultYtDlpPath The expected path to the yt-dlp binary.
+	 * @returns {Promise<string>} A promise that resolves with the path to the yt-dlp binary.
+	 * @throws {Error} Throws an error if the download fails.
+	 */
+	async ensureYtDlpBinary(defaultYtDlpPath) {
 		try {
 			await promises.access(defaultYtDlpPath);
 			return defaultYtDlpPath;
 		} catch {
 			console.log("yt-dlp not found, downloading...");
+
 			$(CONSTANTS.DOM_IDS.POPUP_BOX).style.display = "block";
 			$(CONSTANTS.DOM_IDS.POPUP_SVG).style.display = "inline";
 			document.querySelector("#popupBox p").textContent = i18n.__(
@@ -410,6 +425,16 @@ class YtDownloaderApp {
 					"errorFailedFileDownload"
 				);
 				$(CONSTANTS.DOM_IDS.POPUP_SVG).style.display = "none";
+
+
+				const tryAgainBtn = document.createElement("button");
+				tryAgainBtn.id = "tryBtn";
+				tryAgainBtn.textContent = i18n.__("tryAgain")
+				tryAgainBtn.addEventListener("click", () => {
+					// TODO: Improve it
+					ipcRenderer.send("reload");
+				});
+				document.getElementById("popup").appendChild(tryAgainBtn)
 
 				throw new Error("Failed to download yt-dlp.");
 			}
@@ -505,14 +530,22 @@ class YtDownloaderApp {
 			localStorage.getItem(
 				CONSTANTS.LOCAL_STORAGE_KEYS.BROWSER_COOKIES
 			) || "";
-		prefs.configPath =
-			localStorage.getItem(CONSTANTS.LOCAL_STORAGE_KEYS.CONFIG_PATH) ||
-			"";
+		prefs.customYtDlpArgs =
+			localStorage.getItem(
+				CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_CUSTOM_ARGS
+			) || "";
 
+		this.state.downloadDir = localStorage.getItem(
+			CONSTANTS.LOCAL_STORAGE_KEYS.DOWNLOAD_PATH
+		);
 		const maxDownloads = Number(
 			localStorage.getItem(CONSTANTS.LOCAL_STORAGE_KEYS.MAX_DOWNLOADS)
 		);
 		this.state.maxActiveDownloads = maxDownloads >= 1 ? maxDownloads : 5;
+
+		// Update UI with loaded settings
+		$(CONSTANTS.DOM_IDS.CUSTOM_ARGS_INPUT).value = prefs.customYtDlpArgs;
+		$(CONSTANTS.DOM_IDS.PATH_DISPLAY).textContent = this.state.downloadDir;
 	}
 
 	/**

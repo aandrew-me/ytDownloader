@@ -18,7 +18,7 @@ process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = "true";
 autoUpdater.autoDownload = false;
 
 const USER_DATA_PATH = app.getPath("userData");
-const CONFIG_FILE_PATH = path.join(USER_DATA_PATH, "config.json");
+const CONFIG_FILE_PATH = path.join(USER_DATA_PATH, "ytdownloader.json");
 
 const appState = {
 	/** @type {BrowserWindow | null} */
@@ -199,14 +199,14 @@ function createTray() {
 
 	const contextMenu = Menu.buildFromTemplate([
 		{
-			label: i18n("Open app"),
+			label: i18n("openApp"),
 			click: () => {
 				appState.mainWindow?.show();
 				if (app.dock) app.dock.show();
 			},
 		},
 		{
-			label: i18n("Paste video link"),
+			label: i18n("pasteVideoLink"),
 			click: async () => {
 				const text = clipboard.readText();
 				appState.mainWindow?.show();
@@ -226,7 +226,7 @@ function createTray() {
 			},
 		},
 		{
-			label: i18n("Download playlist"),
+			label: i18n("downloadPlaylistButton"),
 			click: () => {
 				appState.indexPageIsOpen = false;
 				appState.mainWindow?.loadFile("html/playlist.html");
@@ -235,7 +235,7 @@ function createTray() {
 			},
 		},
 		{
-			label: i18n("Quit"),
+			label: i18n("quit"),
 			click: () => {
 				app.quit();
 			},
@@ -445,9 +445,9 @@ function registerAutoUpdaterEvents() {
 	autoUpdater.on("update-available", async (info) => {
 		const dialogOpts = {
 			type: "info",
-			buttons: [i18n("Update"), i18n("No")],
+			buttons: [i18n("update"), i18n("no")],
 			title: "Update Available",
-			message: `A new version (${info.version}) is available. Do you want to update?`,
+			message: i18n("updateAvailablePrompt"),
 			detail:
 				info.releaseNotes?.toString().replace(/<[^>]*>?/gm, "") ||
 				"No details available.",
@@ -464,9 +464,9 @@ function registerAutoUpdaterEvents() {
 	autoUpdater.on("update-downloaded", async () => {
 		const dialogOpts = {
 			type: "info",
-			buttons: [i18n("Restart"), i18n("Later")],
+			buttons: [i18n("restart"), i18n("later")],
 			title: "Update Ready",
-			message: "The update has been downloaded. Install and restart now?",
+			message: i18n("installAndRestartPrompt"),
 		};
 		const {response} = await dialog.showMessageBox(
 			appState.mainWindow,
@@ -481,7 +481,7 @@ function registerAutoUpdaterEvents() {
 		console.error("Auto-update error:", error);
 		dialog.showErrorBox(
 			"Update Error",
-			`An error occurred during the update process: ${error.message}`
+			i18n("updateError")
 		);
 	});
 }
@@ -501,21 +501,6 @@ async function loadConfiguration() {
 	try {
 		const fileContent = await fs.readFile(CONFIG_FILE_PATH, "utf8");
 		appState.config = JSON.parse(fileContent);
-
-		if (appState.config && typeof appState.config.bounds === "string") {
-			console.log("Old config format detected. Migrating...");
-
-			try {
-				appState.config.bounds = JSON.parse(appState.config.bounds);
-			} catch (migrationError) {
-				console.error(
-					"Failed to migrate from old config. Resetting to default.",
-					migrationError
-				);
-
-				appState.config.bounds = {width: 1024, height: 768};
-			}
-		}
 	} catch (error) {
 		console.log(
 			"Could not load config file, using defaults.",

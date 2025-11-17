@@ -26,10 +26,12 @@
     </div>
 
     <div class="prefBox">
-        <span id="clText" data-translate="currentDownloadLocation">Current download location - </span><span id="path"></span>
+        <span id="clText" data-translate="currentDownloadLocation">Current download location - </span><span
+            id="path"></span>
     </div>
 
-    <button id="selectLocation" class="greenBtn" data-translate="selectDownloadLocation">Select Download Location</button>
+    <button id="selectLocation" class="greenBtn" data-translate="selectDownloadLocation">Select Download
+        Location</button>
 
     <p id="msg">
     </p>
@@ -128,6 +130,14 @@
         <span id="proxyTitle" data-translate="proxy">Proxy</span>
         <input type="text" id="proxyTxt" placeholder="Example: http://localhost:8080"
             pattern="^(http:\/\/|https:\/\/|socks5:\/\/)?[a-zA-Z0-9.]+:[\d]+$">
+    </div>
+
+    <div id="ytDlpArgBox">
+        <p>
+            <span data-translate="customArgsTxt">Set custom yt-dlp arguments.</span>
+            <a data-translate="learnMore" id="learnMoreLink">Learn more</a>
+        </p>
+        <textarea spellcheck="false" id="customArgsInput" placeholder="--sponsorblock-remove all"></textarea>
     </div>
 
     <div id="pathConfig">
