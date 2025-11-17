@@ -186,6 +186,12 @@ input[type="text"],
 	background-color: var(--box-main);
 }
 
+#ytDlpArgBox {
+	margin: 15px 15px;
+	padding: 20px 15px;
+	border-radius: 15px;
+	background-color: var(--box-main);
+}
 #path {
 	font-family: "JetBrains";
 	font-size: medium;
@@ -330,4 +336,15 @@ body::-webkit-scrollbar-thumb {
 
 #proxyTxt:invalid {
 	border: 2px solid var(--redBtn);
+}
+
+#customArgsInput {
+	padding: 8px;
+	width: 94%;
+	margin: auto;
+	outline: none;
+	font-family: "JetBrains";
+	border-radius: 8px;
+	resize: none;
+	overflow: hidden;
 }

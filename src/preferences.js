@@ -24,7 +24,7 @@ if (rightToLeft == "true") {
 let downloadPath = localStorage.getItem("downloadPath");
 getId("path").textContent = downloadPath;
 
-const {ipcRenderer} = require("electron");
+const {ipcRenderer, shell} = require("electron");
 /**
  *
  * @param {string} id
@@ -161,6 +161,24 @@ getId("proxyTxt").addEventListener("change", () => {
 	proxy = getId("proxyTxt").value;
 	localStorage.setItem("proxy", proxy);
 });
+
+// Custom yt-dlp args
+const ytDlpArgsInput = getId("customArgsInput");
+let customYtDlpArgs = localStorage.getItem("customYtDlpArgs");
+if (customYtDlpArgs) {
+	ytDlpArgsInput.value = customYtDlpArgs;
+	ytDlpArgsInput.style.height = ytDlpArgsInput.scrollHeight + "px";
+}
+ytDlpArgsInput.addEventListener("input", () => {
+	customYtDlpArgs = getId("customArgsInput").value;
+	localStorage.setItem("customYtDlpArgs", customYtDlpArgs.trim());
+	ytDlpArgsInput.style.height = "auto";
+	ytDlpArgsInput.style.height = ytDlpArgsInput.scrollHeight + "px";
+});
+
+getId("learnMoreLink").addEventListener("click", () => {
+	shell.openExternal("https://github.com/aandrew-me/ytDownloader/wiki/Custom-yt%E2%80%90dlp-options")
+})
 
 // Reload
 function reload() {
