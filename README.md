@@ -6,7 +6,7 @@
 [![GitHub downloads](https://img.shields.io/github/downloads/aandrew-me/ytdownloader/total?label=Github%20downloads)](https://github.com/aandrew-me/ytDownloader/releases)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/aandrew-me/ytdownloader?label=latest%20release)](https://github.com/aandrew-me/ytDownloader/releases/latest)
 [![Flathub](https://img.shields.io/flathub/v/io.github.aandrew_me.ytdn)](https://flathub.org/apps/io.github.aandrew_me.ytdn)
-[![Snapcraft](https://badgen.net/snapcraft/v/ytdownloader)](https://snapcraft.io/ytdownloader)
+[![Snapcraft](https://img.shields.io/snapcraft/v/ytdownloader/latest/stable)](https://snapcraft.io/ytdownloader)
 ![Chocolatey Version](https://img.shields.io/chocolatey/v/ytdownloader)
 ![WinGet Package Version](https://img.shields.io/winget/v/aandrew-me.ytDownloader)
 
