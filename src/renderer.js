@@ -51,6 +51,9 @@ const CONSTANTS = {
 		POPUP_TEXT: "popupText",
 		POPUP_SVG: "popupSvg",
 		YTDLP_DOWNLOAD_PROGRESS: "ytDlpDownloadProgress",
+		UPDATE_POPUP: "updatePopup",
+		UPDATE_POPUP_PROGRESS: "updateProgress",
+		UPDATE_POPUP_BAR: "progressBarFill",
 		// Menu
 		MENU_ICON: "menuIcon",
 		MENU: "menu",
@@ -369,8 +372,8 @@ class YtDownloaderApp {
 		}
 
 		// Priority 4: Default location or download
-		const ytDlpPath = await this.ensureYtDlpBinary(defaultYtDlpPath)
-		return ytDlpPath
+		const ytDlpPath = await this.ensureYtDlpBinary(defaultYtDlpPath);
+		return ytDlpPath;
 	}
 
 	/**
@@ -426,15 +429,14 @@ class YtDownloaderApp {
 				);
 				$(CONSTANTS.DOM_IDS.POPUP_SVG).style.display = "none";
 
-
 				const tryAgainBtn = document.createElement("button");
 				tryAgainBtn.id = "tryBtn";
-				tryAgainBtn.textContent = i18n.__("tryAgain")
+				tryAgainBtn.textContent = i18n.__("tryAgain");
 				tryAgainBtn.addEventListener("click", () => {
 					// TODO: Improve it
 					ipcRenderer.send("reload");
 				});
-				document.getElementById("popup").appendChild(tryAgainBtn)
+				document.getElementById("popup").appendChild(tryAgainBtn);
 
 				throw new Error("Failed to download yt-dlp.");
 			}
@@ -606,9 +608,32 @@ class YtDownloaderApp {
 		// IPC listeners
 		ipcRenderer.on("link", (event, text) => this.getInfo(text));
 		ipcRenderer.on("downloadPath", (event, downloadPath) => {
-			const newPath = downloadPath[0];
-			$(CONSTANTS.DOM_IDS.PATH_DISPLAY).textContent = newPath;
-			this.state.downloadDir = newPath;
+			try {
+				accessSync(downloadPath[0], constants.W_OK);
+
+				const newPath = downloadPath[0];
+				$(CONSTANTS.DOM_IDS.PATH_DISPLAY).textContent = newPath;
+				this.state.downloadDir = newPath;
+			} catch (error) {
+				console.log(error);
+				this._showPopup(i18n.__("unableToAccessDir"), true);
+			}
+		});
+
+		ipcRenderer.on("download-progress", (_event, percent) => {
+			if (percent) {
+				const popup = $(CONSTANTS.DOM_IDS.UPDATE_POPUP);
+				const textEl = $(CONSTANTS.DOM_IDS.UPDATE_POPUP_PROGRESS);
+				const barEl = $(CONSTANTS.DOM_IDS.UPDATE_POPUP_BAR);
+
+				popup.style.display = "flex";
+				textEl.textContent = `${percent.toFixed(1)}%`;
+				barEl.style.width = `${percent}%`;
+			}
+		});
+
+		ipcRenderer.on("update-downloaded", (_event, _) => {
+			$(CONSTANTS.DOM_IDS.UPDATE_POPUP).style.display = "none";
 		});
 
 		// Menu Listeners
