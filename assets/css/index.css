@@ -1052,7 +1052,7 @@ body::-webkit-scrollbar-thumb {
 	flex-shrink: 0;
 	width: 5.5rem;
 	height: 3rem;
-	background-color: var(--background);
+	background-color: var(--box-main);
 	color: var(--text);
 	border-radius: 0.5rem;
 	font-weight: 500;
