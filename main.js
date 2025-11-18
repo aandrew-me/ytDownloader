@@ -384,7 +384,7 @@ function registerIpcHandlers() {
 			type: "error",
 			title: "Error",
 			message: message,
-			buttons: ["Ok", "Copy error"],
+			buttons: ["Ok", i18n("clickToCopy")],
 		});
 		if (response === 1) clipboard.writeText(message);
 	});

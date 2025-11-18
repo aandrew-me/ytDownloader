@@ -170,7 +170,7 @@ async function startCompression() {
 			} else {
 				updateProgress("success", "", itemId);
 				const fileSavedElement = document.createElement("b");
-				fileSavedElement.textContent = "File saved. Click to open";
+				fileSavedElement.textContent = i18n.__("fileSavedClickToOpen");
 				fileSavedElement.onclick = () => {
 					ipcRenderer.send("show-file", outputPath);
 				};
@@ -182,7 +182,7 @@ async function startCompression() {
 			errorElement.onclick = () => {
 				ipcRenderer.send("error_dialog", error.message);
 			};
-			errorElement.textContent = "Error. Click for details";
+			errorElement.textContent = i18n.__("errorClickForDetails");
 			updateProgress("error", "", itemId);
 			getId(itemId + "_prog").appendChild(errorElement);
 			currentItemId = "";
@@ -648,13 +648,3 @@ getId("homeWin").addEventListener("click", () => {
 	menuIsOpen = false;
 	ipcRenderer.send("load-win", __dirname + "/index.html");
 });
-
-// Popup message
-function showPopup(text) {
-	console.log("Triggered showpopup");
-	getId("popupText").textContent = text;
-	getId("popupText").style.display = "inline-block";
-	setTimeout(() => {
-		getId("popupText").style.display = "none";
-	}, 2200);
-}
