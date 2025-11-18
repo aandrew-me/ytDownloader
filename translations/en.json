@@ -159,5 +159,8 @@
 	"failedToDeleteHistoryItem": "Failed to delete history item",
 	"customArgsTxt": "Set custom yt-dlp options.",
 	"learnMore": "Learn more",
-	"updateError": "An error occurred during the update process"
+	"updateError": "An error occurred during the update process",
+	"unableToAccessDir": "The program cannot access that folder",
+	"downloadingUpdate": "Downloading update"
+
 }

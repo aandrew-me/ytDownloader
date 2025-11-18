@@ -1,3 +1,6 @@
+const {ipcRenderer, shell} = require("electron");
+const {accessSync, constants} = require("original-fs");
+
 const storageTheme = localStorage.getItem("theme");
 if (storageTheme) {
 	document.documentElement.setAttribute("theme", storageTheme);
@@ -24,7 +27,6 @@ if (rightToLeft == "true") {
 let downloadPath = localStorage.getItem("downloadPath");
 getId("path").textContent = downloadPath;
 
-const {ipcRenderer, shell} = require("electron");
 /**
  *
  * @param {string} id
@@ -49,10 +51,16 @@ getId("selectLocation").addEventListener("click", () => {
 	ipcRenderer.send("select-location-secondary", "");
 });
 
-ipcRenderer.on("downloadPath", (event, downloadPath) => {
-	console.log(downloadPath[0]);
-	localStorage.setItem("downloadPath", downloadPath[0]);
-	getId("path").textContent = downloadPath[0];
+ipcRenderer.on("downloadPath", (_event, downloadPath) => {
+	try {
+		accessSync(downloadPath[0], constants.W_OK);
+
+		console.log(downloadPath[0]);
+		localStorage.setItem("downloadPath", downloadPath[0]);
+		getId("path").textContent = downloadPath[0];
+	} catch (error) {
+		showPopup(i18n.__("unableToAccessDir"), true)
+	}
 });
 
 // Selecting config directory
@@ -177,8 +185,10 @@ ytDlpArgsInput.addEventListener("input", () => {
 });
 
 getId("learnMoreLink").addEventListener("click", () => {
-	shell.openExternal("https://github.com/aandrew-me/ytDownloader/wiki/Custom-yt%E2%80%90dlp-options")
-})
+	shell.openExternal(
+		"https://github.com/aandrew-me/ytDownloader/wiki/Custom-yt%E2%80%90dlp-options"
+	);
+});
 
 // Reload
 function reload() {
@@ -279,4 +289,37 @@ showMoreFormats.addEventListener("change", (event) => {
 const showMoreFormatOpts = localStorage.getItem("showMoreFormats");
 if (showMoreFormatOpts == "true") {
 	showMoreFormats.checked = true;
+}
+
+function showPopup(text, isError = false) {
+	let popupContainer = document.getElementById("popupContainer");
+
+	if (!popupContainer) {
+		popupContainer = document.createElement("div");
+		popupContainer.id = "popupContainer";
+		popupContainer.className = "popup-container";
+		document.body.appendChild(popupContainer);
+	}
+
+	const popup = document.createElement("span");
+	popup.textContent = text;
+	popup.classList.add("popup-item");
+
+	popup.style.background = isError ? "#ff6b6b" : "#54abde";
+
+	if (isError) {
+		popup.classList.add("popup-error");
+	}
+
+	popupContainer.appendChild(popup);
+
+	setTimeout(() => {
+		popup.style.opacity = "0";
+		setTimeout(() => {
+			popup.remove();
+			if (popupContainer.childElementCount === 0) {
+				popupContainer.remove();
+			}
+		}, 1000);
+	}, 2200);
 }

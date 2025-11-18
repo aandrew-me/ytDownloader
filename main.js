@@ -462,6 +462,7 @@ function registerAutoUpdaterEvents() {
 	});
 
 	autoUpdater.on("update-downloaded", async () => {
+		appState.mainWindow.webContents.send("update-downloaded", "");
 		const dialogOpts = {
 			type: "info",
 			buttons: [i18n("restart"), i18n("later")],
@@ -476,6 +477,10 @@ function registerAutoUpdaterEvents() {
 			autoUpdater.quitAndInstall();
 		}
 	});
+
+	autoUpdater.on("download-progress", async (info) => {
+		appState.mainWindow.webContents.send("download-progress", info.percent);
+	})
 
 	autoUpdater.on("error", (error) => {
 		console.error("Auto-update error:", error);

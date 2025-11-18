@@ -292,7 +292,6 @@ input[type="checkbox"] {
 	font-size: large;
 	color: white;
 	background-color: var(--greenBtn);
-	border-bottom: 4px solid var(--greenBtn-bottom);
 	cursor: pointer;
 	position: relative;
 	outline: none;
@@ -347,4 +346,29 @@ body::-webkit-scrollbar-thumb {
 	border-radius: 8px;
 	resize: none;
 	overflow: hidden;
+}
+
+.popup-container {
+	position: fixed;
+	bottom: 30px;
+	left: 30px;
+	z-index: 9999;
+
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.popup-item {
+	display: inline-block;
+
+	color: #fff;
+	padding: 12px 24px;
+	border-radius: 8px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+	font-weight: 600;
+	font-size: 15px;
+
+	opacity: 1;
+	transition: opacity 0.4s;
 }
