@@ -151,5 +151,15 @@
 	"mostCommonFormat": "Häufigstes Format",
 	"urlCopiedToClipboard": "URL in Zwischenablage kopiert",
 	"confirmDeleteHistoryItem": "Sind Sie sicher, dass Sie dieses Element aus dem Verlauf löschen möchten?",
-	"confirmClearAllHistory": "Sind Sie sicher, dass Sie den gesamten Downloadverlauf löschen möchten? Dies kann nicht rückgängig gemacht werden!"
+	"confirmClearAllHistory": "Sind Sie sicher, dass Sie den gesamten Downloadverlauf löschen möchten? Dies kann nicht rückgängig gemacht werden!",
+	"fileDoesNotExist": "Datei existiert nicht mehr",
+	"updatingYtdlp": "Aktualisiere yt-dlp",
+	"updatedYtdlp": "Aktualisierte yt-dlp",
+	"ytDlpUpdateRequired": "Wenn yt-dlp aktualisiert wird, warten Sie, bis die Aktualisierung abgeschlossen ist. Wenn Sie yt-dlp selbst installiert haben, aktualisieren Sie es bitte.",
+	"failedToDeleteHistoryItem": "Fehler beim Löschen des Verlaufs",
+	"customArgsTxt": "Setze eigene yt-dlp Optionen.",
+	"learnMore": "Erfahre mehr",
+	"updateError": "Beim Update-Prozess ist ein Fehler aufgetreten",
+	"unableToAccessDir": "Das Programm kann nicht auf diesen Ordner zugreifen",
+	"downloadingUpdate": "Update wird heruntergeladen"
 }
