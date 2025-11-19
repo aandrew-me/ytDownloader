@@ -167,7 +167,12 @@ class YtDownloaderApp {
 	_setupDirectories() {
 		const userHomeDir = homedir();
 		const hiddenDir = join(userHomeDir, ".ytDownloader");
-		mkdirSync(hiddenDir, {recursive: true});
+
+		try {
+			mkdirSync(hiddenDir, {recursive: true});
+		} catch (error) {
+			console.log(error);
+		}
 
 		let defaultDownloadDir = join(userHomeDir, "Downloads");
 		if (platform() === "linux") {
@@ -537,9 +542,6 @@ class YtDownloaderApp {
 				CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_CUSTOM_ARGS
 			) || "";
 
-		this.state.downloadDir = localStorage.getItem(
-			CONSTANTS.LOCAL_STORAGE_KEYS.DOWNLOAD_PATH
-		);
 		const maxDownloads = Number(
 			localStorage.getItem(CONSTANTS.LOCAL_STORAGE_KEYS.MAX_DOWNLOADS)
 		);
@@ -547,7 +549,15 @@ class YtDownloaderApp {
 
 		// Update UI with loaded settings
 		$(CONSTANTS.DOM_IDS.CUSTOM_ARGS_INPUT).value = prefs.customYtDlpArgs;
-		$(CONSTANTS.DOM_IDS.PATH_DISPLAY).textContent = this.state.downloadDir;
+
+		const downloadDir = localStorage.getItem(
+			CONSTANTS.LOCAL_STORAGE_KEYS.DOWNLOAD_PATH
+		);
+
+		if (downloadDir) {
+			this.state.downloadDir = downloadDir;
+			$(CONSTANTS.DOM_IDS.PATH_DISPLAY).textContent = downloadDir;
+		}
 	}
 
 	/**
