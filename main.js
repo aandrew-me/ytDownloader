@@ -287,7 +287,6 @@ function registerIpcHandlers() {
 		}
 	});
 
-
 	ipcMain.handle("open-folder", async (_event, folderPath) => {
 		try {
 			await fs.stat(folderPath);
@@ -389,8 +388,8 @@ function registerIpcHandlers() {
 		if (response === 1) clipboard.writeText(message);
 	});
 
-	ipcMain.on("get-system-locale", (event) => {
-		event.returnValue = app.getSystemLocale();
+	ipcMain.handle("get-system-locale", async (_event) => {
+		return app.getSystemLocale();
 	});
 
 	ipcMain.handle("get-translation", (_event, locale) => {
@@ -480,14 +479,11 @@ function registerAutoUpdaterEvents() {
 
 	autoUpdater.on("download-progress", async (info) => {
 		appState.mainWindow.webContents.send("download-progress", info.percent);
-	})
+	});
 
 	autoUpdater.on("error", (error) => {
 		console.error("Auto-update error:", error);
-		dialog.showErrorBox(
-			"Update Error",
-			i18n("updateError")
-		);
+		dialog.showErrorBox("Update Error", i18n("updateError"));
 	});
 }
 

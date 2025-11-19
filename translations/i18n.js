@@ -36,7 +36,9 @@ async function getLocale() {
 	let locale = null;
 	try {
 		locale = await ipcRenderer.invoke("get-system-locale");
-	} catch (e) {}
+	} catch (e) {
+		console.log(e)
+	}
 
 	if (!locale && typeof navigator !== "undefined") {
 		locale =
