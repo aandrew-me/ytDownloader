@@ -14,7 +14,7 @@ const playlistDownloader = {
 		ytDlpPath: null,
 		ytDlpWrap: null,
 		ffmpegPath: null,
-		denoPath: null,
+		jsRuntimePath: null,
 		playlistName: "",
 		originalCount: 0,
 		currentDownloadProcess: null,
@@ -123,9 +123,9 @@ const playlistDownloader = {
 			localStorage.setItem("downloadPath", defaultDownloadsDir);
 		}
 
-		// ffmpeg and deno path setup
+		// ffmpeg and js runtime path setup
 		this.state.ffmpegPath = this.getFfmpegPath();
-		this.state.denoPath = this.getJsRuntimePath();
+		this.state.jsRuntimePath = this.getJsRuntimePath();
 
 		if (localStorage.getItem("preferredVideoQuality")) {
 			this.ui.videoQualitySelect.value = localStorage.getItem(
@@ -263,8 +263,8 @@ const playlistDownloader = {
 			`"${start}:${end}"`,
 			"--ffmpeg-location",
 			`"${this.state.ffmpegPath}"`,
-			...(this.state.denoPath
-				? ["--no-js-runtimes", "--js-runtime", this.state.denoPath]
+			...(this.state.jsRuntimePath
+				? ["--no-js-runtimes", "--js-runtime", this.state.jsRuntimePath]
 				: []),
 			this.config.cookie.arg,
 			this.config.cookie.browser,
@@ -658,19 +658,41 @@ const playlistDownloader = {
 	},
 
 	getJsRuntimePath() {
-		if (
-			process.env.YTDOWNLOADER_DENO_PATH &&
-			fs.existsSync(process.env.YTDOWNLOADER_DENO_PATH)
-		) {
-			return `deno:"${process.env.YTDOWNLOADER_DENO_PATH}"`;
+		{
+			const exeName = "node";
+
+			if (process.env.YTDOWNLOADER_NODE_PATH) {
+				if (fs.existsSync(process.env.YTDOWNLOADER_NODE_PATH)) {
+					return `$node:"${process.env.YTDOWNLOADER_NODE_PATH}"`;
+				}
+
+				return "";
+			}
+
+			if (process.env.YTDOWNLOADER_DENO_PATH) {
+				if (fs.existsSync(process.env.YTDOWNLOADER_DENO_PATH)) {
+					return `$deno:"${process.env.YTDOWNLOADER_DENO_PATH}"`;
+				}
+
+				return "";
+			}
+
+			if (os.platform() === "darwin") {
+				return "";
+			}
+
+			let jsRuntimePath = path.join(__dirname, "..", exeName);
+
+			if (os.platform() === "win32") {
+				jsRuntimePath = path.join(__dirname, "..", `${exeName}.exe`);
+			}
+
+			if (fs.existsSync(jsRuntimePath)) {
+				return `${exeName}:"${jsRuntimePath}"`;
+			} else {
+				return "";
+			}
 		}
-
-		if (os.platform() === "darwin") return "";
-
-		let denoExe = os.platform() === "win32" ? "deno.exe" : "deno";
-		const denoPath = path.join(__dirname, "..", denoExe);
-
-		return fs.existsSync(denoPath) ? `deno:"${denoPath}"` : "";
 	},
 };
 

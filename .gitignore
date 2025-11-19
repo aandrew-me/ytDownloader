@@ -4,8 +4,10 @@ test.js
 .*
 !/.gitignore
 todo.txt
-ffmpeg
+ffmpeg*
 ffmpeg.exe
 generated-sources.json
 ffmpeg.patch
 deno*
+node.exe
+node

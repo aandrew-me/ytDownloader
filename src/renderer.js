@@ -483,9 +483,19 @@ class YtDownloaderApp {
 	 * @returns {Promise<string>} A promise that resolves with the JS runtime path.
 	 */
 	async _getJsRuntimePath() {
+		const exeName = "node";
+
+		if (process.env.YTDOWNLOADER_NODE_PATH) {
+			if (existsSync(process.env.YTDOWNLOADER_NODE_PATH)) {
+				return `$node:"${process.env.YTDOWNLOADER_NODE_PATH}"`;
+			}
+
+			return "";
+		}
+
 		if (process.env.YTDOWNLOADER_DENO_PATH) {
 			if (existsSync(process.env.YTDOWNLOADER_DENO_PATH)) {
-				return `deno:"${process.env.YTDOWNLOADER_DENO_PATH}"`;
+				return `$deno:"${process.env.YTDOWNLOADER_DENO_PATH}"`;
 			}
 
 			return "";
@@ -495,14 +505,14 @@ class YtDownloaderApp {
 			return "";
 		}
 
-		let denoPath = join(__dirname, "..", "deno");
+		let jsRuntimePath = join(__dirname, "..", exeName);
 
 		if (platform() === "win32") {
-			denoPath = join(__dirname, "..", "deno.exe");
+			jsRuntimePath = join(__dirname, "..", `${exeName}.exe`);
 		}
 
-		if (existsSync(denoPath)) {
-			return `deno:"${denoPath}"`;
+		if (existsSync(jsRuntimePath)) {
+			return `${exeName}:"${jsRuntimePath}"`;
 		} else {
 			return "";
 		}

@@ -7,8 +7,8 @@ if ! command -V curl > /dev/null 2>&1; then
 fi
 
 wget "https://github.com/aandrew-me/ffmpeg-builds/releases/download/v8/ffmpeg_linux_amd64.tar.xz"
-wget "https://github.com/aandrew-me/ffmpeg-builds/releases/download/v8/deno_linux_amd64" -O deno
-chmod +x deno
+wget "https://github.com/aandrew-me/ffmpeg-builds/releases/download/v8/node_linux_amd64" -O node
+chmod +x node
 tar -xf ffmpeg_linux_amd64.tar.xz
 mv ffmpeg_linux_amd64 ffmpeg
 chmod +x ffmpeg/bin/ffmpeg

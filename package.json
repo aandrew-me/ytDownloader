@@ -51,7 +51,7 @@
 			"./ffmpeg/**/*",
 			"!ffmpeg.patch",
 			"translations",
-			"deno*"
+			"node*"
 		],
 		"electronLanguages": [
 			"en-US"
