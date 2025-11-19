@@ -151,5 +151,15 @@
 	"mostCommonFormat": "最常用格式",
 	"urlCopiedToClipboard": "网址已复制到剪贴板！",
 	"confirmDeleteHistoryItem": "您确定要从记录中删除此项目吗？",
-	"confirmClearAllHistory": "您确定要清除所有下载记录吗？此操作无法撤销！"
+	"confirmClearAllHistory": "您确定要清除所有下载记录吗？此操作无法撤销！",
+	"fileDoesNotExist": "该文件已不存在",
+	"updatingYtdlp": "更新 yt-dlp",
+	"updatedYtdlp": "更新的yt-dlp",
+	"ytDlpUpdateRequired": "如果 yt-dlp 正在更新，请等待更新完成。如果您是自行安装的 yt-dlp，请手动更新它。",
+	"failedToDeleteHistoryItem": "删除历史记录项失败",
+	"customArgsTxt": "设置自定义yt-dlp选项。",
+	"learnMore": "了解更多",
+	"updateError": "更新过程中发生错误",
+	"unableToAccessDir": "该程序无法访问该文件夹",
+	"downloadingUpdate": "下载更新"
 }
