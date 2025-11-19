@@ -52,8 +52,8 @@ jobs:
               if: matrix.os == 'macos-15-intel'
               run: |
                   mkdir -p ffmpeg/bin
-                  curl -L https://github.com/aandrew-me/ffmpeg-builds/releases/download/v8/ffmpeg_mac_amd64 -o ffmpeg/bin/ffmpeg
-                  curl -L https://github.com/aandrew-me/ffmpeg-builds/releases/download/v8/ffprobe_mac_amd64 -o ffmpeg/bin/ffprobe
+                  curl -L https://github.com/aandrew-me/ffmpeg-builds/releases/download/v8/ffmpeg_macos_amd64 -o ffmpeg/bin/ffmpeg
+                  curl -L https://github.com/aandrew-me/ffmpeg-builds/releases/download/v8/ffprobe_macos_amd64 -o ffmpeg/bin/ffprobe
                   chmod +x ffmpeg/bin/ffmpeg
                   chmod +x ffmpeg/bin/ffprobe
                   npm i
@@ -63,8 +63,8 @@ jobs:
               if: matrix.os == 'macos-latest'
               run: |
                   mkdir -p ffmpeg/bin
-                  curl -L https://github.com/aandrew-me/ffmpeg-builds/releases/download/v8/ffmpeg_mac_arm64 -o ffmpeg/bin/ffmpeg
-                  curl -L https://github.com/aandrew-me/ffmpeg-builds/releases/download/v8/ffprobe_mac_arm64 -o ffmpeg/bin/ffprobe
+                  curl -L https://github.com/aandrew-me/ffmpeg-builds/releases/download/v8/ffmpeg_macos_amd64 -o ffmpeg/bin/ffmpeg
+                  curl -L https://github.com/aandrew-me/ffmpeg-builds/releases/download/v8/ffprobe_macos_arm64 -o ffmpeg/bin/ffprobe
                   chmod +x ffmpeg/bin/ffmpeg
                   chmod +x ffmpeg/bin/ffprobe
                   npm i
