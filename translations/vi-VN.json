@@ -151,5 +151,15 @@
 	"mostCommonFormat": "Định dạng Phổ biến nhất",
 	"urlCopiedToClipboard": "URL đã được sao chép vào clipboard!",
 	"confirmDeleteHistoryItem": "Bạn có chắc chắn muốn xóa mục này khỏi lịch sử không?",
-	"confirmClearAllHistory": "Bạn có chắc chắn muốn xóa toàn bộ lịch sử tải xuống không? Thao tác này không thể hoàn tác!"
+	"confirmClearAllHistory": "Bạn có chắc chắn muốn xóa toàn bộ lịch sử tải xuống không? Thao tác này không thể hoàn tác!",
+	"fileDoesNotExist": "File does not exist anymore",
+	"updatingYtdlp": "Updating yt-dlp",
+	"updatedYtdlp": "Updated yt-dlp",
+	"ytDlpUpdateRequired": "If yt-dlp is updating, wait for the update to finish. If you have installed yt-dlp by yourself, please update it.",
+	"failedToDeleteHistoryItem": "Failed to delete history item",
+	"customArgsTxt": "Set custom yt-dlp options.",
+	"learnMore": "Learn more",
+	"updateError": "An error occurred during the update process",
+	"unableToAccessDir": "The program cannot access that folder",
+	"downloadingUpdate": "Downloading update"
 }
