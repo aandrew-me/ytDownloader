@@ -1223,9 +1223,21 @@ class YtDownloaderApp {
 		let isAVideoSelected = false;
 
 		formats.forEach((format) => {
-			const size = format.filesize || format.filesize_approx;
-			const displaySize = size
-				? `${(size / 1000000).toFixed(2)} MB`
+			let sizeInMB = null;
+			let isApprox = false;
+
+			if (format.filesize) {
+				sizeInMB = format.filesize / 1000000;
+			} else if (format.filesize_approx) {
+				sizeInMB = format.filesize_approx / 1000000;
+				isApprox = true;
+			} else if (this.state.videoInfo.duration && format.tbr) {
+				sizeInMB = (this.state.videoInfo.duration * format.tbr) / 8192;
+				isApprox = true;
+			}
+
+			const displaySize = sizeInMB
+				? `${isApprox ? "~" : ""}${sizeInMB.toFixed(2)} MB`
 				: i18n.__("unknownSize");
 
 			if (format.video_ext !== "none" && format.vcodec !== "none") {
