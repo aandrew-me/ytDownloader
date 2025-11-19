@@ -151,5 +151,15 @@
 	"mostCommonFormat": "پرکاربردترین فرمت",
 	"urlCopiedToClipboard": "نشانی در کلیپ‌بورد کپی شد!",
 	"confirmDeleteHistoryItem": "آیا مطمئن هستید که می‌خواهید این مورد را از تاریخچه حذف کنید؟",
-	"confirmClearAllHistory": "آیا مطمئن هستید که می‌خواهید کل تاریخچه دانلود را پاک کنید؟ این عمل قابل برگشت نیست!"
+	"confirmClearAllHistory": "آیا مطمئن هستید که می‌خواهید کل تاریخچه دانلود را پاک کنید؟ این عمل قابل برگشت نیست!",
+	"fileDoesNotExist": "File does not exist anymore",
+	"updatingYtdlp": "Updating yt-dlp",
+	"updatedYtdlp": "Updated yt-dlp",
+	"ytDlpUpdateRequired": "If yt-dlp is updating, wait for the update to finish. If you have installed yt-dlp by yourself, please update it.",
+	"failedToDeleteHistoryItem": "Failed to delete history item",
+	"customArgsTxt": "Set custom yt-dlp options.",
+	"learnMore": "Learn more",
+	"updateError": "An error occurred during the update process",
+	"unableToAccessDir": "The program cannot access that folder",
+	"downloadingUpdate": "Downloading update"
 }

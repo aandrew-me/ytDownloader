@@ -151,5 +151,15 @@
 	"mostCommonFormat": "Yleisin muoto",
 	"urlCopiedToClipboard": "URL kopioitu leikepöydälle!",
 	"confirmDeleteHistoryItem": "Oletko varma, että haluat poistaa tämän kohteen historiasta?",
-	"confirmClearAllHistory": "Oletko varma, että haluat tyhjentää koko lataushistorian? Tätä ei voi perua!"
+	"confirmClearAllHistory": "Oletko varma, että haluat tyhjentää koko lataushistorian? Tätä ei voi perua!",
+	"fileDoesNotExist": "Tiedostoa ei ole enää olemassa",
+	"updatingYtdlp": "Päivitetään yt-dlp:tä",
+	"updatedYtdlp": "yt-dlp on päivitetty",
+	"ytDlpUpdateRequired": "Jos yt-dlp on päivittymässä, odota päivityksen valmistumista. Jos olet asentanut yt-dlp:n itse, ole hyvä ja päivitä se.",
+	"failedToDeleteHistoryItem": "Historiaelementin poistaminen epäonnistui",
+	"customArgsTxt": "Aseta mukautetut yt-dlp-asetukset.",
+	"learnMore": "Lue lisää",
+	"updateError": "Päivitysprosessin aikana tapahtui virhe",
+	"unableToAccessDir": "Ohjelma ei pääse käsiksi kyseiseen kansioon",
+	"downloadingUpdate": "Ladataan päivitystä"
 }

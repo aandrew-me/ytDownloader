@@ -151,5 +151,15 @@
 	"mostCommonFormat": "Najczęstszy format",
 	"urlCopiedToClipboard": "URL skopiowany do schowka!",
 	"confirmDeleteHistoryItem": "Czy na pewno chcesz usunąć ten element z historii?",
-	"confirmClearAllHistory": "Czy na pewno chcesz wyczyścić całą historię pobierania? Tej operacji nie można cofnąć!"
+	"confirmClearAllHistory": "Czy na pewno chcesz wyczyścić całą historię pobierania? Tej operacji nie można cofnąć!",
+	"fileDoesNotExist": "File does not exist anymore",
+	"updatingYtdlp": "Updating yt-dlp",
+	"updatedYtdlp": "Updated yt-dlp",
+	"ytDlpUpdateRequired": "If yt-dlp is updating, wait for the update to finish. If you have installed yt-dlp by yourself, please update it.",
+	"failedToDeleteHistoryItem": "Failed to delete history item",
+	"customArgsTxt": "Set custom yt-dlp options.",
+	"learnMore": "Learn more",
+	"updateError": "An error occurred during the update process",
+	"unableToAccessDir": "The program cannot access that folder",
+	"downloadingUpdate": "Downloading update"
 }

@@ -151,5 +151,15 @@
 	"mostCommonFormat": "सबैभन्दा सामान्य ढाँचा",
 	"urlCopiedToClipboard": "URL क्लिपबोर्डमा प्रतिलिपि भयो!",
 	"confirmDeleteHistoryItem": "के तपाईं निश्चित हुनुहुन्छ कि तपाईं यो वस्तु ईतिहासबाट मेटाउन चाहनुहुन्छ?",
-	"confirmClearAllHistory": "के तपाईं निश्चित हुनुहुन्छ कि तपाईं सबै डाउनलोड ईतिहास खाली गर्न चाहनुहुन्छ? यो पूर्ववत गर्न सकिँदैन!"
+	"confirmClearAllHistory": "के तपाईं निश्चित हुनुहुन्छ कि तपाईं सबै डाउनलोड ईतिहास खाली गर्न चाहनुहुन्छ? यो पूर्ववत गर्न सकिँदैन!",
+	"fileDoesNotExist": "File does not exist anymore",
+	"updatingYtdlp": "Updating yt-dlp",
+	"updatedYtdlp": "Updated yt-dlp",
+	"ytDlpUpdateRequired": "If yt-dlp is updating, wait for the update to finish. If you have installed yt-dlp by yourself, please update it.",
+	"failedToDeleteHistoryItem": "Failed to delete history item",
+	"customArgsTxt": "Set custom yt-dlp options.",
+	"learnMore": "Learn more",
+	"updateError": "An error occurred during the update process",
+	"unableToAccessDir": "The program cannot access that folder",
+	"downloadingUpdate": "Downloading update"
 }

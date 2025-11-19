@@ -151,5 +151,15 @@
 	"mostCommonFormat": "最常用格式",
 	"urlCopiedToClipboard": "網址已複製到剪貼簿！",
 	"confirmDeleteHistoryItem": "您確定要從紀錄中刪除此項目嗎？",
-	"confirmClearAllHistory": "您確定要清除所有下載紀錄嗎？此操作無法復原！"
+	"confirmClearAllHistory": "您確定要清除所有下載紀錄嗎？此操作無法復原！",
+	"fileDoesNotExist": "檔案已不存在",
+	"updatingYtdlp": "正在更新 yt-dlp",
+	"updatedYtdlp": "已更新 yt-dlp",
+	"ytDlpUpdateRequired": "如果 yt-dlp 正在更新，請等待更新完成。如果您是自行安裝 yt-dlp，請手動更新。",
+	"failedToDeleteHistoryItem": "無法刪除歷史記錄項目",
+	"customArgsTxt": "設定自訂 yt-dlp 選項。",
+	"learnMore": "了解詳情",
+	"updateError": "更新過程中發生錯誤",
+	"unableToAccessDir": "程式無法存取該資料夾",
+	"downloadingUpdate": "正在下載更新"
 }

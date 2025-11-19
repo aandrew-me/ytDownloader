@@ -151,5 +151,15 @@
 	"mostCommonFormat": "Format le plus courant",
 	"urlCopiedToClipboard": "URL copiée dans le presse-papiers !",
 	"confirmDeleteHistoryItem": "Êtes-vous sûr de vouloir supprimer cet élément de l'historique ?",
-	"confirmClearAllHistory": "Êtes-vous sûr de vouloir effacer tout l'historique de téléchargement ? Cette action est irréversible !"
+	"confirmClearAllHistory": "Êtes-vous sûr de vouloir effacer tout l'historique de téléchargement ? Cette action est irréversible !",
+	"fileDoesNotExist": "Le fichier n'existe plus",
+	"updatingYtdlp": "Mise à jour de yt-dlp",
+	"updatedYtdlp": "yt-dlp mis à jour",
+	"ytDlpUpdateRequired": "Si yt-dlp est en cours de mise à jour, attendez que la mise à jour se termine. Si vous avez installé yt-dlp vous-même, veuillez le mettre à jour.",
+	"failedToDeleteHistoryItem": "Échec de la suppression de l'élément de l'historique",
+	"customArgsTxt": "Définir des options yt-dlp personnalisées.",
+	"learnMore": "En savoir plus",
+	"updateError": "Une erreur s'est produite lors du processus de mise à jour",
+	"unableToAccessDir": "Le programme ne peut pas accéder à ce dossier",
+	"downloadingUpdate": "Chargement des données"
 }

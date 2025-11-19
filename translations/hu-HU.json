@@ -151,5 +151,15 @@
 	"mostCommonFormat": "Leggyakoribb formátum",
 	"urlCopiedToClipboard": "URL vágólapra másolva!",
 	"confirmDeleteHistoryItem": "Biztosan törölni szeretné ezt az elemet az előzményekből?",
-	"confirmClearAllHistory": "Biztosan törölni szeretné az összes letöltési előzményt? Ezt nem lehet visszavonni!"
+	"confirmClearAllHistory": "Biztosan törölni szeretné az összes letöltési előzményt? Ezt nem lehet visszavonni!",
+	"fileDoesNotExist": "File does not exist anymore",
+	"updatingYtdlp": "Updating yt-dlp",
+	"updatedYtdlp": "Updated yt-dlp",
+	"ytDlpUpdateRequired": "If yt-dlp is updating, wait for the update to finish. If you have installed yt-dlp by yourself, please update it.",
+	"failedToDeleteHistoryItem": "Failed to delete history item",
+	"customArgsTxt": "Set custom yt-dlp options.",
+	"learnMore": "Learn more",
+	"updateError": "An error occurred during the update process",
+	"unableToAccessDir": "The program cannot access that folder",
+	"downloadingUpdate": "Downloading update"
 }

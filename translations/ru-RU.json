@@ -151,5 +151,15 @@
 	"mostCommonFormat": "Наиболее распространенный формат",
 	"urlCopiedToClipboard": "URL скопирован в буфер обмена!",
 	"confirmDeleteHistoryItem": "Вы уверены, что хотите удалить этот элемент из истории?",
-	"confirmClearAllHistory": "Вы уверены, что хотите удалить всю историю загрузок? Это действие необратимо!"
+	"confirmClearAllHistory": "Вы уверены, что хотите удалить всю историю загрузок? Это действие необратимо!",
+	"fileDoesNotExist": "Файл больше не существует",
+	"updatingYtdlp": "Обновление yt-dlp",
+	"updatedYtdlp": "yt-dlp обновлен",
+	"ytDlpUpdateRequired": "Если yt-dlp обновляется, дождитесь завершения обновления. Если вы установили yt-dlp самостоятельно, пожалуйста, обновите его.",
+	"failedToDeleteHistoryItem": "Не удалось удалить элемент истории",
+	"customArgsTxt": "Задать параметры yt-dlp.",
+	"learnMore": "Подробнее",
+	"updateError": "Произошла ошибка во время обновления",
+	"unableToAccessDir": "Программа не может получить доступ к папке",
+	"downloadingUpdate": "Загрузка обновления"
 }
