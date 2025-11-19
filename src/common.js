@@ -66,6 +66,9 @@ const storageTheme = localStorage.getItem("theme");
 if (storageTheme) {
 	document.documentElement.setAttribute("theme", storageTheme);
 	getId("themeToggle").value = storageTheme;
+} else {
+	getId("themeToggle").value = "frappe";
+	document.documentElement.setAttribute("theme", "frappe");
 }
 
 ////

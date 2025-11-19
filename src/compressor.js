@@ -594,6 +594,9 @@ const storageTheme = localStorage.getItem("theme");
 if (storageTheme) {
 	document.documentElement.setAttribute("theme", storageTheme);
 	getId("themeToggle").value = storageTheme;
+} else {
+	document.documentElement.setAttribute("theme", "frappe");
+	getId("themeToggle").value = "frappe";
 }
 
 ipcRenderer.on("directory-path", (_event, msg) => {

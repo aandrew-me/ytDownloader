@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" theme="dark">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
@@ -34,10 +34,13 @@
 
         document.addEventListener('translations-loaded', () => {
             window.i18n.translatePage();
-            
+
             const storageTheme = localStorage.getItem("theme");
             if (storageTheme) {
                 document.documentElement.setAttribute("theme", storageTheme);
+            } else {
+                document.documentElement.setAttribute("theme", "frappe");
+
             }
 
             ipcRenderer.send("get-version");

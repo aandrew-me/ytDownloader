@@ -4,6 +4,8 @@ const {accessSync, constants} = require("original-fs");
 const storageTheme = localStorage.getItem("theme");
 if (storageTheme) {
 	document.documentElement.setAttribute("theme", storageTheme);
+} else {
+	document.documentElement.setAttribute("theme", "frappe");
 }
 
 let rightToLeft = "false";
@@ -59,7 +61,7 @@ ipcRenderer.on("downloadPath", (_event, downloadPath) => {
 		localStorage.setItem("downloadPath", downloadPath[0]);
 		getId("path").textContent = downloadPath[0];
 	} catch (error) {
-		showPopup(i18n.__("unableToAccessDir"), true)
+		showPopup(i18n.__("unableToAccessDir"), true);
 	}
 });
 
