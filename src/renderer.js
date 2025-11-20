@@ -275,6 +275,11 @@ class YtDownloaderApp {
 		// Priority 1: Environment Variable
 		if (process.env.YTDOWNLOADER_YTDLP_PATH) {
 			if (existsSync(process.env.YTDOWNLOADER_YTDLP_PATH)) {
+				localStorage.setItem(
+					CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_PATH,
+					process.env.YTDOWNLOADER_YTDLP_PATH
+				);
+
 				return process.env.YTDOWNLOADER_YTDLP_PATH;
 			}
 			throw new Error(
@@ -290,12 +295,23 @@ class YtDownloaderApp {
 			];
 			const foundPath = possiblePaths.find((p) => existsSync(p));
 
-			if (foundPath) return foundPath;
+			if (foundPath) {
+				localStorage.setItem(
+					CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_PATH,
+					foundPath
+				);
+
+				return foundPath;
+			}
 
 			$(CONSTANTS.DOM_IDS.POPUP_BOX_MAC).style.display = "block";
 		} else if (platform() === "freebsd") {
 			try {
-				return execSync("which yt-dlp").toString().trim();
+				const foundPath = execSync("which yt-dlp").toString().trim();
+				localStorage.setItem(
+					CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_PATH,
+					foundPath
+				);
 			} catch {
 				throw new Error(
 					"No yt-dlp found in PATH on FreeBSD. Please install it."
@@ -378,6 +394,11 @@ class YtDownloaderApp {
 
 		// Priority 4: Default location or download
 		const ytDlpPath = await this.ensureYtDlpBinary(defaultYtDlpPath);
+		localStorage.setItem(
+			CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_PATH,
+			ytDlpPath
+		);
+
 		return ytDlpPath;
 	}
 
@@ -392,6 +413,7 @@ class YtDownloaderApp {
 	async ensureYtDlpBinary(defaultYtDlpPath) {
 		try {
 			await promises.access(defaultYtDlpPath);
+
 			return defaultYtDlpPath;
 		} catch {
 			console.log("yt-dlp not found, downloading...");
@@ -726,7 +748,8 @@ class YtDownloaderApp {
 			const metadata = await this._fetchVideoMetadata(url);
 			console.log(metadata);
 
-			const durationInt = Math.ceil(metadata.duration);
+			const durationInt =
+				metadata.duration == null ? null : Math.ceil(metadata.duration);
 
 			this.state.videoInfo = {
 				...this.state.videoInfo,
@@ -1134,12 +1157,15 @@ class YtDownloaderApp {
 		const startSeconds = this.parseTime(startTime);
 		const endSeconds = this.parseTime(endTime);
 
-		if (startSeconds === 0 && endSeconds === duration) {
+		if (
+			startSeconds === 0 &&
+			(endSeconds === duration || endSeconds === 0)
+		) {
 			this.state.downloadOptions.rangeCmd = "";
 			this.state.downloadOptions.rangeOption = "";
 		} else {
 			const start = startTime || "0";
-			const end = endTime || this._formatTime(duration);
+			const end = endTime || "inf";
 			this.state.downloadOptions.rangeCmd = `*${start}-${end}`;
 			this.state.downloadOptions.rangeOption = "--download-sections";
 		}
@@ -1655,6 +1681,10 @@ class YtDownloaderApp {
 	}
 
 	_formatTime(duration) {
+		if (duration === null) {
+			return "";
+		}
+
 		const hrs = Math.floor(duration / 3600);
 		const mins = Math.floor((duration % 3600) / 60);
 		const secs = Math.floor(duration % 60);
@@ -1763,6 +1793,13 @@ class YtDownloaderApp {
 			console.error(
 				"Invalid duration provided to setVideoLength. Must be a number greater than 0."
 			);
+
+			minSlider.max = 0;
+			maxSlider.max = 0;
+
+			minSlider.value = 0;
+			maxSlider.value = 0;
+
 			return;
 		}
 
