@@ -982,7 +982,8 @@ class YtDownloaderApp {
 		let format_id, ext, audioForVideoFormat_id, audioFormat;
 
 		if (type === "video") {
-			const [videoFid, videoExt] = uiSnapshot.videoFormat.split("|");
+			const [videoFid, videoExt, _, videoCodec] =
+				uiSnapshot.videoFormat.split("|");
 			const [audioFid, audioExt] =
 				uiSnapshot.audioForVideoFormat.split("|");
 
@@ -990,12 +991,18 @@ class YtDownloaderApp {
 			audioForVideoFormat_id = audioFid;
 
 			const finalAudioExt = audioExt === "webm" ? "opus" : audioExt;
-			ext =
-				(videoExt === "mp4" && finalAudioExt === "opus") ||
-				(videoExt === "webm" &&
-					(finalAudioExt === "m4a" || finalAudioExt === "mp4"))
-					? "mkv"
-					: videoExt;
+			
+			ext = videoExt;
+
+			if (videoExt === "mp4" && finalAudioExt === "opus") {
+				if (videoCodec.includes("avc")) ext = "mkv";
+				else if (videoCodec.includes("av01")) ext = "webm";
+			} else if (
+				videoExt === "webm" &&
+				["m4a", "mp4"].includes(finalAudioExt)
+			) {
+				ext = "mkv";
+			}
 
 			audioFormat =
 				audioForVideoFormat_id === "none"
@@ -1323,7 +1330,7 @@ class YtDownloaderApp {
 
 				const option = `<option value="${format.format_id}|${
 					format.ext
-				}|${format.height}" ${
+				}|${format.height}|${format.vcodec}" ${
 					isSelected ? "selected" : ""
 				}>${optionText}</option>`;
 
