@@ -1014,7 +1014,7 @@ class YtDownloaderApp {
 		} else {
 			// type === 'extract'
 			ext =
-				{alac: "m4a", vorbis: "ogg"}[uiSnapshot.extractFormat] ||
+				{alac: "m4a"}[uiSnapshot.extractFormat] ||
 				uiSnapshot.extractFormat;
 		}
 
