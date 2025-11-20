@@ -168,10 +168,12 @@ class YtDownloaderApp {
 		const userHomeDir = homedir();
 		const hiddenDir = join(userHomeDir, ".ytDownloader");
 
-		try {
-			mkdirSync(hiddenDir, {recursive: true});
-		} catch (error) {
-			console.log(error);
+		if (!existsSync(hiddenDir)) {
+			try {
+				mkdirSync(hiddenDir, {recursive: true});
+			} catch (error) {
+				console.log(error);
+			}
 		}
 
 		let defaultDownloadDir = join(userHomeDir, "Downloads");
@@ -210,7 +212,10 @@ class YtDownloaderApp {
 		}
 
 		$(CONSTANTS.DOM_IDS.PATH_DISPLAY).textContent = this.state.downloadDir;
-		mkdirSync(this.state.downloadDir, {recursive: true});
+
+		if (!existsSync(this.state.downloadDir)) {
+			mkdirSync(this.state.downloadDir, {recursive: true});
+		}
 	}
 
 	/**
