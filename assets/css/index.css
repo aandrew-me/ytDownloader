@@ -487,6 +487,7 @@ img {
 	cursor: pointer;
 	font-size: large;
 	margin-bottom: 8px;
+	margin-left: 8px;
 	outline: none;
 	max-width: min(400px, 100%);
 	font-family: "JetBrains";
@@ -501,7 +502,7 @@ img {
 }
 
 #audioQualitySelect {
-	width: 230px;
+	width: 145px;
 }
 
 #link {
