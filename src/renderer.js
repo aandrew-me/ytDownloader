@@ -277,49 +277,43 @@ class YtDownloaderApp {
 		const defaultYtDlpName = platform() === "win32" ? "ytdlp.exe" : "ytdlp";
 		const defaultYtDlpPath = join(hiddenDir, defaultYtDlpName);
 		const isMacOS = platform() === "darwin";
+		const isFreeBSD = platform() === "freebsd";
 
-		// Priority 1: Environment Variable
+		let executablePath = null;
+
+		// PRIORITY 1: Environment Variable
 		if (process.env.YTDOWNLOADER_YTDLP_PATH) {
 			if (existsSync(process.env.YTDOWNLOADER_YTDLP_PATH)) {
-				localStorage.setItem(
-					CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_PATH,
-					process.env.YTDOWNLOADER_YTDLP_PATH
+				executablePath = process.env.YTDOWNLOADER_YTDLP_PATH;
+			} else {
+				throw new Error(
+					"YTDOWNLOADER_YTDLP_PATH is set, but no file exists there."
 				);
-
-				return process.env.YTDOWNLOADER_YTDLP_PATH;
 			}
-			throw new Error(
-				"YTDOWNLOADER_YTDLP_PATH is set, but no file exists there."
-			);
 		}
 
-		// Priority 2: System-installed versions (macOS, BSD)
-		if (isMacOS) {
+		// PRIORITY 2: macOS homebrew
+		else if (isMacOS) {
 			const possiblePaths = [
-				"/opt/homebrew/bin/yt-dlp",
-				"/usr/local/bin/yt-dlp",
+				"/opt/homebrew/bin/yt-dlp", // Apple Silicon
+				"/usr/local/bin/yt-dlp", // Intel
 			];
-			const foundPath = possiblePaths.find((p) => existsSync(p));
 
-			if (foundPath) {
-				localStorage.setItem(
-					CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_PATH,
-					foundPath
-				);
+			executablePath = possiblePaths.find((p) => existsSync(p));
 
-				return foundPath;
+			// If Homebrew check fails, show popup and abort
+			if (!executablePath) {
+				$(CONSTANTS.DOM_IDS.POPUP_BOX_MAC).style.display = "block";
+				console.warn("Homebrew yt-dlp not found. Prompting user.");
+
+				return "";
 			}
+		}
 
-			$(CONSTANTS.DOM_IDS.POPUP_BOX_MAC).style.display = "block";
-
-			return ""
-		} else if (platform() === "freebsd") {
+		// PRIORITY 3: FreeBSD
+		else if (isFreeBSD) {
 			try {
-				const foundPath = execSync("which yt-dlp").toString().trim();
-				localStorage.setItem(
-					CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_PATH,
-					foundPath
-				);
+				executablePath = execSync("which yt-dlp").toString().trim();
 			} catch {
 				throw new Error(
 					"No yt-dlp found in PATH on FreeBSD. Please install it."
@@ -327,52 +321,54 @@ class YtDownloaderApp {
 			}
 		}
 
-		// Priority 3: localStorage
-		const storedPath = localStorage.getItem(
-			CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_PATH
+		// PRIORITY 4: LocalStorage or Download (Windows/Linux)
+		else {
+			const storedPath = localStorage.getItem(
+				CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_PATH
+			);
+
+			if (storedPath && existsSync(storedPath)) {
+				executablePath = storedPath;
+			}
+			// Download if missing
+			else {
+				executablePath = await this.ensureYtDlpBinary(defaultYtDlpPath);
+			}
+		}
+
+		localStorage.setItem(
+			CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_PATH,
+			executablePath
 		);
 
-		if (isMacOS) {
-			const brewPaths = ["/opt/homebrew/bin/brew", "/usr/local/bin/brew"];
+		// Auto update
+		this._runBackgroundUpdate(executablePath, isMacOS);
 
-			let brewFound = false;
+		return executablePath;
+	}
 
-			for (const brewPath of brewPaths) {
-				try {
-					await access(brewPath, constants.X_OK);
+	/**
+	 * yt-dlp background update
+	 */
+	_runBackgroundUpdate(executablePath, isMacOS) {
+		try {
+			if (isMacOS) {
+				const brewPaths = [
+					"/opt/homebrew/bin/brew",
+					"/usr/local/bin/brew",
+				];
+				const brewExec = brewPaths.find((p) => existsSync(p)) || "brew";
 
-					const brewUpdate = spawn(brewPath, ["upgrade", "yt-dlp"], {
-						shell: true,
-					});
+				const brewUpdate = spawn(brewExec, ["upgrade", "yt-dlp"]);
 
-					brewUpdate.on("error", (err) =>
-						console.error(
-							"Failed to run 'brew upgrade yt-dlp':",
-							err
-						)
-					);
-
-					brewUpdate.stdout.on("data", (data) =>
-						console.log("yt-dlp brew update:", data.toString())
-					);
-
-					brewFound = true;
-					break;
-				} catch {}
-			}
-
-			if (!brewFound) {
-				console.error(
-					"Homebrew not found in expected locations (/opt/homebrew/bin/brew or /usr/local/bin/brew)."
+				brewUpdate.on("error", (err) =>
+					console.error("Failed to run 'brew upgrade yt-dlp':", err)
 				);
-			}
-		} else if (storedPath) {
-			try {
-				await access(storedPath, constants.F_OK);
-
-				const updateProc = spawn(`"${storedPath}"`, ["-U"], {
-					shell: true,
-				});
+				brewUpdate.stdout.on("data", (data) =>
+					console.log("yt-dlp brew update:", data.toString())
+				);
+			} else {
+				const updateProc = spawn(executablePath, ["-U"]);
 
 				updateProc.on("error", (err) =>
 					console.error(
@@ -382,32 +378,21 @@ class YtDownloaderApp {
 				);
 
 				updateProc.stdout.on("data", (data) => {
-					console.log("yt-dlp update check:", data.toString());
+					const output = data.toString();
+					console.log("yt-dlp update check:", output);
 
-					if (data.toString().toLowerCase().includes("updating to")) {
+					if (output.toLowerCase().includes("updating to")) {
 						this._showPopup(i18n.__("updatingYtdlp"));
 					} else if (
-						data
-							.toString()
-							.toLowerCase()
-							.includes("updated yt-dlp to")
+						output.toLowerCase().includes("updated yt-dlp to")
 					) {
 						this._showPopup(i18n.__("updatedYtdlp"));
 					}
 				});
-			} catch {
-				console.warn("yt-dlp path not found, no update performed.");
 			}
+		} catch (err) {
+			console.warn("Error initiating background update:", err);
 		}
-
-		// Priority 4: Default location or download
-		const ytDlpPath = await this.ensureYtDlpBinary(defaultYtDlpPath);
-		localStorage.setItem(
-			CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_PATH,
-			ytDlpPath
-		);
-
-		return ytDlpPath;
 	}
 
 	/**
@@ -535,7 +520,7 @@ class YtDownloaderApp {
 			const possiblePaths = [
 				"/opt/homebrew/bin/deno",
 				"/usr/local/bin/deno",
-			]
+			];
 
 			for (const p of possiblePaths) {
 				if (existsSync(p)) {
@@ -623,7 +608,9 @@ class YtDownloaderApp {
 		document.addEventListener("keydown", (event) => {
 			if (
 				((event.ctrlKey && event.key === "v") ||
-					(event.metaKey && event.key === "v" && platform() === "darwin")) &&
+					(event.metaKey &&
+						event.key === "v" &&
+						platform() === "darwin")) &&
 				document.activeElement.tagName !== "INPUT" &&
 				document.activeElement.tagName !== "TEXTAREA"
 			) {
