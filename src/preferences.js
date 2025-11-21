@@ -1,5 +1,7 @@
 const {ipcRenderer, shell} = require("electron");
 const {accessSync, constants} = require("original-fs");
+const {join} = require("path");
+const {homedir} = require("os");
 
 const storageTheme = localStorage.getItem("theme");
 if (storageTheme) {
@@ -26,7 +28,13 @@ if (rightToLeft == "true") {
 			item.style.flexDirection = "row";
 		});
 }
+
+// Download path
 let downloadPath = localStorage.getItem("downloadPath");
+
+if (!downloadPath) {
+	downloadPath = join(homedir(), "Downloads");
+}
 getId("path").textContent = downloadPath;
 
 /**
