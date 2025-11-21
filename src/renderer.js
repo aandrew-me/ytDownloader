@@ -545,7 +545,7 @@ class YtDownloaderApp {
 
 			console.log("No Deno installation found");
 
-			return ";"
+			return "";
 		}
 
 		let jsRuntimePath = join(__dirname, "..", exeName);
