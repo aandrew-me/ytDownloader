@@ -153,13 +153,13 @@
 	"confirmDeleteHistoryItem": "Ви впевнені, що хочете видалити цей елемент з історії?",
 	"confirmClearAllHistory": "Ви впевнені, що хочете очистити всю історію завантажень? Цю дію не можна скасувати!",
 	"fileDoesNotExist": "Файл більше не існує",
-	"updatingYtdlp": "Updating yt-dlp",
-	"updatedYtdlp": "Updated yt-dlp",
-	"ytDlpUpdateRequired": "If yt-dlp is updating, wait for the update to finish. If you have installed yt-dlp by yourself, please update it.",
-	"failedToDeleteHistoryItem": "Failed to delete history item",
-	"customArgsTxt": "Set custom yt-dlp options.",
-	"learnMore": "Learn more",
-	"updateError": "An error occurred during the update process",
-	"unableToAccessDir": "The program cannot access that folder",
-	"downloadingUpdate": "Downloading update"
+	"updatingYtdlp": "Оновлення yt-dlp",
+	"updatedYtdlp": "Оновлено yt-dlp",
+	"ytDlpUpdateRequired": "Якщо yt-dlp оновлюється, зачекайте поки оновлення завершиться. Якщо встановлено yt-dlp самостійно, будь ласка, оновіть його.",
+	"failedToDeleteHistoryItem": "Не вдалося видалити елемент історії",
+	"customArgsTxt": "Встановити користувацькі параметри yt-dlp.",
+	"learnMore": "Докладніше",
+	"updateError": "Сталася помилка під час процесу оновлення",
+	"unableToAccessDir": "Програма не має доступу до папки",
+	"downloadingUpdate": "Завантаження оновлення"
 }
