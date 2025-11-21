@@ -996,7 +996,7 @@ class YtDownloaderApp {
 			audioForVideoFormat_id = audioFid;
 
 			const finalAudioExt = audioExt === "webm" ? "opus" : audioExt;
-			
+
 			ext = videoExt;
 
 			if (videoExt === "mp4" && finalAudioExt === "opus") {
@@ -1450,17 +1450,36 @@ class YtDownloaderApp {
 		const progEl = $(`${randomId}_prog`);
 		if (!speedEl || !progEl) return;
 
+		let fillEl = progEl.querySelector(".custom-progress-fill");
+
+		if (!fillEl) {
+			progEl.innerHTML = "";
+
+			const bar = document.createElement("div");
+			bar.className = "custom-progress";
+
+			fillEl = document.createElement("div");
+			fillEl.className = "custom-progress-fill";
+
+			bar.appendChild(fillEl);
+			progEl.appendChild(bar);
+		}
+
 		if (progress.percent === 100) {
+			fillEl.style.width = progress.percent + "%";
 			speedEl.textContent = "";
 			progEl.textContent = i18n.__("processing");
 			ipcRenderer.send("progress", 0);
-		} else {
-			speedEl.textContent = `${i18n.__("speed")}: ${
-				progress.currentSpeed || "0 B/s"
-			}`;
-			progEl.innerHTML = `<progress class="progressBar" value="${progress.percent}" max="100"></progress>`;
-			ipcRenderer.send("progress", progress.percent / 100);
+
+			return;
 		}
+
+		speedEl.textContent = `${i18n.__("speed")}: ${
+			progress.currentSpeed || "0 B/s"
+		}`;
+		fillEl.style.width = progress.percent + "%";
+
+		ipcRenderer.send("progress", progress.percent / 100);
 	}
 
 	/**

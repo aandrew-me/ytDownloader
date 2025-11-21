@@ -361,10 +361,27 @@ img {
 .itemProgress {
 	font-weight: bold;
 	cursor: pointer;
+	padding: 10px 0;
 }
-.progressBar {
-	width: 90%;
+
+.custom-progress {
+    width: 90%;
+    height: 8px;
+    background: #e0e0e0;
+    border-radius: 6px;
+    overflow: hidden;
+	display:inline-block;
 }
+
+.custom-progress-fill {
+    width: 0%;
+    height: 100%;
+    background: var(--blueBtn);
+    transition: width 0.3s ease;
+    border-radius: 6px 0 0 6px;
+}
+
+
 .itemSpeed {
 	padding: 10px 5px 5px 5px;
 }
@@ -1138,38 +1155,39 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 #updatePopup {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    z-index: 9999;
-    background-color: var(--box-separation);
-    padding: 15px 20px;
-    border-radius: 10px;
+	position: fixed;
+	bottom: 30px;
+	right: 30px;
+	z-index: 9999;
+	background-color: var(--box-separation);
+	padding: 15px 20px;
+	border-radius: 10px;
 	display: none;
 
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
 .progress-track {
-    width: 200px;
-    height: 8px;
-    background-color: rgba(209, 209, 209, 0.446);
-    border-radius: 4px;
-    overflow: hidden;
+	width: 200px;
+	height: 8px;
+	background-color: rgba(209, 209, 209, 0.446);
+	border-radius: 4px;
+	overflow: hidden;
 	margin: 10px 2px;
 }
 
 #progressBarFill {
-    height: 100%;
-    width: 0%;
-    background-color: var(--greenBtn);
-    transition: width 0.2s ease;
+	height: 100%;
+	width: 0%;
+	background-color: var(--greenBtn);
+	transition: width 0.2s ease;
 }
 
-.update-label, #updateProgress {
-    font-size: 14px;
+.update-label,
+#updateProgress {
+	font-size: 14px;
 }
