@@ -532,7 +532,20 @@ class YtDownloaderApp {
 		}
 
 		if (platform() === "darwin") {
-			return "";
+			const possiblePaths = [
+				"/opt/homebrew/bin/deno",
+				"/usr/local/bin/deno",
+			]
+
+			for (const p of possiblePaths) {
+				if (existsSync(p)) {
+					return `deno:"${p}"`;
+				}
+			}
+
+			console.log("No Deno installation found");
+
+			return ";"
 		}
 
 		let jsRuntimePath = join(__dirname, "..", exeName);
