@@ -25,6 +25,7 @@ const CONSTANTS = {
 		TITLE_INPUT: "titleName",
 		URL_INPUTS: ".url",
 		AUDIO_PRESENT_SECTION: "audioPresent",
+		QUIT_APP_BTN: "quitAppBtn",
 		// Format Selectors
 		VIDEO_FORMAT_SELECT: "videoFormatSelect",
 		AUDIO_FORMAT_SELECT: "audioFormatSelect",
@@ -310,6 +311,8 @@ class YtDownloaderApp {
 			}
 
 			$(CONSTANTS.DOM_IDS.POPUP_BOX_MAC).style.display = "block";
+
+			return ""
 		} else if (platform() === "freebsd") {
 			try {
 				const foundPath = execSync("which yt-dlp").toString().trim();
@@ -650,6 +653,10 @@ class YtDownloaderApp {
 			// @ts-ignore
 			clipboard.writeText(e.target.innerText);
 			this._showPopup(i18n.__("copiedText"), false);
+		});
+
+		$(CONSTANTS.DOM_IDS.QUIT_APP_BTN).addEventListener("click", () => {
+			ipcRenderer.send("quit", "quit");
 		});
 
 		// IPC listeners
