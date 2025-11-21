@@ -142,7 +142,12 @@ const playlistDownloader = {
 	initEventListeners() {
 		this.ui.pasteLinkBtn.addEventListener("click", () => this.pasteLink());
 		document.addEventListener("keydown", (event) => {
-			if (event.ctrlKey && event.key === "v") this.pasteLink();
+			if ((event.ctrlKey && event.key === "v") || (event.metaKey && event.key === "v" && os.platform() === "darwin") &&
+				document.activeElement.tagName !== "INPUT" &&
+				document.activeElement.tagName !== "TEXTAREA"
+			) {
+				this.pasteLink();
+			}
 		});
 
 		this.ui.downloadVideoBtn.addEventListener("click", () =>

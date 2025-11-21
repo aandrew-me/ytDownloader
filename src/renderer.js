@@ -607,7 +607,7 @@ class YtDownloaderApp {
 		document.addEventListener("keydown", (event) => {
 			if (
 				((event.ctrlKey && event.key === "v") ||
-					(event.metaKey && event.key === "v")) &&
+					(event.metaKey && event.key === "v" && platform() === "darwin")) &&
 				document.activeElement.tagName !== "INPUT" &&
 				document.activeElement.tagName !== "TEXTAREA"
 			) {
