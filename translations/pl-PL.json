@@ -154,7 +154,7 @@
 	"confirmClearAllHistory": "Czy na pewno chcesz wyczyścić całą historię pobierania? Tej operacji nie można cofnąć!",
 	"fileDoesNotExist": "Plik już nie istnieje",
 	"updatingYtdlp": "Aktualizacja yt-dlp",
-	"updatedYtdlp": "Zaktualizowano jt-dlp",
+	"updatedYtdlp": "Zaktualizowano yt-dlp",
 	"ytDlpUpdateRequired": "Jeśli yt-dlp aktualizuje, poczekaj na zakończenie aktualizacji. Jeśli zainstalowałeś yt-dlp samodzielnie, zaktualizuj go.",
 	"failedToDeleteHistoryItem": "Nie udało się usunąć elementu historii",
 	"customArgsTxt": "Ustaw niestandardowe opcje yt-dlp.",
