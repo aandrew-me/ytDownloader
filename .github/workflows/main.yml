@@ -36,13 +36,12 @@ jobs:
               run: |
                   sudo snap install snapcraft --classic
                   wget "https://github.com/aandrew-me/ffmpeg-builds/releases/download/v8/ffmpeg_linux_amd64.tar.xz"
-                  wget "https://github.com/aandrew-me/ffmpeg-builds/releases/download/v8/deno_linux_amd64" -O deno
-                  chmod +x deno
+                  wget "https://github.com/aandrew-me/ffmpeg-builds/releases/download/v8/node_linux_amd64" -O node
+                  chmod +x node
                   tar -xf ffmpeg_linux_amd64.tar.xz
                   mv ffmpeg_linux_amd64 ffmpeg
                   chmod +x ffmpeg/bin/ffmpeg
                   chmod +x ffmpeg/bin/ffprobe
-                  chmod +x ffmpeg/bin/ffplay
                   rm ffmpeg_linux_amd64.tar.xz
                   npm i
                   npx electron-builder -l --publish=always
@@ -74,7 +73,7 @@ jobs:
               if: matrix.os == 'windows-latest'
               shell: powershell
               run: |
-                  Invoke-WebRequest -Uri "https://github.com/aandrew-me/ffmpeg-builds/releases/download/v8/deno.exe" -OutFile deno.exe
+                  Invoke-WebRequest -Uri "https://github.com/aandrew-me/ffmpeg-builds/releases/download/v8/node.exe" -OutFile node.exe
                   Invoke-WebRequest -Uri "https://github.com/aandrew-me/ffmpeg-builds/releases/download/v8/ffmpeg_win64.zip" -OutFile ffmpeg_win64.zip
                   Expand-Archive -Path ffmpeg_win64.zip -DestinationPath .
                   Move-Item -Path .\ffmpeg_win64 -Destination .\ffmpeg
