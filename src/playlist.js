@@ -298,7 +298,7 @@ const playlistDownloader = {
 			if (videoType === "mp4") {
 				formatArgs = [
 					"-f",
-					`"bestvideo[height<=1080]+bestaudio[ext=m4a]/best[height<=1080]/best"`,
+					`"bestvideo[height<=${quality}]+bestaudio[ext=m4a]/best[height<=${quality}]/best"`,
 					"--merge-output-format",
 					"mp4",
 					"--recode-video",
@@ -307,7 +307,7 @@ const playlistDownloader = {
 			} else if (videoType === "webm") {
 				formatArgs = [
 					"-f",
-					`"bestvideo[height<=1080]+bestaudio[ext=webm]/best[height<=1080]/best"`,
+					`"bestvideo[height<=${quality}]+bestaudio[ext=webm]/best[height<=${quality}]/best"`,
 					"--merge-output-format",
 					"webm",
 					"--recode-video",
