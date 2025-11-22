@@ -106,7 +106,7 @@ const playlistDownloader = {
 	loadInitialConfig() {
 		// yt-dlp path
 		this.state.ytDlpPath = localStorage.getItem("ytdlp");
-		this.state.ytDlpWrap = new YTDlpWrap(this.state.ytDlpPath);
+		this.state.ytDlp = new YTDlpWrap(`"${this.state.ytDlpPath}"`);
 
 		const defaultDownloadsDir = path.join(os.homedir(), "Downloads");
 		let preferredDir =
@@ -142,9 +142,13 @@ const playlistDownloader = {
 	initEventListeners() {
 		this.ui.pasteLinkBtn.addEventListener("click", () => this.pasteLink());
 		document.addEventListener("keydown", (event) => {
-			if ((event.ctrlKey && event.key === "v") || (event.metaKey && event.key === "v" && os.platform() === "darwin") &&
-				document.activeElement.tagName !== "INPUT" &&
-				document.activeElement.tagName !== "TEXTAREA"
+			if (
+				(event.ctrlKey && event.key === "v") ||
+				(event.metaKey &&
+					event.key === "v" &&
+					os.platform() === "darwin" &&
+					document.activeElement.tagName !== "INPUT" &&
+					document.activeElement.tagName !== "TEXTAREA")
 			) {
 				this.pasteLink();
 			}

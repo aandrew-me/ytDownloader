@@ -142,7 +142,7 @@ class YtDownloaderApp {
 
 		try {
 			this.state.ytDlpPath = await this._findOrDownloadYtDlp();
-			this.state.ytDlp = new YTDlpWrap(this.state.ytDlpPath);
+			this.state.ytDlp = new YTDlpWrap(`"${this.state.ytDlpPath}"`);
 			this.state.ffmpegPath = await this._findFfmpeg();
 			this.state.jsRuntimePath = await this._getJsRuntimePath();
 
