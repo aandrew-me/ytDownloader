@@ -49,11 +49,11 @@ A modern GUI video and audio downloader supporting [hundreds of sites](https://g
 
 <!-- ![ytdownloader_dark](https://github.com/aandrew-me/ytDownloader/assets/66430340/62efbca0-28b8-4016-bcf2-1a14bcaa782c) -->
 <!-- ![ytdownloader_light](https://github.com/aandrew-me/ytDownloader/assets/66430340/34f5270f-bdea-460e-8622-6459cd147b73) -->
-![ss_dark](https://github.com/user-attachments/assets/0e810d71-6e8e-428f-9cca-9af71b5d7c16)
 
-![ss_prefs](https://github.com/user-attachments/assets/12097005-b41c-44a3-a579-61b8e990432f)
+![ss_homepage](https://github.com/user-attachments/assets/12410bca-31c3-48a0-bbd3-1d74bcc752b6)
+![ss_settings](https://github.com/user-attachments/assets/060557bc-d209-4bd0-bda4-debe42ca83a0)
+![ss_compressor](https://github.com/user-attachments/assets/52da7e50-46bb-4749-8152-5e79324a6cc3)
 
-![ss_compressor](https://github.com/user-attachments/assets/b366aa8e-a004-4697-873f-965f51752f15)
 
 
 <!-- ![ytdownloader_dark](https://github.com/aandrew-me/ytDownloader/assets/66430340/2f6695e7-6ca0-4f7c-91a0-0ad735c1e3af) -->
@@ -129,10 +129,14 @@ Translations into other languages would be highly appreciated. If you want to he
 | Name                | Status |
 | ------------------- | ------ |
 | Arabic              | ✔️     |
+| Bengali             | ✔️     |
 | English             | ✔️     |
-| Simplified Chinese  | ✔️     |
+| Chinese Simplified  | ✔️     |
+| Chinese Traditional | ✔️     |
 | Finnish             | ✔️     |
+| Hindi               | ✔️     |
 | French              | ✔️     |
+| Finnish             | ✔️     |
 | German              | ✔️     |
 | Greek               | ✔️     |
 | Hungarian           | ✔️     |
