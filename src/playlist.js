@@ -106,7 +106,7 @@ const playlistDownloader = {
 	loadInitialConfig() {
 		// yt-dlp path
 		this.state.ytDlpPath = localStorage.getItem("ytdlp");
-		this.state.ytDlp = new YTDlpWrap(`"${this.state.ytDlpPath}"`);
+		this.state.ytDlpWrap = new YTDlpWrap(`"${this.state.ytDlpPath}"`);
 
 		const defaultDownloadsDir = path.join(os.homedir(), "Downloads");
 		let preferredDir =
