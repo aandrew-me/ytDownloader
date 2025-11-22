@@ -30,20 +30,49 @@
   <screenshots>
     <screenshot type="default">
       <image>
-        https://github.com/aandrew-me/ytDownloader/assets/66430340/2f6695e7-6ca0-4f7c-91a0-0ad735c1e3af</image>
-        <caption>ytDownloader Dark theme</caption>
+        https://github.com/user-attachments/assets/12410bca-31c3-48a0-bbd3-1d74bcc752b6
+      </image>
+      <caption>ytDownloader homepage</caption>
     </screenshot>
+
     <screenshot>
       <image>
-        https://github.com/aandrew-me/ytDownloader/assets/66430340/3c974ab0-8257-4b8a-88ec-ee6bd119751e</image>
-        <caption>ytDownloader Light theme</caption>
+        https://github.com/user-attachments/assets/060557bc-d209-4bd0-bda4-debe42ca83a0
+      </image>
+      <caption>ytDownloader Settings</caption>
     </screenshot>
+
+    <screenshot>
+      <image>
+        https://github.com/user-attachments/assets/52da7e50-46bb-4749-8152-5e79324a6cc3
+      </image>
+      <caption>ytDownloader video compressor</caption>
+    </screenshot>
+
   </screenshots>
   <url type="homepage">https://github.com/aandrew-me/ytDownloader</url>
 
   <content_rating type="oars-1.1" />
 
   <releases>
+    <release version="3.20.0" date="2025-11-22">
+      <description>
+        <p>Added download history</p>
+        <p>Added JS runtime support as per new yt-dlp requirements. The app will now ship with a
+          nodejs binary. Youtube downloads should be more stable.</p>
+        <p>Added slider for range selection.</p>
+        <p>Added progress for yt-dlp download and update</p>
+        <p>Translation updates, added new languages.</p>
+        <p>Added custom built ffmpeg, ffprobe for Windows and Linux builds.</p>
+        <p>Added support to add custom yt-dlp arguments</p>
+        <p>Fixed incorrect resolution downloads for playlists.</p>
+        <p>Added showing approximate file sizes when possible.</p>
+        <p>Improved user interface.</p>
+        <p>Minor bug fixes.</p>
+        <p>Major code refactoring.</p>
+      </description>
+    </release>
+
     <release version="3.19.2" date="2025-09-06">
       <description>
         <p>Improved app performance</p>
