@@ -1,9 +1,9 @@
 {
 	"homepage": "https://ytdn.netlify.app",
-	"version": "3.19.2",
+	"version": "3.20.0",
 	"description": "A modern GUI App for downloading Videos and Audios from hundreds of sites",
 	"license": "GPL-3",
-	"url": "https://github.com/aandrew-me/ytDownloader/releases/download/v3.19.2/YTDownloader_Win.zip",
+	"url": "https://github.com/aandrew-me/ytDownloader/releases/download/v3.20.0/YTDownloader_Win.zip",
 	"checkver": {
 		"github": "https://github.com/aandrew-me/ytDownloader"
 	},
