@@ -1,6 +1,6 @@
 const {shell, ipcRenderer, clipboard} = require("electron");
 const {default: YTDlpWrap} = require("yt-dlp-wrap-plus");
-const {constants, access} = require("fs/promises");
+const {constants} = require("fs/promises");
 const {homedir, platform} = require("os");
 const {join} = require("path");
 const {mkdirSync, accessSync, promises, existsSync} = require("fs");
