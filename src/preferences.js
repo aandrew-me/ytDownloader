@@ -50,6 +50,16 @@ document.addEventListener("translations-loaded", () => {
 	window.i18n.translatePage();
 
 	document.title = window.i18n.__("preferences");
+
+	if (process.env.FLATPAK_ID) {
+		getId("flatpakTxt").addEventListener("click", () => {
+			shell.openExternal(
+				"https://flathub.org/apps/com.github.tchx84.Flatseal"
+			);
+		});
+
+		getId("flatpakTxt").style.display = "block";
+	}
 });
 
 getId("back").addEventListener("click", () => {
