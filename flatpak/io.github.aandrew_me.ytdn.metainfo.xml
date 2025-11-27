@@ -54,13 +54,14 @@
 
   <content_rating type="oars-1.1" />
 
-  <release version="3.20.2" date="2025-09-06">
+  <releases>
+    <release version="3.20.2" date="2025-11-27">
       <description>
         <p>Bring back cookie related info</p>
       </description>
     </release>
 
-  <releases>
+
     <release version="3.20.0" date="2025-11-22">
       <description>
         <p>Added download history</p>
