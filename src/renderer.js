@@ -579,6 +579,7 @@ class YtDownloaderApp {
 			localStorage.getItem(
 				CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_CUSTOM_ARGS
 			) || "";
+		prefs.configPath = localStorage.getItem(CONSTANTS.LOCAL_STORAGE_KEYS.CONFIG_PATH) || "";
 
 		const maxDownloads = Number(
 			localStorage.getItem(CONSTANTS.LOCAL_STORAGE_KEYS.MAX_DOWNLOADS)
@@ -848,6 +849,11 @@ class YtDownloaderApp {
 			].filter(Boolean);
 
 			const process = this.state.ytDlp.exec(args, {shell: true});
+
+			console.log(
+			"Spawned yt-dlp with args:",
+			process.ytDlpProcess.spawnargs.join(" ")
+		);
 
 			let stdout = "";
 			let stderr = "";
