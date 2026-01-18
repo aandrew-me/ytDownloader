@@ -387,12 +387,134 @@ img {
 }
 .itemClose {
 	position: absolute;
-	top: 8px;
-	right: 8px;
+	top: 10px;
+	right: 10px;
 	cursor: pointer;
+	width: 22px;
+	height: 22px;
+	z-index: 3;
+	opacity: 0.65;
+	transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+	filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.itemClose:hover {
+	opacity: 1;
+	transform: scale(1.15) rotate(90deg);
+	filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.3));
+}
+
+.itemClose:active {
+	transform: scale(1.0) rotate(90deg);
+	filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+}
+
+.itemControls {
+	position: absolute;
+	bottom: 10px;
+	right: 10px;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 0;
+	z-index: 2;
+	pointer-events: none;
+}
+
+.itemPauseResume {
+	background: rgba(var(--box-separation-rgb, 46, 46, 46), 0.75);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	border-radius: 8px;
+	width: 36px;
+	height: 36px;
 	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0;
+	opacity: 0;
+	visibility: hidden;
+	transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+	box-shadow: 
+		0 2px 8px rgba(0, 0, 0, 0.15),
+		0 1px 3px rgba(0, 0, 0, 0.1),
+		inset 0 1px 0 rgba(255, 255, 255, 0.05);
+	backdrop-filter: blur(12px) saturate(180%);
+	-webkit-backdrop-filter: blur(12px) saturate(180%);
+	pointer-events: auto;
+}
+
+/* Show pause/resume button on hover for downloading items */
+.item[data-state="downloading"]:hover .itemPauseResume {
+	opacity: 1;
+	visibility: visible;
+	transform: translateY(0);
+}
+
+/* Always show for paused items with accent styling */
+.item[data-state="paused"] .itemPauseResume {
+	opacity: 1;
+	visibility: visible;
+	background: linear-gradient(135deg, var(--box-toggleOn) 0%, rgba(var(--box-separation-rgb, 46, 46, 46), 0.9) 100%);
+	border-color: rgba(255, 255, 255, 0.2);
+	box-shadow: 
+		0 4px 12px rgba(0, 0, 0, 0.2),
+		0 2px 4px rgba(0, 0, 0, 0.15),
+		inset 0 1px 0 rgba(255, 255, 255, 0.1);
+	transform: translateY(0);
+}
+
+/* Hide pause/resume button for completed items */
+.item[data-state="completed"] .itemPauseResume {
+	display: none;
+}
+
+.itemPauseResume:hover {
+	background: linear-gradient(135deg, var(--box-toggleOn) 0%, rgba(var(--box-separation-rgb, 46, 46, 46), 0.85) 100%);
+	border-color: rgba(255, 255, 255, 0.2);
+	transform: translateY(-2px) scale(1.02);
+	box-shadow: 
+		0 6px 16px rgba(0, 0, 0, 0.25),
+		0 3px 6px rgba(0, 0, 0, 0.18),
+		inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.itemPauseResume:active {
+	transform: translateY(0) scale(0.98);
+	box-shadow: 
+		0 2px 6px rgba(0, 0, 0, 0.15),
+		0 1px 2px rgba(0, 0, 0, 0.1),
+		inset 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.pauseResumeIcon {
+	color: var(--text);
+	font-size: 14px;
+	line-height: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	opacity: 0.9;
+	transition: all 0.2s ease;
+	filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+}
+
+.itemPauseResume:hover .pauseResumeIcon {
+	opacity: 1;
+	transform: scale(1.1);
+}
+
+/* Enhanced styling for paused state */
+.item[data-state="paused"] .itemPauseResume .pauseResumeIcon {
+	opacity: 1;
+	font-weight: 600;
+	filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.4));
+}
+
+.itemClose {
 	width: 20px;
 	height: 20px;
+	cursor: pointer;
 }
 .itemType {
 	font-style: italic;
