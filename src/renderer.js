@@ -126,7 +126,11 @@ class YtDownloaderApp {
 			downloadControllers: new Map(),
 			downloadedItems: new Set(),
 			downloadQueue: [],
+			// Pause/Resume state management
+			pausedDownloads: new Map(), // Stores paused download metadata
+			downloadStates: new Map(), // Tracks current state: 'downloading', 'paused', 'completed', 'error'
 		};
+		this._loadPausedDownloads();
 	}
 
 	/**
@@ -152,6 +156,7 @@ class YtDownloaderApp {
 
 			this._loadSettings();
 			this._addEventListeners();
+			this._restorePausedDownloads();
 
 			// Signal to the main process that the renderer is ready for links
 			ipcRenderer.send("ready-for-links");
@@ -891,18 +896,37 @@ class YtDownloaderApp {
 	/**
 	 * Starts the download process for a given job.
 	 * @param {object} job The download job object.
+	 * @param {string} existingId Optional ID for resuming downloads
 	 */
-	_startDownload(job) {
+	_startDownload(job, existingId = null) {
 		this.state.currentDownloads++;
-		const randomId = "item_" + Math.random().toString(36).substring(2, 12);
+		const randomId = existingId || "item_" + Math.random().toString(36).substring(2, 12);
 
 		const {downloadArgs, finalFilename, finalExt} =
 			this._prepareDownloadArgs(job);
 
-		this._createDownloadUI(randomId, job);
+		// Add --continue flag for resume support
+		downloadArgs.unshift("--continue", "--no-part");
+
+		if (!existingId) {
+			this._createDownloadUI(randomId, job);
+		}
+
+		this.state.downloadStates.set(randomId, "downloading");
 
 		const controller = new AbortController();
 		this.state.downloadControllers.set(randomId, controller);
+
+		// Store download metadata for pause/resume
+		const downloadMetadata = {
+			job,
+			randomId,
+			finalFilename,
+			finalExt,
+			downloadArgs,
+			lastProgress: 0,
+		};
+		this.state.pausedDownloads.set(randomId, downloadMetadata);
 
 		const downloadProcess = this.state.ytDlp.exec(downloadArgs, {
 			shell: true,
@@ -919,14 +943,16 @@ class YtDownloaderApp {
 		downloadProcess
 			.on("progress", (progress) => {
 				this._updateProgressUI(randomId, progress);
+				// Update last progress for resume
+				const metadata = this.state.pausedDownloads.get(randomId);
+				if (metadata) {
+					metadata.lastProgress = progress.percent || 0;
+				}
 			})
 			.once("ytDlpEvent", () => {
 				const el = $(`${randomId}_prog`);
 				if (el) el.textContent = i18n.__("downloading");
 			})
-			// .on("ytDlpEvent", (eventType, eventData) => {
-			// 	console.log(eventData)
-			// })
 			.once("close", (code) => {
 				this._handleDownloadCompletion(
 					code,
@@ -1127,6 +1153,9 @@ class YtDownloaderApp {
 		if (code === 0) {
 			this._showDownloadSuccessUI(randomId, filename, ext, thumbnail);
 			this.state.downloadedItems.add(randomId);
+			this.state.downloadStates.set(randomId, "completed");
+			this.state.pausedDownloads.delete(randomId);
+			this._savePausedDownloads();
 			this._updateClearAllButton();
 		} else if (code !== null) {
 			// code is null if aborted, so only show error if it's a real exit code
@@ -1160,9 +1189,17 @@ class YtDownloaderApp {
 			this._processQueue();
 			return; // Don't treat user cancellation as an error
 		}
+		
 		this.state.currentDownloads--;
 		this.state.downloadControllers.delete(randomId);
 		console.error("Download Error:", error);
+		
+		// Update item state to error
+		const item = $(randomId);
+		if (item) {
+			item.setAttribute("data-state", "error");
+		}
+		
 		const progressEl = $(`${randomId}_prog`);
 		if (progressEl) {
 			progressEl.textContent = i18n.__("errorHoverForDetails");
@@ -1425,9 +1462,10 @@ class YtDownloaderApp {
 	/**
 	 * Creates the initial UI element for a new download.
 	 */
-	_createDownloadUI(randomId, job) {
+	_createDownloadUI(randomId, job, isPaused = false) {
+		const state = isPaused ? "paused" : "downloading";
 		const itemHTML = `
-            <div class="item" id="${randomId}">
+            <div class="item" id="${randomId}" data-state="${state}">
                 <div class="itemIconBox">
                     <img src="${
 						job.thumbnail || "../assets/images/thumb.png"
@@ -1436,13 +1474,22 @@ class YtDownloaderApp {
 						job.type === "video" ? "video" : "audio"
 					)}</span>
                 </div>
-                <img src="../assets/images/close.png" class="itemClose" id="${randomId}_close">
+                <img src="../assets/images/close.png" class="itemClose" id="${randomId}_close" alt="Close">
+                <div class="itemControls">
+                    <button class="itemPauseResume" id="${randomId}_pauseResume" title="${i18n.__(
+			isPaused ? "resume" : "pause"
+		)}" aria-label="${i18n.__(isPaused ? "resume" : "pause")}">
+                        <span class="pauseResumeIcon">${
+							isPaused ? "▶" : "⏸"
+						}</span>
+                    </button>
+                </div>
                 <div class="itemBody">
                     <div class="itemTitle">${job.title}</div>
                     <strong class="itemSpeed" id="${randomId}_speed"></strong>
-                    <div id="${randomId}_prog" class="itemProgress">${i18n.__(
-			"preparing"
-		)}</div>
+                    <div id="${randomId}_prog" class="itemProgress">${
+			isPaused ? i18n.__("paused") : i18n.__("preparing")
+		}</div>
                 </div>
             </div>`;
 		$(CONSTANTS.DOM_IDS.DOWNLOAD_LIST).insertAdjacentHTML(
@@ -1452,6 +1499,9 @@ class YtDownloaderApp {
 
 		$(`${randomId}_close`).addEventListener("click", () =>
 			this._cancelDownload(randomId)
+		);
+		$(`${randomId}_pauseResume`).addEventListener("click", () =>
+			this._togglePauseResume(randomId)
 		);
 	}
 
@@ -1500,7 +1550,14 @@ class YtDownloaderApp {
 	 */
 	_showDownloadSuccessUI(randomId, filename, ext, thumbnail) {
 		const progressEl = $(`${randomId}_prog`);
+		const item = $(randomId);
+		
 		if (!progressEl) return;
+
+		// Update item state to completed
+		if (item) {
+			item.setAttribute("data-state", "completed");
+		}
 
 		const fullFilename = `${filename}.${ext}`;
 		const fullPath = join(this.state.downloadDir, fullFilename);
@@ -1638,8 +1695,247 @@ class YtDownloaderApp {
 		// If it has been downloaded, remove from the set
 		this.state.downloadedItems.delete(id);
 
+		// Clean up pause/resume state
+		this.state.pausedDownloads.delete(id);
+		this.state.downloadStates.delete(id);
+		this._savePausedDownloads();
+
 		this._fadeAndRemoveItem(id);
 		this._updateClearAllButton();
+	}
+
+	/**
+	 * Toggles pause/resume for a download
+	 * @param {string} id The ID of the download item
+	 */
+	_togglePauseResume(id) {
+		const currentState = this.state.downloadStates.get(id);
+
+		if (currentState === "downloading") {
+			this._pauseDownload(id);
+		} else if (currentState === "paused") {
+			this._resumeDownload(id);
+		}
+	}
+
+	/**
+	 * Pauses an active download
+	 * @param {string} id The ID of the download item
+	 */
+	_pauseDownload(id) {
+		const controller = this.state.downloadControllers.get(id);
+		if (!controller) return;
+
+		// Abort the current download process
+		controller.abort();
+
+		// Update state
+		this.state.downloadStates.set(id, "paused");
+		this.state.currentDownloads = Math.max(0, this.state.currentDownloads - 1);
+
+		// Update UI
+		const item = $(id);
+		const pauseResumeBtn = $(`${id}_pauseResume`);
+		const progEl = $(`${id}_prog`);
+		const speedEl = $(`${id}_speed`);
+
+		if (item) {
+			item.setAttribute("data-state", "paused");
+		}
+
+		if (pauseResumeBtn) {
+			pauseResumeBtn.querySelector(".pauseResumeIcon").textContent = "▶";
+			pauseResumeBtn.title = i18n.__("resume");
+			pauseResumeBtn.setAttribute("aria-label", i18n.__("resume"));
+		}
+
+		if (progEl) {
+			const fillEl = progEl.querySelector(".custom-progress-fill");
+			if (fillEl) {
+				// Keep the progress bar visible
+			} else {
+				progEl.textContent = i18n.__("paused");
+			}
+		}
+
+		if (speedEl) {
+			speedEl.textContent = "";
+		}
+
+		// Save paused state to localStorage
+		this._savePausedDownloads();
+
+		// Process queue to start next download
+		this._processQueue();
+
+		console.log(`Download ${id} paused`);
+	}
+
+	/**
+	 * Resumes a paused download
+	 * @param {string} id The ID of the download item
+	 */
+	_resumeDownload(id) {
+		const metadata = this.state.pausedDownloads.get(id);
+		if (!metadata) {
+			console.error(`No metadata found for download ${id}`);
+			return;
+		}
+
+		// Check if we can start a new download
+		if (this.state.currentDownloads >= this.state.maxActiveDownloads) {
+			this._showPopup(i18n.__("maxDownloadsReached"), true);
+			return;
+		}
+
+		// Update UI to show resuming
+		const item = $(id);
+		const progEl = $(`${id}_prog`);
+		const pauseResumeBtn = $(`${id}_pauseResume`);
+
+		if (item) {
+			item.setAttribute("data-state", "downloading");
+		}
+
+		if (progEl) {
+			const fillEl = progEl.querySelector(".custom-progress-fill");
+			if (!fillEl) {
+				progEl.innerHTML = "";
+				const bar = document.createElement("div");
+				bar.className = "custom-progress";
+				const fill = document.createElement("div");
+				fill.className = "custom-progress-fill";
+				fill.style.width = `${metadata.lastProgress}%`;
+				bar.appendChild(fill);
+				progEl.appendChild(bar);
+			}
+		}
+
+		if (pauseResumeBtn) {
+			pauseResumeBtn.querySelector(".pauseResumeIcon").textContent = "⏸";
+			pauseResumeBtn.title = i18n.__("pause");
+			pauseResumeBtn.setAttribute("aria-label", i18n.__("pause"));
+		}
+
+		// Restart the download with the same ID
+		this.state.currentDownloads++;
+		this.state.downloadStates.set(id, "downloading");
+
+		const controller = new AbortController();
+		this.state.downloadControllers.set(id, controller);
+
+		const downloadProcess = this.state.ytDlp.exec(metadata.downloadArgs, {
+			shell: true,
+			detached: false,
+			signal: controller.signal,
+		});
+
+		console.log(
+			"Resuming download with args:",
+			downloadProcess.ytDlpProcess.spawnargs.join(" ")
+		);
+
+		// Attach event listeners
+		downloadProcess
+			.on("progress", (progress) => {
+				this._updateProgressUI(id, progress);
+				metadata.lastProgress = progress.percent || 0;
+			})
+			.once("ytDlpEvent", () => {
+				const el = $(`${id}_prog`);
+				if (el) el.textContent = i18n.__("downloading");
+			})
+			.once("close", (code) => {
+				this._handleDownloadCompletion(
+					code,
+					id,
+					metadata.finalFilename,
+					metadata.finalExt,
+					metadata.job.thumbnail
+				);
+			})
+			.once("error", (error) => {
+				this.state.downloadedItems.add(id);
+				this._updateClearAllButton();
+				this._handleDownloadError(error, id);
+			});
+
+		console.log(`Download ${id} resumed`);
+	}
+
+	/**
+	 * Saves paused downloads to localStorage
+	 */
+	_savePausedDownloads() {
+		try {
+			const pausedData = [];
+			this.state.pausedDownloads.forEach((metadata, id) => {
+				const state = this.state.downloadStates.get(id);
+				if (state === "paused") {
+					pausedData.push({
+						id,
+						job: metadata.job,
+						finalFilename: metadata.finalFilename,
+						finalExt: metadata.finalExt,
+						downloadArgs: metadata.downloadArgs,
+						lastProgress: metadata.lastProgress,
+					});
+				}
+			});
+			localStorage.setItem("pausedDownloads", JSON.stringify(pausedData));
+		} catch (error) {
+			console.error("Error saving paused downloads:", error);
+		}
+	}
+
+	/**
+	 * Loads paused downloads from localStorage
+	 */
+	_loadPausedDownloads() {
+		try {
+			const pausedData = localStorage.getItem("pausedDownloads");
+			if (pausedData) {
+				const downloads = JSON.parse(pausedData);
+				downloads.forEach((data) => {
+					this.state.pausedDownloads.set(data.id, {
+						job: data.job,
+						randomId: data.id,
+						finalFilename: data.finalFilename,
+						finalExt: data.finalExt,
+						downloadArgs: data.downloadArgs,
+						lastProgress: data.lastProgress,
+					});
+					this.state.downloadStates.set(data.id, "paused");
+				});
+			}
+		} catch (error) {
+			console.error("Error loading paused downloads:", error);
+		}
+	}
+
+	/**
+	 * Restores paused downloads UI on app restart
+	 */
+	_restorePausedDownloads() {
+		this.state.pausedDownloads.forEach((metadata, id) => {
+			const state = this.state.downloadStates.get(id);
+			if (state === "paused") {
+				this._createDownloadUI(id, metadata.job, true);
+				
+				// Restore progress bar
+				const progEl = $(`${id}_prog`);
+				if (progEl && metadata.lastProgress > 0) {
+					progEl.innerHTML = "";
+					const bar = document.createElement("div");
+					bar.className = "custom-progress";
+					const fill = document.createElement("div");
+					fill.className = "custom-progress-fill";
+					fill.style.width = `${metadata.lastProgress}%`;
+					bar.appendChild(fill);
+					progEl.appendChild(bar);
+				}
+			}
+		});
 	}
 
 	/**
