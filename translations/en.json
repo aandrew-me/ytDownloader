@@ -161,6 +161,10 @@
 	"learnMore": "Learn more",
 	"updateError": "An error occurred during the update process",
 	"unableToAccessDir": "The program cannot access that folder",
-	"downloadingUpdate": "Downloading update"
+	"downloadingUpdate": "Downloading update",
+	"pause": "Pause",
+	"resume": "Resume",
+	"paused": "Paused",
+	"maxDownloadsReached": "Maximum active downloads reached. Please wait for a download to complete."
 
 }
