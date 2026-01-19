@@ -458,7 +458,7 @@ class YtDownloaderApp {
 				tryAgainBtn.id = "tryBtn";
 				tryAgainBtn.textContent = i18n.__("tryAgain");
 				tryAgainBtn.addEventListener("click", () => {
-					// TODO: Improve it
+					// Reload the app to retry yt-dlp download
 					ipcRenderer.send("reload");
 				});
 				document.getElementById("popup").appendChild(tryAgainBtn);
@@ -1724,7 +1724,10 @@ class YtDownloaderApp {
 	 */
 	_pauseDownload(id) {
 		const controller = this.state.downloadControllers.get(id);
-		if (!controller) return;
+		if (!controller) {
+			console.warn(`Cannot pause download ${id}: controller not found`);
+			return;
+		}
 
 		// Abort the current download process
 		controller.abort();
@@ -1744,18 +1747,20 @@ class YtDownloaderApp {
 		}
 
 		if (pauseResumeBtn) {
-			pauseResumeBtn.querySelector(".pauseResumeIcon").textContent = "▶";
+			const iconEl = pauseResumeBtn.querySelector(".pauseResumeIcon");
+			if (iconEl) {
+				iconEl.textContent = "▶";
+			}
 			pauseResumeBtn.title = i18n.__("resume");
 			pauseResumeBtn.setAttribute("aria-label", i18n.__("resume"));
 		}
 
 		if (progEl) {
 			const fillEl = progEl.querySelector(".custom-progress-fill");
-			if (fillEl) {
-				// Keep the progress bar visible
-			} else {
+			if (!fillEl) {
 				progEl.textContent = i18n.__("paused");
 			}
+			// If fillEl exists, keep the progress bar visible
 		}
 
 		if (speedEl) {
@@ -1778,7 +1783,7 @@ class YtDownloaderApp {
 	_resumeDownload(id) {
 		const metadata = this.state.pausedDownloads.get(id);
 		if (!metadata) {
-			console.error(`No metadata found for download ${id}`);
+			console.error(`Cannot resume download ${id}: metadata not found`);
 			return;
 		}
 
@@ -1805,14 +1810,17 @@ class YtDownloaderApp {
 				bar.className = "custom-progress";
 				const fill = document.createElement("div");
 				fill.className = "custom-progress-fill";
-				fill.style.width = `${metadata.lastProgress}%`;
+				fill.style.width = `${metadata.lastProgress || 0}%`;
 				bar.appendChild(fill);
 				progEl.appendChild(bar);
 			}
 		}
 
 		if (pauseResumeBtn) {
-			pauseResumeBtn.querySelector(".pauseResumeIcon").textContent = "⏸";
+			const iconEl = pauseResumeBtn.querySelector(".pauseResumeIcon");
+			if (iconEl) {
+				iconEl.textContent = "⏸";
+			}
 			pauseResumeBtn.title = i18n.__("pause");
 			pauseResumeBtn.setAttribute("aria-label", i18n.__("pause"));
 		}
