@@ -469,6 +469,11 @@ img {
 	display: none;
 }
 
+/* Hide pause/resume button for error items */
+.item[data-state="error"] .itemPauseResume {
+	display: none;
+}
+
 .itemPauseResume:hover {
 	background: linear-gradient(135deg, var(--box-toggleOn) 0%, rgba(var(--box-separation-rgb, 46, 46, 46), 0.85) 100%);
 	border-color: rgba(255, 255, 255, 0.2);
