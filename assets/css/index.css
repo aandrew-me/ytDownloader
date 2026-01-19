@@ -516,11 +516,6 @@ img {
 	filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.4));
 }
 
-.itemClose {
-	width: 20px;
-	height: 20px;
-	cursor: pointer;
-}
 .itemType {
 	font-style: italic;
 	margin-top: 5px;
