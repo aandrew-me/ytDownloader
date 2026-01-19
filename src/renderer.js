@@ -1194,6 +1194,17 @@ class YtDownloaderApp {
 		this.state.downloadControllers.delete(randomId);
 		console.error("Download Error:", error);
 		
+		// Update state map to error
+		this.state.downloadStates.set(randomId, "error");
+		
+		// Clean up paused metadata to prevent state desynchronization
+		this.state.pausedDownloads.delete(randomId);
+		this._savePausedDownloads();
+		
+		// Mark as downloaded item for cleanup
+		this.state.downloadedItems.add(randomId);
+		this._updateClearAllButton();
+		
 		// Update item state to error
 		const item = $(randomId);
 		if (item) {
