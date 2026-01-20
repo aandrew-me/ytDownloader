@@ -418,7 +418,6 @@ img {
 	align-items: center;
 	gap: 0;
 	z-index: 2;
-	pointer-events: none;
 }
 
 .itemPauseResume {
@@ -441,7 +440,6 @@ img {
 		inset 0 1px 0 rgba(255, 255, 255, 0.05);
 	backdrop-filter: blur(12px) saturate(180%);
 	-webkit-backdrop-filter: blur(12px) saturate(180%);
-	pointer-events: auto;
 }
 
 /* Show pause/resume button on hover for downloading items */
