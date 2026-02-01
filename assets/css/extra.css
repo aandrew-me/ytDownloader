@@ -140,6 +140,23 @@
 	--blueBtn-bottom: #2074b1;
 }
 
+:root[theme = "Gruvbox-dark"]{
+	--background: #1d2021;
+	--text: #fbf1c7 ;
+	--box-main: #003745;
+	--box-toggle: #2e4c52;
+	--box-separation: #2e4c52;
+	--box-toggleOn: #005a6f;
+	--item-bg: #32302f ;
+	--select:  #fabd2f;
+	--greenBtn: #b8bb26;
+	--greenBtn-bottom: #98971a;
+	--redBtn: #dc322f;
+	--redBtn-bottom: #af2523;
+	--blueBtn: #268bd2;
+	--blueBtn-bottom: #2074b1;
+}
+
 body {
 	background-color: var(--background);
 	color: var(--text);

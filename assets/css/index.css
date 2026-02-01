@@ -150,6 +150,24 @@
 	--blueBtn-bottom: #2074b1;
 }
 
+
+:root[theme = "Gruvbox-dark"]{
+	--background: #1d2021;
+	--text: #fbf1c7 ;
+	--box-main: #282828;
+	--box-toggle:  #32302f;
+	--box-separation: #3c3836;
+	--box-toggleOn: #689d6a;
+	--item-bg: #32302f;
+	--select:  #fabd2f;
+	--greenBtn: #b8bb26;
+	--greenBtn-bottom: #98971a;
+	--redBtn: #dc322f;
+	--redBtn-bottom: #af2523;
+	--blueBtn: #268bd2;
+	--blueBtn-bottom: #2074b1;
+}
+
 body {
 	font-family: "Ubuntu";
 	text-align: center;
