@@ -491,8 +491,16 @@ img {
 	padding: 8px;
 	color: var(--text);
 }
+
+#audioToggle {
+	margin-left: 5px;
+	margin-right: 10px;
+}
+
 #videoToggle {
 	background-color: var(--box-toggleOn);
+	margin-left: 10px;
+	margin-right: 5px;
 }
 
 .select {
