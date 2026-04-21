@@ -3,7 +3,7 @@ const { default: YTDlpWrap } = require("yt-dlp-wrap-plus");
 const path = require("path");
 const os = require("os");
 const fs = require("fs");
-const { execSync, exec, spawnSync } = require("child_process");
+const { execSync, execFile, spawnSync } = require("child_process");
 let url;
 const ytDlp = localStorage.getItem("ytdlp");
 const ytdlp = new YTDlpWrap(ytDlp);
@@ -59,8 +59,35 @@ function pasteLink() {
 	getId("errorBtn").style.display = "none";
 	getId("errorDetails").style.display = "none";
 	getId("errorDetails").textContent = "";
-	exec(
-		`${ytDlp} --yes-playlist --no-warnings -J --flat-playlist "${clipboardText}"`,
+	let clipboardUrl;
+	try {
+		clipboardUrl = new URL(clipboardText);
+		if (clipboardUrl.protocol !== "http:" && clipboardUrl.protocol !== "https:") {
+			throw new Error("Invalid URL protocol");
+		}
+	} catch (error) {
+		getId("loadingWrapper").style.display = "none";
+		getId("incorrectMsg").textContent = i18n.__(
+			"Incompatible URL. Please provide a playlist URL"
+		);
+		getId("errorDetails").innerHTML = `
+			<strong>URL: ${clipboardText}</strong>
+			<br><br>
+			${error}
+			`;
+		getId("errorDetails").title = i18n.__("Click to copy");
+		getId("errorBtn").style.display = "inline-block";
+		return;
+	}
+	execFile(
+		ytDlp,
+		[
+			"--yes-playlist",
+			"--no-warnings",
+			"-J",
+			"--flat-playlist",
+			clipboardUrl.toString(),
+		],
 		(error, stdout, stderr) => {
 			if (error) {
 				getId("loadingWrapper").style.display = "none";
@@ -116,7 +143,7 @@ function pasteLink() {
 					getId("errorDetails").innerHTML = `
 			<strong>URL: ${clipboardText}</strong>
 			<br><br>
-			${error}
+			${stderr}
 			`;
 					getId("errorDetails").title = i18n.__("Click to copy");
 					getId("errorBtn").style.display = "inline-block";
