@@ -52,6 +52,16 @@ function getId(id) {
 	return document.getElementById(id);
 }
 
+function sanitizeHttpUrl(value) {
+	try {
+		const parsedUrl = new URL(value);
+		if (parsedUrl.protocol === "http:" || parsedUrl.protocol === "https:") {
+			return parsedUrl.href;
+		}
+	} catch (error) {}
+	return "";
+}
+
 function pasteLink() {
 	const clipboardText = clipboard.readText();
 	getId("loadingWrapper").style.display = "flex";
@@ -67,19 +77,17 @@ function pasteLink() {
 				getId("incorrectMsg").textContent = i18n.__(
 					"Some error has occurred. Check your network and use correct URL"
 				);
-				getId("errorDetails").innerHTML = `
-			<strong>URL: ${clipboardText}</strong>
-			<br><br>
-			${error}
-			`;
+				getId("errorDetails").textContent = `URL: ${clipboardText}\n\n${error}`;
 				getId("errorDetails").title = i18n.__("Click to copy");
 				getId("errorBtn").style.display = "inline-block";
 			} else {
 				const parsed = JSON.parse(stdout);
 				console.log(parsed);
-				let items = "";
+				const data = getId("data");
+				data.textContent = "";
 				// If correct playlist url is used
 				if (parsed.entries) {
+					const fragment = document.createDocumentFragment();
 					parsed.entries.forEach((entry) => {
 						console.log(entry)
 						const randId = Math.random()
@@ -88,23 +96,56 @@ function pasteLink() {
 							.slice(2);
 
 						if (entry.channel) {
-							items += `
-						<div class="item" id="${randId}">
-						<img src="${
-							entry.thumbnails[3].url
-						}" alt="No thumbnail" class="itemIcon" crossorigin="anonymous">
-			
-						<div class="itemBody">
-							<div class="itemTitle">${entry.title}</div>
-							<div>${formatTime(entry.duration)}</div>
-							<input type="checkbox" class="playlistCheck" id="c${randId}">
-							<input type="hidden" id="link${randId}" value="${entry.url}">
-						</div>
-					</div>
-						`;
+							const item = document.createElement("div");
+							item.className = "item";
+							item.id = randId;
+
+							const image = document.createElement("img");
+							let thumbnailUrl = "";
+							if (
+								entry.thumbnails &&
+								entry.thumbnails[3] &&
+								entry.thumbnails[3].url
+							) {
+								thumbnailUrl = sanitizeHttpUrl(entry.thumbnails[3].url);
+							}
+							if (thumbnailUrl) {
+								image.src = thumbnailUrl;
+							}
+							image.alt = "No thumbnail";
+							image.className = "itemIcon";
+							image.setAttribute("crossorigin", "anonymous");
+
+							const itemBody = document.createElement("div");
+							itemBody.className = "itemBody";
+
+							const itemTitle = document.createElement("div");
+							itemTitle.className = "itemTitle";
+							itemTitle.textContent = entry.title || "";
+
+							const duration = document.createElement("div");
+							duration.textContent = formatTime(entry.duration);
+
+							const checkbox = document.createElement("input");
+							checkbox.type = "checkbox";
+							checkbox.className = "playlistCheck";
+							checkbox.id = `c${randId}`;
+
+							const hiddenLink = document.createElement("input");
+							hiddenLink.type = "hidden";
+							hiddenLink.id = `link${randId}`;
+							hiddenLink.value = entry.url || "";
+
+							itemBody.appendChild(itemTitle);
+							itemBody.appendChild(duration);
+							itemBody.appendChild(checkbox);
+							itemBody.appendChild(hiddenLink);
+							item.appendChild(image);
+							item.appendChild(itemBody);
+							fragment.appendChild(item);
 						}
 					});
-					getId("data").innerHTML = items;
+					data.appendChild(fragment);
 					getId("loadingWrapper").style.display = "none";
 				}
 				// If correct playlist url is not used
@@ -113,11 +154,7 @@ function pasteLink() {
 					getId("incorrectMsg").textContent = i18n.__(
 						"Incompatible URL. Please provide a playlist URL"
 					);
-					getId("errorDetails").innerHTML = `
-			<strong>URL: ${clipboardText}</strong>
-			<br><br>
-			${error}
-			`;
+					getId("errorDetails").textContent = `URL: ${clipboardText}\n\n${stderr}`;
 					getId("errorDetails").title = i18n.__("Click to copy");
 					getId("errorBtn").style.display = "inline-block";
 				}
