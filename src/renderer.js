@@ -78,6 +78,14 @@ const CONSTANTS = {
 		AUTO_UPDATE: "autoUpdate",
 		CLOSE_TO_TRAY: "closeToTray",
 		YT_DLP_CUSTOM_ARGS: "customYtDlpArgs",
+		YT_DLP_SOURCE: "ytdlpSource",
+	},
+	// yt-dlp source selectable in preferences.
+	// "nightly": app-managed standalone binary kept on the nightly channel.
+	// "system": use the yt-dlp found in PATH (managed by apt/pip/brew/etc.).
+	YT_DLP_SOURCE: {
+		NIGHTLY: "nightly",
+		SYSTEM: "system",
 	},
 };
 
@@ -144,6 +152,7 @@ class YtDownloaderApp {
 			this.state.ytDlpPath = await this._findOrDownloadYtDlp();
 			this.state.ytDlp = new YTDlpWrap(`"${this.state.ytDlpPath}"`);
 			this.state.ffmpegPath = await this._findFfmpeg();
+			this._ensureFfmpegLibsLoadable(this.state.ffmpegPath);
 			this.state.jsRuntimePath = await this._getJsRuntimePath();
 
 			console.log("yt-dlp path:", this.state.ytDlpPath);
@@ -321,18 +330,50 @@ class YtDownloaderApp {
 			}
 		}
 
-		// PRIORITY 4: LocalStorage or Download (Windows/Linux)
+		// PRIORITY 4: User-selected source (Windows/Linux)
 		else {
-			const storedPath = localStorage.getItem(
-				CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_PATH
-			);
+			// Source is chosen in preferences; defaults to the nightly,
+			// app-managed binary so YouTube fixes arrive fastest.
+			const source =
+				localStorage.getItem(
+					CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_SOURCE
+				) || CONSTANTS.YT_DLP_SOURCE.NIGHTLY;
 
-			if (storedPath && existsSync(storedPath)) {
-				executablePath = storedPath;
+			// "system": use yt-dlp from PATH (apt/pip/etc.). Falls back to the
+			// managed binary if nothing is found in PATH.
+			if (source === CONSTANTS.YT_DLP_SOURCE.SYSTEM) {
+				try {
+					const systemPath = execSync("command -v yt-dlp")
+						.toString()
+						.trim();
+					if (systemPath && existsSync(systemPath)) {
+						executablePath = systemPath;
+					}
+				} catch {
+					// Not found in PATH; fall back to the managed binary.
+				}
 			}
-			// Download if missing
-			else {
-				executablePath = await this.ensureYtDlpBinary(defaultYtDlpPath);
+
+			// "nightly" (default), or "system" fallback: use the app-managed
+			// binary. A stored path is reused; otherwise it is downloaded.
+			if (!executablePath) {
+				const storedPath = localStorage.getItem(
+					CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_PATH
+				);
+
+				if (
+					storedPath &&
+					existsSync(storedPath) &&
+					storedPath.startsWith(hiddenDir)
+				) {
+					executablePath = storedPath;
+				}
+				// Download if missing
+				else {
+					executablePath = await this.ensureYtDlpBinary(
+						defaultYtDlpPath
+					);
+				}
 			}
 		}
 
@@ -368,7 +409,27 @@ class YtDownloaderApp {
 					console.log("yt-dlp brew update:", data.toString())
 				);
 			} else {
-				const updateProc = spawn(executablePath, ["-U"]);
+				// Only self-update binaries we manage in ~/.ytDownloader.
+				// A system yt-dlp (apt/pip/etc.) rejects `-U` and is updated
+				// by the system package manager instead.
+				const hiddenDir = join(homedir(), ".ytDownloader");
+				if (!executablePath.startsWith(hiddenDir)) {
+					console.log(
+						"Using system yt-dlp; skipping self-update (-U)."
+					);
+					return;
+				}
+
+				// Release channel for the self-managed binary.
+				// "nightly" gets YouTube fixes days before stable; switching
+				// the channel also keeps the binary on the latest nightly on
+				// every launch. Set to "stable" to track stable releases.
+				const releaseChannel = "nightly";
+
+				const updateProc = spawn(executablePath, [
+					"--update-to",
+					releaseChannel,
+				]);
 
 				updateProc.on("error", (err) =>
 					console.error(
@@ -491,6 +552,34 @@ class YtDownloaderApp {
 
 		// Priority 3: Bundled ffmpeg
 		return join(__dirname, "..", "ffmpeg", "bin");
+	}
+
+	/**
+	 * The bundled Linux ffmpeg is dynamically linked and ships its shared
+	 * libraries in a sibling "lib" directory, but its RPATH is broken, so it
+	 * cannot find them on its own. yt-dlp spawns ffmpeg as a child process, so
+	 * we expose that lib directory via LD_LIBRARY_PATH (inherited by children).
+	 * Without this, audio extraction fails with "ffprobe and ffmpeg not found".
+	 * @param {string} ffmpegPath Path to the bundled ffmpeg "bin" directory.
+	 */
+	_ensureFfmpegLibsLoadable(ffmpegPath) {
+		if (platform() !== "linux" || !ffmpegPath) {
+			return;
+		}
+
+		const libDir = join(ffmpegPath, "..", "lib");
+		if (!existsSync(libDir)) {
+			return;
+		}
+
+		const current = process.env.LD_LIBRARY_PATH;
+		if (current) {
+			if (!current.split(":").includes(libDir)) {
+				process.env.LD_LIBRARY_PATH = `${libDir}:${current}`;
+			}
+		} else {
+			process.env.LD_LIBRARY_PATH = libDir;
+		}
 	}
 
 	/**
