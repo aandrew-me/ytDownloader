@@ -1,7 +1,8 @@
 const {ipcRenderer, shell} = require("electron");
 const {accessSync, constants} = require("original-fs");
 const {join} = require("path");
-const {homedir} = require("os");
+const {homedir, platform} = require("os");
+const {exec} = require("child_process");
 
 const storageTheme = localStorage.getItem("theme");
 if (storageTheme) {
@@ -29,6 +30,68 @@ if (rightToLeft == "true") {
 		});
 }
 
+// Check yt-dlp version
+// Execute the yt-dlp --version command with childprocess exec command
+const ytdlpPath = localStorage.getItem("ytdlp");
+console.log("yt-dlp path:", ytdlpPath);
+if (ytdlpPath) {
+	exec(`"${ytdlpPath}" --version`, (error, stdout, _stderr) => {
+		if (error) {
+			console.error("Error executing yt-dlp:", error);
+		} else {
+			const version = stdout.trim();
+
+			console.log("yt-dlp version:", version);
+			document.getElementById("ytDlpVersion").textContent = version;
+			document.getElementById("ytDlpPath").textContent = ytdlpPath;
+		}
+	});
+} else {
+	let systemPath;
+	if (platform() === "win32") {
+		exec("where yt-dlp", (err, stdout) => {
+			if (err) {
+				console.error("Error finding yt-dlp:", err);
+				return;
+			}
+			systemPath = stdout.trim().split("\n")[0];
+			console.log("System yt-dlp path:", systemPath);
+
+			exec(`"${systemPath}" --version`, (error, stdout, _stderr) => {
+				if (error) {
+					console.error("Error executing yt-dlp:", error);
+				} else {
+					const version = stdout.trim();
+
+					console.log("yt-dlp version:", version);
+					document.getElementById("ytDlpVersion").textContent =
+						version;
+					document.getElementById("ytDlpPath").textContent =
+						systemPath;
+				}
+			});
+		});
+	} else {
+		// for Unix-like systems including macos, use 'which' command to find yt-dlp
+		exec("which yt-dlp", (err, stdout) => {
+			if (err) {
+				console.error("Error finding yt-dlp:", err);
+				return;
+			}
+			systemPath = stdout.trim();
+			console.log("System yt-dlp path:", systemPath);
+			exec(`"${systemPath}" --version`, (error, stdout, _stderr) => {
+				if (error) {
+					console.error("Error executing yt-dlp:", error);
+				}
+				const version = stdout.trim();
+				console.log("yt-dlp version:", version);
+				document.getElementById("ytDlpVersion").textContent = version;
+			});
+		});
+	}
+}
+
 // Download path
 let downloadPath = localStorage.getItem("downloadPath");
 
@@ -54,7 +117,7 @@ document.addEventListener("translations-loaded", () => {
 	if (process.env.FLATPAK_ID) {
 		getId("flatpakTxt").addEventListener("click", () => {
 			shell.openExternal(
-				"https://flathub.org/apps/com.github.tchx84.Flatseal"
+				"https://flathub.org/apps/com.github.tchx84.Flatseal",
 			);
 		});
 
@@ -148,16 +211,22 @@ getId("browser").addEventListener("change", () => {
 });
 
 // yt-dlp source (nightly app-managed binary vs system yt-dlp)
-let ytdlpSource = localStorage.getItem("ytdlpSource") || "nightly";
-getId("ytdlpSource").value = ytdlpSource;
-getId("ytdlpSource").addEventListener("change", () => {
-	ytdlpSource = getId("ytdlpSource").value;
-	localStorage.setItem("ytdlpSource", ytdlpSource);
-	// Drop the cached path so the new source is resolved on reload.
-	localStorage.removeItem("ytdlp");
-	// Reload so renderer re-resolves the yt-dlp binary for the new source.
-	ipcRenderer.send("reload");
-});
+
+if (platform() === "darwin") {
+	getId("ytdlpSourceBox").style.display = "none";
+} else {
+	const ytdlpSource = localStorage.getItem("ytdlpSource") || "nightly";
+	const ytdlpSourceSelect = getId("ytdlpSource");
+
+	ytdlpSourceSelect.value = ytdlpSource;
+	ytdlpSourceSelect.addEventListener("change", () => {
+		localStorage.setItem("ytdlpSource", ytdlpSourceSelect.value);
+		// Drop the cached path so the new source is resolved on reload.
+		localStorage.removeItem("ytdlp");
+		// Reload so renderer re-resolves the yt-dlp binary for the new source.
+		ipcRenderer.send("reload");
+	});
+}
 
 // Handling preferred video quality
 let preferredVideoQuality = localStorage.getItem("preferredVideoQuality");
@@ -218,7 +287,7 @@ ytDlpArgsInput.addEventListener("input", () => {
 
 getId("learnMoreLink").addEventListener("click", () => {
 	shell.openExternal(
-		"https://github.com/aandrew-me/ytDownloader/wiki/Custom-yt%E2%80%90dlp-options"
+		"https://github.com/aandrew-me/ytDownloader/wiki/Custom-yt%E2%80%90dlp-options",
 	);
 });
 
@@ -244,7 +313,7 @@ getId("resetFilenameFormat").addEventListener("click", () => {
 	getId("filenameFormat").value = "%(playlist_index)s.%(title)s.%(ext)s";
 	localStorage.setItem(
 		"filenameFormat",
-		"%(playlist_index)s.%(title)s.%(ext)s"
+		"%(playlist_index)s.%(title)s.%(ext)s",
 	);
 });
 

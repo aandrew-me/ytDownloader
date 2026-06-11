@@ -343,9 +343,17 @@ class YtDownloaderApp {
 			// managed binary if nothing is found in PATH.
 			if (source === CONSTANTS.YT_DLP_SOURCE.SYSTEM) {
 				try {
-					const systemPath = execSync("command -v yt-dlp")
-						.toString()
-						.trim();
+					let systemPath;
+					if (platform() === "win32") {
+						systemPath = execSync("where yt-dlp")
+							.toString()
+							.split(/\r?\n/)[0]
+							.trim();
+					} else {
+						systemPath = execSync("command -v yt-dlp")
+							.toString()
+							.trim();
+					}
 					if (systemPath && existsSync(systemPath)) {
 						executablePath = systemPath;
 					}
@@ -420,10 +428,6 @@ class YtDownloaderApp {
 					return;
 				}
 
-				// Release channel for the self-managed binary.
-				// "nightly" gets YouTube fixes days before stable; switching
-				// the channel also keeps the binary on the latest nightly on
-				// every launch. Set to "stable" to track stable releases.
 				const releaseChannel = "nightly";
 
 				const updateProc = spawn(executablePath, [

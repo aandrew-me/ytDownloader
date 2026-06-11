@@ -134,20 +134,33 @@
             pattern="^(http:\/\/|https:\/\/|socks5:\/\/)?[a-zA-Z0-9.]+:[\d]+$">
     </div>
 
-    <div class="prefBox">
-        <span id="ytdlpSourceTxt" data-translate="ytdlpSource">yt-dlp source</span>
-        <select id="ytdlpSource">
-            <option value="nightly" data-translate="ytdlpSourceNightly">Nightly (auto-updating)</option>
-            <option value="system" data-translate="ytdlpSourceSystem">System yt-dlp</option>
-        </select>
-    </div>
+    <div id="ytdlpInfoBox">
+        <div class="ytdlpInfoItem">
+            <span>yt-dlp version</span>
+            <span id="ytDlpVersion"></span>
+        </div>
 
-    <div id="ytDlpArgBox">
-        <p>
-            <span data-translate="customArgsTxt">Set custom yt-dlp arguments.</span>
-            <a data-translate="learnMore" id="learnMoreLink">Learn more</a>
-        </p>
-        <textarea spellcheck="false" id="customArgsInput" placeholder="--sponsorblock-remove all"></textarea>
+        <div class="ytdlpInfoItem">
+            <span id="ytDlpPathTxt" data-translate="ytDlpPath">yt-dlp path</span>
+            <span id="ytDlpPath" class="path"></span>
+        </div>
+
+        <div class="ytdlpInfoItem" id="ytdlpSourceBox">
+            <span id="ytdlpSourceTxt" data-translate="ytdlpSource">yt-dlp source</span>
+            <select id="ytdlpSource">
+                <option value="nightly" data-translate="ytdlpSourceNightly">Nightly (auto-updating)</option>
+                <option value="system" data-translate="ytdlpSourceSystem">System yt-dlp</option>
+            </select>
+        </div>
+
+        <div id="ytDlpArgBox">
+            <p>
+                <span data-translate="customArgsTxt">Set custom yt-dlp arguments.</span>
+                <a data-translate="learnMore" id="learnMoreLink">Learn more</a>
+            </p>
+            <textarea spellcheck="false" id="customArgsInput" placeholder="--sponsorblock-remove all"></textarea>
+        </div>
+
     </div>
 
     <div id="pathConfig">

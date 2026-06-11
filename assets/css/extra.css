@@ -139,7 +139,7 @@
 	--blueBtn: #268bd2;
 	--blueBtn-bottom: #2074b1;
 }
-:root[theme = "gruvbox"]{
+:root[theme="gruvbox"] {
 	--background: #242424;
 	--text: #fffefd;
 	--box-main: #32302f;
@@ -148,13 +148,12 @@
 	--box-toggleOn: #458588;
 	--item-bg: #4d515d;
 	--select: #98971a;
-	--greenBtn:#8ec07c;
-	--greenBtn-bottom:#689D6A;
+	--greenBtn: #8ec07c;
+	--greenBtn-bottom: #689d6a;
 	--redBtn: #fb4934;
 	--redBtn-bottom: #cc241d;
 	--blueBtn: #7fa2ac;
 	--blueBtn-bottom: #458588;
-
 }
 
 body {
@@ -163,8 +162,17 @@ body {
 	padding: 20px;
 	font-size: x-large;
 	text-align: left;
-	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-		Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
+	font-family:
+		system-ui,
+		-apple-system,
+		BlinkMacSystemFont,
+		"Segoe UI",
+		Roboto,
+		Oxygen,
+		Ubuntu,
+		Cantarell,
+		"Open Sans",
+		"Helvetica Neue",
 		sans-serif;
 }
 h1 {
@@ -182,8 +190,17 @@ input[type="text"],
 	border: none;
 	width: 50%;
 	height: 35px;
-	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-		Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
+	font-family:
+		system-ui,
+		-apple-system,
+		BlinkMacSystemFont,
+		"Segoe UI",
+		Roboto,
+		Oxygen,
+		Ubuntu,
+		Cantarell,
+		"Open Sans",
+		"Helvetica Neue",
 		sans-serif;
 }
 .input {
@@ -203,13 +220,31 @@ input[type="text"],
 	background-color: var(--box-main);
 }
 
-#ytDlpArgBox {
+#ytdlpInfoBox {
 	margin: 15px 15px;
 	padding: 20px 15px;
 	border-radius: 15px;
 	background-color: var(--box-main);
 }
-#path {
+
+.ytdlpInfoItem {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin: 5px 5px;
+	padding: 20px 15px;
+	background-color: var(--box-separation);
+	border-radius: 15px;
+	overflow: hidden;
+}
+
+#ytDlpArgBox {
+	margin: 5px 5px;
+	padding: 20px 15px;
+	border-radius: 15px;
+	background-color: var(--box-separation);
+}
+#path, .path {
 	font-family: "JetBrains";
 	font-size: medium;
 }
