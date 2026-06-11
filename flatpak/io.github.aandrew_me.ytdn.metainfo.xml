@@ -55,6 +55,12 @@
   <content_rating type="oars-1.1" />
 
   <releases>
+    <release version="3.20.3" date="2026-06-11">
+      <description>
+        <p>Minor fixes and enhancements</p>
+      </description>
+    </release>
+
     <release version="3.20.2" date="2025-11-27">
       <description>
         <p>Bring back cookie related info</p>
