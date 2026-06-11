@@ -147,6 +147,18 @@ getId("browser").addEventListener("change", () => {
 	localStorage.setItem("browser", browser);
 });
 
+// yt-dlp source (nightly app-managed binary vs system yt-dlp)
+let ytdlpSource = localStorage.getItem("ytdlpSource") || "nightly";
+getId("ytdlpSource").value = ytdlpSource;
+getId("ytdlpSource").addEventListener("change", () => {
+	ytdlpSource = getId("ytdlpSource").value;
+	localStorage.setItem("ytdlpSource", ytdlpSource);
+	// Drop the cached path so the new source is resolved on reload.
+	localStorage.removeItem("ytdlp");
+	// Reload so renderer re-resolves the yt-dlp binary for the new source.
+	ipcRenderer.send("reload");
+});
+
 // Handling preferred video quality
 let preferredVideoQuality = localStorage.getItem("preferredVideoQuality");
 if (preferredVideoQuality) {
