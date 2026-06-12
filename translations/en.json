@@ -161,6 +161,7 @@
 	"ytdlpSource": "yt-dlp source",
 	"ytdlpSourceNightly": "Nightly (auto-updating)",
 	"ytdlpSourceSystem": "System yt-dlp",
+	"ytDlpPath": "yt-dlp path",
 	"learnMore": "Learn more",
 	"updateError": "An error occurred during the update process",
 	"unableToAccessDir": "The program cannot access that folder",
