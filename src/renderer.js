@@ -201,7 +201,7 @@ class YtDownloaderApp {
 		}
 
 		const savedPath = localStorage.getItem(
-			CONSTANTS.LOCAL_STORAGE_KEYS.DOWNLOAD_PATH
+			CONSTANTS.LOCAL_STORAGE_KEYS.DOWNLOAD_PATH,
 		);
 		if (savedPath) {
 			try {
@@ -209,12 +209,12 @@ class YtDownloaderApp {
 				this.state.downloadDir = savedPath;
 			} catch {
 				console.warn(
-					`Cannot write to saved path "${savedPath}". Falling back to default.`
+					`Cannot write to saved path "${savedPath}". Falling back to default.`,
 				);
 				this.state.downloadDir = defaultDownloadDir;
 				localStorage.setItem(
 					CONSTANTS.LOCAL_STORAGE_KEYS.DOWNLOAD_PATH,
-					defaultDownloadDir
+					defaultDownloadDir,
 				);
 			}
 		} else {
@@ -272,7 +272,7 @@ class YtDownloaderApp {
 					window.i18n.translatePage();
 					resolve();
 				},
-				{once: true}
+				{once: true},
 			);
 		});
 	}
@@ -296,7 +296,7 @@ class YtDownloaderApp {
 				executablePath = process.env.YTDOWNLOADER_YTDLP_PATH;
 			} else {
 				throw new Error(
-					"YTDOWNLOADER_YTDLP_PATH is set, but no file exists there."
+					"YTDOWNLOADER_YTDLP_PATH is set, but no file exists there.",
 				);
 			}
 		}
@@ -325,7 +325,7 @@ class YtDownloaderApp {
 				executablePath = execSync("which yt-dlp").toString().trim();
 			} catch {
 				throw new Error(
-					"No yt-dlp found in PATH on FreeBSD. Please install it."
+					"No yt-dlp found in PATH on FreeBSD. Please install it.",
 				);
 			}
 		}
@@ -336,7 +336,7 @@ class YtDownloaderApp {
 			// app-managed binary so YouTube fixes arrive fastest.
 			const source =
 				localStorage.getItem(
-					CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_SOURCE
+					CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_SOURCE,
 				) || CONSTANTS.YT_DLP_SOURCE.NIGHTLY;
 
 			// "system": use yt-dlp from PATH (apt/pip/etc.). Falls back to the
@@ -366,7 +366,7 @@ class YtDownloaderApp {
 			// binary. A stored path is reused; otherwise it is downloaded.
 			if (!executablePath) {
 				const storedPath = localStorage.getItem(
-					CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_PATH
+					CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_PATH,
 				);
 
 				if (
@@ -378,16 +378,15 @@ class YtDownloaderApp {
 				}
 				// Download if missing
 				else {
-					executablePath = await this.ensureYtDlpBinary(
-						defaultYtDlpPath
-					);
+					executablePath =
+						await this.ensureYtDlpBinary(defaultYtDlpPath);
 				}
 			}
 		}
 
 		localStorage.setItem(
 			CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_PATH,
-			executablePath
+			executablePath,
 		);
 
 		// Auto update
@@ -411,10 +410,10 @@ class YtDownloaderApp {
 				const brewUpdate = spawn(brewExec, ["upgrade", "yt-dlp"]);
 
 				brewUpdate.on("error", (err) =>
-					console.error("Failed to run 'brew upgrade yt-dlp':", err)
+					console.error("Failed to run 'brew upgrade yt-dlp':", err),
 				);
 				brewUpdate.stdout.on("data", (data) =>
-					console.log("yt-dlp brew update:", data.toString())
+					console.log("yt-dlp brew update:", data.toString()),
 				);
 			} else {
 				// Only self-update binaries we manage in ~/.ytDownloader.
@@ -423,7 +422,7 @@ class YtDownloaderApp {
 				const hiddenDir = join(homedir(), ".ytDownloader");
 				if (!executablePath.startsWith(hiddenDir)) {
 					console.log(
-						"Using system yt-dlp; skipping self-update (-U)."
+						"Using system yt-dlp; skipping self-update (-U).",
 					);
 					return;
 				}
@@ -438,8 +437,8 @@ class YtDownloaderApp {
 				updateProc.on("error", (err) =>
 					console.error(
 						"Failed to run background yt-dlp update:",
-						err
-					)
+						err,
+					),
 				);
 
 				updateProc.stdout.on("data", (data) => {
@@ -479,7 +478,7 @@ class YtDownloaderApp {
 			$(CONSTANTS.DOM_IDS.POPUP_BOX).style.display = "block";
 			$(CONSTANTS.DOM_IDS.POPUP_SVG).style.display = "inline";
 			document.querySelector("#popupBox p").textContent = i18n.__(
-				"downloadingNecessaryFilesWait"
+				"downloadingNecessaryFilesWait",
 			);
 
 			try {
@@ -489,18 +488,18 @@ class YtDownloaderApp {
 					undefined,
 					(progress, _d, _t) => {
 						$(
-							CONSTANTS.DOM_IDS.YTDLP_DOWNLOAD_PROGRESS
+							CONSTANTS.DOM_IDS.YTDLP_DOWNLOAD_PROGRESS,
 						).textContent =
 							i18n.__("progress") +
 							`: ${(progress * 100).toFixed(2)}%`;
-					}
+					},
 				);
 
 				$(CONSTANTS.DOM_IDS.POPUP_BOX).style.display = "none";
 
 				localStorage.setItem(
 					CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_PATH,
-					defaultYtDlpPath
+					defaultYtDlpPath,
 				);
 
 				return defaultYtDlpPath;
@@ -510,7 +509,7 @@ class YtDownloaderApp {
 				console.error("Failed to download yt-dlp:", downloadError);
 
 				document.querySelector("#popupBox p").textContent = i18n.__(
-					"errorFailedFileDownload"
+					"errorFailedFileDownload",
 				);
 				$(CONSTANTS.DOM_IDS.POPUP_SVG).style.display = "none";
 
@@ -539,7 +538,7 @@ class YtDownloaderApp {
 				return process.env.YTDOWNLOADER_FFMPEG_PATH;
 			}
 			throw new Error(
-				"YTDOWNLOADER_FFMPEG_PATH is set, but no file exists there."
+				"YTDOWNLOADER_FFMPEG_PATH is set, but no file exists there.",
 			);
 		}
 
@@ -549,7 +548,7 @@ class YtDownloaderApp {
 				return execSync("which ffmpeg").toString().trim();
 			} catch {
 				throw new Error(
-					"No ffmpeg found in PATH on FreeBSD. App may not work correctly."
+					"No ffmpeg found in PATH on FreeBSD. App may not work correctly.",
 				);
 			}
 		}
@@ -647,35 +646,37 @@ class YtDownloaderApp {
 		prefs.videoQuality =
 			Number(
 				localStorage.getItem(
-					CONSTANTS.LOCAL_STORAGE_KEYS.PREFERRED_VIDEO_QUALITY
-				)
+					CONSTANTS.LOCAL_STORAGE_KEYS.PREFERRED_VIDEO_QUALITY,
+				),
 			) || 1080;
 		prefs.audioQuality =
 			localStorage.getItem(
-				CONSTANTS.LOCAL_STORAGE_KEYS.PREFERRED_AUDIO_QUALITY
+				CONSTANTS.LOCAL_STORAGE_KEYS.PREFERRED_AUDIO_QUALITY,
 			) || "";
 		prefs.videoCodec =
 			localStorage.getItem(
-				CONSTANTS.LOCAL_STORAGE_KEYS.PREFERRED_VIDEO_CODEC
+				CONSTANTS.LOCAL_STORAGE_KEYS.PREFERRED_VIDEO_CODEC,
 			) || "avc1";
 		prefs.showMoreFormats =
 			localStorage.getItem(
-				CONSTANTS.LOCAL_STORAGE_KEYS.SHOW_MORE_FORMATS
+				CONSTANTS.LOCAL_STORAGE_KEYS.SHOW_MORE_FORMATS,
 			) === "true";
 		prefs.proxy =
 			localStorage.getItem(CONSTANTS.LOCAL_STORAGE_KEYS.PROXY) || "";
 		prefs.browserForCookies =
 			localStorage.getItem(
-				CONSTANTS.LOCAL_STORAGE_KEYS.BROWSER_COOKIES
+				CONSTANTS.LOCAL_STORAGE_KEYS.BROWSER_COOKIES,
 			) || "";
 		prefs.customYtDlpArgs =
 			localStorage.getItem(
-				CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_CUSTOM_ARGS
+				CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_CUSTOM_ARGS,
 			) || "";
-		prefs.configPath = localStorage.getItem(CONSTANTS.LOCAL_STORAGE_KEYS.CONFIG_PATH) || "";
+		prefs.configPath =
+			localStorage.getItem(CONSTANTS.LOCAL_STORAGE_KEYS.CONFIG_PATH) ||
+			"";
 
 		const maxDownloads = Number(
-			localStorage.getItem(CONSTANTS.LOCAL_STORAGE_KEYS.MAX_DOWNLOADS)
+			localStorage.getItem(CONSTANTS.LOCAL_STORAGE_KEYS.MAX_DOWNLOADS),
 		);
 		this.state.maxActiveDownloads = maxDownloads >= 1 ? maxDownloads : 5;
 
@@ -683,7 +684,7 @@ class YtDownloaderApp {
 		$(CONSTANTS.DOM_IDS.CUSTOM_ARGS_INPUT).value = prefs.customYtDlpArgs;
 
 		const downloadDir = localStorage.getItem(
-			CONSTANTS.LOCAL_STORAGE_KEYS.DOWNLOAD_PATH
+			CONSTANTS.LOCAL_STORAGE_KEYS.DOWNLOAD_PATH,
 		);
 
 		if (downloadDir) {
@@ -697,7 +698,7 @@ class YtDownloaderApp {
 	 */
 	_addEventListeners() {
 		$(CONSTANTS.DOM_IDS.PASTE_URL_BTN).addEventListener("click", () =>
-			this.pasteAndGetInfo()
+			this.pasteAndGetInfo(),
 		);
 		document.addEventListener("keydown", (event) => {
 			if (
@@ -712,7 +713,7 @@ class YtDownloaderApp {
 
 				setTimeout(() => {
 					$(CONSTANTS.DOM_IDS.PASTE_URL_BTN).classList.remove(
-						"active"
+						"active",
 					);
 				}, 150);
 
@@ -722,24 +723,24 @@ class YtDownloaderApp {
 
 		// Download buttons
 		$(CONSTANTS.DOM_IDS.VIDEO_DOWNLOAD_BTN).addEventListener("click", () =>
-			this.handleDownloadRequest("video")
+			this.handleDownloadRequest("video"),
 		);
 		$(CONSTANTS.DOM_IDS.AUDIO_DOWNLOAD_BTN).addEventListener("click", () =>
-			this.handleDownloadRequest("audio")
+			this.handleDownloadRequest("audio"),
 		);
 		$(CONSTANTS.DOM_IDS.EXTRACT_BTN).addEventListener("click", () =>
-			this.handleDownloadRequest("extract")
+			this.handleDownloadRequest("extract"),
 		);
 
 		// UI controls
 		$(CONSTANTS.DOM_IDS.CLOSE_HIDDEN_BTN).addEventListener("click", () =>
-			this._hideInfoPanel()
+			this._hideInfoPanel(),
 		);
 		$(CONSTANTS.DOM_IDS.SELECT_LOCATION_BTN).addEventListener("click", () =>
-			ipcRenderer.send("select-location-main", "")
+			ipcRenderer.send("select-location-main", ""),
 		);
 		$(CONSTANTS.DOM_IDS.CLEAR_BTN).addEventListener("click", () =>
-			this._clearAllDownloaded()
+			this._clearAllDownloaded(),
 		);
 
 		// Error details
@@ -813,19 +814,19 @@ class YtDownloaderApp {
 		const maxSlider = $(CONSTANTS.DOM_IDS.MAX_SLIDER);
 
 		minSlider.addEventListener("input", () =>
-			this._updateSliderUI(minSlider)
+			this._updateSliderUI(minSlider),
 		);
 		maxSlider.addEventListener("input", () =>
-			this._updateSliderUI(maxSlider)
+			this._updateSliderUI(maxSlider),
 		);
 
 		$(CONSTANTS.DOM_IDS.START_TIME).addEventListener(
 			"change",
-			this._handleTimeInputChange
+			this._handleTimeInputChange,
 		);
 		$(CONSTANTS.DOM_IDS.END_TIME).addEventListener(
 			"change",
-			this._handleTimeInputChange
+			this._handleTimeInputChange,
 		);
 
 		this._updateSliderUI(null);
@@ -899,7 +900,7 @@ class YtDownloaderApp {
 			uiSnapshot: {
 				videoFormat: $(CONSTANTS.DOM_IDS.VIDEO_FORMAT_SELECT).value,
 				audioForVideoFormat: $(
-					CONSTANTS.DOM_IDS.AUDIO_FOR_VIDEO_FORMAT_SELECT
+					CONSTANTS.DOM_IDS.AUDIO_FOR_VIDEO_FORMAT_SELECT,
 				).value,
 				audioFormat: $(CONSTANTS.DOM_IDS.AUDIO_FORMAT_SELECT).value,
 				extractFormat: $(CONSTANTS.DOM_IDS.EXTRACT_SELECTION).value,
@@ -944,9 +945,9 @@ class YtDownloaderApp {
 			const process = this.state.ytDlp.exec(args, {shell: true});
 
 			console.log(
-			"Spawned yt-dlp with args:",
-			process.ytDlpProcess.spawnargs.join(" ")
-		);
+				"Spawned yt-dlp with args:",
+				process.ytDlpProcess.spawnargs.join(" "),
+			);
 
 			let stdout = "";
 			let stderr = "";
@@ -964,15 +965,15 @@ class YtDownloaderApp {
 						reject(
 							new Error(
 								"Failed to parse yt-dlp JSON output: " +
-									(stderr || e.message)
-							)
+									(stderr || e.message),
+							),
 						);
 					}
 				} else {
 					reject(
 						new Error(
-							stderr || `yt-dlp exited with a non-zero code.`
-						)
+							stderr || `yt-dlp exited with a non-zero code.`,
+						),
 					);
 				}
 			});
@@ -1005,7 +1006,7 @@ class YtDownloaderApp {
 
 		console.log(
 			"Spawned yt-dlp with args:",
-			downloadProcess.ytDlpProcess.spawnargs.join(" ")
+			downloadProcess.ytDlpProcess.spawnargs.join(" "),
 		);
 
 		// Attach event listeners
@@ -1026,7 +1027,7 @@ class YtDownloaderApp {
 					randomId,
 					finalFilename,
 					finalExt,
-					job.thumbnail
+					job.thumbnail,
 				);
 			})
 			.once("error", (error) => {
@@ -1051,7 +1052,7 @@ class YtDownloaderApp {
 						job.thumbnail || "../assets/images/thumb.png"
 					}" alt="thumbnail" class="itemIcon" crossorigin="anonymous">
                     <span class="itemType">${i18n.__(
-						job.type === "video" ? "video" : "audio"
+						job.type === "video" ? "video" : "audio",
 					)}</span>
                 </div>
                 <div class="itemBody">
@@ -1061,7 +1062,7 @@ class YtDownloaderApp {
             </div>`;
 		$(CONSTANTS.DOM_IDS.DOWNLOAD_LIST).insertAdjacentHTML(
 			"beforeend",
-			itemHTML
+			itemHTML,
 		);
 	}
 
@@ -1146,7 +1147,7 @@ class YtDownloaderApp {
 
 		const outputPath = `"${join(
 			this.state.downloadDir,
-			`${finalFilename}.${ext}`
+			`${finalFilename}.${ext}`,
 		)}"`;
 
 		const baseArgs = [
@@ -1198,7 +1199,7 @@ class YtDownloaderApp {
 		if (rangeOption) downloadArgs.push(rangeOption, rangeCmd);
 
 		const customArgsString = $(
-			CONSTANTS.DOM_IDS.CUSTOM_ARGS_INPUT
+			CONSTANTS.DOM_IDS.CUSTOM_ARGS_INPUT,
 		).value.trim();
 		if (customArgsString) {
 			const customArgs = customArgsString.split(/\s+/);
@@ -1225,7 +1226,7 @@ class YtDownloaderApp {
 			// code is null if aborted, so only show error if it's a real exit code
 			this._handleDownloadError(
 				new Error(`Download process exited with code ${code}.`),
-				randomId
+				randomId,
 			);
 		}
 
@@ -1247,7 +1248,7 @@ class YtDownloaderApp {
 			console.log(`Download ${randomId} was aborted.`);
 			this.state.currentDownloads = Math.max(
 				0,
-				this.state.currentDownloads - 1
+				this.state.currentDownloads - 1,
 			);
 			this.state.downloadControllers.delete(randomId);
 			this._processQueue();
@@ -1309,9 +1310,8 @@ class YtDownloaderApp {
 		$(CONSTANTS.DOM_IDS.VIDEO_FORMAT_SELECT).innerHTML = "";
 		$(CONSTANTS.DOM_IDS.AUDIO_FORMAT_SELECT).innerHTML = "";
 		const noAudioTxt = i18n.__("noAudio");
-		$(
-			CONSTANTS.DOM_IDS.AUDIO_FOR_VIDEO_FORMAT_SELECT
-		).innerHTML = `<option value="none|none">${noAudioTxt}</option>`;
+		$(CONSTANTS.DOM_IDS.AUDIO_FOR_VIDEO_FORMAT_SELECT).innerHTML =
+			`<option value="none|none">${noAudioTxt}</option>`;
 	}
 
 	/**
@@ -1319,48 +1319,18 @@ class YtDownloaderApp {
 	 * @param {Array} formats The formats array from yt-dlp metadata.
 	 */
 	_populateFormatSelectors(formats) {
-		const videoSelect = $(CONSTANTS.DOM_IDS.VIDEO_FORMAT_SELECT);
-		const audioSelect = $(CONSTANTS.DOM_IDS.AUDIO_FORMAT_SELECT);
-		const audioForVideoSelect = $(
-			CONSTANTS.DOM_IDS.AUDIO_FOR_VIDEO_FORMAT_SELECT
-		);
-
-		const NBSP = " ";
-
-		let maxVideoQualityLen = 0;
-		let maxAudioQualityLen = 0;
-
-		formats.forEach((format) => {
-			if (format.video_ext !== "none" && format.vcodec !== "none") {
-				const quality = `${format.height || "???"}p${
-					format.fps === 60 ? "60" : ""
-				}`;
-				if (quality.length > maxVideoQualityLen) {
-					maxVideoQualityLen = quality.length;
-				}
-			} else if (
-				format.acodec !== "none" &&
-				format.video_ext === "none"
-			) {
-				const formatNote =
-					i18n.__(format.format_note) || i18n.__("unknownQuality");
-				if (formatNote.length > maxAudioQualityLen) {
-					maxAudioQualityLen = formatNote.length;
-				}
-			}
-		});
-
-		const videoQualityPadding = maxVideoQualityLen;
-		const audioQualityPadding = maxAudioQualityLen;
-
-		const extPadding = 5; // "mp4", "webm"
-		const vcodecPadding = 5; // "avc1", "vp9"
-		const filesizePadding = 10; // "12.48 MB"
+		const videoSelectId = CONSTANTS.DOM_IDS.VIDEO_FORMAT_SELECT;
+		const audioSelectId = CONSTANTS.DOM_IDS.AUDIO_FORMAT_SELECT;
+		const audioForVideoSelectId =
+			CONSTANTS.DOM_IDS.AUDIO_FOR_VIDEO_FORMAT_SELECT;
 
 		const {videoQuality, videoCodec, showMoreFormats} =
 			this.state.preferences;
 		let bestMatchHeight = 0;
 
+		const speakerIconSvg = `<svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>`;
+
+		// Find the ideal match height boundary
 		formats.forEach((f) => {
 			if (
 				f.height &&
@@ -1373,18 +1343,23 @@ class YtDownloaderApp {
 		});
 		if (bestMatchHeight === 0 && formats.length > 0) {
 			bestMatchHeight = Math.max(
-				...formats.filter((f) => f.height).map((f) => f.height)
+				...formats.filter((f) => f.height).map((f) => f.height),
 			);
 		}
+
 		const availableCodecs = new Set(
 			formats
 				.filter((f) => f.height === bestMatchHeight && f.vcodec)
-				.map((f) => f.vcodec.split(".")[0])
+				.map((f) => f.vcodec.split(".")[0]),
 		);
 		const finalCodec = availableCodecs.has(videoCodec)
 			? videoCodec
 			: [...availableCodecs].pop();
+
 		let isAVideoSelected = false;
+
+		const videoOptions = [];
+		const audioOptions = [];
 
 		formats.forEach((format) => {
 			let sizeInMB = null;
@@ -1411,7 +1386,9 @@ class YtDownloaderApp {
 				) {
 					return;
 				}
+
 				let isSelected = false;
+
 				if (
 					!isAVideoSelected &&
 					format.height === bestMatchHeight &&
@@ -1421,31 +1398,44 @@ class YtDownloaderApp {
 					isAVideoSelected = true;
 				}
 
-				const quality = `${format.height || "???"}p${
-					format.fps === 60 ? "60" : ""
-				}`;
-				const hasAudio = format.acodec !== "none" ? " 🔊" : "";
+				const quality = `${format.height || "???"}p${format.fps === 60 ? "60" : ""}`;
+				const vcodecText = format.vcodec?.split(".")[0] || "";
 
-				const col1 = quality.padEnd(videoQualityPadding + 1, NBSP);
-				const col2 = format.ext.padEnd(extPadding, NBSP);
-				const col4 = displaySize.padEnd(filesizePadding, NBSP);
+				const audioMarkup =
+					format.acodec !== "none"
+						? `<div class="audio-indicator">${speakerIconSvg}</div>`
+						: `<div class="audio-placeholder"></div>`;
 
-				let optionText;
-				if (showMoreFormats) {
-					const vcodec = format.vcodec?.split(".")[0] || "";
-					const col3 = vcodec.padEnd(vcodecPadding, NBSP);
-					optionText = `${col1} | ${col2} | ${col3} | ${col4}${hasAudio}`;
-				} else {
-					optionText = `${col1} | ${col2} | ${col4}${hasAudio}`;
-				}
+				const codecHtml = showMoreFormats
+					? `<span class="codec-text">${vcodecText}</span>`
+					: "";
 
-				const option = `<option value="${format.format_id}|${
-					format.ext
-				}|${format.height}|${format.vcodec}" ${
-					isSelected ? "selected" : ""
-				}>${optionText}</option>`;
+				const gridClass = showMoreFormats
+					? "video-grid-extended"
+					: "video-grid-compact";
 
-				videoSelect.innerHTML += option;
+				const optionTextFallback = showMoreFormats
+					? `${quality} ${format.ext} ${vcodecText} ${displaySize}`
+					: `${quality} ${format.ext} ${displaySize}`;
+
+				const htmlContent = `
+					<div class="modern-option-row ${gridClass}">
+						<span class="main-text">${quality}</span>
+						<span class="badge badge-format">${format.ext}</span>
+						${codecHtml}
+						<span class="size-text">${displaySize}</span>
+						${audioMarkup}
+					</div>
+				`;
+
+				videoOptions.push({
+					text: optionTextFallback,
+					value: `${format.format_id}|${format.ext}|${format.height}|${format.vcodec}`,
+					selected: isSelected,
+					html: htmlContent,
+				});
+
+				// PROCESS AUDIO ONLY CHANNELS
 			} else if (
 				format.acodec !== "none" &&
 				format.video_ext === "none"
@@ -1456,31 +1446,82 @@ class YtDownloaderApp {
 				const formatNote =
 					i18n.__(format.format_note) || i18n.__("unknownQuality");
 
-				const audioExtPadded = audioExt.padEnd(extPadding, NBSP);
+				// HTML for Audio Grid
+				const htmlContent = `
+					<div class="modern-option-row audio-grid">
+						<span class="main-text">${formatNote}</span>
+						<span class="badge badge-format">${audioExt}</span>
+						<span class="size-text">${displaySize}</span>
+					</div>
+				`;
 
-				const audioQualityPadded = formatNote.padEnd(
-					audioQualityPadding,
-					NBSP
-				);
-				const audioSizePadded = displaySize.padEnd(
-					filesizePadding,
-					NBSP
-				);
-
-				const option_audio = `<option value="${format.format_id}|${audioExt}">${audioQualityPadded} | ${audioExtPadded} | ${audioSizePadded}</option>`;
-
-				audioSelect.innerHTML += option_audio;
-				audioForVideoSelect.innerHTML += option_audio;
+				audioOptions.push({
+					text: `${formatNote} ${audioExt} ${displaySize}`,
+					value: `${format.format_id}|${audioExt}`,
+					html: htmlContent,
+				});
 			}
 		});
 
-		if (
-			formats.every((f) => f.acodec === "none" || f.acodec === undefined)
-		) {
-			$(CONSTANTS.DOM_IDS.AUDIO_PRESENT_SECTION).style.display = "none";
-		} else {
-			$(CONSTANTS.DOM_IDS.AUDIO_PRESENT_SECTION).style.display = "block";
+		const hasAudioTrack = formats.some(
+			(f) => f.acodec !== "none" && f.acodec !== undefined && f.vcodec === "none",
+		);
+		const audioSection = $(CONSTANTS.DOM_IDS.AUDIO_PRESENT_SECTION);
+
+		if (audioSection) {
+			audioSection.style.display = hasAudioTrack ? "block" : "none";
 		}
+
+		const videoSelectEl = $(CONSTANTS.DOM_IDS.VIDEO_FORMAT_SELECT);
+		const audioSelectEl = $(CONSTANTS.DOM_IDS.AUDIO_FORMAT_SELECT);
+		const audioForVideoSelectEl = $(
+			CONSTANTS.DOM_IDS.AUDIO_FOR_VIDEO_FORMAT_SELECT,
+		);
+
+		const mountSlimSelect = (domElement, optionsData) => {
+			if (!domElement) return;
+
+			if (domElement.slim) {
+				domElement.slim.destroy();
+			}
+
+			domElement.slim = new SlimSelect({
+				select: domElement,
+				data: optionsData,
+				settings: {
+					showSearch: true,
+					contentLocation: document.body,
+				},
+			});
+		};
+
+		if (videoOptions.length > 0) {
+			mountSlimSelect(videoSelectEl, videoOptions);
+		}
+
+		if (audioOptions.length > 0) {
+			mountSlimSelect(audioSelectEl, audioOptions);
+
+			mountSlimSelect(
+				audioForVideoSelectEl,
+				JSON.parse(JSON.stringify(audioOptions)),
+			);
+		}
+
+		const audioForVideoOptions = JSON.parse(JSON.stringify(audioOptions));
+		const noAudioTxt = i18n.__("noAudio") || "No Audio";
+
+		audioForVideoOptions.push({
+			text: noAudioTxt,
+			value: "none|none",
+			html: `
+            <div class="modern-option-row audio-grid">
+                <span class="main-text">${noAudioTxt}</span>
+            </div>
+        `,
+		});
+
+		mountSlimSelect(audioForVideoSelectEl, audioForVideoOptions);
 	}
 
 	/**
@@ -1501,7 +1542,7 @@ class YtDownloaderApp {
 				type: "text",
 				value: `${info.title} [${info.id}]`,
 				onchange: (e) => (this.state.videoInfo.title = e.target.value),
-			})
+			}),
 		);
 
 		document
@@ -1526,7 +1567,7 @@ class YtDownloaderApp {
 						job.thumbnail || "../assets/images/thumb.png"
 					}" alt="thumbnail" class="itemIcon" crossorigin="anonymous">
                     <span class="itemType">${i18n.__(
-						job.type === "video" ? "video" : "audio"
+						job.type === "video" ? "video" : "audio",
 					)}</span>
                 </div>
                 <img src="../assets/images/close.png" class="itemClose" id="${randomId}_close">
@@ -1534,17 +1575,17 @@ class YtDownloaderApp {
                     <div class="itemTitle">${job.title}</div>
                     <strong class="itemSpeed" id="${randomId}_speed"></strong>
                     <div id="${randomId}_prog" class="itemProgress">${i18n.__(
-			"preparing"
-		)}</div>
+						"preparing",
+					)}</div>
                 </div>
             </div>`;
 		$(CONSTANTS.DOM_IDS.DOWNLOAD_LIST).insertAdjacentHTML(
 			"beforeend",
-			itemHTML
+			itemHTML,
 		);
 
 		$(`${randomId}_close`).addEventListener("click", () =>
-			this._cancelDownload(randomId)
+			this._cancelDownload(randomId),
 		);
 	}
 
@@ -1633,7 +1674,7 @@ class YtDownloaderApp {
 						duration: this.state.videoInfo.duration,
 					})
 					.catch((err) =>
-						console.error("Error adding to history:", err)
+						console.error("Error adding to history:", err),
 					);
 			})
 			.catch((error) => console.error("Error saving to history:", error));
@@ -1710,7 +1751,7 @@ class YtDownloaderApp {
 		$(CONSTANTS.DOM_IDS.MENU).style.opacity = "0";
 		setTimeout(
 			() => ($(CONSTANTS.DOM_IDS.MENU).style.display = "none"),
-			500
+			500,
 		);
 	}
 
@@ -1725,7 +1766,7 @@ class YtDownloaderApp {
 		}
 		// If it's in the queue
 		this.state.downloadQueue = this.state.downloadQueue.filter(
-			(job) => job.queueId !== id
+			(job) => job.queueId !== id,
 		);
 
 		// If it has been downloaded, remove from the set
@@ -1888,7 +1929,7 @@ class YtDownloaderApp {
 
 		if (isNaN(newSeconds)) {
 			input.value = this._formatTime(
-				input.id === "min-time" ? minSlider.value : maxSlider.value
+				input.id === "min-time" ? minSlider.value : maxSlider.value,
 			);
 			return;
 		}
@@ -1901,7 +1942,7 @@ class YtDownloaderApp {
 			if (newSeconds >= parseInt(maxSlider.value)) {
 				newSeconds = Math.max(
 					minSliderVal,
-					parseInt(maxSlider.value) - 1
+					parseInt(maxSlider.value) - 1,
 				);
 			}
 			minSlider.value = newSeconds;
@@ -1909,7 +1950,7 @@ class YtDownloaderApp {
 			if (newSeconds <= parseInt(minSlider.value)) {
 				newSeconds = Math.min(
 					maxSliderVal,
-					parseInt(minSlider.value) + 1
+					parseInt(minSlider.value) + 1,
 				);
 			}
 			maxSlider.value = newSeconds;
@@ -1928,7 +1969,7 @@ class YtDownloaderApp {
 
 		if (typeof duration !== "number" || duration < 1) {
 			console.error(
-				"Invalid duration provided to setVideoLength. Must be a number greater than 0."
+				"Invalid duration provided to setVideoLength. Must be a number greater than 0.",
 			);
 
 			minSlider.max = 0;

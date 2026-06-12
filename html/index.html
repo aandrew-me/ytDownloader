@@ -7,6 +7,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>YtDownloader</title>
+    
+    <script src="../assets/slimselect.js"></script>
+    <link href="../assets/slimselect.css" rel="stylesheet">
+
     <link rel="stylesheet" href="../assets/css/index.css">
 
     <script src="../translations/i18n-init.js" defer></script>
@@ -70,8 +74,9 @@
             <option id="matrixTxt" value="matrix" data-translate="themeMatrix">Matrix</option>
             <option id="githubTxt" value="github">Github</option>
             <option id="latteTxt" value="latte">Latte</option>
-            <option id="solarizedDarkTxt" value="solarized-dark" data-translate="themeSolarizedDark">Solarized Dark</option>
-            <option id ="guvboxTxt" value="gruvbox">Gruvbox</option>
+            <option id="solarizedDarkTxt" value="solarized-dark" data-translate="themeSolarizedDark">Solarized Dark
+            </option>
+            <option id="guvboxTxt" value="gruvbox">Gruvbox</option>
         </select>
     </div>
 
@@ -119,8 +124,11 @@
                 <div class="separationBox">
                     <h2 id="videoHeader" data-translate="video">Video</h2>
                     <label class="formatSelect" data-translate="selectFormat">Select Format </label>
-                    <select id="videoFormatSelect" class="select">
-                    </select>
+                    <div id="videoFormatSelectContainer">
+                        <select id="videoFormatSelect">
+                        </select>
+                    </div>
+
                     <br>
                     <input type="hidden" name="url" class="url" id="url">
 
@@ -128,8 +136,13 @@
                     <div id="audioForVideo">
                         <h2 id="audioHeader" data-translate="audio">Audio</h2>
                         <label class="formatSelect" data-translate="selectAudioFormat">Select Audio Format </label>
-                        <select id="audioForVideoFormatSelect" class="select">
-                        </select>
+
+
+                        <div id="audioFormatSelectContainer">
+                            <select id="audioForVideoFormatSelect">
+                            </select>
+                        </div>
+
                         <br>
                         <input type="hidden" name="url" class="url">
                     </div>
@@ -146,9 +159,13 @@
             <div id="audioList">
                 <div id="audioPresent">
                     <label class="formatSelect" data-translate="selectFormat">Select Format </label>
-                    <select id="audioFormatSelect" class="select">
-                    </select>
-                    <br>
+
+                    <div id="audioFormatSelectContainer">
+                        <select id="audioFormatSelect">
+                        </select>
+                    </div>
+
+                    <br><br>
                     <input type="hidden" name="url" class="url">
                     <button class="submitBtn" id="audioDownload" data-translate="download">Download</button>
                     <button id="advancedAudioToggle" class="blueBtn" onClick="advancedToggle()"
@@ -259,6 +276,11 @@
 
         <span id="updateProgress">0.0%</span>
     </div>
+    <script>
+        new SlimSelect({ select: '#videoFormatSelect' });
+    </script>
+
+
 </body>
 
 </html>
