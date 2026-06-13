@@ -129,6 +129,7 @@ Translations into other languages would be highly appreciated. If you want to he
 | Name                | Status |
 | ------------------- | ------ |
 | Arabic              | ✔️     |
+| Basque              | ✔️     |
 | Bengali             | ✔️     |
 | English             | ✔️     |
 | Chinese Simplified  | ✔️     |
