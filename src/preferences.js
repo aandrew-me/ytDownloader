@@ -285,9 +285,15 @@ ytDlpArgsInput.addEventListener("input", () => {
 	ytDlpArgsInput.style.height = ytDlpArgsInput.scrollHeight + "px";
 });
 
-getId("learnMoreLink").addEventListener("click", () => {
+getId("learnMoreYtdlpArgs").addEventListener("click", () => {
 	shell.openExternal(
 		"https://github.com/aandrew-me/ytDownloader/wiki/Custom-yt%E2%80%90dlp-options",
+	);
+});
+
+getId("learnMoreOutputTemplates").addEventListener("click", () => {
+	shell.openExternal(
+		"https://github.com/yt-dlp/yt-dlp#output-template",
 	);
 });
 
@@ -299,7 +305,43 @@ getId("restart").addEventListener("click", () => {
 	reload();
 });
 
-// Handling filename formats
+// Handling filename formats for videos
+getId("filenameTemplateVideo").addEventListener("input", () => {
+	const text = getId("filenameTemplateVideo").value;
+	localStorage.setItem("filenameTemplateVideo", text);
+});
+
+if (localStorage.getItem("filenameTemplateVideo")) {
+	getId("filenameTemplateVideo").value = localStorage.getItem("filenameTemplateVideo");
+}
+
+getId("resetFilenameTemplateVideo").addEventListener("click", () => {
+	getId("filenameTemplateVideo").value = "%(title)s.%(ext)s";
+	localStorage.setItem(
+		"filenameTemplateVideo",
+		"%(title)s.%(ext)s"
+	);
+});
+
+// Handling filename formats for audios
+getId("filenameTemplateAudio").addEventListener("input", () => {
+	const text = getId("filenameTemplateAudio").value;
+	localStorage.setItem("filenameTemplateAudio", text);
+});
+
+if (localStorage.getItem("filenameTemplateAudio")) {
+	getId("filenameTemplateAudio").value = localStorage.getItem("filenameTemplateAudio");
+}
+
+getId("resetAudioFilenameTemplate").addEventListener("click", () => {
+	getId("filenameTemplateAudio").value = "%(title)s.%(ext)s";
+	localStorage.setItem(
+		"filenameTemplateAudio",
+		"%(title)s.%(ext)s"
+	);
+});
+
+// Handling filename formats for playlists
 getId("filenameFormat").addEventListener("input", () => {
 	const text = getId("filenameFormat").value;
 	localStorage.setItem("filenameFormat", text);
