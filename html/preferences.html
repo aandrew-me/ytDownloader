@@ -156,7 +156,7 @@
         <div id="ytDlpArgBox">
             <p>
                 <span data-translate="customArgsTxt">Set custom yt-dlp arguments.</span>
-                <a data-translate="learnMore" id="learnMoreLink">Learn more</a>
+                <a data-translate="learnMore" id="learnMoreYtdlpArgs">Learn more</a>
             </p>
             <textarea spellcheck="false" id="customArgsInput" placeholder="--sponsorblock-remove all"></textarea>
         </div>
@@ -184,18 +184,38 @@
         <input type="checkbox" class="cb" id="showMoreFormats">
     </div>
 
-    <div class="prefBox">
-        <span id="fileFormatTxt" data-translate="playlistFilenameFormat">Filename format for playlists</span>
-        <input type="text" id="filenameFormat" placeholder="yt-dlp format style"
-            value="%(playlist_index)s.%(title)s.%(ext)s">
-        <button class="redBtn" id="resetFilenameFormat" data-translate="resetToDefault">Reset to default</button>
+    <div id="outputTemplateBox">
+        <p id="outputTemplateTxt"><span data-translate="outputTemplates">Output Templates.</span> <a
+                id="learnMoreOutputTemplates" data-translate="learnMore">Learn more</a></p>
+        <div class="outputTemplateItem">
+            <span data-translate="audioFilenameTemplate">Filename template for audios</span>
+            <input type="text" id="filenameTemplateAudio" placeholder="yt-dlp format style" value="%(title)s.%(ext)s">
+            <button class="redBtn" id="resetAudioFilenameTemplate" data-translate="resetToDefault">Reset to
+                default</button>
+        </div>
+
+        <div class="outputTemplateItem">
+            <span data-translate="videoFilenameTemplate">Filename template for videos</span>
+            <input type="text" id="filenameTemplateVideo" placeholder="yt-dlp format style" value="%(title)s.%(ext)s">
+            <button class="redBtn" id="resetFilenameTemplateVideo" data-translate="resetToDefault">Reset to
+                default</button>
+        </div>
+
+        <div class="outputTemplateItem">
+            <span id="fileFormatTxt" data-translate="playlistFilenameFormat">Filename format for playlists</span>
+            <input type="text" id="filenameFormat" placeholder="yt-dlp format style"
+                value="%(playlist_index)s.%(title)s.%(ext)s">
+            <button class="redBtn" id="resetFilenameFormat" data-translate="resetToDefault">Reset to default</button>
+        </div>
+
+        <div class="outputTemplateItem">
+            <span id="dirFormatTxt" data-translate="playlistFolderNameFormat">Folder name format for playlists</span>
+            <input type="text" id="foldernameFormat" value="%(playlist_title)s" placeholder="yt-dlp format style">
+            <button class="redBtn" id="resetFoldernameFormat" data-translate="resetToDefault">Reset to default</button>
+        </div>
     </div>
 
-    <div class="prefBox">
-        <span id="dirFormatTxt" data-translate="playlistFolderNameFormat">Folder name format for playlists</span>
-        <input type="text" id="foldernameFormat" value="%(playlist_title)s" placeholder="yt-dlp format style">
-        <button class="redBtn" id="resetFoldernameFormat" data-translate="resetToDefault">Reset to default</button>
-    </div>
+
 
 
     <div class="prefBox">

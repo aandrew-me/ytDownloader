@@ -210,7 +210,7 @@ input[type="text"],
 }
 
 .prefBox,
-#pathConfig {
+#pathConfig, .outputTemplateItem {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
@@ -220,13 +220,32 @@ input[type="text"],
 	background-color: var(--box-main);
 }
 
+.prefBox,
+#pathConfig {
+	background-color: var(--box-main);
+}
+
 #ytdlpInfoBox {
 	margin: 15px 15px;
 	padding: 20px 15px;
 	border-radius: 15px;
 	background-color: var(--box-main);
 }
-
+#outputTemplateTxt {
+	padding: 15px 0 15px 30px;
+	margin:0;
+	font-weight: bold;
+	font-size: 30px;
+}
+.outputTemplateItem {
+	background-color: var(--box-separation);
+}
+#outputTemplateBox {
+	margin: 15px 15px;
+	padding: 10px 15px;
+	border-radius: 15px;
+	background-color: var(--box-main);
+}
 .ytdlpInfoItem {
 	display: flex;
 	justify-content: space-between;
@@ -244,7 +263,8 @@ input[type="text"],
 	border-radius: 15px;
 	background-color: var(--box-separation);
 }
-#path, .path {
+#path,
+.path {
 	font-family: "JetBrains";
 	font-size: medium;
 }

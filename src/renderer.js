@@ -130,6 +130,8 @@ class YtDownloaderApp {
 				proxy: "",
 				browserForCookies: "",
 				customYtDlpArgs: "",
+				videoOutputTemplate: "%(title)s.%(ext)s",
+				audioOutputTemplate: "%(title)s.%(ext)s",
 			},
 			downloadControllers: new Map(),
 			downloadedItems: new Set(),
@@ -674,6 +676,13 @@ class YtDownloaderApp {
 		prefs.configPath =
 			localStorage.getItem(CONSTANTS.LOCAL_STORAGE_KEYS.CONFIG_PATH) ||
 			"";
+		prefs.videoOutputTemplate =
+			localStorage.getItem("filenameTemplateVideo") ||
+			"%(title)s.%(ext)s";
+
+		prefs.audioOutputTemplate =
+			localStorage.getItem("filenameTemplateAudio") ||
+			"%(title)s.%(ext)s";
 
 		const maxDownloads = Number(
 			localStorage.getItem(CONSTANTS.LOCAL_STORAGE_KEYS.MAX_DOWNLOADS),
@@ -990,8 +999,7 @@ class YtDownloaderApp {
 		this.state.currentDownloads++;
 		const randomId = "item_" + Math.random().toString(36).substring(2, 12);
 
-		const {downloadArgs, finalFilename, finalExt} =
-			this._prepareDownloadArgs(job);
+		const {downloadArgs, tempFilePath} = this._prepareDownloadArgs(job);
 
 		this._createDownloadUI(randomId, job);
 
@@ -1009,7 +1017,31 @@ class YtDownloaderApp {
 			downloadProcess.ytDlpProcess.spawnargs.join(" "),
 		);
 
-		// Attach event listeners
+		let actualFilePath = "";
+		downloadProcess.ytDlpProcess.stdout.on("data", (data) => {
+			const str = data.toString();
+
+			const destMatch = str.match(/Destination:\s+([^\r\n]+)/);
+			if (destMatch)
+				actualFilePath = destMatch[1]
+					.trim()
+					.replace(/(^["'])|(["']$)/g, "");
+
+			const mergeMatch = str.match(/Merging formats into\s+([^\r\n]+)/);
+			if (mergeMatch)
+				actualFilePath = mergeMatch[1]
+					.trim()
+					.replace(/(^["'])|(["']$)/g, "");
+
+			const existMatch = str.match(
+				/\[download\]\s+([^\r\n]+)\s+has already been downloaded/,
+			);
+			if (existMatch)
+				actualFilePath = existMatch[1]
+					.trim()
+					.replace(/(^["'])|(["']$)/g, "");
+		});
+
 		downloadProcess
 			.on("progress", (progress) => {
 				this._updateProgressUI(randomId, progress);
@@ -1018,22 +1050,36 @@ class YtDownloaderApp {
 				const el = $(`${randomId}_prog`);
 				if (el) el.textContent = i18n.__("downloading");
 			})
-			// .on("ytDlpEvent", (eventType, eventData) => {
-			// 	console.log(eventData)
-			// })
 			.once("close", (code) => {
+				if (existsSync(tempFilePath)) {
+					try {
+						const fileContent = require("fs")
+							.readFileSync(tempFilePath, "utf-8")
+							.trim();
+						if (fileContent) {
+							actualFilePath = fileContent;
+						}
+						require("fs").unlinkSync(tempFilePath);
+					} catch (e) {
+						console.error("Error reading temp file:", e);
+					}
+				}
+
 				this._handleDownloadCompletion(
 					code,
 					randomId,
-					finalFilename,
-					finalExt,
+					actualFilePath,
 					job.thumbnail,
 				);
 			})
 			.once("error", (error) => {
+				if (existsSync(tempFilePath)) {
+					try {
+						require("fs").unlinkSync(tempFilePath);
+					} catch (e) {}
+				}
 				this.state.downloadedItems.add(randomId);
 				this._updateClearAllButton();
-
 				this._handleDownloadError(error, randomId);
 			});
 	}
@@ -1084,28 +1130,32 @@ class YtDownloaderApp {
 	/**
 	 * Prepares the command-line arguments for yt-dlp based on the download job.
 	 * @param {object} job The download job object.
-	 * @returns {{downloadArgs: string[], finalFilename: string, finalExt: string}}
+	 * @returns {{downloadArgs: string[], tempFilePath: string}}
 	 */
 	_prepareDownloadArgs(job) {
 		const {type, url, title, options, uiSnapshot} = job;
 		const {rangeOption, rangeCmd, subs, subLangs} = options;
-		const {proxy, browserForCookies, configPath} = this.state.preferences;
+		const {
+			proxy,
+			browserForCookies,
+			configPath,
+			videoOutputTemplate,
+			audioOutputTemplate,
+		} = this.state.preferences;
 
 		let format_id, ext, audioForVideoFormat_id, audioFormat;
+
+		let template = videoOutputTemplate;
 
 		if (type === "video") {
 			const [videoFid, videoExt, _, videoCodec] =
 				uiSnapshot.videoFormat.split("|");
 			const [audioFid, audioExt] =
 				uiSnapshot.audioForVideoFormat.split("|");
-
 			format_id = videoFid;
 			audioForVideoFormat_id = audioFid;
-
 			const finalAudioExt = audioExt === "webm" ? "opus" : audioExt;
-
 			ext = videoExt;
-
 			if (videoExt === "mp4" && finalAudioExt === "opus") {
 				if (videoCodec.includes("avc")) ext = "mkv";
 				else if (videoCodec.includes("av01")) ext = "webm";
@@ -1115,7 +1165,6 @@ class YtDownloaderApp {
 			) {
 				ext = "mkv";
 			}
-
 			audioFormat =
 				audioForVideoFormat_id === "none"
 					? ""
@@ -1123,32 +1172,36 @@ class YtDownloaderApp {
 		} else if (type === "audio") {
 			[format_id, ext] = uiSnapshot.audioFormat.split("|");
 			ext = ext === "webm" ? "opus" : ext;
+
+			template = audioOutputTemplate;
 		} else {
-			// type === 'extract'
 			ext =
 				{alac: "m4a"}[uiSnapshot.extractFormat] ||
 				uiSnapshot.extractFormat;
+
+			template = audioOutputTemplate;
 		}
 
-		const invalidChars =
-			platform() === "win32" ? /[<>:"/\\|?*[\]`#]/g : /["/`#]/g;
-		let finalFilename = title
-			.replace(invalidChars, "")
-			.trim()
-			.slice(0, 100);
-		if (finalFilename.startsWith(".")) {
-			finalFilename = finalFilename.substring(1);
-		}
 		if (rangeCmd) {
 			let rangeTxt = rangeCmd.replace("*", "");
 			if (platform() === "win32") rangeTxt = rangeTxt.replace(/:/g, "_");
-			finalFilename += ` [${rangeTxt}]`;
+
+			if (template.includes(".%(ext)s")) {
+				template = template.replace(
+					".%(ext)s",
+					` [${rangeTxt}].%(ext)s`,
+				);
+			} else {
+				template += ` [${rangeTxt}]`;
+			}
 		}
 
-		const outputPath = `"${join(
-			this.state.downloadDir,
-			`${finalFilename}.${ext}`,
-		)}"`;
+		const outputArgs = [
+			"-P",
+			`"${this.state.downloadDir}"`,
+			"-o",
+			`"${template}"`,
+		];
 
 		const baseArgs = [
 			"--no-playlist",
@@ -1184,14 +1237,13 @@ class YtDownloaderApp {
 				uiSnapshot.extractFormat,
 				"--audio-quality",
 				uiSnapshot.extractQuality,
-				"-o",
-				outputPath,
+				...outputArgs,
 				...baseArgs,
 			];
 		} else {
 			const formatString =
 				type === "video" ? `${format_id}${audioFormat}` : format_id;
-			downloadArgs = ["-f", formatString, "-o", outputPath, ...baseArgs];
+			downloadArgs = ["-f", formatString, ...outputArgs, ...baseArgs];
 		}
 
 		if (subs) downloadArgs.push(subs);
@@ -1206,24 +1258,47 @@ class YtDownloaderApp {
 			downloadArgs.push(...customArgs);
 		}
 
+		const randomId = "item_" + Math.random().toString(36).substring(2, 12);
+
+		const sanitizedTitle = (job.title || "Unknown Title").replace(
+			/"/g,
+			"'",
+		);
+		downloadArgs.push(
+			"--replace-in-metadata",
+			"title",
+			`"^.*$"`,
+			`"${sanitizedTitle}"`,
+		);
+
+		// Create a unique temporary file path to capture the exact filename from yt-dlp
+		const tmpDir = require("os").tmpdir();
+		const tempFilePath = join(tmpDir, `ytdlp_path_${randomId}.txt`);
+
+		// Tell yt-dlp to output the absolute final file path directly to the temp file
+		downloadArgs.push(
+			"--print-to-file",
+			"after_move:filepath",
+			`"${tempFilePath}"`,
+		);
+
 		downloadArgs.push(`"${url}"`);
 
-		return {downloadArgs, finalFilename, finalExt: ext};
+		return {downloadArgs, tempFilePath};
 	}
 
 	/**
 	 * Handles the completion of a download process.
 	 */
-	_handleDownloadCompletion(code, randomId, filename, ext, thumbnail) {
+	_handleDownloadCompletion(code, randomId, actualFilePath, thumbnail) {
 		this.state.currentDownloads--;
 		this.state.downloadControllers.delete(randomId);
 
 		if (code === 0) {
-			this._showDownloadSuccessUI(randomId, filename, ext, thumbnail);
+			this._showDownloadSuccessUI(randomId, actualFilePath, thumbnail);
 			this.state.downloadedItems.add(randomId);
 			this._updateClearAllButton();
 		} else if (code !== null) {
-			// code is null if aborted, so only show error if it's a real exit code
 			this._handleDownloadError(
 				new Error(`Download process exited with code ${code}.`),
 				randomId,
@@ -1464,7 +1539,10 @@ class YtDownloaderApp {
 		});
 
 		const hasAudioTrack = formats.some(
-			(f) => f.acodec !== "none" && f.acodec !== undefined && f.vcodec === "none",
+			(f) =>
+				f.acodec !== "none" &&
+				f.acodec !== undefined &&
+				f.vcodec === "none",
 		);
 		const audioSection = $(CONSTANTS.DOM_IDS.AUDIO_PRESENT_SECTION);
 
@@ -1540,7 +1618,7 @@ class YtDownloaderApp {
 				className: "title",
 				id: CONSTANTS.DOM_IDS.TITLE_INPUT,
 				type: "text",
-				value: `${info.title} [${info.id}]`,
+				value: `${info.title}`,
 				onchange: (e) => (this.state.videoInfo.title = e.target.value),
 			}),
 		);
@@ -1632,12 +1710,72 @@ class YtDownloaderApp {
 	/**
 	 * Updates a download item's UI to show it has completed successfully.
 	 */
-	_showDownloadSuccessUI(randomId, filename, ext, thumbnail) {
+	_showDownloadSuccessUI(randomId, actualFilePath, thumbnail) {
 		const progressEl = $(`${randomId}_prog`);
 		if (!progressEl) return;
 
-		const fullFilename = `${filename}.${ext}`;
-		const fullPath = join(this.state.downloadDir, fullFilename);
+		let fullPath;
+		if (actualFilePath) {
+			const isAbsolute =
+				actualFilePath.startsWith("/") ||
+				/^[a-zA-Z]:[\\\/]/.test(actualFilePath);
+			fullPath = isAbsolute
+				? actualFilePath
+				: join(this.state.downloadDir, actualFilePath);
+		}
+
+		if (!fullPath) {
+			console.error("Could not resolve downloaded file path.");
+
+			return;
+		}
+
+		const expectedExt = fullPath.includes(".")
+			? fullPath.split(".").pop()
+			: "";
+
+		// If file doesn't exist at the expected path, attempt to find it with a loose matching strategy
+		if (
+			!existsSync(fullPath) &&
+			this.state.videoInfo &&
+			this.state.videoInfo.title
+		) {
+			try {
+				const originalTitle = this.state.videoInfo.title;
+				const dirFiles = require("fs").readdirSync(
+					this.state.downloadDir,
+				);
+				const looseTitle = originalTitle
+					.replace(/[^a-zA-Z0-9]/g, "")
+					.toLowerCase();
+
+				const matchedFile = dirFiles.find((f) => {
+					const cleanF = f.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+					return (
+						cleanF.includes(looseTitle) &&
+						(expectedExt
+							? f
+									.toLowerCase()
+									.endsWith(expectedExt.toLowerCase())
+							: true)
+					);
+				});
+
+				if (matchedFile) {
+					fullPath = join(this.state.downloadDir, matchedFile);
+				}
+			} catch (err) {
+				console.error("Failed to execute loose filename recovery");
+			}
+		}
+
+		// Extract just the filename
+		const fullFilename = fullPath.split(/[\/\\]/).pop();
+		const baseFilename =
+			fullFilename.substring(0, fullFilename.lastIndexOf(".")) ||
+			fullFilename;
+
+		const ext = fullFilename.split(".").pop();
 
 		progressEl.innerHTML = ""; // Clear progress bar
 		const link = document.createElement("b");
@@ -1654,7 +1792,7 @@ class YtDownloaderApp {
 			body: fullFilename,
 			icon: thumbnail,
 		}).onclick = () => {
-			shell.showItemInFolder(fullPath);
+			ipcRenderer.send("show-file", fullPath);
 		};
 
 		// Add to download history
@@ -1666,7 +1804,7 @@ class YtDownloaderApp {
 					.invoke("add-to-history", {
 						title: this.state.videoInfo.title,
 						url: this.state.videoInfo.url,
-						filename: filename,
+						filename: baseFilename,
 						filePath: fullPath,
 						fileSize: fileSize,
 						format: ext,
