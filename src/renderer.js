@@ -953,6 +953,12 @@ class YtDownloaderApp {
 
 			const process = this.state.ytDlp.exec(args, {shell: true});
 
+			window.addEventListener("beforeunload", () => {
+				if (process && !process.killed) {
+					process.kill();
+				}
+			});
+
 			console.log(
 				"Spawned yt-dlp with args:",
 				process.ytDlpProcess.spawnargs.join(" "),
@@ -1010,6 +1016,12 @@ class YtDownloaderApp {
 			shell: true,
 			detached: false,
 			signal: controller.signal,
+		});
+
+		window.addEventListener("beforeunload", () => {
+			if (downloadProcess && !downloadProcess.killed) {
+				downloadProcess.kill();
+			}
 		});
 
 		console.log(

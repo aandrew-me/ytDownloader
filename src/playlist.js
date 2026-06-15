@@ -253,6 +253,15 @@ const playlistDownloader = {
 			controller.signal
 		);
 
+		document.addEventListener("beforeunload", () => {
+			if (
+				this.state.currentDownloadProcess &&
+				!this.state.currentDownloadProcess.killed
+			) {
+				this.state.currentDownloadProcess.kill();
+			}
+		});
+
 		this.handleDownloadEvents(this.state.currentDownloadProcess, type);
 	},
 
