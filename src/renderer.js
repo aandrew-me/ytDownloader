@@ -1582,6 +1582,21 @@ class YtDownloaderApp {
 					showSearch: true,
 					contentLocation: document.body,
 				},
+				events: {
+					afterOpen: () => {
+						document
+							.querySelectorAll(".ss-option.ss-selected")
+							.forEach((el) => {
+								el.addEventListener(
+									"click",
+									() => {
+										domElement.slim.close();
+									},
+									{once: true},
+								);
+							});
+					},
+				},
 			});
 		};
 
