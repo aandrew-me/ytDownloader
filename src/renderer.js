@@ -152,7 +152,7 @@ class YtDownloaderApp {
 
 		try {
 			this.state.ytDlpPath = await this._findOrDownloadYtDlp();
-			this.state.ytDlp = new YTDlpWrap(`"${this.state.ytDlpPath}"`);
+			this.state.ytDlp = new YTDlpWrap(this.state.ytDlpPath);
 			this.state.ffmpegPath = await this._findFfmpeg();
 			this._ensureFfmpegLibsLoadable(this.state.ffmpegPath);
 			this.state.jsRuntimePath = await this._getJsRuntimePath();
@@ -596,7 +596,7 @@ class YtDownloaderApp {
 
 		if (process.env.YTDOWNLOADER_NODE_PATH) {
 			if (existsSync(process.env.YTDOWNLOADER_NODE_PATH)) {
-				return `$node:"${process.env.YTDOWNLOADER_NODE_PATH}"`;
+				return `$node:${process.env.YTDOWNLOADER_NODE_PATH}`;
 			}
 
 			return "";
@@ -604,7 +604,7 @@ class YtDownloaderApp {
 
 		if (process.env.YTDOWNLOADER_DENO_PATH) {
 			if (existsSync(process.env.YTDOWNLOADER_DENO_PATH)) {
-				return `$deno:"${process.env.YTDOWNLOADER_DENO_PATH}"`;
+				return `$deno:${process.env.YTDOWNLOADER_DENO_PATH}`;
 			}
 
 			return "";
@@ -618,7 +618,7 @@ class YtDownloaderApp {
 
 			for (const p of possiblePaths) {
 				if (existsSync(p)) {
-					return `deno:"${p}"`;
+					return `deno:${p}`;
 				}
 			}
 
@@ -634,7 +634,7 @@ class YtDownloaderApp {
 		}
 
 		if (existsSync(jsRuntimePath)) {
-			return `${exeName}:"${jsRuntimePath}"`;
+			return `${exeName}:${jsRuntimePath}`;
 		} else {
 			return "";
 		}
@@ -889,6 +889,7 @@ class YtDownloaderApp {
 			this._populateFormatSelectors(metadata.formats || []);
 			this._displayInfoPanel();
 		} catch (error) {
+			console.log(error);
 			if (
 				error.message.includes("js-runtimes") &&
 				error.message.includes("no such option")
@@ -949,19 +950,28 @@ class YtDownloaderApp {
 				"-j",
 				"--no-playlist",
 				"--no-warnings",
-				proxy ? "--proxy" : "",
-				proxy,
-				browserForCookies ? "--cookies-from-browser" : "",
-				browserForCookies,
-				this.state.jsRuntimePath
-					? `--no-js-runtimes --js-runtime ${this.state.jsRuntimePath}`
-					: "",
-				configPath ? "--config-location" : "",
-				configPath ? `"${configPath}"` : "",
-				`"${url}"`,
-			].filter(Boolean);
 
-			const process = this.state.ytDlp.exec(args, {shell: true});
+				...(proxy ? ["--proxy", proxy] : []),
+
+				...(browserForCookies
+					? ["--cookies-from-browser", browserForCookies]
+					: []),
+
+				...(this.state.jsRuntimePath
+					? [
+							"--no-js-runtimes",
+							"--js-runtime",
+							this.state.jsRuntimePath,
+						]
+					: []),
+
+				...(configPath ? ["--config-location", configPath] : []),
+
+				"--",
+				url,
+			];
+
+			const process = this.state.ytDlp.exec(args, {shell: false});
 
 			window.addEventListener("beforeunload", () => {
 				if (process && !process.killed) {
@@ -1023,8 +1033,7 @@ class YtDownloaderApp {
 		this.state.downloadControllers.set(randomId, controller);
 
 		const downloadProcess = this.state.ytDlp.exec(downloadArgs, {
-			shell: true,
-			detached: false,
+			shell: false,
 			signal: controller.signal,
 		});
 
@@ -1218,28 +1227,27 @@ class YtDownloaderApp {
 			}
 		}
 
-		const outputArgs = [
-			"-P",
-			`"${this.state.downloadDir}"`,
-			"-o",
-			`"${template}"`,
-		];
+		const outputArgs = ["-P", this.state.downloadDir, "-o", template];
 
 		const baseArgs = [
 			"--no-playlist",
 			"--no-mtime",
-			browserForCookies ? "--cookies-from-browser" : "",
-			browserForCookies,
-			proxy ? "--proxy" : "",
-			proxy,
-			configPath ? "--config-location" : "",
-			configPath ? `"${configPath}"` : "",
+
+			...(browserForCookies
+				? ["--cookies-from-browser", browserForCookies]
+				: []),
+
+			...(proxy ? ["--proxy", proxy] : []),
+
+			...(configPath ? ["--config-location", configPath] : []),
+
 			"--ffmpeg-location",
-			`"${this.state.ffmpegPath}"`,
-			this.state.jsRuntimePath
-				? `--no-js-runtimes --js-runtime ${this.state.jsRuntimePath}`
-				: "",
-		].filter(Boolean);
+			this.state.ffmpegPath,
+
+			...(this.state.jsRuntimePath
+				? ["--no-js-runtimes", "--js-runtime", this.state.jsRuntimePath]
+				: []),
+		];
 
 		if (type === "audio") {
 			if (ext === "m4a" || ext === "mp3" || ext === "mp4") {
@@ -1289,8 +1297,8 @@ class YtDownloaderApp {
 		downloadArgs.push(
 			"--replace-in-metadata",
 			"title",
-			`"^.*$"`,
-			`"${sanitizedTitle}"`,
+			"^.*$",
+			sanitizedTitle,
 		);
 
 		// Create a unique temporary file path to capture the exact filename from yt-dlp
@@ -1301,10 +1309,10 @@ class YtDownloaderApp {
 		downloadArgs.push(
 			"--print-to-file",
 			"after_move:filepath",
-			`"${tempFilePath}"`,
+			tempFilePath,
 		);
 
-		downloadArgs.push(`"${url}"`);
+		downloadArgs.push(url);
 
 		return {downloadArgs, tempFilePath};
 	}

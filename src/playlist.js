@@ -106,7 +106,7 @@ const playlistDownloader = {
 	loadInitialConfig() {
 		// yt-dlp path
 		this.state.ytDlpPath = localStorage.getItem("ytdlp");
-		this.state.ytDlpWrap = new YTDlpWrap(`"${this.state.ytDlpPath}"`);
+		this.state.ytDlpWrap = new YTDlpWrap(this.state.ytDlpPath);
 
 		const defaultDownloadsDir = path.join(os.homedir(), "Downloads");
 		let preferredDir =
@@ -117,7 +117,7 @@ const playlistDownloader = {
 		} catch (err) {
 			console.error(
 				"Unable to write to preferred download directory. Reverting to default.",
-				err
+				err,
 			);
 			this.state.downloadDir = defaultDownloadsDir;
 			localStorage.setItem("downloadPath", defaultDownloadsDir);
@@ -129,12 +129,12 @@ const playlistDownloader = {
 
 		if (localStorage.getItem("preferredVideoQuality")) {
 			this.ui.videoQualitySelect.value = localStorage.getItem(
-				"preferredVideoQuality"
+				"preferredVideoQuality",
 			);
 		}
 		if (localStorage.getItem("preferredAudioQuality")) {
 			this.ui.audioQualitySelect.value = localStorage.getItem(
-				"preferredAudioQuality"
+				"preferredAudioQuality",
 			);
 		}
 	},
@@ -155,54 +155,54 @@ const playlistDownloader = {
 		});
 
 		this.ui.downloadVideoBtn.addEventListener("click", () =>
-			this.startDownload("video")
+			this.startDownload("video"),
 		);
 		this.ui.downloadAudioBtn.addEventListener("click", () =>
-			this.startDownload("audio")
+			this.startDownload("audio"),
 		);
 		this.ui.downloadThumbnailsBtn.addEventListener("click", () =>
-			this.startDownload("thumbnails")
+			this.startDownload("thumbnails"),
 		);
 		this.ui.saveLinksBtn.addEventListener("click", () =>
-			this.startDownload("links")
+			this.startDownload("links"),
 		);
 
 		this.ui.videoToggle.addEventListener("click", () =>
-			this.toggleDownloadType("video")
+			this.toggleDownloadType("video"),
 		);
 		this.ui.audioToggle.addEventListener("click", () =>
-			this.toggleDownloadType("audio")
+			this.toggleDownloadType("audio"),
 		);
 		this.ui.advancedToggle.addEventListener("click", () =>
-			this.toggleAdvancedMenu()
+			this.toggleAdvancedMenu(),
 		);
 		this.ui.videoQualitySelect.addEventListener("change", () =>
-			this.updateVideoTypeVisibility()
+			this.updateVideoTypeVisibility(),
 		);
 		this.ui.selectLocationBtn.addEventListener("click", () =>
-			ipcRenderer.send("select-location-main", "")
+			ipcRenderer.send("select-location-main", ""),
 		);
 		this.ui.openDownloadsBtn.addEventListener("click", () =>
-			this.openDownloadsFolder()
+			this.openDownloadsFolder(),
 		);
 		this.ui.closeHiddenBtn.addEventListener("click", () =>
-			this.hideOptions(true)
+			this.hideOptions(true),
 		);
 
 		this.ui.preferenceWinBtn.addEventListener("click", () =>
-			this.navigate("page", "/preferences.html")
+			this.navigate("page", "/preferences.html"),
 		);
 		this.ui.aboutWinBtn.addEventListener("click", () =>
-			this.navigate("page", "/about.html")
+			this.navigate("page", "/about.html"),
 		);
 		this.ui.historyWinBtn.addEventListener("click", () =>
-			this.navigate("page", "/history.html")
+			this.navigate("page", "/history.html"),
 		);
 		this.ui.homeWinBtn.addEventListener("click", () =>
-			this.navigate("win", "/index.html")
+			this.navigate("win", "/index.html"),
 		);
 		this.ui.compressorWinBtn.addEventListener("click", () =>
-			this.navigate("win", "/compressor.html")
+			this.navigate("win", "/compressor.html"),
 		);
 
 		ipcRenderer.on("downloadPath", (_event, downloadPath) => {
@@ -244,17 +244,15 @@ const playlistDownloader = {
 				break;
 		}
 
-		const allArgs = [
-			...baseArgs,
-			...specificArgs,
-			`"${this.state.url}"`,
-		].filter(Boolean);
+		const allArgs = [...baseArgs, ...specificArgs, this.state.url].filter(
+			Boolean,
+		);
 
 		console.log(`Command: ${this.state.ytDlpPath}`, allArgs.join(" "));
 		this.state.currentDownloadProcess = this.state.ytDlpWrap.exec(
 			allArgs,
-			{shell: true, detached: false},
-			controller.signal
+			{shell: false},
+			controller.signal,
 		);
 
 		document.addEventListener("beforeunload", () => {
@@ -271,33 +269,40 @@ const playlistDownloader = {
 
 	buildBaseArgs() {
 		const {start, end} = this.config.playlistRange;
-		const outputPath = `"${path.join(
+		const outputPath = path.join(
 			this.state.downloadDir,
 			this.config.foldernameFormat,
-			this.config.filenameFormat
-		)}"`;
+			this.config.filenameFormat,
+		);
 
 		return [
 			"--yes-playlist",
 			"-o",
 			outputPath,
+
 			"-I",
-			`"${start}:${end}"`,
+			`${start}:${end}`,
+
 			"--ffmpeg-location",
-			`"${this.state.ffmpegPath}"`,
+			this.state.ffmpegPath,
+
 			...(this.state.jsRuntimePath
 				? ["--no-js-runtimes", "--js-runtime", this.state.jsRuntimePath]
 				: []),
+
 			this.config.cookie.arg,
 			this.config.cookie.browser,
+
 			this.config.configFile.arg,
 			this.config.configFile.path,
+
 			...(this.config.proxy
 				? ["--no-check-certificate", "--proxy", this.config.proxy]
 				: []),
+
 			"--compat-options",
 			"no-youtube-unavailable-videos",
-		].filter(Boolean);
+		];
 	},
 
 	getVideoArgs() {
@@ -315,7 +320,7 @@ const playlistDownloader = {
 			if (videoType === "mp4") {
 				formatArgs = [
 					"-f",
-					`"bestvideo[height<=${quality}]+bestaudio[ext=m4a]/best[height<=${quality}]/best"`,
+					"bestvideo[height<=${quality}]+bestaudio[ext=m4a]/best[height<=${quality}]/best",
 					"--merge-output-format",
 					"mp4",
 					"--recode-video",
@@ -324,7 +329,7 @@ const playlistDownloader = {
 			} else if (videoType === "webm") {
 				formatArgs = [
 					"-f",
-					`"bestvideo[height<=${quality}]+bestaudio[ext=webm]/best[height<=${quality}]/best"`,
+					"bestvideo[height<=${quality}]+bestaudio[ext=webm]/best[height<=${quality}]/best",
 					"--merge-output-format",
 					"webm",
 					"--recode-video",
@@ -333,7 +338,7 @@ const playlistDownloader = {
 			} else {
 				formatArgs = [
 					"-f",
-					`"bv*[height=${quality}]+ba/best[height=${quality}]/best[height<=${quality}]"`,
+					`bv*[height=${quality}]+ba/best[height=${quality}]/best[height<=${quality}]`,
 				];
 			}
 		}
@@ -396,11 +401,11 @@ const playlistDownloader = {
 	},
 
 	getLinkArgs() {
-		const linksFilePath = `"${path.join(
+		const linksFilePath = path.join(
 			this.state.downloadDir,
 			this.config.foldernameFormat,
-			"links.txt"
-		)}"`;
+			"links.txt",
+		);
 		return [
 			"--skip-download",
 			"--print-to-file",
@@ -438,7 +443,7 @@ const playlistDownloader = {
 				}
 
 				this.ui.playlistNameDisplay.textContent = `${window.i18n.__(
-					"downloadingPlaylist"
+					"downloadingPlaylist",
 				)} ${this.state.playlistName}`;
 			}
 
@@ -461,7 +466,7 @@ const playlistDownloader = {
 
 			if (progress.percent === 100) {
 				progressElement.textContent = `${window.i18n.__(
-					"processing"
+					"processing",
 				)}...`;
 			} else {
 				progressElement.textContent = `${window.i18n.__("progress")} ${
@@ -513,8 +518,8 @@ const playlistDownloader = {
             <div class="playlistItem">
                 <p class="itemTitle">${itemTitle}</p>
                 <p class="itemProgress" id="p${count}">${window.i18n.__(
-			"downloading"
-		)}</p>
+					"downloading",
+				)}</p>
             </div>`;
 		this.ui.downloadList.innerHTML += itemHTML;
 		window.scrollTo(0, document.body.scrollHeight);
@@ -561,7 +566,7 @@ const playlistDownloader = {
 
 		if (!justHide) {
 			this.ui.playlistNameDisplay.textContent = `${window.i18n.__(
-				"processing"
+				"processing",
 			)}...`;
 			this.ui.pasteLinkBtn.style.display = "none";
 			this.ui.openDownloadsBtn.style.display = "inline-block";
@@ -604,7 +609,7 @@ const playlistDownloader = {
 		const openPath =
 			this.state.playlistName &&
 			fs.existsSync(
-				path.join(this.state.downloadDir, this.state.playlistName)
+				path.join(this.state.downloadDir, this.state.playlistName),
 			)
 				? path.join(this.state.downloadDir, this.state.playlistName)
 				: this.state.downloadDir;
@@ -727,7 +732,7 @@ const playlistDownloader = {
 		}
 
 		return parsed.toString();
-	}
+	},
 };
 
 playlistDownloader.init();
