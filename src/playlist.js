@@ -214,10 +214,14 @@ const playlistDownloader = {
 	},
 
 	startDownload(type) {
-		if (!this.state.url) {
-			this.showError("URL is missing. Please paste a link first.");
+		try {
+			this.state.url = this.validateUrl(this.state.url);
+		} catch (_) {
+			this.showError("Invalid URL");
+
 			return;
 		}
+
 		this.updateDynamicConfig();
 		this.hideOptions();
 
@@ -712,6 +716,18 @@ const playlistDownloader = {
 			}
 		}
 	},
+	validateUrl(rawUrl) {
+		const input = String(rawUrl ?? "").trim();
+
+		let parsed;
+		try {
+			parsed = new URL(input);
+		} catch {
+			throw new Error("invalidUrl");
+		}
+
+		return parsed.toString();
+	}
 };
 
 playlistDownloader.init();

@@ -855,13 +855,23 @@ class YtDownloaderApp {
 	 * @param {string} url The video URL.
 	 */
 	async getInfo(url) {
+		let safeUrl;
+		try {
+			safeUrl = this.validateUrl(url);
+		} catch {
+			this._showError(i18n.__("invalidUrl"), url);
+
+			return;
+		}
+
 		this._loadSettings();
 		this._defaultVideoToggle();
 		this._resetUIForNewLink();
-		this.state.videoInfo.url = url;
+
+		this.state.videoInfo.url = safeUrl;
 
 		try {
-			const metadata = await this._fetchVideoMetadata(url);
+			const metadata = await this._fetchVideoMetadata(safeUrl);
 			console.log(metadata);
 
 			const durationInt =
@@ -2156,6 +2166,25 @@ class YtDownloaderApp {
 		maxSlider.value = defaultMax;
 
 		this._updateSliderUI(null);
+	}
+
+	/**
+	 * Validates a URL and returns the sanitized version.
+	 * @param {string} rawUrl - The URL to validate.
+	 * @returns {string} - The sanitized URL.
+	 * @throws {Error} - If the URL is invalid.
+	 */
+	validateUrl(rawUrl) {
+		const input = String(rawUrl ?? "").trim();
+
+		let parsed;
+		try {
+			parsed = new URL(input);
+		} catch {
+			throw new Error("invalidUrl");
+		}
+
+		return parsed.toString();
 	}
 }
 
