@@ -473,7 +473,10 @@ function registerAutoUpdaterEvents() {
 			dialogOpts
 		);
 		if (response === 0) {
-			autoUpdater.quitAndInstall();
+			autoUpdater.quitAndInstall(true, true);
+		} else {
+			// TODO: Consider if its worth enabling
+			// autoUpdater.autoInstallOnAppQuit = true;
 		}
 	});
 
