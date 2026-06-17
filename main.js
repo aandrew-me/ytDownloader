@@ -7,6 +7,7 @@ const {
 	Tray,
 	Menu,
 	clipboard,
+	session,
 } = require("electron");
 const {autoUpdater} = require("electron-updater");
 const fs = require("fs").promises;
@@ -220,7 +221,7 @@ function createTray() {
 						"did-finish-load",
 						() => {
 							appState.mainWindow.webContents.send("link", text);
-						}
+						},
 					);
 				}
 			},
@@ -322,7 +323,7 @@ function registerIpcHandlers() {
 		if (!appState.mainWindow) return;
 		const {canceled, filePaths} = await dialog.showOpenDialog(
 			appState.mainWindow,
-			{properties: ["openDirectory"]}
+			{properties: ["openDirectory"]},
 		);
 		if (!canceled && filePaths.length > 0) {
 			appState.mainWindow.webContents.send("downloadPath", filePaths);
@@ -333,12 +334,12 @@ function registerIpcHandlers() {
 		if (!appState.secondaryWindow) return;
 		const {canceled, filePaths} = await dialog.showOpenDialog(
 			appState.secondaryWindow,
-			{properties: ["openDirectory"]}
+			{properties: ["openDirectory"]},
 		);
 		if (!canceled && filePaths.length > 0) {
 			appState.secondaryWindow.webContents.send(
 				"downloadPath",
-				filePaths
+				filePaths,
 			);
 		}
 	});
@@ -347,7 +348,7 @@ function registerIpcHandlers() {
 		if (!appState.mainWindow) return;
 		const {canceled, filePaths} = await dialog.showOpenDialog(
 			appState.mainWindow,
-			{properties: ["openDirectory"]}
+			{properties: ["openDirectory"]},
 		);
 		if (!canceled && filePaths.length > 0) {
 			appState.mainWindow.webContents.send("directory-path", filePaths);
@@ -358,7 +359,7 @@ function registerIpcHandlers() {
 		if (!appState.secondaryWindow) return;
 		const {canceled, filePaths} = await dialog.showOpenDialog(
 			appState.secondaryWindow,
-			{properties: ["openFile"]}
+			{properties: ["openFile"]},
 		);
 		if (!canceled && filePaths.length > 0) {
 			appState.secondaryWindow.webContents.send("configPath", filePaths);
@@ -397,7 +398,7 @@ function registerIpcHandlers() {
 		const localeFile = path.join(
 			__dirname,
 			"translations",
-			`${locale}.json`
+			`${locale}.json`,
 		);
 
 		const fallbackData = JSON.parse(readFileSync(fallbackFile, "utf8"));
@@ -417,26 +418,65 @@ function registerIpcHandlers() {
 	});
 
 	ipcMain.handle("get-download-history", () =>
-		appState.downloadHistory.getHistory()
+		appState.downloadHistory.getHistory(),
 	);
 	ipcMain.handle("add-to-history", (_, info) =>
-		appState.downloadHistory.addDownload(info)
+		appState.downloadHistory.addDownload(info),
 	);
 	ipcMain.handle("get-download-stats", () =>
-		appState.downloadHistory.getStats()
+		appState.downloadHistory.getStats(),
 	);
 	ipcMain.handle("delete-history-item", (_, id) =>
-		appState.downloadHistory.removeHistoryItem(id)
+		appState.downloadHistory.removeHistoryItem(id),
 	);
 	ipcMain.handle("clear-all-history", async () => {
 		await appState.downloadHistory.clearHistory();
 		return true;
 	});
 	ipcMain.handle("export-history-json", () =>
-		appState.downloadHistory.exportAsJSON()
+		appState.downloadHistory.exportAsJSON(),
 	);
 	ipcMain.handle("export-history-csv", () =>
-		appState.downloadHistory.exportAsCSV()
+		appState.downloadHistory.exportAsCSV(),
+	);
+
+	ipcMain.handle(
+		"get-system-proxy",
+		async (_event, targetUrl = "https://youtube.com") => {
+			try {
+				const proxyInfo =
+					await session.defaultSession.resolveProxy(targetUrl);
+
+				const rule = String(proxyInfo)
+					.split(";")
+					.map((s) => s.trim())
+					.find((s) => s && s.toUpperCase() !== "DIRECT");
+
+				if (!rule) {
+					return null;
+				}
+
+				const [type, hostPort] = rule.split(/\s+/, 2);
+
+				if (!type || !hostPort) {
+					return null;
+				}
+
+				const protocol = {
+					PROXY: "http://",
+					HTTP: "http://",
+					HTTPS: "https://",
+					SOCKS: "socks5://",
+					SOCKS5: "socks5://",
+					SOCKS4: "socks4://",
+				}[type.toUpperCase()];
+
+				return protocol ? `${protocol}${hostPort}` : null;
+			} catch (error) {
+				console.error("Failed to get system proxy:", error);
+				return null;
+			}
+		},
 	);
 }
 
@@ -453,7 +493,7 @@ function registerAutoUpdaterEvents() {
 		};
 		const {response} = await dialog.showMessageBox(
 			appState.mainWindow,
-			dialogOpts
+			dialogOpts,
 		);
 		if (response === 0) {
 			autoUpdater.downloadUpdate();
@@ -470,7 +510,7 @@ function registerAutoUpdaterEvents() {
 		};
 		const {response} = await dialog.showMessageBox(
 			appState.mainWindow,
-			dialogOpts
+			dialogOpts,
 		);
 		if (response === 0) {
 			autoUpdater.quitAndInstall(true, true);
@@ -508,7 +548,7 @@ async function loadConfiguration() {
 	} catch (error) {
 		console.log(
 			"Could not load config file, using defaults.",
-			error.message
+			error.message,
 		);
 		appState.config = {
 			bounds: {width: 1024, height: 768},

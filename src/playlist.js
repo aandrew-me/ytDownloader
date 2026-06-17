@@ -213,7 +213,7 @@ const playlistDownloader = {
 		});
 	},
 
-	startDownload(type) {
+	async startDownload(type) {
 		try {
 			this.state.url = this.validateUrl(this.state.url);
 		} catch (_) {
@@ -222,7 +222,7 @@ const playlistDownloader = {
 			return;
 		}
 
-		this.updateDynamicConfig();
+		await this.updateDynamicConfig();
 		this.hideOptions();
 
 		const controller = new AbortController();
@@ -525,7 +525,7 @@ const playlistDownloader = {
 		window.scrollTo(0, document.body.scrollHeight);
 	},
 
-	updateDynamicConfig() {
+	async updateDynamicConfig() {
 		// Naming formats from localStorage
 		this.config.foldernameFormat =
 			localStorage.getItem("foldernameFormat") || "%(playlist_title)s";
@@ -535,6 +535,14 @@ const playlistDownloader = {
 
 		// Proxy, cookies, config file
 		this.config.proxy = localStorage.getItem("proxy") || "";
+
+		if (!this.config.proxy) {
+			const proxy = await ipcRenderer.invoke("get-system-proxy");
+			console.log("Using system proxy: " + proxy);
+
+			this.config.proxy = proxy;
+		}
+
 		this.config.cookie.browser = localStorage.getItem("browser") || "";
 		this.config.cookie.arg = this.config.cookie.browser
 			? "--cookies-from-browser"

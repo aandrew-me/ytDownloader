@@ -161,6 +161,7 @@ class YtDownloaderApp {
 			console.log("ffmpeg path:", this.state.ffmpegPath);
 			console.log("JS runtime path:", this.state.jsRuntimePath);
 
+			// TODO: See if it can be removed
 			this._loadSettings();
 			this._addEventListeners();
 
@@ -643,7 +644,7 @@ class YtDownloaderApp {
 	/**
 	 * Loads various settings from localStorage into the application state.
 	 */
-	_loadSettings() {
+	async _loadSettings(url) {
 		const prefs = this.state.preferences;
 		prefs.videoQuality =
 			Number(
@@ -665,6 +666,23 @@ class YtDownloaderApp {
 			) === "true";
 		prefs.proxy =
 			localStorage.getItem(CONSTANTS.LOCAL_STORAGE_KEYS.PROXY) || "";
+
+		if (!prefs.proxy) {
+			try {
+				const systemProxy = await ipcRenderer.invoke(
+					"get-system-proxy",
+					url,
+				);
+				if (systemProxy) {
+					prefs.proxy = systemProxy;
+
+					console.log("Using system proxy:", systemProxy);
+				}
+			} catch (err) {
+				console.error("Failed to get system proxy:", err);
+			}
+		}
+
 		prefs.browserForCookies =
 			localStorage.getItem(
 				CONSTANTS.LOCAL_STORAGE_KEYS.BROWSER_COOKIES,
@@ -864,7 +882,7 @@ class YtDownloaderApp {
 			return;
 		}
 
-		this._loadSettings();
+		await this._loadSettings(safeUrl);
 		this._defaultVideoToggle();
 		this._resetUIForNewLink();
 
