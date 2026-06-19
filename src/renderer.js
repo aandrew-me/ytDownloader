@@ -568,7 +568,13 @@ class YtDownloaderApp {
 		// Check if the folder has already been copied
 		if (!existsSync(targetFfmpegFile)) {
 			if (existsSync(bundledDir)) {
-				cpSync(bundledDir, targetDir, {recursive: true});
+				try {
+					cpSync(bundledDir, targetDir, {recursive: true});
+				} catch {
+					console.error("Failed to copy bundled ffmpeg.");
+
+					return "";
+				}
 			} else {
 				return "";
 			}
@@ -667,7 +673,13 @@ class YtDownloaderApp {
 				mkdirSync(targetDir, {recursive: true});
 			}
 
-			copyFileSync(bundledNodePath, targetNodeFile);
+			try {
+				copyFileSync(bundledNodePath, targetNodeFile);
+			} catch {
+				console.error("Failed to copy bundled Node runtime.");
+
+				return "";
+			}
 
 			return `${exeName}:${targetNodeFile}`;
 		}
