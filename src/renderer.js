@@ -557,24 +557,24 @@ class YtDownloaderApp {
 		}
 
 		// Priority 3: Bundled ffmpeg
-		const bundledBinDir = join(__dirname, "..", "ffmpeg");
-		const targetBinDir = join(homedir(), ".ytDownloader", "ffmpeg", "bin");
+		const bundledDir = join(__dirname, "..", "ffmpeg");
+		const targetDir = join(homedir(), ".ytDownloader", "ffmpeg");
 
 		const isWin = platform() === "win32";
 		const ffmpegName = isWin ? "ffmpeg.exe" : "ffmpeg";
-		const targetFfmpegFile = join(targetBinDir, ffmpegName);
+		const targetFfmpegFile = join(targetDir, "bin", ffmpegName);
 
 
 		// Check if the folder has already been copied
 		if (!existsSync(targetFfmpegFile)) {
-			if (existsSync(bundledBinDir)) {
-				cpSync(bundledBinDir, targetBinDir, {recursive: true});
+			if (existsSync(bundledDir)) {
+				cpSync(bundledDir, targetDir, {recursive: true});
 			} else {
 				return "";
 			}
 		}
 
-		return targetBinDir;
+		return join(targetDir, "bin");
 	}
 
 	/**
