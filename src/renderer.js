@@ -3,7 +3,7 @@ const {default: YTDlpWrap} = require("yt-dlp-wrap-plus");
 const {constants} = require("fs/promises");
 const {homedir, platform} = require("os");
 const {join} = require("path");
-const {mkdirSync, accessSync, promises, existsSync} = require("fs");
+const {mkdirSync, accessSync, promises, existsSync, cpSync, copyFileSync} = require("fs");
 const {execSync, spawn} = require("child_process");
 
 const CONSTANTS = {
@@ -159,7 +159,7 @@ class YtDownloaderApp {
 
 			console.log("yt-dlp path:", this.state.ytDlpPath);
 			console.log("ffmpeg path:", this.state.ffmpegPath);
-			console.log("JS runtime path:", this.state.jsRuntimePath);
+			console.log("JS runtime:", this.state.jsRuntimePath);
 
 			// TODO: See if it can be removed
 			this._loadSettings();
@@ -557,7 +557,24 @@ class YtDownloaderApp {
 		}
 
 		// Priority 3: Bundled ffmpeg
-		return join(__dirname, "..", "ffmpeg", "bin");
+		const bundledBinDir = join(__dirname, "..", "ffmpeg");
+		const targetBinDir = join(homedir(), ".ytDownloader", "ffmpeg", "bin");
+
+		const isWin = platform() === "win32";
+		const ffmpegName = isWin ? "ffmpeg.exe" : "ffmpeg";
+		const targetFfmpegFile = join(targetBinDir, ffmpegName);
+
+
+		// Check if the folder has already been copied
+		if (!existsSync(targetFfmpegFile)) {
+			if (existsSync(bundledBinDir)) {
+				cpSync(bundledBinDir, targetBinDir, {recursive: true});
+			} else {
+				return "";
+			}
+		}
+
+		return targetBinDir;
 	}
 
 	/**
@@ -595,6 +612,7 @@ class YtDownloaderApp {
 	async _getJsRuntimePath() {
 		const exeName = "node";
 
+		// Priority 1: Environment Variable (Node)
 		if (process.env.YTDOWNLOADER_NODE_PATH) {
 			if (existsSync(process.env.YTDOWNLOADER_NODE_PATH)) {
 				return `$node:${process.env.YTDOWNLOADER_NODE_PATH}`;
@@ -603,6 +621,7 @@ class YtDownloaderApp {
 			return "";
 		}
 
+		// Priority 2: Environment Variable (Deno)
 		if (process.env.YTDOWNLOADER_DENO_PATH) {
 			if (existsSync(process.env.YTDOWNLOADER_DENO_PATH)) {
 				return `$deno:${process.env.YTDOWNLOADER_DENO_PATH}`;
@@ -611,6 +630,7 @@ class YtDownloaderApp {
 			return "";
 		}
 
+		// Priority 3: System-installed Deno (macOS Fallback)
 		if (platform() === "darwin") {
 			const possiblePaths = [
 				"/opt/homebrew/bin/deno",
@@ -628,17 +648,32 @@ class YtDownloaderApp {
 			return "";
 		}
 
-		let jsRuntimePath = join(__dirname, "..", exeName);
+		// Priority 4: Bundled Node Runtime
+		const isWin = platform() === "win32";
+		const nodeName = isWin ? "node.exe" : "node";
 
-		if (platform() === "win32") {
-			jsRuntimePath = join(__dirname, "..", `${exeName}.exe`);
+		const bundledNodePath = join(__dirname, "..", nodeName);
+		const targetDir = join(homedir(), ".ytDownloader");
+		const targetNodeFile = join(targetDir, nodeName);
+
+		// Check if folder has already been copied
+		if (existsSync(targetNodeFile)) {
+			return `${exeName}:${targetNodeFile}`;
 		}
 
-		if (existsSync(jsRuntimePath)) {
-			return `${exeName}:${jsRuntimePath}`;
-		} else {
-			return "";
+		// Copy to .ytDownloader
+		if (existsSync(bundledNodePath)) {
+			if (!existsSync(targetDir)) {
+				mkdirSync(targetDir, {recursive: true});
+			}
+
+			copyFileSync(bundledNodePath, targetNodeFile);
+
+			return `${exeName}:${targetNodeFile}`;
 		}
+
+
+		return "";
 	}
 
 	/**
