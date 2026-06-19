@@ -674,12 +674,13 @@ const playlistDownloader = {
 			fs.existsSync(process.env.YTDOWNLOADER_FFMPEG_PATH)
 		) {
 			console.log("Using FFMPEG from YTDOWNLOADER_FFMPEG_PATH");
+
 			return process.env.YTDOWNLOADER_FFMPEG_PATH;
 		}
 
 		switch (os.platform()) {
 			case "win32":
-				return path.join(__dirname, "..", "ffmpeg", "bin");
+				return path.join(os.homedir(), ".ytDownloader", "ffmpeg", "bin");
 			case "freebsd":
 				try {
 					return execSync("which ffmpeg").toString("utf8").trim();
@@ -688,7 +689,7 @@ const playlistDownloader = {
 					return "";
 				}
 			default:
-				return path.join(__dirname, "..", "ffmpeg", "bin");
+				return path.join(os.homedir(), ".ytDownloader", "ffmpeg", "bin");
 		}
 	},
 
@@ -698,7 +699,7 @@ const playlistDownloader = {
 
 			if (process.env.YTDOWNLOADER_NODE_PATH) {
 				if (fs.existsSync(process.env.YTDOWNLOADER_NODE_PATH)) {
-					return `$node:"${process.env.YTDOWNLOADER_NODE_PATH}"`;
+					return `$node:${process.env.YTDOWNLOADER_NODE_PATH}`;
 				}
 
 				return "";
@@ -706,7 +707,7 @@ const playlistDownloader = {
 
 			if (process.env.YTDOWNLOADER_DENO_PATH) {
 				if (fs.existsSync(process.env.YTDOWNLOADER_DENO_PATH)) {
-					return `$deno:"${process.env.YTDOWNLOADER_DENO_PATH}"`;
+					return `$deno:${process.env.YTDOWNLOADER_DENO_PATH}`;
 				}
 
 				return "";
@@ -716,14 +717,14 @@ const playlistDownloader = {
 				return "";
 			}
 
-			let jsRuntimePath = path.join(__dirname, "..", exeName);
+			let jsRuntimePath = path.join(os.homedir(), ".ytDownloader", exeName);
 
 			if (os.platform() === "win32") {
-				jsRuntimePath = path.join(__dirname, "..", `${exeName}.exe`);
+				jsRuntimePath = path.join(os.homedir(), ".ytDownloader", `${exeName}.exe`);
 			}
 
 			if (fs.existsSync(jsRuntimePath)) {
-				return `${exeName}:"${jsRuntimePath}"`;
+				return `${exeName}:${jsRuntimePath}`;
 			} else {
 				return "";
 			}

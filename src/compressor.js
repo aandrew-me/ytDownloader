@@ -38,7 +38,7 @@ getId("menuIcon").addEventListener("click", () => {
 	}
 });
 
-const ffmpeg = `"${getFfmpegPath()}"`;
+const ffmpeg = getFfmpegPath();
 
 console.log(ffmpeg);
 
@@ -560,7 +560,7 @@ function getFfmpegPath() {
 
 	switch (os.platform()) {
 		case "win32":
-			return path.join(__dirname, "..", "ffmpeg", "bin", "ffmpeg.exe");
+			return path.join(os.homedir(), ".ytDownloader", "ffmpeg", "bin", "ffmpeg.exe");
 		case "freebsd":
 			try {
 				return execSync("which ffmpeg").toString("utf8").trim();
@@ -569,7 +569,7 @@ function getFfmpegPath() {
 				return "";
 			}
 		default:
-			return path.join(__dirname, "..", "ffmpeg", "bin", "ffmpeg");
+			return path.join(os.homedir(), ".ytDownloader", "ffmpeg", "bin", "ffmpeg");
 	}
 }
 
