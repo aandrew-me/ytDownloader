@@ -1,9 +1,10 @@
-const {exec, execSync} = require("child_process");
+const {spawn, execSync} = require("child_process");
 const path = require("path");
-const {ipcRenderer, shell} = require("electron");
+const {ipcRenderer} = require("electron");
 const os = require("os");
 const si = require("systeminformation");
 const {existsSync} = require("fs");
+const crypto = require("crypto");
 
 document.addEventListener("translations-loaded", () => {
 	window.i18n.translatePage();
@@ -11,35 +12,74 @@ document.addEventListener("translations-loaded", () => {
 
 let menuIsOpen = false;
 
-getId("menuIcon").addEventListener("click", () => {
-	if (menuIsOpen) {
-		getId("menuIcon").style.transform = "rotate(0deg)";
-		menuIsOpen = false;
-		let count = 0;
-		let opacity = 1;
-		const fade = setInterval(() => {
-			if (count >= 10) {
-				getId("menu").style.display = "none";
-				clearInterval(fade);
-			} else {
-				opacity -= 0.1;
-				getId("menu").style.opacity = opacity.toFixed(3).toString();
-				count++;
-			}
-		}, 50);
-	} else {
-		getId("menuIcon").style.transform = "rotate(90deg)";
-		menuIsOpen = true;
+/**
+ * @param {string} id
+ */
+function getId(id) {
+	return document.getElementById(id);
+}
 
-		setTimeout(() => {
-			getId("menu").style.display = "flex";
-			getId("menu").style.opacity = "1";
-		}, 150);
+const dom = {
+	menuIcon: getId("menuIcon"),
+	menu: getId("menu"),
+	fileInput: getId("fileInput"),
+	selectedFilesDiv: getId("selected-files"),
+	customFolderSelect: getId("custom-folder-select"),
+	customFolderPath: getId("custom-folder-path"),
+	compressBtn: getId("compress-btn"),
+	cancelBtn: getId("cancel-btn"),
+	compressionStatus: getId("compression-status"),
+	themeToggle: getId("themeToggle"),
+	outputFolderInput: getId("output-folder-input"),
+	preferenceWin: getId("preferenceWin"),
+	playlistWin: getId("playlistWin"),
+	aboutWin: getId("aboutWin"),
+	historyWin: getId("historyWin"),
+	homeWin: getId("homeWin"),
+	encoder: getId("encoder"),
+	compressionSpeed: getId("compression-speed"),
+	videoQuality: getId("video-quality"),
+	audioFormat: getId("audio-format"),
+	fileExtension: getId("file_extension"),
+	outputSuffix: getId("output-suffix"),
+};
+
+function openMenu() {
+	dom.menuIcon.style.transform = "rotate(90deg)";
+	menuIsOpen = true;
+	dom.menu.style.display = "flex";
+
+	setTimeout(() => {
+		dom.menu.style.opacity = "1";
+	}, 20);
+}
+
+function closeMenu() {
+	dom.menuIcon.style.transform = "rotate(0deg)";
+	menuIsOpen = false;
+	let count = 0;
+	let opacity = 1;
+	const fade = setInterval(() => {
+		if (count >= 10) {
+			dom.menu.style.display = "none";
+			clearInterval(fade);
+		} else {
+			opacity -= 0.1;
+			dom.menu.style.opacity = opacity.toFixed(2);
+			count++;
+		}
+	}, 50);
+}
+
+dom.menuIcon.addEventListener("click", () => {
+	if (menuIsOpen) {
+		closeMenu();
+	} else {
+		openMenu();
 	}
 });
 
 const ffmpeg = getFfmpegPath();
-
 console.log(ffmpeg);
 
 const vaapi_device = "/dev/dri/renderD128";
@@ -47,48 +87,42 @@ const vaapi_device = "/dev/dri/renderD128";
 // Checking GPU
 si.graphics().then((info) => {
 	console.log({gpuInfo: info});
-	const gpuDevices = info.controllers;
+	const platform = os.platform();
 
-	gpuDevices.forEach((gpu) => {
-		// NVIDIA
+	const selectorMap = {
+		nvidia: ".nvidia_opt",
+		amf: platform === "win32" ? ".amf_opt" : ".vaapi_opt",
+		qsv:
+			platform === "win32"
+				? ".qsv_opt"
+				: platform !== "darwin"
+					? ".vaapi_opt"
+					: null,
+		videotoolbox: platform === "darwin" ? ".videotoolbox_opt" : null,
+	};
+
+	info.controllers.forEach((gpu) => {
 		const gpuName = gpu.vendor.toLowerCase();
 		const gpuModel = gpu.model.toLowerCase();
+		let selector = null;
 
 		if (gpuName.includes("nvidia") || gpuModel.includes("nvidia")) {
-			document.querySelectorAll(".nvidia_opt").forEach((opt) => {
-				opt.style.display = "block";
-			});
+			selector = selectorMap.nvidia;
 		} else if (
 			gpuName.includes("advanced micro devices") ||
 			gpuModel.includes("amd")
 		) {
-			if (os.platform() == "win32") {
-				document.querySelectorAll(".amf_opt").forEach((opt) => {
-					opt.style.display = "block";
-				});
-			} else {
-				document.querySelectorAll(".vaapi_opt").forEach((opt) => {
-					opt.style.display = "block";
-				});
-			}
+			selector = selectorMap.amf;
 		} else if (gpuName.includes("intel")) {
-			if (os.platform() == "win32") {
-				document.querySelectorAll(".qsv_opt").forEach((opt) => {
-					opt.style.display = "block";
-				});
-			} else if (os.platform() != "darwin") {
-				document.querySelectorAll(".vaapi_opt").forEach((opt) => {
-					opt.style.display = "block";
-				});
-			}
-		} else {
-			if (os.platform() == "darwin") {
-				document
-					.querySelectorAll(".videotoolbox_opt")
-					.forEach((opt) => {
-						opt.style.display = "block";
-					});
-			}
+			selector = selectorMap.qsv;
+		} else if (platform === "darwin") {
+			selector = selectorMap.videotoolbox;
+		}
+
+		if (selector) {
+			document.querySelectorAll(selector).forEach((opt) => {
+				opt.style.display = "block";
+			});
 		}
 	});
 });
@@ -99,17 +133,8 @@ let activeProcesses = new Set();
 let currentItemId = "";
 let isCancelled = false;
 
-/**
- * @param {string} id
- */
-function getId(id) {
-	return document.getElementById(id);
-}
-
 // File Handling
 const dropZone = document.querySelector(".drop-zone");
-const fileInput = getId("fileInput");
-const selectedFilesDiv = getId("selected-files");
 
 dropZone.addEventListener("dragover", (e) => {
 	e.preventDefault();
@@ -123,19 +148,16 @@ dropZone.addEventListener("dragleave", () => {
 dropZone.addEventListener("drop", (e) => {
 	e.preventDefault();
 	dropZone.classList.remove("dragover");
-	// @ts-ignore
-	console.log(e.dataTransfer);
 	files = Array.from(e.dataTransfer.files);
 	updateSelectedFiles();
 });
 
-fileInput.addEventListener("change", (e) => {
-	// @ts-ignore
+dom.fileInput.addEventListener("change", (e) => {
 	files = Array.from(e.target.files);
 	updateSelectedFiles();
 });
 
-getId("custom-folder-select").addEventListener("click", (e) => {
+dom.customFolderSelect.addEventListener("click", () => {
 	ipcRenderer.send("get-directory", "");
 });
 
@@ -143,21 +165,24 @@ function updateSelectedFiles() {
 	const fileList = files
 		.map((f) => `${f.name} (${formatBytes(f.size)})<br/>`)
 		.join("\n");
-	selectedFilesDiv.innerHTML = fileList || "No files selected";
+	dom.selectedFilesDiv.innerHTML = fileList || "No files selected";
 }
 
 // Compression Logic
-getId("compress-btn").addEventListener("click", startCompression);
-getId("cancel-btn").addEventListener("click", cancelCompression);
+dom.compressBtn.addEventListener("click", startCompression);
+dom.cancelBtn.addEventListener("click", cancelCompression);
 
 async function startCompression() {
 	if (files.length === 0) return alert("Please select files first!");
 
 	const settings = getEncoderSettings();
+	isCancelled = false; // Ensure clean state at the start
 
 	for (const file of files) {
-		const itemId =
-			"f" + Math.random().toFixed(10).toString().slice(2).toString();
+		// Check if cancellation happened before starting this file
+		if (isCancelled) break;
+
+		const itemId = "f" + crypto.randomUUID().replace(/-/g, "");
 		currentItemId = itemId;
 
 		const outputPath = generateOutputPath(file, settings);
@@ -166,7 +191,7 @@ async function startCompression() {
 			await compressVideo(file, settings, itemId, outputPath);
 
 			if (isCancelled) {
-				isCancelled = false;
+				break; // Break the loop if cancelled during compression
 			} else {
 				updateProgress("success", "", itemId);
 				const fileSavedElement = document.createElement("b");
@@ -174,28 +199,36 @@ async function startCompression() {
 				fileSavedElement.onclick = () => {
 					ipcRenderer.send("show-file", outputPath);
 				};
-				getId(itemId + "_prog").appendChild(fileSavedElement);
-				currentItemId = "";
+				getId(itemId + "_prog")?.appendChild(fileSavedElement);
 			}
 		} catch (error) {
+			if (isCancelled) {
+				break; // Break loop if process was killed by cancel button
+			}
+
 			const errorElement = document.createElement("div");
 			errorElement.onclick = () => {
 				ipcRenderer.send("error_dialog", error.message);
 			};
 			errorElement.textContent = i18n.__("errorClickForDetails");
 			updateProgress("error", "", itemId);
-			getId(itemId + "_prog").appendChild(errorElement);
-			currentItemId = "";
+			getId(itemId + "_prog")?.appendChild(errorElement);
 		}
 	}
+
+	// Reset states when queue finishes or is broken
+	currentItemId = "";
+	isCancelled = false;
 }
 
 function cancelCompression() {
+	isCancelled = true;
+
 	activeProcesses.forEach((child) => {
 		child.stdin.write("q");
-		isCancelled = true;
 	});
 	activeProcesses.clear();
+
 	updateProgress("error", "Cancelled", currentItemId);
 }
 
@@ -203,22 +236,20 @@ function cancelCompression() {
  * @param {File} file
  */
 function generateOutputPath(file, settings) {
-	console.log({settings});
 	const output_extension = settings.extension;
 	const parsed_file = path.parse(file.path);
+	const outputDir = settings.outputPath || parsed_file.dir;
 
-	let outputDir = settings.outputPath || parsed_file.dir;
-
-	if (output_extension == "unchanged") {
+	if (output_extension === "unchanged") {
 		return path.join(
 			outputDir,
-			`${parsed_file.name}${settings.outputSuffix}${parsed_file.ext}`
+			`${parsed_file.name}${settings.outputSuffix}${parsed_file.ext}`,
 		);
 	}
 
 	return path.join(
 		outputDir,
-		`${parsed_file.name}_compressed.${output_extension}`
+		`${parsed_file.name}_compressed.${output_extension}`,
 	);
 }
 
@@ -229,64 +260,65 @@ function generateOutputPath(file, settings) {
  * @param {string} outputPath
  */
 async function compressVideo(file, settings, itemId, outputPath) {
-	const command = buildFFmpegCommand(file, settings, outputPath);
-
-	console.log("Command: " + command);
+	const args = buildFFmpegArgs(file, settings, outputPath);
+	console.log("Command: " + args.join(" "));
 
 	return new Promise((resolve, reject) => {
-		const child = exec(command, (error) => {
-			if (error) reject(error);
-			else resolve();
-		});
+		const child = spawn(ffmpeg, args);
 
 		activeProcesses.add(child);
-		child.on("exit", (_code) => {
+		child.on("exit", () => {
 			activeProcesses.delete(child);
 		});
 
-		let video_info = {
-			duration: "",
-			bitrate: "",
-		};
+		let video_info = {duration: ""};
 
 		createProgressItem(
 			path.basename(file.path),
 			"progress",
 			`Starting...`,
-			itemId
+			itemId,
 		);
 
 		child.stderr.on("data", (data) => {
-			// console.log(data)
-			const duration_match = data.match(/Duration:\s*([\d:.]+)/);
+			const dataStr = data.toString();
+
+			const duration_match = dataStr.match(/Duration:\s*([\d:.]+)/);
 			if (duration_match) {
 				video_info.duration = duration_match[1];
 			}
 
-			// const bitrate_match = data.match(/bitrate:\s*([\d:.]+)/);
-			// if (bitrate_match) {
-			// 	// Bitrate in kb/s
-			// 	video_info.bitrate = bitrate_match[1];
-			// }
-
-			const progressTime = data.match(/time=(\d+:\d+:\d+\.\d+)/);
-
+			const progressTime = dataStr.match(/time=(\d+:\d+:\d+\.\d+)/);
 			const totalSeconds = timeToSeconds(video_info.duration);
-
 			const currentSeconds =
 				progressTime && progressTime.length > 1
 					? timeToSeconds(progressTime[1])
 					: null;
 
-			if (currentSeconds && !isCancelled) {
+			if (currentSeconds && totalSeconds > 0 && !isCancelled) {
 				const progress = Math.round(
-					(currentSeconds / totalSeconds) * 100
+					(currentSeconds / totalSeconds) * 100,
 				);
+				const progElem = getId(itemId + "_prog");
 
-				getId(
-					itemId + "_prog"
-				).innerHTML = `<progress class="progressBarCompress" min=0 max=100 value=${progress}>`;
+				if (progElem) {
+					let progressBar = progElem.querySelector(
+						".progressBarCompress",
+					);
+					if (!progressBar) {
+						progElem.innerHTML = `<progress class="progressBarCompress" min="0" max="100" value="${progress}"></progress>`;
+					} else {
+						progressBar.value = progress;
+					}
+				}
 			}
+		});
+
+		child.on("error", (err) => reject(err));
+		child.on("close", (code) => {
+			if (code !== 0 && !isCancelled)
+				reject(new Error(`Process exited with code ${code}`));
+			else resolve();
 		});
 	});
 }
@@ -296,12 +328,12 @@ async function compressVideo(file, settings, itemId, outputPath) {
  * @param {{ encoder: string; speed: string; videoQuality: string; audioQuality: string; audioFormat: string }} settings
  * @param {string} outputPath
  */
-function buildFFmpegCommand(file, settings, outputPath) {
+function buildFFmpegArgs(file, settings, outputPath) {
 	const inputPath = file.path;
-
 	console.log("Output path: " + outputPath);
 
-	const args = ["-hide_banner", "-y", "-stats", "-i", `"${inputPath}"`];
+	const args = ["-hide_banner", "-y", "-stats", "-i", inputPath];
+	const quality = parseInt(settings.videoQuality, 10).toString();
 
 	switch (settings.encoder) {
 		case "copy":
@@ -316,7 +348,7 @@ function buildFFmpegCommand(file, settings, outputPath) {
 				"-vf",
 				"format=yuv420p",
 				"-crf",
-				parseInt(settings.videoQuality).toString()
+				quality,
 			);
 			break;
 		case "x265":
@@ -328,10 +360,9 @@ function buildFFmpegCommand(file, settings, outputPath) {
 				"-preset",
 				settings.speed,
 				"-crf",
-				parseInt(settings.videoQuality).toString()
+				quality,
 			);
 			break;
-		// Intel windows
 		case "qsv":
 			args.push(
 				"-c:v",
@@ -341,10 +372,9 @@ function buildFFmpegCommand(file, settings, outputPath) {
 				"-preset",
 				settings.speed,
 				"-global_quality",
-				parseInt(settings.videoQuality).toString()
+				quality,
 			);
 			break;
-		// Linux amd and intel
 		case "vaapi":
 			args.push(
 				"-vaapi_device",
@@ -354,7 +384,7 @@ function buildFFmpegCommand(file, settings, outputPath) {
 				"-c:v",
 				"h264_vaapi",
 				"-qp",
-				parseInt(settings.videoQuality).toString()
+				quality,
 			);
 			break;
 		case "hevc_vaapi":
@@ -366,10 +396,9 @@ function buildFFmpegCommand(file, settings, outputPath) {
 				"-c:v",
 				"hevc_vaapi",
 				"-qp",
-				parseInt(settings.videoQuality).toString()
+				quality,
 			);
 			break;
-		// Nvidia windows and linux
 		case "nvenc":
 			args.push(
 				"-c:v",
@@ -381,19 +410,13 @@ function buildFFmpegCommand(file, settings, outputPath) {
 				"-rc",
 				"vbr",
 				"-cq",
-				parseInt(settings.videoQuality).toString()
+				quality,
 			);
 			break;
-		// Amd windows
-		case "hevc_amf":
-			let amf_hevc_quality = "balanced";
-
-			if (settings.speed == "slow") {
-				amf_hevc_quality = "quality";
-			} else if (settings.speed == "fast") {
-				amf_hevc_quality = "speed";
-			}
-
+		case "hevc_amf": {
+			const speedToQuality = {slow: "quality", fast: "speed"};
+			const amf_hevc_quality =
+				speedToQuality[settings.speed] || "balanced";
 			args.push(
 				"-c:v",
 				"hevc_amf",
@@ -404,20 +427,15 @@ function buildFFmpegCommand(file, settings, outputPath) {
 				"-rc",
 				"cqp",
 				"-qp_i",
-				parseInt(settings.videoQuality).toString(),
+				quality,
 				"-qp_p",
-				parseInt(settings.videoQuality).toString()
+				quality,
 			);
 			break;
-		case "amf":
-			let amf_quality = "balanced";
-
-			if (settings.speed == "slow") {
-				amf_quality = "quality";
-			} else if (settings.speed == "fast") {
-				amf_quality = "speed";
-			}
-
+		}
+		case "amf": {
+			const speedToQuality = {slow: "quality", fast: "speed"};
+			const amf_quality = speedToQuality[settings.speed] || "balanced";
 			args.push(
 				"-c:v",
 				"h264_amf",
@@ -428,51 +446,42 @@ function buildFFmpegCommand(file, settings, outputPath) {
 				"-rc",
 				"cqp",
 				"-qp_i",
-				parseInt(settings.videoQuality).toString(),
+				quality,
 				"-qp_p",
-				parseInt(settings.videoQuality).toString(),
+				quality,
 				"-qp_b",
-				parseInt(settings.videoQuality).toString()
+				quality,
 			);
 			break;
+		}
 		case "videotoolbox":
 			args.push(
 				"-c:v",
+				"h264_videotoolbox",
 				"-vf",
 				"format=yuv420p",
-				"h264_videotoolbox",
 				"-q:v",
-				parseInt(settings.videoQuality).toString()
+				quality,
 			);
 			break;
 	}
 
-	// args.push("-vf", "scale=trunc(iw*1/2)*2:trunc(ih*1/2)*2,format=yuv420p");
-
-	args.push("-c:a", settings.audioFormat, `"${outputPath}"`);
-
-	return `${ffmpeg} ${args.join(" ")}`;
+	args.push("-c:a", settings.audioFormat, outputPath);
+	return args;
 }
 
 /**
- *
- * @returns {{ encoder: string; speed: string; videoQuality: string; audioQuality?: string; audioFormat: string, extension: string, outputPath:string }} settings
+ * @returns {{ encoder: string; speed: string; videoQuality: string; audioQuality?: string; audioFormat: string, extension: string, outputPath:string, outputSuffix: string }} settings
  */
 function getEncoderSettings() {
 	return {
-		// @ts-ignore
-		encoder: getId("encoder").value,
-		// @ts-ignore
-		speed: getId("compression-speed").value,
-		// @ts-ignore
-		videoQuality: getId("video-quality").value,
-		// @ts-ignore
-		audioFormat: getId("audio-format").value,
-		// @ts-ignore
-		extension: getId("file_extension").value,
-		outputPath: getId("custom-folder-path").textContent,
-		// @ts-ignore
-		outputSuffix: getId("output-suffix").value,
+		encoder: dom.encoder.value,
+		speed: dom.compressionSpeed.value,
+		videoQuality: dom.videoQuality.value,
+		audioFormat: dom.audioFormat.value,
+		extension: dom.fileExtension.value,
+		outputPath: dom.customFolderPath.textContent,
+		outputSuffix: dom.outputSuffix.value,
 	};
 }
 
@@ -490,17 +499,17 @@ function getNvencPreset(speed) {
  * @param {string} itemId
  */
 function updateProgress(status, data, itemId) {
-	if (status == "success" || status == "error") {
-		const item = getId("itemId");
-
+	if (status === "success" || status === "error") {
+		const item = getId(itemId);
 		if (item) {
-			getId(itemId).classList.remove("progress");
-			getId(itemId).classList.add(status);
+			item.classList.remove("progress");
+			item.classList.add(status);
 		}
 	}
 
 	if (itemId) {
-		getId(itemId + "_prog").textContent = data;
+		const progItem = getId(itemId + "_prog");
+		if (progItem) progItem.textContent = data;
 	}
 }
 
@@ -511,40 +520,32 @@ function updateProgress(status, data, itemId) {
  * @param {string} itemId
  */
 function createProgressItem(filename, status, data, itemId) {
-	const statusElement = getId("compression-status");
 	const newStatus = document.createElement("div");
 	newStatus.id = itemId;
 	newStatus.className = `status-item ${status}`;
 	const visibleFilename = filename.substring(0, 45);
 	newStatus.innerHTML = `
         <div class="filename">${visibleFilename}</div>
-        <div id="${itemId + "_prog"}" class="itemProgress">${data}</div>
+        <div id="${itemId}_prog" class="itemProgress">${data}</div>
     `;
-	statusElement.append(newStatus);
+	dom.compressionStatus.append(newStatus);
 }
 
 /**
- * @param {any} bytes
+ * @param {number} bytes
  */
 function formatBytes(bytes) {
+	if (bytes === 0) return "0 B";
 	const units = ["B", "KB", "MB", "GB"];
-	let size = bytes;
-	let unitIndex = 0;
-	while (size >= 1024 && unitIndex < units.length - 1) {
-		size /= 1024;
-		unitIndex++;
-	}
-	return `${size.toFixed(2)} ${units[unitIndex]}`;
+	const i = Math.floor(Math.log(bytes) / Math.log(1024));
+	return `${(bytes / Math.pow(1024, i)).toFixed(2)} ${units[i]}`;
 }
 
 /**
  * @param {string} timeStr
  */
 function timeToSeconds(timeStr) {
-	if (!timeStr) {
-		return 0;
-	}
-
+	if (!timeStr) return 0;
 	const [hh, mm, ss] = timeStr.split(":").map(parseFloat);
 	return hh * 3600 + mm * 60 + ss;
 }
@@ -560,7 +561,13 @@ function getFfmpegPath() {
 
 	switch (os.platform()) {
 		case "win32":
-			return path.join(os.homedir(), ".ytDownloader", "ffmpeg", "bin", "ffmpeg.exe");
+			return path.join(
+				os.homedir(),
+				".ytDownloader",
+				"ffmpeg",
+				"bin",
+				"ffmpeg.exe",
+			);
 		case "freebsd":
 			try {
 				return execSync("which ffmpeg").toString("utf8").trim();
@@ -569,85 +576,54 @@ function getFfmpegPath() {
 				return "";
 			}
 		default:
-			return path.join(os.homedir(), ".ytDownloader", "ffmpeg", "bin", "ffmpeg");
+			return path.join(
+				os.homedir(),
+				".ytDownloader",
+				"ffmpeg",
+				"bin",
+				"ffmpeg",
+			);
 	}
 }
 
-getId("themeToggle").addEventListener("change", () => {
-	document.documentElement.setAttribute("theme", getId("themeToggle").value);
-	localStorage.setItem("theme", getId("themeToggle").value);
+dom.themeToggle.addEventListener("change", () => {
+	const theme = dom.themeToggle.value;
+	document.documentElement.setAttribute("theme", theme);
+	localStorage.setItem("theme", theme);
 });
 
-getId("output-folder-input").addEventListener("change", (e) => {
+dom.outputFolderInput.addEventListener("change", (e) => {
 	const checked = e.target.checked;
-
 	if (!checked) {
-		getId("custom-folder-select").style.display = "block";
+		dom.customFolderSelect.style.display = "block";
 	} else {
-		getId("custom-folder-select").style.display = "none";
-		getId("custom-folder-path").textContent = "";
-		getId("custom-folder-path").style.display = "none";
+		dom.customFolderSelect.style.display = "none";
+		dom.customFolderPath.textContent = "";
+		dom.customFolderPath.style.display = "none";
 	}
 });
 
-const storageTheme = localStorage.getItem("theme");
-if (storageTheme) {
-	document.documentElement.setAttribute("theme", storageTheme);
-	getId("themeToggle").value = storageTheme;
-} else {
-	document.documentElement.setAttribute("theme", "frappe");
-	getId("themeToggle").value = "frappe";
-}
+const storageTheme = localStorage.getItem("theme") || "frappe";
+document.documentElement.setAttribute("theme", storageTheme);
+dom.themeToggle.value = storageTheme;
 
 ipcRenderer.on("directory-path", (_event, msg) => {
-	let customFolderPathItem = getId("custom-folder-path");
-
-	customFolderPathItem.textContent = msg;
-	customFolderPathItem.style.display = "inline";
+	dom.customFolderPath.textContent = msg;
+	dom.customFolderPath.style.display = "inline";
 });
 
-function closeMenu() {
-	getId("menuIcon").style.transform = "rotate(0deg)";
-	let count = 0;
-	let opacity = 1;
-	const fade = setInterval(() => {
-		if (count >= 10) {
-			clearInterval(fade);
-		} else {
-			opacity -= 0.1;
-			getId("menu").style.opacity = String(opacity);
-			count++;
-		}
-	}, 50);
-}
+// DRWed Menu Router Engine
+const menuRoutes = {
+	preferenceWin: {page: "/preferences.html", channel: "load-page"},
+	playlistWin: {page: "/playlist.html", channel: "load-win"},
+	aboutWin: {page: "/about.html", channel: "load-page"},
+	historyWin: {page: "/history.html", channel: "load-page"},
+	homeWin: {page: "/index.html", channel: "load-win"},
+};
 
-// Menu
-getId("preferenceWin").addEventListener("click", () => {
-	closeMenu();
-	menuIsOpen = false;
-	ipcRenderer.send("load-page", __dirname + "/preferences.html");
-});
-
-getId("playlistWin").addEventListener("click", () => {
-	closeMenu();
-	menuIsOpen = false;
-	ipcRenderer.send("load-win", __dirname + "/playlist.html");
-});
-
-getId("aboutWin").addEventListener("click", () => {
-	closeMenu();
-	menuIsOpen = false;
-	ipcRenderer.send("load-page", __dirname + "/about.html");
-});
-
-getId("historyWin").addEventListener("click", () => {
-	closeMenu();
-	menuIsOpen = false;
-	ipcRenderer.send("load-page", __dirname + "/history.html");
-});
-
-getId("homeWin").addEventListener("click", () => {
-	closeMenu();
-	menuIsOpen = false;
-	ipcRenderer.send("load-win", __dirname + "/index.html");
+Object.entries(menuRoutes).forEach(([domKey, route]) => {
+	dom[domKey]?.addEventListener("click", () => {
+		closeMenu();
+		ipcRenderer.send(route.channel, __dirname + route.page);
+	});
 });
