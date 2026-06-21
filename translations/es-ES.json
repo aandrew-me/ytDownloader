@@ -161,5 +161,11 @@
 	"learnMore": "Saber más",
 	"updateError": "Se produjo un error durante el proceso de actualización",
 	"unableToAccessDir": "El programa no puede acceder a esa carpeta",
-	"downloadingUpdate": "Descargando actualización"
+	"downloadingUpdate": "Descargando actualización",
+	"searchPlaceholder": "Buscar en YouTube...",
+	"searchButton": "Buscar",
+	"searchOnlyYoutube": "Nota: El buscador solo funciona para YouTube.",
+	"searching": "Buscando...",
+	"youtubeSearch": "Búsqueda de YouTube",
+	"noResultsFound": "No se encontraron resultados."
 }

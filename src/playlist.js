@@ -83,6 +83,7 @@ const playlistDownloader = {
 		historyWinBtn: document.getElementById("historyWin"),
 		homeWinBtn: document.getElementById("homeWin"),
 		compressorWinBtn: document.getElementById("compressorWin"),
+		searchWinBtn: document.getElementById("searchWin"),
 	},
 
 	init() {
@@ -203,6 +204,9 @@ const playlistDownloader = {
 		);
 		this.ui.compressorWinBtn.addEventListener("click", () =>
 			this.navigate("win", "/compressor.html"),
+		);
+		this.ui.searchWinBtn?.addEventListener("click", () =>
+			this.navigate("win", "/search.html"),
 		);
 
 		ipcRenderer.on("downloadPath", (_event, downloadPath) => {
