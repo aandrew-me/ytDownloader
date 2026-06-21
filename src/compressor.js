@@ -42,6 +42,14 @@ const dom = {
 	audioFormat: getId("audio-format"),
 	fileExtension: getId("file_extension"),
 	outputSuffix: getId("output-suffix"),
+	targetSizeInput: getId("target-size-input"),
+	qualitySlider: getId("quality-slider"),
+	customQualityContainer: getId("custom-quality-container"),
+	targetSizeContainer: getId("target-size-container"),
+	targetPercentInput: getId("target-percent-input"),
+	targetPercentContainer: getId("target-percent-container"),
+	advancedToggleBtn: getId("advanced-toggle-btn"),
+	advancedSettingsCollapse: getId("advanced-settings-collapse"),
 };
 
 function openMenu() {
@@ -260,7 +268,7 @@ function generateOutputPath(file, settings) {
  * @param {string} outputPath
  */
 async function compressVideo(file, settings, itemId, outputPath) {
-	const args = buildFFmpegArgs(file, settings, outputPath);
+	const args = await buildFFmpegArgs(file, settings, outputPath);
 	console.log("Command: " + args.join(" "));
 
 	return new Promise((resolve, reject) => {
@@ -323,17 +331,105 @@ async function compressVideo(file, settings, itemId, outputPath) {
 	});
 }
 
+function getCRFValue(settings) {
+	const isHEVC =
+		settings.encoder === "x265" ||
+		settings.encoder === "hevc_qsv" ||
+		settings.encoder === "hevc_amf" ||
+		settings.encoder === "hevc_nvenc" ||
+		settings.encoder === "hevc_vaapi" ||
+		settings.encoder === "hevc_videotoolbox";
+
+	if (settings.videoQuality === "small") {
+		return isHEVC ? "32" : "28";
+	}
+	if (settings.videoQuality === "balanced") {
+		return isHEVC ? "28" : "23";
+	}
+	if (settings.videoQuality === "high") {
+		return isHEVC ? "23" : "18";
+	}
+
+	const num = parseInt(settings.videoQuality, 10);
+	return isNaN(num) ? "23" : num.toString();
+}
+
 /**
  * @param {File} file
  * @param {{ encoder: string; speed: string; videoQuality: string; audioQuality: string; audioFormat: string }} settings
  * @param {string} outputPath
  */
-function buildFFmpegArgs(file, settings, outputPath) {
+async function buildFFmpegArgs(file, settings, outputPath) {
 	const inputPath = file.path;
 	console.log("Output path: " + outputPath);
 
 	const args = ["-hide_banner", "-y", "-stats", "-i", inputPath];
-	const quality = parseInt(settings.videoQuality, 10).toString();
+
+	let useBitrate = false;
+	let videoBitrate = 0;
+
+	if (settings.videoQuality === "target-size") {
+		try {
+			const duration = await getVideoDuration(inputPath);
+			if (duration > 0) {
+				const targetSizeMB = parseFloat(settings.targetSize);
+				if (!isNaN(targetSizeMB) && targetSizeMB > 0) {
+					const targetSizeBytes = targetSizeMB * 1024 * 1024;
+					const targetBitrateBits = (targetSizeBytes * 8) / duration;
+
+					// Reserve 128k for audio
+					const audioBitrate = 128000;
+					videoBitrate = targetBitrateBits - audioBitrate;
+
+					// Set a minimum threshold for video bitrate
+					if (videoBitrate < 100000) {
+						videoBitrate = Math.max(50000, targetBitrateBits * 0.8);
+					}
+					useBitrate = true;
+				}
+			}
+		} catch (error) {
+			console.error(
+				"Failed to estimate duration for bitrate calculation, falling back to CRF 23",
+				error,
+			);
+		}
+	}
+
+	if (settings.videoQuality === "target-percent") {
+		try {
+			const duration = await getVideoDuration(inputPath);
+			if (duration > 0) {
+				const targetPercent = parseFloat(settings.targetPercent);
+				if (
+					!isNaN(targetPercent) &&
+					targetPercent > 0 &&
+					targetPercent <= 100
+				) {
+					// Calculate target bytes based on the input File size property
+					const targetSizeBytes = file.size * (targetPercent / 100);
+					const targetBitrateBits = (targetSizeBytes * 8) / duration;
+
+					// Reserve 128k for audio
+					const audioBitrate = 128000;
+					videoBitrate = targetBitrateBits - audioBitrate;
+
+					// Set a minimum threshold for video bitrate
+					if (videoBitrate < 100000) {
+						videoBitrate = Math.max(50000, targetBitrateBits * 0.8);
+					}
+					useBitrate = true;
+				}
+			}
+		} catch (error) {
+			console.error(
+				"Failed to estimate duration for percentage calculation, falling back to CRF 23",
+				error,
+			);
+		}
+	}
+
+	const quality = getCRFValue(settings);
 
 	switch (settings.encoder) {
 		case "copy":
@@ -347,9 +443,12 @@ function buildFFmpegArgs(file, settings, outputPath) {
 				settings.speed,
 				"-vf",
 				"format=yuv420p",
-				"-crf",
-				quality,
 			);
+			if (useBitrate) {
+				args.push("-b:v", Math.round(videoBitrate).toString());
+			} else {
+				args.push("-crf", quality);
+			}
 			break;
 		case "x265":
 			args.push(
@@ -359,9 +458,12 @@ function buildFFmpegArgs(file, settings, outputPath) {
 				"format=yuv420p",
 				"-preset",
 				settings.speed,
-				"-crf",
-				quality,
 			);
+			if (useBitrate) {
+				args.push("-b:v", Math.round(videoBitrate).toString());
+			} else {
+				args.push("-crf", quality);
+			}
 			break;
 		case "qsv":
 			args.push(
@@ -371,9 +473,27 @@ function buildFFmpegArgs(file, settings, outputPath) {
 				"format=yuv420p",
 				"-preset",
 				settings.speed,
-				"-global_quality",
-				quality,
 			);
+			if (useBitrate) {
+				args.push("-b:v", Math.round(videoBitrate).toString());
+			} else {
+				args.push("-global_quality", quality);
+			}
+			break;
+		case "hevc_qsv":
+			args.push(
+				"-c:v",
+				"hevc_qsv",
+				"-vf",
+				"format=yuv420p",
+				"-preset",
+				settings.speed,
+			);
+			if (useBitrate) {
+				args.push("-b:v", Math.round(videoBitrate).toString());
+			} else {
+				args.push("-global_quality", quality);
+			}
 			break;
 		case "vaapi":
 			args.push(
@@ -383,9 +503,12 @@ function buildFFmpegArgs(file, settings, outputPath) {
 				"format=nv12,hwupload",
 				"-c:v",
 				"h264_vaapi",
-				"-qp",
-				quality,
 			);
+			if (useBitrate) {
+				args.push("-b:v", Math.round(videoBitrate).toString());
+			} else {
+				args.push("-qp", quality);
+			}
 			break;
 		case "hevc_vaapi":
 			args.push(
@@ -395,9 +518,12 @@ function buildFFmpegArgs(file, settings, outputPath) {
 				"format=nv12,hwupload",
 				"-c:v",
 				"hevc_vaapi",
-				"-qp",
-				quality,
 			);
+			if (useBitrate) {
+				args.push("-b:v", Math.round(videoBitrate).toString());
+			} else {
+				args.push("-qp", quality);
+			}
 			break;
 		case "nvenc":
 			args.push(
@@ -407,11 +533,27 @@ function buildFFmpegArgs(file, settings, outputPath) {
 				"format=yuv420p",
 				"-preset",
 				getNvencPreset(settings.speed),
-				"-rc",
-				"vbr",
-				"-cq",
-				quality,
 			);
+			if (useBitrate) {
+				args.push("-b:v", Math.round(videoBitrate).toString());
+			} else {
+				args.push("-rc", "vbr", "-cq", quality);
+			}
+			break;
+		case "hevc_nvenc":
+			args.push(
+				"-c:v",
+				"hevc_nvenc",
+				"-vf",
+				"format=yuv420p",
+				"-preset",
+				getNvencPreset(settings.speed),
+			);
+			if (useBitrate) {
+				args.push("-b:v", Math.round(videoBitrate).toString());
+			} else {
+				args.push("-rc", "vbr", "-cq", quality);
+			}
 			break;
 		case "hevc_amf": {
 			const speedToQuality = {slow: "quality", fast: "speed"};
@@ -424,13 +566,17 @@ function buildFFmpegArgs(file, settings, outputPath) {
 				"format=yuv420p",
 				"-quality",
 				amf_hevc_quality,
-				"-rc",
-				"cqp",
-				"-qp_i",
-				quality,
-				"-qp_p",
-				quality,
 			);
+			if (useBitrate) {
+				args.push(
+					"-rc",
+					"cbr",
+					"-b:v",
+					Math.round(videoBitrate).toString(),
+				);
+			} else {
+				args.push("-rc", "cqp", "-qp_i", quality, "-qp_p", quality);
+			}
 			break;
 		}
 		case "amf": {
@@ -443,30 +589,56 @@ function buildFFmpegArgs(file, settings, outputPath) {
 				"format=yuv420p",
 				"-quality",
 				amf_quality,
-				"-rc",
-				"cqp",
-				"-qp_i",
-				quality,
-				"-qp_p",
-				quality,
-				"-qp_b",
-				quality,
 			);
+			if (useBitrate) {
+				args.push(
+					"-rc",
+					"cbr",
+					"-b:v",
+					Math.round(videoBitrate).toString(),
+				);
+			} else {
+				args.push(
+					"-rc",
+					"cqp",
+					"-qp_i",
+					quality,
+					"-qp_p",
+					quality,
+					"-qp_b",
+					quality,
+				);
+			}
 			break;
 		}
 		case "videotoolbox":
-			args.push(
-				"-c:v",
-				"h264_videotoolbox",
-				"-vf",
-				"format=yuv420p",
-				"-q:v",
-				quality,
-			);
+			args.push("-c:v", "h264_videotoolbox", "-vf", "format=yuv420p");
+			if (useBitrate) {
+				args.push("-b:v", Math.round(videoBitrate).toString());
+			} else {
+				args.push("-q:v", quality);
+			}
+			break;
+		case "hevc_videotoolbox":
+			args.push("-c:v", "hevc_videotoolbox", "-vf", "format=yuv420p");
+			if (useBitrate) {
+				args.push("-b:v", Math.round(videoBitrate).toString());
+			} else {
+				args.push("-q:v", quality);
+			}
 			break;
 	}
 
-	args.push("-c:a", settings.audioFormat, outputPath);
+	const audioFormat =
+		useBitrate && settings.audioFormat === "copy"
+			? "aac"
+			: settings.audioFormat;
+
+	args.push("-c:a", settings.audioFormat);
+	if (audioFormat !== "copy") {
+		args.push("-b:a", "128k");
+	}
+	args.push(outputPath);
 	return args;
 }
 
@@ -482,6 +654,10 @@ function getEncoderSettings() {
 		extension: dom.fileExtension.value,
 		outputPath: dom.customFolderPath.textContent,
 		outputSuffix: dom.outputSuffix.value,
+		targetSize: dom.targetSizeInput ? dom.targetSizeInput.value : "25",
+		targetPercent: dom.targetPercentInput
+			? dom.targetPercentInput.value
+			: "50",
 	};
 }
 
@@ -529,6 +705,7 @@ function createProgressItem(filename, status, data, itemId) {
         <div id="${itemId}_prog" class="itemProgress">${data}</div>
     `;
 	dom.compressionStatus.append(newStatus);
+	dom.compressionStatus.scrollIntoView({behavior: "smooth", block: "end"});
 }
 
 /**
@@ -627,3 +804,133 @@ Object.entries(menuRoutes).forEach(([domKey, route]) => {
 		ipcRenderer.send(route.channel, __dirname + route.page);
 	});
 });
+
+// Target Size / CRF Mode helper functions
+function getFfprobePath() {
+	const ffmpegPath = getFfmpegPath();
+	if (!ffmpegPath) return "";
+	const dir = path.dirname(ffmpegPath);
+	const ext = os.platform() === "win32" ? ".exe" : "";
+	return path.join(dir, "ffprobe" + ext);
+}
+
+function getVideoDuration(filePath) {
+	const ffprobe = getFfprobePath();
+	return new Promise((resolve, reject) => {
+		const child = spawn(ffprobe, [
+			"-v",
+			"error",
+			"-show_entries",
+			"format=duration",
+			"-of",
+			"default=noprint_wrappers=1:nokey=1",
+			filePath,
+		]);
+		let output = "";
+		const timeout = setTimeout(() => {
+			child.kill();
+			reject(new Error("ffprobe timeout"));
+		}, 10000);
+		child.stdout.on("data", (data) => {
+			output += data.toString();
+		});
+		child.on("close", (code) => {
+			clearTimeout(timeout);
+			if (code === 0) {
+				const duration = parseFloat(output.trim());
+				if (!isNaN(duration)) {
+					resolve(duration);
+				} else {
+					reject(new Error("Invalid duration format"));
+				}
+			} else {
+				reject(new Error(`ffprobe exited with code ${code}`));
+			}
+		});
+		child.on("error", (err) => {
+			clearTimeout(timeout);
+			reject(err);
+		});
+	});
+}
+
+function updateCRFDisplay(crf) {
+	const valElem = getId("crf-val");
+	if (valElem) valElem.textContent = crf;
+
+	let descKey = "qualityBalancedDesc";
+	if (crf <= 20) {
+		descKey = "qualityHighDesc";
+	} else if (crf <= 25) {
+		descKey = "qualityBalancedDesc";
+	} else if (crf <= 28) {
+		descKey = "qualitySmallFileDesc";
+	} else {
+		descKey = "qualityCustomDesc";
+	}
+
+	const descElem = getId("crf-desc");
+	if (descElem) {
+		descElem.textContent = window.i18n ? window.i18n.__(descKey) : descKey;
+	}
+}
+
+// Listeners for Video Quality Presets & Accordion
+document.querySelectorAll(".preset-btn").forEach((btn) => {
+	btn.addEventListener("click", () => {
+		document
+			.querySelectorAll(".preset-btn")
+			.forEach((b) => b.classList.remove("active"));
+		btn.classList.add("active");
+
+		const quality = btn.getAttribute("data-quality");
+
+		if (quality === "custom") {
+			dom.customQualityContainer.style.display = "block";
+			dom.targetSizeContainer.style.display = "none";
+			dom.targetPercentContainer.style.display = "none";
+			const sliderVal = parseInt(dom.qualitySlider.value, 10);
+			const crf = 69 - sliderVal;
+			dom.videoQuality.value = crf.toString();
+			updateCRFDisplay(crf);
+		} else if (quality === "target-size") {
+			dom.customQualityContainer.style.display = "none";
+			dom.targetSizeContainer.style.display = "block";
+			dom.targetPercentContainer.style.display = "none";
+			dom.videoQuality.value = "target-size";
+		} else if (quality === "target-percent") {
+			dom.customQualityContainer.style.display = "none";
+			dom.targetSizeContainer.style.display = "none";
+			dom.targetPercentContainer.style.display = "block";
+			dom.videoQuality.value = "target-percent";
+		} else {
+			dom.customQualityContainer.style.display = "none";
+			dom.targetSizeContainer.style.display = "none";
+			dom.targetPercentContainer.style.display = "none";
+			dom.videoQuality.value = quality;
+		}
+	});
+});
+
+if (dom.qualitySlider) {
+	dom.qualitySlider.addEventListener("input", (e) => {
+		const val = parseInt(e.target.value, 10);
+		const crf = 69 - val;
+		dom.videoQuality.value = crf.toString();
+		updateCRFDisplay(crf);
+	});
+}
+
+if (dom.advancedToggleBtn) {
+	dom.advancedToggleBtn.addEventListener("click", () => {
+		const isCollapsed =
+			dom.advancedSettingsCollapse.classList.contains("collapsed");
+		if (isCollapsed) {
+			dom.advancedSettingsCollapse.classList.remove("collapsed");
+			dom.advancedToggleBtn.classList.add("expanded");
+		} else {
+			dom.advancedSettingsCollapse.classList.add("collapsed");
+			dom.advancedToggleBtn.classList.remove("expanded");
+		}
+	});
+}

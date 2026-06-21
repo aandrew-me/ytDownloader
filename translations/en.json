@@ -168,6 +168,22 @@
 	"learnMore": "Learn more",
 	"updateError": "An error occurred during the update process",
 	"unableToAccessDir": "The program cannot access that folder",
-	"downloadingUpdate": "Downloading update"
-
+	"downloadingUpdate": "Downloading update",
+	"qualitySmallFile": "Small File",
+	"qualitySmallFileDesc": "Decent quality, smaller size",
+	"qualityBalanced": "Balanced",
+	"qualityBalancedDesc": "Recommended",
+	"qualityHigh": "High Quality",
+	"qualityHighDesc": "Excellent detail, larger size",
+	"qualityCustom": "Custom",
+	"qualityCustomDesc": "Choose exact CRF",
+	"qualityTargetSize": "Target Size",
+	"qualityTargetSizeDesc": "Specify target MB",
+	"targetSizeMB": "Target Size (MB)",
+	"worst": "Worst",
+	"best": "Best",
+	"advancedSettings": "Advanced Settings",
+	"qualityTargetPercent": "Target %",
+	"qualityTargetPercentDesc": "Set target % of size",
+	"targetPercentLabel": "Target Percentage (%)"
 }

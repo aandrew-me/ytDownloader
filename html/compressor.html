@@ -48,101 +48,127 @@
             <div id="selected-files" data-translate="noFilesSelected">No files selected</div>
         </div>
 
-        <div id="settings-group-container">
-            <div class="settings-group">
-                <label class="compress-label" for="extension" data-translate="videoFormat">Video format</label>
-                <select class="select compress-select" id="file_extension">
-                    <option value="unchanged">Unchanged</option>
-                    <option value="mp4">mp4</option>
-                    <option value="mkv">mkv</option>
-                </select>
+        <!-- Main Quality Setting (Always Visible) -->
+        <div class="main-quality-container">
+            <input type="hidden" id="video-quality" value="balanced">
+            <div class="settings-group full-width-settings">
+                <label class="compress-label" data-translate="videoQuality">Video Quality</label>
+                <div class="quality-presets">
+                    <button type="button" class="preset-btn" data-quality="small">
+                        <span class="preset-title" data-translate="qualitySmallFile">Small File</span>
+                        <span class="preset-desc" data-translate="qualitySmallFileDesc">Decent quality, smaller size</span>
+                    </button>
+                    <button type="button" class="preset-btn active" data-quality="balanced">
+                        <span class="preset-title" data-translate="qualityBalanced">Balanced</span>
+                        <span class="preset-desc" data-translate="qualityBalancedDesc">Recommended</span>
+                    </button>
+                    <button type="button" class="preset-btn" data-quality="high">
+                        <span class="preset-title" data-translate="qualityHigh">High Quality</span>
+                        <span class="preset-desc" data-translate="qualityHighDesc">Excellent detail, larger size</span>
+                    </button>
+                    <button type="button" class="preset-btn" id="custom-quality-btn" data-quality="custom">
+                        <span class="preset-title" data-translate="qualityCustom">Custom</span>
+                        <span class="preset-desc" data-translate="qualityCustomDesc">Choose exact CRF</span>
+                    </button>
+                    <button type="button" class="preset-btn" id="target-size-btn" data-quality="target-size">
+                        <span class="preset-title" data-translate="qualityTargetSize">Target Size</span>
+                        <span class="preset-desc" data-translate="qualityTargetSizeDesc">Specify target MB</span>
+                    </button>
+                    <button type="button" class="preset-btn" id="target-percent-btn" data-quality="target-percent">
+                        <span class="preset-title" data-translate="qualityTargetPercent">Target %</span>
+                        <span class="preset-desc" data-translate="qualityTargetPercentDesc">Compress to % of size</span>
+                    </button>
+                </div>
+
+                <!-- Custom Quality Slider Container -->
+                <div id="custom-quality-container" class="custom-slider-container" style="display: none;">
+                    <div class="slider-header">
+                        <span class="crf-value-label">CRF: <span id="crf-val">23</span></span>
+                        <span class="crf-description" id="crf-desc" data-translate="qualityBalancedDesc">Recommended</span>
+                    </div>
+                    <div class="slider-wrapper">
+                        <span class="slider-extremes" data-translate="worst">Worst</span>
+                        <input type="range" id="quality-slider" min="18" max="51" step="1" value="46">
+                        <span class="slider-extremes" data-translate="best">Best</span>
+                    </div>
+                </div>
+
+                <!-- Target Size Container -->
+                <div id="target-size-container" class="target-size-container" style="display: none;">
+                    <label class="compress-label" for="target-size-input" data-translate="targetSizeMB">Target Size (MB)</label>
+                    <input type="number" id="target-size-input" class="select compress-select" min="1" max="10000" value="25" placeholder="e.g. 25">
+                </div>
+
+                <!-- Target Percentage Container -->
+                <div id="target-percent-container" class="target-percent-container" style="display: none;">
+                    <label class="compress-label" for="target-percent-input" data-translate="targetPercentLabel">Target Percentage (%)</label>
+                    <input type="number" id="target-percent-input" class="select compress-select" min="1" max="99" value="50" placeholder="e.g. 50">
+                </div>
             </div>
+        </div>
 
-            <div class="settings-group">
-                <label class="compress-label" for="encoder" data-translate="videoEncoder">Video Encoder</label>
-                <select class="select compress-select" id="encoder">
-                    <option value="x264">x264</option>
-                    <option value="x265">x265</option>
-                    <option class="qsv_opt" value="qsv">x264 (Intel QSV Hardware Acceleration)</option>
-                    <option class="qsv_opt" value="hevc_qsv">x265 (Intel QSV Hardware Acceleration)</option>
-                    <option class="amf_opt" value="amf">x264 (AMD Hardware Acceleration)</option>
-                    <option class="amf_opt" value="hevc_amf">x265 (AMD Hardware Acceleration)</option>
-                    <option class="nvidia_opt" value="nvenc">x264 (NVIDIA Hardware Acceleration)</option>
-                    <option class="nvidia_opt" value="hevc_nvenc">x265 (NVIDIA Hardware Acceleration)</option>
-                    <option class="vaapi_opt" value="vaapi">x264 (VA-API Hardware Acceleration)</option>
-                    <option class="vaapi_opt" value="hevc_vaapi">x265 (VA-API Hardware Acceleration)</option>
-                    <option class="videotoolbox_opt" value="videotoolbox">x264 (VideoToolbox Hardware Acceleration)
-                    </option>
-                    <option class="videotoolbox_opt" value="hevc_videotoolbox">x265 (VideoToolbox Hardware Acceleration)
-                    </option>
-                    <option value="copy">Copy video</option>
-                </select>
-            </div>
+        <!-- Advanced Toggle -->
+        <button type="button" class="advanced-toggle-btn" id="advanced-toggle-btn">
+            <span class="toggle-icon">▸</span> <span data-translate="advancedSettings">Advanced Settings</span>
+        </button>
 
-            <div class="settings-group">
-                <label class="compress-label" for="compression-speed" data-translate="compressionSpeed">Compression
-                    Speed</label>
-                <select class="select compress-select" id="compression-speed">
-                    <option value="fast">Fast</option>
-                    <option selected value="medium">Medium</option>
-                    <option value="slow">Slow</option>
-                </select>
-            </div>
+        <!-- Collapsible Advanced Settings -->
+        <div id="advanced-settings-collapse" class="advanced-settings-collapse collapsed">
+            <div id="settings-group-container">
+                <div class="settings-group">
+                    <label class="compress-label" for="extension" data-translate="videoFormat">Video format</label>
+                    <select class="select compress-select" id="file_extension">
+                        <option value="unchanged">Unchanged</option>
+                        <option value="mp4">mp4</option>
+                        <option value="mkv">mkv</option>
+                    </select>
+                </div>
 
-            <div class="settings-group">
-                <label class="compress-label" for="video-quality" data-translate="videoQuality">Video Quality</label>
-                <select class="select compress-select" id="video-quality">
-                    <option value="18">18 (Best quality)</option>
-                    <option value="19">19</option>
-                    <option value="20">20</option>
-                    <option value="21">21</option>
-                    <option value="22">22</option>
-                    <option selected value="23">23 (Medium size, good quality)</option>
-                    <option value="24">24</option>
-                    <option value="25">25</option>
-                    <option value="26">26</option>
-                    <option value="27">27</option>
-                    <option value="28">28 (Smaller file size, decent quality)</option>
-                    <option value="29">29</option>
-                    <option value="30">30</option>
-                    <option value="31">31</option>
-                    <option value="32">32</option>
-                    <option value="33">33</option>
-                    <option value="34">34</option>
-                    <option value="35">35</option>
-                    <option value="36">36</option>
-                    <option value="37">37</option>
-                    <option value="38">38</option>
-                    <option value="39">39</option>
-                    <option value="40">40</option>
-                    <option value="41">41</option>
-                    <option value="42">42</option>
-                    <option value="43">43</option>
-                    <option value="44">44</option>
-                    <option value="45">45</option>
-                    <option value="46">46</option>
-                    <option value="47">47</option>
-                    <option value="48">48</option>
-                    <option value="49">49</option>
-                    <option value="50">50</option>
-                    <option value="51">51 (Worst quality)</option>
-                </select>
+                <div class="settings-group">
+                    <label class="compress-label" for="encoder" data-translate="videoEncoder">Video Encoder</label>
+                    <select class="select compress-select" id="encoder">
+                        <option value="x264">x264</option>
+                        <option value="x265">x265</option>
+                        <option class="qsv_opt" value="qsv">x264 (Intel QSV Hardware Acceleration)</option>
+                        <option class="qsv_opt" value="hevc_qsv">x265 (Intel QSV Hardware Acceleration)</option>
+                        <option class="amf_opt" value="amf">x264 (AMD Hardware Acceleration)</option>
+                        <option class="amf_opt" value="hevc_amf">x265 (AMD Hardware Acceleration)</option>
+                        <option class="nvidia_opt" value="nvenc">x264 (NVIDIA Hardware Acceleration)</option>
+                        <option class="nvidia_opt" value="hevc_nvenc">x265 (NVIDIA Hardware Acceleration)</option>
+                        <option class="vaapi_opt" value="vaapi">x264 (VA-API Hardware Acceleration)</option>
+                        <option class="vaapi_opt" value="hevc_vaapi">x265 (VA-API Hardware Acceleration)</option>
+                        <option class="videotoolbox_opt" value="videotoolbox">x264 (VideoToolbox Hardware Acceleration)
+                        </option>
+                        <option class="videotoolbox_opt" value="hevc_videotoolbox">x265 (VideoToolbox Hardware Acceleration)
+                        </option>
+                        <option value="copy">Copy video</option>
+                    </select>
+                </div>
 
-            </div>
+                <div class="settings-group">
+                    <label class="compress-label" for="compression-speed" data-translate="compressionSpeed">Compression
+                        Speed</label>
+                    <select class="select compress-select" id="compression-speed">
+                        <option value="fast">Fast</option>
+                        <option selected value="medium">Medium</option>
+                        <option value="slow">Slow</option>
+                    </select>
+                </div>
 
-            <div class="settings-group">
-                <label class="compress-label" for="audio-format" data-translate="audioFormat">Audio Format</label>
-                <select class="select compress-select" id="audio-format">
-                    <option value="copy">Unchanged</option>
-                    <option value="aac">aac</option>
-                    <option value="mp3">mp3</option>
-                </select>
-            </div>
+                <div class="settings-group">
+                    <label class="compress-label" for="audio-format" data-translate="audioFormat">Audio Format</label>
+                    <select class="select compress-select" id="audio-format">
+                        <option value="copy">Unchanged</option>
+                        <option value="aac">aac</option>
+                        <option value="mp3">mp3</option>
+                    </select>
+                </div>
 
-            <div class="settings-group">
-                <div class="compress-label" data-translate="outputSuffix">Output suffix</div>
-                <input type="text" name="suffix" id="output-suffix" class="select compress-select"
-                    placeholder="No suffix needs different output folder" value="_compressed">
+                <div class="settings-group">
+                    <div class="compress-label" data-translate="outputSuffix">Output suffix</div>
+                    <input type="text" name="suffix" id="output-suffix" class="select compress-select"
+                        placeholder="No suffix needs different output folder" value="_compressed">
+                </div>
             </div>
         </div>
 
