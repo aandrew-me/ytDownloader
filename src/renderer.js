@@ -3,7 +3,14 @@ const {default: YTDlpWrap} = require("yt-dlp-wrap-plus");
 const {constants} = require("fs/promises");
 const {homedir, platform} = require("os");
 const {join} = require("path");
-const {mkdirSync, accessSync, promises, existsSync, cpSync, copyFileSync} = require("fs");
+const {
+	mkdirSync,
+	accessSync,
+	promises,
+	existsSync,
+	cpSync,
+	copyFileSync,
+} = require("fs");
 const {execSync, spawn} = require("child_process");
 
 const CONSTANTS = {
@@ -564,7 +571,6 @@ class YtDownloaderApp {
 		const ffmpegName = isWin ? "ffmpeg.exe" : "ffmpeg";
 		const targetFfmpegFile = join(targetDir, "bin", ffmpegName);
 
-
 		// Check if the folder has already been copied
 		if (!existsSync(targetFfmpegFile)) {
 			if (existsSync(bundledDir)) {
@@ -683,7 +689,6 @@ class YtDownloaderApp {
 
 			return `${exeName}:${targetNodeFile}`;
 		}
-
 
 		return "";
 	}
@@ -1500,6 +1505,25 @@ class YtDownloaderApp {
 
 		const speakerIconSvg = `<svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>`;
 
+		// Convert en -> English
+		const langFormatter = new Intl.DisplayNames(
+			[navigator.language || "en"],
+			{type: "language"},
+		);
+		const getLanguageName = (code) => {
+			if (!code) return "";
+			try {
+				// Split cases like "en-US"
+				const baseCode = code.split("-")[0];
+				const name = langFormatter.of(baseCode);
+				return name
+					? name.charAt(0).toUpperCase() + name.slice(1)
+					: code;
+			} catch (e) {
+				return code;
+			}
+		};
+
 		// Find the ideal match height boundary
 		formats.forEach((f) => {
 			if (
@@ -1571,10 +1595,19 @@ class YtDownloaderApp {
 				const quality = `${format.height || "???"}p${format.fps === 60 ? "60" : ""}`;
 				const vcodecText = format.vcodec?.split(".")[0] || "";
 
-				const audioMarkup =
-					format.acodec !== "none"
-						? `<div class="audio-indicator">${speakerIconSvg}</div>`
-						: `<div class="audio-placeholder"></div>`;
+				let audioMarkup = `<div class="audio-placeholder"></div>`;
+				if (format.acodec !== "none") {
+					const langName = getLanguageName(format.language);
+					const langSpan = langName
+						? `<span class="lang-text">${langName}</span>`
+						: "";
+					audioMarkup = `
+                    <div class="audio-indicator">
+                        ${speakerIconSvg}
+                        ${langSpan}
+                    </div>
+                `;
+				}
 
 				const codecHtml = showMoreFormats
 					? `<span class="codec-text">${vcodecText}</span>`
@@ -1589,14 +1622,14 @@ class YtDownloaderApp {
 					: `${quality} ${format.ext} ${displaySize}`;
 
 				const htmlContent = `
-					<div class="modern-option-row ${gridClass}">
-						<span class="main-text">${quality}</span>
-						<span class="badge badge-format">${format.ext}</span>
-						${codecHtml}
-						<span class="size-text">${displaySize}</span>
-						${audioMarkup}
-					</div>
-				`;
+                <div class="modern-option-row ${gridClass}">
+                    <span class="main-text">${quality}</span>
+                    <span class="badge badge-format">${format.ext}</span>
+                    ${codecHtml}
+                    <span class="size-text">${displaySize}</span>
+                    ${audioMarkup}
+                </div>
+            `;
 
 				videoOptions.push({
 					text: optionTextFallback,
@@ -1613,17 +1646,22 @@ class YtDownloaderApp {
 				if (!showMoreFormats && format.ext === "webm") return;
 
 				const audioExt = format.ext === "webm" ? "opus" : format.ext;
+
+				const langName = getLanguageName(format.language);
+				const displayLang = langName ? ` [${langName}]` : "";
+
 				const formatNote =
-					i18n.__(format.format_note) || i18n.__("unknownQuality");
+					(i18n.__(format.format_note) || i18n.__("unknownQuality")) +
+					displayLang;
 
 				// HTML for Audio Grid
 				const htmlContent = `
-					<div class="modern-option-row audio-grid">
-						<span class="main-text">${formatNote}</span>
-						<span class="badge badge-format">${audioExt}</span>
-						<span class="size-text">${displaySize}</span>
-					</div>
-				`;
+                <div class="modern-option-row audio-grid">
+                    <span class="main-text">${formatNote}</span>
+                    <span class="badge badge-format">${audioExt}</span>
+                    <span class="size-text">${displaySize}</span>
+                </div>
+            `;
 
 				audioOptions.push({
 					text: `${formatNote} ${audioExt} ${displaySize}`,
@@ -1703,10 +1741,10 @@ class YtDownloaderApp {
 			text: noAudioTxt,
 			value: "none|none",
 			html: `
-            <div class="modern-option-row audio-grid">
-                <span class="main-text">${noAudioTxt}</span>
-            </div>
-        `,
+        <div class="modern-option-row audio-grid">
+            <span class="main-text">${noAudioTxt}</span>
+        </div>
+    `,
 		});
 
 		mountSlimSelect(audioForVideoSelectEl, audioForVideoOptions);
