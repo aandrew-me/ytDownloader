@@ -526,7 +526,7 @@ function registerAutoUpdaterEvents() {
 
 	autoUpdater.on("error", (error) => {
 		console.error("Auto-update error:", error);
-		dialog.showErrorBox("Update Error", i18n("updateError"));
+		// dialog.showErrorBox("Update Error", i18n("updateError"));
 	});
 }
 
