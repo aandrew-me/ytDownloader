@@ -168,12 +168,7 @@ class YtDownloaderApp {
 			console.log("ffmpeg path:", this.state.ffmpegPath);
 			console.log("JS runtime:", this.state.jsRuntimePath);
 
-			// TODO: See if it can be removed
-			this._loadSettings();
 			this._addEventListeners();
-
-			// Signal to the main process that the renderer is ready for links
-			ipcRenderer.send("ready-for-links");
 		} catch (error) {
 			console.error("Initialization failed:", error);
 			$(CONSTANTS.DOM_IDS.INCORRECT_MSG).textContent = error.message;
