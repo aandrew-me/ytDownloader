@@ -1,3 +1,5 @@
+/* 1. Fonts & Color Themes */
+
 @font-face {
 	font-family: "JetBrains";
 	src: url("../fonts/JetBrainsMono-Regular.ttf") format("truetype");
@@ -169,6 +171,8 @@
 	--blueBtn-bottom: #458588;
 }
 
+/* 2. Base Layout & Body Defaults */
+
 body {
 	font-family: "Ubuntu";
 	text-align: center;
@@ -184,6 +188,9 @@ img {
 	-webkit-user-drag: none;
 }
 
+/* 3. Modal Popups & Overlays */
+
+/* Fullscreen modal overlays backdrop */
 #popupBox,
 #popupBoxMac {
 	width: 100vw;
@@ -233,6 +240,8 @@ img {
 	cursor: pointer;
 	transition: 0.3s;
 }
+
+/* 4. Context Menu & Drop-downs */
 
 #menu {
 	display: none;
@@ -320,6 +329,8 @@ img {
 		transform: translateY(0);
 	}
 }
+
+/* 5. Progress Tracking & List Items */
 
 .item {
 	display: flex;
@@ -438,6 +449,9 @@ img {
 	height: 20px;
 }
 
+/* 6. Floating Option Panels & Extractors */
+
+/* Hidden advanced options drawer overlay */
 #hidden {
 	display: none;
 	position: absolute;
@@ -571,6 +585,8 @@ input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
 	appearance: none;
 }
+
+/* 7. Control Buttons & Actions */
 
 .submitBtn {
 	padding: 15px;
@@ -1090,6 +1106,8 @@ body::-webkit-scrollbar-thumb {
 	}
 }
 
+/* 8. Dual-Handle Sliders */
+
 .slider-wrapper {
 	display: flex;
 	align-items: center;
@@ -1230,6 +1248,8 @@ input[type="range"]::-webkit-slider-thumb:hover {
 	width: min(400px, 100%);
 	padding: 5px 0;
 }
+
+/* 9. SlimSelect Custom Styling Overrides */
 
 .ss-main {
 	background-color: var(--select);
@@ -1409,6 +1429,8 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 /* New Compressor UX Styles */
+/* 10. Video Compression Quality Presets & Sliders */
+
 .quality-presets {
 	display: flex;
 	flex-wrap: wrap;
@@ -1645,6 +1667,8 @@ input[type="range"]::-webkit-slider-thumb:hover {
 	width: 100% !important;
 }
 
+
+/* 11. Search Wrappers & Results */
 
 #searchContainer {
 	margin: 25px auto 15px auto;
