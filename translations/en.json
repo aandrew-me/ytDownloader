@@ -181,9 +181,9 @@
 	"qualityTargetSizeDesc": "Specify target MB",
 	"targetSizeMB": "Target Size (MB)",
 	"worst": "Worst",
-	"best": "Best",
 	"advancedSettings": "Advanced Settings",
 	"qualityTargetPercent": "Target %",
 	"qualityTargetPercentDesc": "Set target % of size",
-	"targetPercentLabel": "Target Percentage (%)"
+	"targetPercentLabel": "Target Percentage (%)",
+	"cancel_download": "Are you sure you want to cancel the download?"
 }
