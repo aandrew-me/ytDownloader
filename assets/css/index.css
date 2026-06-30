@@ -156,11 +156,18 @@ img {
 	background-color: var(--item-bg);
 	color: var(--text);
 	margin: 10px auto;
-	border-radius: 10px;
+	border-radius: 15px;
 	padding: 10px;
 	align-items: center;
 	justify-content: space-between;
 }
+
+@media (min-width: 1200px) {
+	.item {
+		width: 70%;
+	}
+}
+
 .playlistItem {
 	display: flex;
 	position: relative;
@@ -213,7 +220,7 @@ img {
 .itemProgress {
 	font-weight: bold;
 	cursor: pointer;
-	padding: 10px 0;
+	padding: 4px 0;
 }
 
 .custom-progress {

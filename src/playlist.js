@@ -259,9 +259,11 @@ const playlistDownloader = {
 					break;
 			}
 
-			const allArgs = [...baseArgs, ...specificArgs, this.state.url].filter(
-				Boolean,
-			);
+			const allArgs = [
+				...baseArgs,
+				...specificArgs,
+				this.state.url,
+			].filter(Boolean);
 
 			console.log(`Command: ${this.state.ytDlpPath}`, allArgs.join(" "));
 			this.state.currentDownloadProcess = this.state.ytDlpWrap.exec(
@@ -269,7 +271,6 @@ const playlistDownloader = {
 				{shell: false},
 				this.state.currentAbortController.signal,
 			);
-
 
 			// TODO: Avoid duplication of event listeners
 			document.addEventListener("beforeunload", () => {
@@ -330,6 +331,10 @@ const playlistDownloader = {
 
 			"--compat-options",
 			"no-youtube-unavailable-videos",
+			"--exec",
+			// Since shell is disabled, it will not execute the code, however it will print all the info
+			`[Item info]:::%(playlist_index)q:::%(title)q:::%(thumbnail)q`,
+			"echo hi"
 		];
 	},
 
@@ -475,16 +480,35 @@ const playlistDownloader = {
 				)} ${this.state.playlistName}`;
 			}
 
-			const videoIndexTxt = "Downloading item ";
-			const oldVideoIndexTxt = "Downloading video ";
-			if (
-				(eventData.includes(videoIndexTxt) ||
-					eventData.includes(oldVideoIndexTxt)) &&
-				!eventData.includes("thumbnail")
-			) {
+			if (eventData.includes("[Item info]")) {
+				const videoInfo = {
+					index: "",
+					title: "",
+					thumbnail: "",
+				};
+
+				try {
+					const eventItems = eventData.split(":::");
+
+					videoInfo.index = eventItems[1];
+					videoInfo.title = eventItems[2];
+
+					// The title from yt-dlp output usually has double quotes around
+					if (
+						typeof videoInfo.title === "string" &&
+						videoInfo.title.startsWith('"') &&
+						videoInfo.title.endsWith('"') &&
+						videoInfo.title.length >= 2
+					) {
+						videoInfo.title = videoInfo.title.slice(1, -1);
+					}
+
+					videoInfo.thumbnail = eventItems[3];
+				} catch (error) {}
+
 				count++;
 				this.state.originalCount++;
-				this.updatePlaylistUI(count, type);
+				this.updatePlaylistUI(videoInfo, count, type);
 			}
 		});
 
@@ -496,11 +520,11 @@ const playlistDownloader = {
 				progressElement.textContent = `${window.i18n.__(
 					"processing",
 				)}...`;
-			} else {
+			} else if (progress.percent) {
 				progressElement.textContent = `${window.i18n.__("progress")} ${
 					progress.percent
 				}% | ${window.i18n.__("speed")} ${
-					progress.currentSpeed || "N/A"
+					progress.currentSpeed || "0"
 				}`;
 			}
 		});
@@ -539,7 +563,7 @@ const playlistDownloader = {
 		this.ui.errorBtn.style.display = "none";
 	},
 
-	updatePlaylistUI(count, type) {
+	updatePlaylistUI(videoInfo, count, type) {
 		let itemTitle = "";
 		switch (type) {
 			case "thumbnails":
@@ -564,14 +588,59 @@ const playlistDownloader = {
 				prevProgress.textContent = window.i18n.__("fileSaved");
 		}
 
-		const itemHTML = `
-            <div class="playlistItem">
-                <p class="itemTitle">${itemTitle}</p>
-                <p class="itemProgress" id="p${count}">${window.i18n.__(
-					"downloading",
-				)}</p>
-            </div>`;
-		this.ui.downloadList.innerHTML += itemHTML;
+		const itemTypeLabel = window.i18n.__(
+			type === "thumbnails"
+				? "thumbnail"
+				: type === "links"
+					? "link"
+					: type,
+		);
+
+		const thumbnailUrl =
+			typeof videoInfo.thumbnail === "string"
+				? videoInfo.thumbnail.trim()
+				: "";
+		const safeThumbnail =
+			thumbnailUrl &&
+			/^(https?:\/\/|\/\/|\/|\.\/|\.\.\/|data:|blob:)/i.test(thumbnailUrl)
+				? thumbnailUrl
+				: "../assets/images/thumb.png";
+		const safeAlt = videoInfo.title || "thumbnail";
+		const itemTitleText = videoInfo.title
+			? `${videoInfo.index ?? this.state.originalCount}. ${videoInfo.title}`
+			: itemTitle;
+
+		const itemElement = document.createElement("div");
+		itemElement.className = "item";
+		itemElement.id = `item-${count}`;
+
+		const iconBox = document.createElement("div");
+		iconBox.className = "itemIconBox";
+
+		const img = document.createElement("img");
+		img.src = safeThumbnail;
+		img.alt = safeAlt;
+		img.className = "itemIcon";
+		img.crossOrigin = "anonymous";
+		iconBox.appendChild(img);
+
+		const body = document.createElement("div");
+		body.className = "itemBody";
+
+		const titleElement = document.createElement("div");
+		titleElement.className = "itemTitle";
+		titleElement.textContent = itemTitleText;
+
+		const progressElement = document.createElement("p");
+		progressElement.className = "itemProgress";
+		progressElement.id = `p${count}`;
+		progressElement.textContent = window.i18n.__("downloading");
+
+		body.appendChild(titleElement);
+		body.appendChild(progressElement);
+		itemElement.appendChild(iconBox);
+		itemElement.appendChild(body);
+		this.ui.downloadList.appendChild(itemElement);
 		window.scrollTo(0, document.body.scrollHeight);
 	},
 
@@ -644,7 +713,7 @@ const playlistDownloader = {
 			if (lastProgress) {
 				lastProgress.textContent = window.i18n.__("cancel");
 			}
-			this.ui.playlistNameDisplay.textContent = window.i18n.__("cancel");
+			// this.ui.playlistNameDisplay.textContent = window.i18n.__("cancel");
 			this.ui.pasteLinkBtn.style.display = "inline-block";
 			return;
 		}
@@ -670,7 +739,6 @@ const playlistDownloader = {
 
 		if (this.state.isCancelled && wasDownloading) {
 			this.state.isCancelled = false;
-			this.ui.playlistNameDisplay.textContent = window.i18n.__("cancel");
 			this.ui.pasteLinkBtn.style.display = "inline-block";
 			return;
 		}
@@ -742,7 +810,9 @@ const playlistDownloader = {
 
 	navigate(type, page) {
 		if (this.state.isDownloading) {
-			const confirmMsg = window.i18n ? window.i18n.__("cancel_download") + "?" : "Are you sure you want to cancel the download?";
+			const confirmMsg = window.i18n
+				? window.i18n.__("cancel_download") + "?"
+				: "Are you sure you want to cancel the download?";
 			const choice = confirm(confirmMsg);
 			if (!choice) {
 				return;
@@ -766,7 +836,12 @@ const playlistDownloader = {
 
 		switch (os.platform()) {
 			case "win32":
-				return path.join(os.homedir(), ".ytDownloader", "ffmpeg", "bin");
+				return path.join(
+					os.homedir(),
+					".ytDownloader",
+					"ffmpeg",
+					"bin",
+				);
 			case "freebsd":
 				try {
 					return execSync("which ffmpeg").toString("utf8").trim();
@@ -775,7 +850,12 @@ const playlistDownloader = {
 					return "";
 				}
 			default:
-				return path.join(os.homedir(), ".ytDownloader", "ffmpeg", "bin");
+				return path.join(
+					os.homedir(),
+					".ytDownloader",
+					"ffmpeg",
+					"bin",
+				);
 		}
 	},
 
@@ -803,10 +883,18 @@ const playlistDownloader = {
 				return "";
 			}
 
-			let jsRuntimePath = path.join(os.homedir(), ".ytDownloader", exeName);
+			let jsRuntimePath = path.join(
+				os.homedir(),
+				".ytDownloader",
+				exeName,
+			);
 
 			if (os.platform() === "win32") {
-				jsRuntimePath = path.join(os.homedir(), ".ytDownloader", `${exeName}.exe`);
+				jsRuntimePath = path.join(
+					os.homedir(),
+					".ytDownloader",
+					`${exeName}.exe`,
+				);
 			}
 
 			if (fs.existsSync(jsRuntimePath)) {
