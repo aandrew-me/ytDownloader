@@ -13,226 +13,302 @@
 </head>
 
 <body>
-    <div id="top">
-        <a id="restart" data-translate="restartApp">Restart app</a>
-        <a id="back" data-translate="homepage">Homepage</a>
-    </div>
 
-    <h1 id="preferences" data-translate="preferences">Preferences</h1>
-    <br><br>
+    <header class="main-header">
+        <div class="header-core">
+            <h1 id="preferences" data-translate="preferences">Preferences</h1>
 
-    <div class="prefBox" style="border: none;">
-        <strong id="dlText" data-translate="downloadLocation">Download location</strong>
-    </div>
+            <div class="search-wrapper">
+                <span class="search-icon">&#128269;</span>
+                <input type="search" id="settingsSearch" placeholder="Search settings...">
+            </div>
 
-    <div class="prefBox">
-        <span id="clText" data-translate="currentDownloadLocation">Current download location - </span><span
-            id="path"></span>
-    </div>
-
-    <button id="selectLocation" class="greenBtn" data-translate="selectDownloadLocation">Select Download
-        Location</button>
-
-    <p id="msg">
-    </p>
-
-    <!-- Language -->
-    <div class="prefBox">
-        <label id="selectLn" data-translate="selectLanguageRelaunch">Select Language (Requires reload)</label>
-        <select id="select" onchange="changeLanguage()">
-            <option value="en">English</option>
-            <option value="de-DE">Deutsch</option>
-            <option value="es-ES">Español</option>
-            <option value="fa-IR">فارسی</option>
-            <option value="el-GR">Ελληνικά</option>
-            <option value="fr-FR">Français</option>
-            <option value="it-IT">Italiano</option>
-            <option value="ja-JP">Japanese</option>
-            <option value="hu-HU">Magyar</option>
-            <option value="pl-PL">Polski</option>
-            <option value="pt-BR">Português</option>
-            <option value="ru-RU">Русский</option>
-            <option value="fi-FI">Finnish</option>
-            <option value="uk-UA">Українська</option>
-            <option value="tr-TR">Türkçe</option>
-            <option value="vi-VN">Vietnamese</option>
-            <option value="ar-SA">اَلْعَرَبِيَّةُ</option>
-            <option value="zh-CN">简体中文</option>
-            <option value="zh-TW">繁體中文</option>
-            <option value="bn-BD">বাংলা</option>
-            <option value="hi-IN">हिन्दी</option>
-            <option value="ne-NP">नेपाली</option>
-            <option value="eu-ES">Basque</option>
-        </select>
-    </div>
-
-    <!-- Video Quality -->
-    <div class="prefBox">
-        <span id="preferredVideoTxt" data-translate="preferredVideoQuality">Preferred video quality</span>
-        <select id="preferredVideoQuality">
-            <option value="144">144p</option>
-            <option value="240">240p</option>
-            <option value="360">360p</option>
-            <option value="480">480p</option>
-            <option value="720">720p (HD)</option>
-            <option value="1080">1080p (FHD)</option>
-            <option value="1440">1440p</option>
-            <option value="2160">2160p (4k)</option>
-        </select>
-
-    </div>
-
-    <!-- Video Codec -->
-    <div class="prefBox">
-        <span id="preferredVideoCodecTxt" data-translate="preferredVideoCodec">Preferred video codec</span>
-        <select id="preferredVideoCodec">
-            <option value="avc1">AVC1</option>
-            <option value="av01">AV1</option>
-            <option value="vp9">VP9</option>
-            <option value="mp4v">MP4V</option>
-        </select>
-
-    </div>
-
-    <!-- Audio format -->
-    <div class="prefBox">
-        <span id="preferredAudioTxt" data-translate="preferredAudioFormat">Preferred audio format</span>
-        <select id="preferredAudioQuality">
-            <option value="mp3">Mp3</option>
-            <option value="aac">Aac</option>
-            <option value="m4a">M4a</option>
-            <option value="opus">Opus</option>
-            <option value="wav">Wav</option>
-            <option value="alac">Alac</option>
-            <option value="flac">Flac</option>
-        </select>
-
-    </div>
-
-    <p id="flatpakTxt" data-translate="flatsealPermissionWarning"></p>
-    <div class="prefBox">
-        <div>
-            <span id="browserTxt" data-translate="selectBrowserForCookies">Select browser to use cookies from</span>
-            <span id="browserInfo" data-translate-title="cookiesWarning"> &#9432;</span>
-        </div>
-        <select id="browser">
-            <option value="" id="none" data-translate="none">None</option>
-            <option value="chrome">Chrome</option>
-            <option value="firefox">Firefox</option>
-            <option value="brave">Brave</option>
-            <option value="opera">Opera Mini</option>
-            <option value="edge">Edge</option>
-            <option value="chromium">Chromium</option>
-            <option value="safari">Safari</option>
-            <option value="vivaldi">Vivaldi</option>
-        </select>
-    </div>
-
-    <div class="prefBox">
-        <span id="proxyTitle" data-translate="proxy">Proxy</span>
-        <input type="text" id="proxyTxt" placeholder="http://localhost:8080"
-            pattern="^(http:\/\/|https:\/\/|socks5:\/\/)?[a-zA-Z0-9.]+:[\d]+$">
-    </div>
-
-    <div id="ytdlpInfoBox">
-        <div class="ytdlpInfoItem">
-            <span>yt-dlp version</span>
-            <span id="ytDlpVersion"></span>
+            <div id="top">
+                <a id="restart" class="btn redBtn" data-translate="restartApp">Restart app</a>
+                <a id="back" class="btn blueBtn" data-translate="homepage">Homepage</a>
+            </div>
         </div>
 
-        <div class="ytdlpInfoItem">
-            <span id="ytDlpPathTxt" data-translate="ytDlpPath">yt-dlp path</span>
-            <span id="ytDlpPath" class="path"></span>
+        <nav class="tab-container">
+            <button class="tab-btn active" data-tab="general">General</button>
+            <button class="tab-btn" data-tab="media">Media Settings</button>
+            <button class="tab-btn" data-tab="advanced">Advanced Tools</button>
+        </nav>
+    </header>
+
+    <main class="settings-container">
+
+        <!-- Tab 1: General -->
+        <div id="generalTab" class="tab-content active">
+            <section class="settings-section">
+                <div class="prefBox title-box">
+                    <strong id="dlText" data-translate="downloadLocation">Download location</strong>
+                </div>
+
+                <div class="prefBox">
+                    <div class="label-group">
+                        <span id="clText" data-translate="currentDownloadLocation">Current download location</span>
+                        <span id="path" class="path-display"></span>
+                    </div>
+                    <button id="selectLocation" class="btn greenBtn" data-translate="selectDownloadLocation">Select
+                        Download Location</button>
+                </div>
+
+
+                <p id="msg"></p>
+            </section>
+
+            <section class="settings-section">
+                <div class="prefBox">
+                    <label id="selectLn" for="select" data-translate="selectLanguageRelaunch">Select Language (Requires
+                        reload)</label>
+                    <select id="select">
+                        <option value="en">English</option>
+                        <option value="de-DE">Deutsch</option>
+                        <option value="es-ES">Español</option>
+                        <option value="fa-IR">فارسی</option>
+                        <option value="el-GR">Ελληνικά</option>
+                        <option value="fr-FR">Français</option>
+                        <option value="it-IT">Italiano</option>
+                        <option value="ja-JP">Japanese</option>
+                        <option value="hu-HU">Magyar</option>
+                        <option value="pl-PL">Polski</option>
+                        <option value="pt-BR">Português</option>
+                        <option value="ru-RU">Русский</option>
+                        <option value="fi-FI">Finnish</option>
+                        <option value="uk-UA">Українська</option>
+                        <option value="tr-TR">Türkçe</option>
+                        <option value="vi-VN">Vietnamese</option>
+                        <option value="ar-SA">اَلْعَرَبِيَّةُ</option>
+                        <option value="zh-CN">简体中文</option>
+                        <option value="zh-TW">繁體中文</option>
+                        <option value="bn-BD">বাংলা</option>
+                        <option value="hi-IN">हिन्दी</option>
+                        <option value="ne-NP">नेपाली</option>
+                        <option value="eu-ES">Basque</option>
+                    </select>
+                </div>
+            </section>
+
+            <section class="settings-section">
+                <div class="prefBox">
+                    <span id="maxTxt" data-translate="maxActiveDownloads">Maximum number of active downloads</span>
+                    <input type="number" min="1" class="input input-num" id="maxDownloads" value="5">
+                </div>
+            </section>
+
+            <section class="settings-section">
+                <div class="prefBox">
+                    <span id="trayTxt" data-translate="closeAppToTray">Close to system tray</span>
+                    <label class="switch">
+                        <input type="checkbox" id="closeToTray">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+            </section>
+
+            <section class="settings-section">
+                <div class="prefBox" id="autoUpdatesBox">
+                    <span id="autoUpdateTxt" data-translate="disableAutoUpdates">Disable auto updates</span>
+                    <label class="switch">
+                        <input type="checkbox" id="autoUpdateDisabled">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+            </section>
         </div>
 
-        <div class="ytdlpInfoItem" id="ytdlpSourceBox">
-            <span id="ytdlpSourceTxt" data-translate="ytdlpSource">yt-dlp source</span>
-            <select id="ytdlpSource">
-                <option value="nightly" data-translate="ytdlpSourceNightly">Nightly (auto-updating)</option>
-                <option value="system" data-translate="ytdlpSourceSystem">System yt-dlp</option>
-            </select>
+        <!-- TAB 2: MEDIA PREFERENCES -->
+        <div id="mediaTab" class="tab-content">
+            <section class="settings-section">
+                <div class="prefBox">
+                    <span id="preferredVideoTxt" data-translate="preferredVideoQuality">Preferred video quality</span>
+                    <select id="preferredVideoQuality">
+                        <option value="144">144p</option>
+                        <option value="240">240p</option>
+                        <option value="360">360p</option>
+                        <option value="480">480p</option>
+                        <option value="720">720p (HD)</option>
+                        <option value="1080">1080p (FHD)</option>
+                        <option value="1440">1440p</option>
+                        <option value="2160">2160p (4k)</option>
+                    </select>
+                </div>
+
+                <div class="prefBox">
+                    <span id="preferredVideoCodecTxt" data-translate="preferredVideoCodec">Preferred video codec</span>
+                    <select id="preferredVideoCodec">
+                        <option value="avc1">AVC1</option>
+                        <option value="av01">AV1</option>
+                        <option value="vp9">VP9</option>
+                        <option value="mp4v">MP4V</option>
+                    </select>
+                </div>
+
+                <div class="prefBox">
+                    <span id="preferredAudioTxt" data-translate="preferredAudioFormat">Preferred audio format</span>
+                    <select id="preferredAudioQuality">
+                        <option value="mp3">Mp3</option>
+                        <option value="aac">Aac</option>
+                        <option value="m4a">M4a</option>
+                        <option value="opus">Opus</option>
+                        <option value="wav">Wav</option>
+                        <option value="alac">Alac</option>
+                        <option value="flac">Flac</option>
+                    </select>
+                </div>
+
+                <div class="prefBox">
+                    <span id="showMoreFormatsTxt" data-translate="showMoreFormatOptions">Show more format options</span>
+                    <label class="switch">
+                        <input type="checkbox" id="showMoreFormats">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </section>
         </div>
 
-        <div id="ytDlpArgBox">
-            <p>
-                <span data-translate="customArgsTxt">Set custom yt-dlp arguments.</span>
-                <a data-translate="learnMore" id="learnMoreYtdlpArgs">Learn more</a>
-            </p>
-            <textarea spellcheck="false" id="customArgsInput" placeholder="--sponsorblock-remove all"></textarea>
+        <!-- TAB 3: ADVANCED & NETWORK PREFERENCES -->
+        <div id="advancedTab" class="tab-content">
+            <!-- Advanced Output Templates Sub-Section -->
+            <section id="outputTemplateBox" class="settings-section">
+                <p id="outputTemplateTxt">
+                    <span data-translate="outputTemplates">Output Templates</span>
+                    <a id="learnMoreOutputTemplates" class="link-info" data-translate="learnMore">Learn more</a>
+                </p>
+
+                <div class="outputTemplateItem">
+                    <span data-translate="audioFilenameTemplate">Filename template for audios</span>
+                    <div class="input-action-group">
+                        <input type="text" id="filenameTemplateAudio" placeholder="yt-dlp format style"
+                            value="%(title)s.%(ext)s">
+                        <button class="btn redBtn sm" id="resetAudioFilenameTemplate"
+                            data-translate="resetToDefault">Reset</button>
+                    </div>
+                </div>
+
+                <div class="outputTemplateItem">
+                    <span data-translate="videoFilenameTemplate">Filename template for videos</span>
+                    <div class="input-action-group">
+                        <input type="text" id="filenameTemplateVideo" placeholder="yt-dlp format style"
+                            value="%(title)s.%(ext)s">
+                        <button class="btn redBtn sm" id="resetFilenameTemplateVideo"
+                            data-translate="resetToDefault">Reset</button>
+                    </div>
+                </div>
+
+                <div class="outputTemplateItem">
+                    <span id="fileFormatTxt" data-translate="playlistFilenameFormat">Filename format for
+                        playlists</span>
+                    <div class="input-action-group">
+                        <input type="text" id="filenameFormat" placeholder="yt-dlp format style"
+                            value="%(playlist_index)s.%(title)s.%(ext)s">
+                        <button class="btn redBtn sm" id="resetFilenameFormat"
+                            data-translate="resetToDefault">Reset</button>
+                    </div>
+                </div>
+
+                <div class="outputTemplateItem">
+                    <span id="dirFormatTxt" data-translate="playlistFolderNameFormat">Folder name format for
+                        playlists</span>
+                    <div class="input-action-group">
+                        <input type="text" id="foldernameFormat" value="%(playlist_title)s"
+                            placeholder="yt-dlp format style">
+                        <button class="btn redBtn sm" id="resetFoldernameFormat"
+                            data-translate="resetToDefault">Reset</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Network Parameters -->
+            <section class="settings-section">
+                <p id="flatpakTxt" data-translate="flatsealPermissionWarning"></p>
+
+                <div class="prefBox">
+                    <div>
+                        <span id="browserTxt" data-translate="selectBrowserForCookies">Select browser to use cookies
+                            from</span>
+                        <span id="browserInfo" class="info-icon" data-translate-title="cookiesWarning">&#9432;</span>
+                    </div>
+                    <select id="browser">
+                        <option value="" id="none" data-translate="none">None</option>
+                        <option value="chrome">Chrome</option>
+                        <option value="firefox">Firefox</option>
+                        <option value="brave">Brave</option>
+                        <option value="edge">Edge</option>
+                        <option value="chromium">Chromium</option>
+                        <option value="safari">Safari</option>
+                        <option value="vivaldi">Vivaldi</option>
+                    </select>
+                </div>
+            </section>
+
+            <section class="settings-section">
+                <div class="prefBox">
+                    <span id="proxyTitle" data-translate="proxy">Proxy</span>
+                    <input type="text" id="proxyTxt" placeholder="http://localhost:8080"
+                        pattern="^(http:\/\/|https:\/\/|socks5:\/\/)?[a-zA-Z0-9.]+:[\d]+$">
+                </div>
+            </section>
+
+            <!-- Technical Systems Modules -->
+            <section id="ytdlpInfoBox" class="settings-section">
+                <div class="ytdlpInfoItem">
+                    <span>yt-dlp version</span>
+                    <span id="ytDlpVersion" class="badge"></span>
+                </div>
+
+                <div class="ytdlpInfoItem">
+                    <span id="ytDlpPathTxt" data-translate="ytDlpPath">yt-dlp path</span>
+                    <span id="ytDlpPath" class="path"></span>
+                </div>
+
+                <div class="ytdlpInfoItem" id="ytdlpSourceBox">
+                    <span id="ytdlpSourceTxt" data-translate="ytdlpSource">yt-dlp source</span>
+                    <select id="ytdlpSource">
+                        <option value="nightly" data-translate="ytdlpSourceNightly">Nightly (auto-updating)</option>
+                        <option value="system" data-translate="ytdlpSourceSystem">System yt-dlp</option>
+                    </select>
+                </div>
+
+
+            </section>
+
+            <!-- Configuration Engine Config File -->
+            <section id="pathConfig" class="settings-section">
+                <div id="ytDlpArgBox">
+                    <p>
+                        <span data-translate="customArgsTxt">Set custom yt-dlp arguments.</span>
+                        <a data-translate="learnMore" id="learnMoreYtdlpArgs" class="link-info">Learn more</a>
+                    </p>
+                    <textarea spellcheck="false" id="customArgsInput"
+                        placeholder="--sponsorblock-remove all"></textarea>
+                </div>
+
+                <br>
+
+                <div class="configBox">
+                    <span id="configTxt" data-translate="useConfigFile">Use configuration file</span>
+                    <label class="switch">
+                        <input type="checkbox" id="configCheck">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div id="configOpts">
+                    <button class="btn greenBtn" id="configBtn" data-translate="selectConfigFile">Select config
+                        file</button>
+                    <div class="path-readout">
+                        <strong id="configPathTxt" data-translate="path">Path:</strong>
+                        <span id="configPath"></span>
+                    </div>
+                </div>
+            </section>
         </div>
 
-    </div>
-
-    <div id="pathConfig">
-
-        <div class="configBox">
-            <span id="configTxt" data-translate="useConfigFile">Use configuration file</span>
-            <input type="checkbox" class="cb" id="configCheck">
-        </div>
-
-        <div id="configOpts">
-            <br>
-            <button class="greenBtn" id="configBtn" data-translate="selectConfigFile">Select config file</button>
-            <br>
-            <strong id="configPathTxt" data-translate="path">Path:</strong>
-            <span id="configPath"></span>
-        </div>
-    </div>
-
-    <div class="prefBox">
-        <span id="showMoreFormatsTxt" data-translate="showMoreFormatOptions">Show more format options</span>
-        <input type="checkbox" class="cb" id="showMoreFormats">
-    </div>
-
-    <div id="outputTemplateBox">
-        <p id="outputTemplateTxt"><span data-translate="outputTemplates">Output Templates.</span> <a
-                id="learnMoreOutputTemplates" data-translate="learnMore">Learn more</a></p>
-        <div class="outputTemplateItem">
-            <span data-translate="audioFilenameTemplate">Filename template for audios</span>
-            <input type="text" id="filenameTemplateAudio" placeholder="yt-dlp format style" value="%(title)s.%(ext)s">
-            <button class="redBtn" id="resetAudioFilenameTemplate" data-translate="resetToDefault">Reset to
-                default</button>
-        </div>
-
-        <div class="outputTemplateItem">
-            <span data-translate="videoFilenameTemplate">Filename template for videos</span>
-            <input type="text" id="filenameTemplateVideo" placeholder="yt-dlp format style" value="%(title)s.%(ext)s">
-            <button class="redBtn" id="resetFilenameTemplateVideo" data-translate="resetToDefault">Reset to
-                default</button>
-        </div>
-
-        <div class="outputTemplateItem">
-            <span id="fileFormatTxt" data-translate="playlistFilenameFormat">Filename format for playlists</span>
-            <input type="text" id="filenameFormat" placeholder="yt-dlp format style"
-                value="%(playlist_index)s.%(title)s.%(ext)s">
-            <button class="redBtn" id="resetFilenameFormat" data-translate="resetToDefault">Reset to default</button>
-        </div>
-
-        <div class="outputTemplateItem">
-            <span id="dirFormatTxt" data-translate="playlistFolderNameFormat">Folder name format for playlists</span>
-            <input type="text" id="foldernameFormat" value="%(playlist_title)s" placeholder="yt-dlp format style">
-            <button class="redBtn" id="resetFoldernameFormat" data-translate="resetToDefault">Reset to default</button>
-        </div>
-    </div>
-
-
-
-
-    <div class="prefBox">
-        <span id="maxTxt" data-translate="maxActiveDownloads">Maximum number of active downloads</span>
-        <input type="number" min="1" class="input" id="maxDownloads" value="5">
-    </div>
-
-
-    <div class="prefBox">
-        <span id="trayTxt" data-translate="closeAppToTray">Close to system tray</span>
-        <input type="checkbox" class="cb" id="closeToTray">
-    </div>
-
-    <div class="prefBox" id="autoUpdatesBox">
-        <span id="autoUpdateTxt" data-translate="disableAutoUpdates">Disable auto updates</span>
-        <input type="checkbox" class="cb" id="autoUpdateDisabled">
-    </div>
+    </main>
 </body>
 
 </html>
