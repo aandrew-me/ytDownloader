@@ -4,34 +4,100 @@ const {join} = require("path");
 const {homedir, platform} = require("os");
 const {exec} = require("child_process");
 
-const storageTheme = localStorage.getItem("theme");
-if (storageTheme) {
-	document.documentElement.setAttribute("theme", storageTheme);
-} else {
-	document.documentElement.setAttribute("theme", "frappe");
+function getId(id) {
+	return document.getElementById(id);
 }
 
-let rightToLeft = "false";
-if (localStorage.getItem("rightToLeft")) {
-	rightToLeft = localStorage.getItem("rightToLeft");
-}
-if (rightToLeft == "true") {
-	document
-		.querySelectorAll(".prefBox")
-		.forEach((/** @type {HTMLElement} */ item) => {
-			item.style.flexDirection = "row-reverse";
+const tabButtons = document.querySelectorAll(".tab-btn");
+const tabContents = document.querySelectorAll(".tab-content");
+
+tabButtons.forEach((button) => {
+	button.addEventListener("click", () => {
+		tabButtons.forEach((btn) => btn.classList.remove("active"));
+		tabContents.forEach((content) => content.classList.remove("active"));
+
+		button.classList.add("active");
+		const targetTab = getId(`${button.dataset.tab}Tab`);
+		if (targetTab) targetTab.classList.add("active");
+	});
+});
+
+const searchInput = getId("settingsSearch");
+
+searchInput.addEventListener("input", (e) => {
+	const query = e.target.value.toLowerCase().trim();
+	const searchableItems = document.querySelectorAll(
+		".prefBox, .outputTemplateItem, .ytdlpInfoItem, #ytDlpArgBox, .configBox",
+	);
+	const tabContainer = document.querySelector(".tab-container");
+	const structuralSections = document.querySelectorAll(".settings-section");
+
+	if (query.length > 0) {
+		tabContainer.classList.add("search-active");
+		tabContents.forEach((content) =>
+			content.classList.add("search-override"),
+		);
+
+		searchableItems.forEach((item) => {
+			const innerTextData = item.textContent.toLowerCase();
+			const interactiveInputs = item.querySelectorAll(
+				"input, select, textarea",
+			);
+			let inputPlaceholdersText = "";
+
+			interactiveInputs.forEach(
+				(i) =>
+					(inputPlaceholdersText +=
+						(i.placeholder || "") + " " + (i.value || "")),
+			);
+
+			const totalHaystack =
+				innerTextData + " " + inputPlaceholdersText.toLowerCase();
+
+			if (totalHaystack.includes(query)) {
+				item.classList.remove("item-hidden");
+			} else {
+				item.classList.add("item-hidden");
+			}
 		});
-} else {
-	console.log("Change to left to right");
-	document
-		.querySelectorAll(".prefBox")
-		.forEach((/** @type {HTMLElement} */ item) => {
-			item.style.flexDirection = "row";
+
+		structuralSections.forEach((section) => {
+			const visibleChildren = section.querySelectorAll(
+				".prefBox:not(.item-hidden), .outputTemplateItem:not(.item-hidden), .ytdlpInfoItem:not(.item-hidden), #ytDlpArgBox:not(.item-hidden), .configBox:not(.item-hidden)",
+			);
+			if (visibleChildren.length === 0) {
+				section.classList.add("item-hidden");
+			} else {
+				section.classList.remove("item-hidden");
+			}
 		});
+	} else {
+		tabContainer.classList.remove("search-active");
+		tabContents.forEach((content) =>
+			content.classList.remove("search-override"),
+		);
+		searchableItems.forEach((item) => item.classList.remove("item-hidden"));
+		structuralSections.forEach((section) =>
+			section.classList.remove("item-hidden"),
+		);
+	}
+});
+
+const storageTheme = localStorage.getItem("theme") || "frappe";
+document.documentElement.setAttribute("theme", storageTheme);
+
+// Handle Layout Direction
+function updateDirectionality() {
+	const isRtl = localStorage.getItem("rightToLeft") === "true";
+	if (isRtl) {
+		document.body.classList.add("rtl");
+	} else {
+		document.body.classList.remove("rtl");
+	}
 }
+updateDirectionality();
 
 // Check yt-dlp version
-// Execute the yt-dlp --version command with childprocess exec command
 const ytdlpPath = localStorage.getItem("ytdlp");
 console.log("yt-dlp path:", ytdlpPath);
 if (ytdlpPath) {
@@ -40,10 +106,9 @@ if (ytdlpPath) {
 			console.error("Error executing yt-dlp:", error);
 		} else {
 			const version = stdout.trim();
-
 			console.log("yt-dlp version:", version);
-			document.getElementById("ytDlpVersion").textContent = version;
-			document.getElementById("ytDlpPath").textContent = ytdlpPath;
+			getId("ytDlpVersion").textContent = version;
+			getId("ytDlpPath").textContent = ytdlpPath;
 		}
 	});
 } else {
@@ -62,66 +127,47 @@ if (ytdlpPath) {
 					console.error("Error executing yt-dlp:", error);
 				} else {
 					const version = stdout.trim();
-
-					console.log("yt-dlp version:", version);
-					document.getElementById("ytDlpVersion").textContent =
-						version;
-					document.getElementById("ytDlpPath").textContent =
-						systemPath;
+					getId("ytDlpVersion").textContent = version;
+					getId("ytDlpPath").textContent = systemPath;
 				}
 			});
 		});
 	} else {
-		// for Unix-like systems including macos, use 'which' command to find yt-dlp
 		exec("which yt-dlp", (err, stdout) => {
 			if (err) {
 				console.error("Error finding yt-dlp:", err);
 				return;
 			}
 			systemPath = stdout.trim();
-			console.log("System yt-dlp path:", systemPath);
 			exec(`"${systemPath}" --version`, (error, stdout, _stderr) => {
 				if (error) {
 					console.error("Error executing yt-dlp:", error);
 				}
 				const version = stdout.trim();
-				console.log("yt-dlp version:", version);
-				document.getElementById("ytDlpVersion").textContent = version;
+				getId("ytDlpVersion").textContent = version;
+				getId("ytDlpPath").textContent = systemPath;
 			});
 		});
 	}
 }
 
-// Download path
-let downloadPath = localStorage.getItem("downloadPath");
-
-if (!downloadPath) {
-	downloadPath = join(homedir(), "Downloads");
-}
+// Download Path Setup
+let downloadPath =
+	localStorage.getItem("downloadPath") || join(homedir(), "Downloads");
 getId("path").textContent = downloadPath;
-
-/**
- *
- * @param {string} id
- * @returns {any}
- */
-function getId(id) {
-	return document.getElementById(id);
-}
 
 document.addEventListener("translations-loaded", () => {
 	window.i18n.translatePage();
-
 	document.title = window.i18n.__("preferences");
 
 	if (process.env.FLATPAK_ID) {
-		getId("flatpakTxt").addEventListener("click", () => {
+		const flatpakEl = getId("flatpakTxt");
+		flatpakEl.addEventListener("click", () => {
 			shell.openExternal(
 				"https://flathub.org/apps/com.github.tchx84.Flatseal",
 			);
 		});
-
-		getId("flatpakTxt").style.display = "block";
+		flatpakEl.style.display = "block";
 	}
 });
 
@@ -129,37 +175,36 @@ getId("back").addEventListener("click", () => {
 	ipcRenderer.send("close-secondary");
 });
 
-// Selecting download directory
 getId("selectLocation").addEventListener("click", () => {
 	ipcRenderer.send("select-location-secondary", "");
 });
 
-ipcRenderer.on("downloadPath", (_event, downloadPath) => {
+ipcRenderer.on("downloadPath", (_event, pathArray) => {
 	try {
-		accessSync(downloadPath[0], constants.W_OK);
-
-		console.log(downloadPath[0]);
-		localStorage.setItem("downloadPath", downloadPath[0]);
-		getId("path").textContent = downloadPath[0];
+		accessSync(pathArray[0], constants.W_OK);
+		localStorage.setItem("downloadPath", pathArray[0]);
+		getId("path").textContent = pathArray[0];
 	} catch (error) {
-		showPopup(i18n.__("unableToAccessDir"), true);
+		showPopup(
+			window.i18n
+				? window.i18n.__("unableToAccessDir")
+				: "Unable to access directory",
+			true,
+		);
 	}
 });
-
-// Selecting config directory
 
 getId("configBtn").addEventListener("click", () => {
 	ipcRenderer.send("select-config", "");
 });
 
 ipcRenderer.on("configPath", (event, configPath) => {
-	console.log(configPath);
 	localStorage.setItem("configPath", configPath);
 	getId("configPath").textContent = configPath;
 });
 
 const configCheck = getId("configCheck");
-configCheck.addEventListener("change", (event) => {
+configCheck.addEventListener("change", () => {
 	if (configCheck.checked) {
 		getId("configOpts").style.display = "flex";
 	} else {
@@ -168,110 +213,78 @@ configCheck.addEventListener("change", (event) => {
 	}
 });
 
-const configPath = localStorage.getItem("configPath");
-if (configPath) {
-	getId("configPath").textContent = configPath;
+const savedConfigPath = localStorage.getItem("configPath");
+if (savedConfigPath) {
+	getId("configPath").textContent = savedConfigPath;
 	configCheck.checked = true;
 	getId("configOpts").style.display = "flex";
 }
 
-// Language settings
-
-const language = localStorage.getItem("locale");
-
-if (language) {
-	if (language.startsWith("en")) {
-		getId("select").value = "en";
-	} else {
-		getId("select").value = language;
-	}
+// Localization Setup
+const activeLang = localStorage.getItem("locale");
+if (activeLang) {
+	getId("select").value = activeLang.startsWith("en") ? "en" : activeLang;
 }
 
-function changeLanguage() {
-	const language = getId("select").value;
-	localStorage.setItem("locale", language);
-	if (language === "fa" || language === "ar") {
-		rightToLeft = "true";
+getId("select").addEventListener("change", (e) => {
+	const chosenLang = e.target.value;
+	localStorage.setItem("locale", chosenLang);
+	if (
+		chosenLang === "fa" ||
+		chosenLang === "ar" ||
+		chosenLang === "fa-IR" ||
+		chosenLang === "ar-SA"
+	) {
 		localStorage.setItem("rightToLeft", "true");
 	} else {
-		rightToLeft = "false";
 		localStorage.setItem("rightToLeft", "false");
 	}
-}
-
-// Browser preferences
-let browser = localStorage.getItem("browser");
-if (browser) {
-	getId("browser").value = browser;
-}
-
-getId("browser").addEventListener("change", () => {
-	browser = getId("browser").value;
-	localStorage.setItem("browser", browser);
+	updateDirectionality();
 });
 
-// yt-dlp source (nightly app-managed binary vs system yt-dlp)
+const savedBrowser = localStorage.getItem("browser");
+if (savedBrowser) {
+	getId("browser").value = savedBrowser;
+}
+getId("browser").addEventListener("change", (e) => {
+	localStorage.setItem("browser", e.target.value);
+});
 
 if (platform() === "darwin") {
 	getId("ytdlpSourceBox").style.display = "none";
 } else {
 	const ytdlpSource = localStorage.getItem("ytdlpSource") || "nightly";
 	const ytdlpSourceSelect = getId("ytdlpSource");
-
 	ytdlpSourceSelect.value = ytdlpSource;
 	ytdlpSourceSelect.addEventListener("change", () => {
 		localStorage.setItem("ytdlpSource", ytdlpSourceSelect.value);
-		// Drop the cached path so the new source is resolved on reload.
 		localStorage.removeItem("ytdlp");
-		// Reload so renderer re-resolves the yt-dlp binary for the new source.
 		ipcRenderer.send("reload");
 	});
 }
 
-// Handling preferred video quality
-let preferredVideoQuality = localStorage.getItem("preferredVideoQuality");
-if (preferredVideoQuality) {
-	getId("preferredVideoQuality").value = preferredVideoQuality;
+function bindSelectToStorage(elementId, storageKey) {
+	const value = localStorage.getItem(storageKey);
+
+	if (value) getId(elementId).value = value;
+
+	getId(elementId).addEventListener("change", (e) => {
+		localStorage.setItem(storageKey, e.target.value);
+	});
 }
 
-getId("preferredVideoQuality").addEventListener("change", () => {
-	preferredVideoQuality = getId("preferredVideoQuality").value;
-	localStorage.setItem("preferredVideoQuality", preferredVideoQuality);
+bindSelectToStorage("preferredVideoQuality", "preferredVideoQuality");
+bindSelectToStorage("preferredAudioQuality", "preferredAudioQuality");
+bindSelectToStorage("preferredVideoCodec", "preferredVideoCodec");
+
+// Proxy Setting Updates
+const savedProxy = localStorage.getItem("proxy");
+if (savedProxy) getId("proxyTxt").value = savedProxy;
+getId("proxyTxt").addEventListener("change", (e) => {
+	localStorage.setItem("proxy", e.target.value);
 });
 
-// Handling preferred audio quality
-let preferredAudioQuality = localStorage.getItem("preferredAudioQuality");
-if (preferredAudioQuality) {
-	getId("preferredAudioQuality").value = preferredAudioQuality;
-}
-
-getId("preferredAudioQuality").addEventListener("change", () => {
-	preferredAudioQuality = getId("preferredAudioQuality").value;
-	localStorage.setItem("preferredAudioQuality", preferredAudioQuality);
-});
-
-// Handling preferred video codec
-let preferredVideoCodec = localStorage.getItem("preferredVideoCodec");
-if (preferredVideoCodec) {
-	getId("preferredVideoCodec").value = preferredVideoCodec;
-}
-
-getId("preferredVideoCodec").addEventListener("change", () => {
-	preferredVideoCodec = getId("preferredVideoCodec").value;
-	localStorage.setItem("preferredVideoCodec", preferredVideoCodec);
-});
-
-// Proxy
-let proxy = localStorage.getItem("proxy");
-if (proxy) {
-	getId("proxyTxt").value = proxy;
-}
-getId("proxyTxt").addEventListener("change", () => {
-	proxy = getId("proxyTxt").value;
-	localStorage.setItem("proxy", proxy);
-});
-
-// Custom yt-dlp args
+// Custom yt-dlp arguments
 const ytDlpArgsInput = getId("customArgsInput");
 let customYtDlpArgs = localStorage.getItem("customYtDlpArgs");
 if (customYtDlpArgs) {
@@ -279,8 +292,7 @@ if (customYtDlpArgs) {
 	ytDlpArgsInput.style.height = ytDlpArgsInput.scrollHeight + "px";
 }
 ytDlpArgsInput.addEventListener("input", () => {
-	customYtDlpArgs = getId("customArgsInput").value;
-	localStorage.setItem("customYtDlpArgs", customYtDlpArgs.trim());
+	localStorage.setItem("customYtDlpArgs", ytDlpArgsInput.value.trim());
 	ytDlpArgsInput.style.height = "auto";
 	ytDlpArgsInput.style.height = ytDlpArgsInput.scrollHeight + "px";
 });
@@ -292,151 +304,107 @@ getId("learnMoreYtdlpArgs").addEventListener("click", () => {
 });
 
 getId("learnMoreOutputTemplates").addEventListener("click", () => {
-	shell.openExternal(
-		"https://github.com/yt-dlp/yt-dlp#output-template",
-	);
+	shell.openExternal("https://github.com/yt-dlp/yt-dlp#output-template");
 });
 
-// Reload
-function reload() {
-	ipcRenderer.send("reload");
-}
 getId("restart").addEventListener("click", () => {
-	reload();
+	ipcRenderer.send("reload");
 });
 
-// Handling filename formats for videos
-getId("filenameTemplateVideo").addEventListener("input", () => {
-	const text = getId("filenameTemplateVideo").value;
-	localStorage.setItem("filenameTemplateVideo", text);
-});
+// Dynamic configuration fields abstractions helper function
+function bindInputToStorage(inputId, storageKey, fallbackValue, resetId) {
+	const inputEl = getId(inputId);
+	const savedVal = localStorage.getItem(storageKey);
 
-if (localStorage.getItem("filenameTemplateVideo")) {
-	getId("filenameTemplateVideo").value = localStorage.getItem("filenameTemplateVideo");
-}
-
-getId("resetFilenameTemplateVideo").addEventListener("click", () => {
-	getId("filenameTemplateVideo").value = "%(title)s.%(ext)s";
-	localStorage.setItem(
-		"filenameTemplateVideo",
-		"%(title)s.%(ext)s"
-	);
-});
-
-// Handling filename formats for audios
-getId("filenameTemplateAudio").addEventListener("input", () => {
-	const text = getId("filenameTemplateAudio").value;
-	localStorage.setItem("filenameTemplateAudio", text);
-});
-
-if (localStorage.getItem("filenameTemplateAudio")) {
-	getId("filenameTemplateAudio").value = localStorage.getItem("filenameTemplateAudio");
-}
-
-getId("resetAudioFilenameTemplate").addEventListener("click", () => {
-	getId("filenameTemplateAudio").value = "%(title)s.%(ext)s";
-	localStorage.setItem(
-		"filenameTemplateAudio",
-		"%(title)s.%(ext)s"
-	);
-});
-
-// Handling filename formats for playlists
-getId("filenameFormat").addEventListener("input", () => {
-	const text = getId("filenameFormat").value;
-	localStorage.setItem("filenameFormat", text);
-});
-
-if (localStorage.getItem("filenameFormat")) {
-	getId("filenameFormat").value = localStorage.getItem("filenameFormat");
-}
-
-getId("resetFilenameFormat").addEventListener("click", () => {
-	getId("filenameFormat").value = "%(playlist_index)s.%(title)s.%(ext)s";
-	localStorage.setItem(
-		"filenameFormat",
-		"%(playlist_index)s.%(title)s.%(ext)s",
-	);
-});
-
-// Handling folder name formats
-getId("foldernameFormat").addEventListener("input", () => {
-	const text = getId("foldernameFormat").value;
-	localStorage.setItem("foldernameFormat", text);
-});
-
-if (localStorage.getItem("foldernameFormat")) {
-	getId("foldernameFormat").value = localStorage.getItem("foldernameFormat");
-}
-
-getId("resetFoldernameFormat").addEventListener("click", () => {
-	getId("foldernameFormat").value = "%(playlist_title)s";
-	localStorage.setItem("foldernameFormat", "%(playlist_title)s");
-});
-
-// Max active downloads
-getId("maxDownloads").addEventListener("input", () => {
-	const number = Number(getId("maxDownloads").value);
-
-	if (number < 1) {
-		localStorage.setItem("maxActiveDownloads", "1");
-	} else {
-		localStorage.setItem("maxActiveDownloads", String(number));
+	if (savedVal !== null) {
+		inputEl.value = savedVal;
 	}
-});
 
+	inputEl.addEventListener("input", () => {
+		localStorage.setItem(storageKey, inputEl.value);
+	});
+
+	if (resetId) {
+		getId(resetId).addEventListener("click", () => {
+			inputEl.value = fallbackValue;
+			localStorage.setItem(storageKey, fallbackValue);
+		});
+	}
+}
+
+bindInputToStorage(
+	"filenameTemplateVideo",
+	"filenameTemplateVideo",
+	"%(title)s.%(ext)s",
+	"resetFilenameTemplateVideo",
+);
+bindInputToStorage(
+	"filenameTemplateAudio",
+	"filenameTemplateAudio",
+	"%(title)s.%(ext)s",
+	"resetAudioFilenameTemplate",
+);
+bindInputToStorage(
+	"filenameFormat",
+	"filenameFormat",
+	"%(playlist_index)s.%(title)s.%(ext)s",
+	"resetFilenameFormat",
+);
+bindInputToStorage(
+	"foldernameFormat",
+	"foldernameFormat",
+	"%(playlist_title)s",
+	"resetFoldernameFormat",
+);
+
+// Max active downloads validation parameters
+const maxDownloadsInput = getId("maxDownloads");
 if (localStorage.getItem("maxActiveDownloads")) {
-	getId("maxDownloads").value = localStorage.getItem("maxActiveDownloads");
+	maxDownloadsInput.value = localStorage.getItem("maxActiveDownloads");
+}
+maxDownloadsInput.addEventListener("input", () => {
+	const num = Number(maxDownloadsInput.value);
+	const resolved = num < 1 ? "1" : String(num);
+	localStorage.setItem("maxActiveDownloads", resolved);
+});
+
+// UI Switches triggers
+function bindCheckboxToStorage(
+	checkboxId,
+	storageKey,
+	checkValue = "true",
+	uncheckValue = "false",
+	onChangeCallback = null,
+) {
+	const cb = getId(checkboxId);
+	cb.checked = localStorage.getItem(storageKey) === checkValue;
+
+	cb.addEventListener("change", () => {
+		const value = cb.checked ? checkValue : uncheckValue;
+		localStorage.setItem(storageKey, value);
+		if (onChangeCallback) onChangeCallback(cb.checked);
+	});
 }
 
-// Closing app to system tray
-const closeToTray = getId("closeToTray");
-closeToTray.addEventListener("change", (event) => {
-	if (closeToTray.checked) {
-		localStorage.setItem("closeToTray", "true");
-		ipcRenderer.send("useTray", true);
-	} else {
-		localStorage.setItem("closeToTray", "false");
-		ipcRenderer.send("useTray", false);
-	}
-});
-const trayEnabled = localStorage.getItem("closeToTray");
-if (trayEnabled == "true") {
-	closeToTray.checked = true;
+bindCheckboxToStorage(
+	"closeToTray",
+	"closeToTray",
+	"true",
+	"false",
+	(checked) => {
+		ipcRenderer.send("useTray", checked);
+	},
+);
+
+if (localStorage.getItem("closeToTray") === "true") {
 	ipcRenderer.send("useTray", true);
 }
 
-// Auto updates
-const autoUpdateDisabled = getId("autoUpdateDisabled");
-autoUpdateDisabled.addEventListener("change", (event) => {
-	if (autoUpdateDisabled.checked) {
-		localStorage.setItem("autoUpdate", "false");
-	} else {
-		localStorage.setItem("autoUpdate", "true");
-	}
-});
-const autoUpdate = localStorage.getItem("autoUpdate");
-if (autoUpdate == "false") {
-	autoUpdateDisabled.checked = true;
-}
-
-// Show more format options
-const showMoreFormats = getId("showMoreFormats");
-showMoreFormats.addEventListener("change", (event) => {
-	if (showMoreFormats.checked) {
-		localStorage.setItem("showMoreFormats", "true");
-	} else {
-		localStorage.setItem("showMoreFormats", "false");
-	}
-});
-const showMoreFormatOpts = localStorage.getItem("showMoreFormats");
-if (showMoreFormatOpts == "true") {
-	showMoreFormats.checked = true;
-}
+bindCheckboxToStorage("autoUpdateDisabled", "autoUpdate", "false", "true");
+bindCheckboxToStorage("showMoreFormats", "showMoreFormats", "true", "false");
 
 function showPopup(text, isError = false) {
-	let popupContainer = document.getElementById("popupContainer");
-
+	let popupContainer = getId("popupContainer");
 	if (!popupContainer) {
 		popupContainer = document.createElement("div");
 		popupContainer.id = "popupContainer";
@@ -447,12 +415,7 @@ function showPopup(text, isError = false) {
 	const popup = document.createElement("span");
 	popup.textContent = text;
 	popup.classList.add("popup-item");
-
 	popup.style.background = isError ? "#ff6b6b" : "#54abde";
-
-	if (isError) {
-		popup.classList.add("popup-error");
-	}
 
 	popupContainer.appendChild(popup);
 
@@ -463,6 +426,6 @@ function showPopup(text, isError = false) {
 			if (popupContainer.childElementCount === 0) {
 				popupContainer.remove();
 			}
-		}, 1000);
+		}, 400);
 	}, 2200);
 }
