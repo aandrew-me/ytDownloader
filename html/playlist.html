@@ -28,6 +28,17 @@
             bottom: 8px;
         }
 
+        #stopDownload {
+            display: none;
+            position: relative;
+            bottom: 8px;
+            background-color: var(--redBtn);
+        }
+
+        #stopDownload:active {
+            background-color: var(--redBtn-bottom);
+        }
+
         #audioBox {
             display: none;
         }
@@ -188,6 +199,10 @@
 
     <h2 id="playlistName"></h2>
     <button class="submitBtn" id="openDownloads" data-translate="openDownloadFolder">Open download folder</button>
+    <button class="submitBtn" id="stopDownload" data-translate="cancel">Cancel</button>
+
+    <br><br>
+
     <div id="list">
     </div>
 
