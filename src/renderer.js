@@ -17,6 +17,9 @@ const CONSTANTS = {
 	DOM_IDS: {
 		// Main UI
 		PASTE_URL_BTN: "pasteUrl",
+		SEARCH_INPUT: "searchQuery",
+		SEARCH_BTN: "searchBtn",
+		SEARCH_RESULTS: "searchResults",
 		LOADING_WRAPPER: "loadingWrapper",
 		INCORRECT_MSG: "incorrectMsg",
 		ERROR_BTN: "errorBtn",
@@ -70,6 +73,8 @@ const CONSTANTS = {
 		PLAYLIST_WIN: "playlistWin",
 		HISTORY_WIN: "historyWin",
 		COMPRESSOR_WIN: "compressorWin",
+		SEARCH_WIN: "searchWin",
+		HOME_WIN: "homeWin",
 	},
 	LOCAL_STORAGE_KEYS: {
 		DOWNLOAD_PATH: "downloadPath",
@@ -172,7 +177,8 @@ class YtDownloaderApp {
 		} catch (error) {
 			console.error("Initialization failed:", error);
 			$(CONSTANTS.DOM_IDS.INCORRECT_MSG).textContent = error.message;
-			$(CONSTANTS.DOM_IDS.PASTE_URL_BTN).style.display = "none";
+			const pasteBtn = $(CONSTANTS.DOM_IDS.PASTE_URL_BTN);
+			if (pasteBtn) pasteBtn.style.display = "none";
 		}
 	}
 
@@ -771,9 +777,23 @@ class YtDownloaderApp {
 	 * Attaches all necessary event listeners for the UI.
 	 */
 	_addEventListeners() {
-		$(CONSTANTS.DOM_IDS.PASTE_URL_BTN).addEventListener("click", () =>
+		$(CONSTANTS.DOM_IDS.PASTE_URL_BTN)?.addEventListener("click", () =>
 			this.pasteAndGetInfo(),
 		);
+		$(CONSTANTS.DOM_IDS.SEARCH_BTN)?.addEventListener("click", () => {
+			const query = $(CONSTANTS.DOM_IDS.SEARCH_INPUT).value.trim();
+			if (query) {
+				this.searchYoutube(query);
+			}
+		});
+		$(CONSTANTS.DOM_IDS.SEARCH_INPUT)?.addEventListener("keydown", (event) => {
+			if (event.key === "Enter") {
+				const query = $(CONSTANTS.DOM_IDS.SEARCH_INPUT).value.trim();
+				if (query) {
+					this.searchYoutube(query);
+				}
+			}
+		});
 		document.addEventListener("keydown", (event) => {
 			if (
 				((event.ctrlKey && event.key === "v") ||
@@ -783,12 +803,10 @@ class YtDownloaderApp {
 				document.activeElement.tagName !== "INPUT" &&
 				document.activeElement.tagName !== "TEXTAREA"
 			) {
-				$(CONSTANTS.DOM_IDS.PASTE_URL_BTN).classList.add("active");
-
+				const pasteBtnInner = $(CONSTANTS.DOM_IDS.PASTE_URL_BTN);
+				pasteBtnInner?.classList.add("active");
 				setTimeout(() => {
-					$(CONSTANTS.DOM_IDS.PASTE_URL_BTN).classList.remove(
-						"active",
-					);
+					pasteBtnInner?.classList.remove("active");
 				}, 150);
 
 				this.pasteAndGetInfo();
@@ -868,6 +886,8 @@ class YtDownloaderApp {
 		const windowMapping = {
 			[CONSTANTS.DOM_IDS.PLAYLIST_WIN]: "/playlist.html",
 			[CONSTANTS.DOM_IDS.COMPRESSOR_WIN]: "/compressor.html",
+			[CONSTANTS.DOM_IDS.SEARCH_WIN]: "/search.html",
+			[CONSTANTS.DOM_IDS.HOME_WIN]: "/index.html",
 		};
 
 		Object.entries(menuMapping).forEach(([id, page]) => {
@@ -907,6 +927,154 @@ class YtDownloaderApp {
 	}
 
 	// --- Public Methods ---
+
+	/**
+	 * Searches YouTube for the given query and displays the results.
+	 * @param {string} query The search terms.
+	 */
+	async searchYoutube(query) {
+		this._resetUIForNewLink();
+		$(CONSTANTS.DOM_IDS.SEARCH_RESULTS).innerHTML = "";
+
+		try {
+			await this._loadSettings("https://youtube.com");
+			const {proxy, browserForCookies, configPath} = this.state.preferences;
+			const args = [
+				"--flat-playlist",
+				"-j",
+				"--no-warnings",
+				...(proxy ? ["--proxy", proxy] : []),
+				...(browserForCookies ? ["--cookies-from-browser", browserForCookies] : []),
+				...(this.state.jsRuntimePath
+					? [
+							"--no-js-runtimes",
+							"--js-runtime",
+							this.state.jsRuntimePath,
+						]
+					: []),
+				...(configPath ? ["--config-location", configPath] : []),
+				"--",
+				`ytsearch12:${query}`
+			];
+
+			const results = await new Promise((resolve, reject) => {
+				const process = this.state.ytDlp.exec(args, {shell: false});
+				let stdout = "";
+				let stderr = "";
+
+				window.addEventListener("beforeunload", () => {
+					if (process && !process.killed) {
+						process.kill();
+					}
+				});
+
+				process.ytDlpProcess.stdout.on("data", (data) => {
+					stdout += data;
+				});
+				process.ytDlpProcess.stderr.on("data", (data) => {
+					stderr += data;
+				});
+
+				process.on("close", () => {
+					const items = [];
+					if (stdout) {
+						const lines = stdout.split(/\r?\n/);
+						for (const line of lines) {
+							if (line.trim()) {
+								try {
+									items.push(JSON.parse(line));
+								} catch (e) {
+									console.error("Failed to parse search line:", e);
+								}
+							}
+						}
+					}
+					resolve(items);
+				});
+
+				process.on("error", (err) => reject(err));
+			});
+
+			this._renderSearchResults(results);
+		} catch (error) {
+			console.error("Search failed:", error);
+			$(CONSTANTS.DOM_IDS.INCORRECT_MSG).textContent = error.message;
+		} finally {
+			$(CONSTANTS.DOM_IDS.LOADING_WRAPPER).style.display = "none";
+		}
+	}
+
+	/**
+	 * Renders search results list.
+	 * @param {Array} results The list of search results from yt-dlp.
+	 */
+	_renderSearchResults(results) {
+		const container = $(CONSTANTS.DOM_IDS.SEARCH_RESULTS);
+		container.innerHTML = "";
+
+		if (!results || results.length === 0) {
+			const noResults = document.createElement("div");
+			noResults.style.padding = "20px";
+			noResults.textContent = i18n.__("noResultsFound");
+			container.appendChild(noResults);
+			return;
+		}
+
+		results.forEach((item) => {
+			if (!item.url && item.id) {
+				item.url = `https://www.youtube.com/watch?v=${item.id}`;
+			}
+			if (!item.url) return;
+
+			const card = document.createElement("div");
+			card.className = "searchResultItem";
+			card.addEventListener("click", () => {
+				this.getInfo(item.url);
+			});
+
+			const thumbWrapper = document.createElement("div");
+			thumbWrapper.className = "searchResultThumbnailWrapper";
+
+			const img = document.createElement("img");
+			img.className = "searchResultThumbnail";
+			let thumbUrl = "../assets/images/icon.png";
+			if (item.thumbnails && item.thumbnails.length > 0) {
+				thumbUrl = item.thumbnails[0].url;
+			} else if (item.thumbnail) {
+				thumbUrl = item.thumbnail;
+			}
+			img.src = thumbUrl;
+			img.onerror = () => {
+				img.src = "../assets/images/icon.png";
+			};
+			thumbWrapper.appendChild(img);
+
+			if (item.duration || item.duration_string) {
+				const durationBadge = document.createElement("span");
+				durationBadge.className = "searchResultDuration";
+				durationBadge.textContent = item.duration_string || this._formatTime(Math.ceil(item.duration));
+				thumbWrapper.appendChild(durationBadge);
+			}
+
+			card.appendChild(thumbWrapper);
+
+			const info = document.createElement("div");
+			info.className = "searchResultInfo";
+
+			const title = document.createElement("span");
+			title.className = "searchResultTitle";
+			title.textContent = item.title || "No Title";
+			info.appendChild(title);
+
+			const channel = document.createElement("span");
+			channel.className = "searchResultChannel";
+			channel.textContent = item.channel || item.uploader || "";
+			info.appendChild(channel);
+
+			card.appendChild(info);
+			container.appendChild(card);
+		});
+	}
 
 	/**
 	 * Pastes URL from clipboard and initiates fetching video info.

@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YtDownloader</title>
+    <title data-translate="youtubeSearch">YouTube Search</title>
 
     <script src="../assets/slimselect.js"></script>
     <link href="../assets/slimselect.css" rel="stylesheet">
@@ -52,12 +52,10 @@
         </div>
     </div>
 
-    <!-- Menu icon -->
     <img src="../assets/images/menu.png" alt="menu" id="menuIcon">
 
-    <!-- Menu -->
     <div id="menu" class="menu">
-        <a id="searchWin" class="menuItem" data-translate="youtubeSearch">YouTube Search</a>
+        <a id="homeWin" class="menuItem" data-translate="homepage">Homepage</a>
         <a id="playlistWin" class="menuItem" data-translate="downloadPlaylistButton">Download Playlist</a>
         <a id="preferenceWin" class="menuItem" data-translate="preferences">Preferences</a>
         <a id="compressorWin" class="menuItem" data-translate="compressor">Compressor</a>
@@ -81,15 +79,16 @@
         </select>
     </div>
 
-
-    <button id="pasteUrl">
-        <span id="pasteText" data-translate="pasteText">Click to paste video link from clipboard</span>
-        <span class="paste-keys">
-            <span class="key" id="pasteCtrlKey">Ctrl</span><span class="key">V</span>
-        </span>
-    </button>
-
-
+    <div class="modernSearchWrapper">
+        <button id="searchBtn" class="modernSearchButton">
+            <svg viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+        </button>
+        <input type="text" id="searchQuery" class="modernSearchInput" data-translate-placeholder="searchPlaceholder"
+            placeholder="Search YouTube videos...">
+    </div>
     <div id="loadingWrapper">
         <span id="processing" data-translate="processing">Loading </span>
         <svg version="1.1" id="L4" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
@@ -105,9 +104,11 @@
             </circle>
         </svg>
     </div>
+
+    <div id="searchResults" class="searchResults"></div>
     <p id="incorrectMsg"></p>
     <button class="advancedToggle" id="errorBtn" onclick="toggleErrorDetails()" data-translate="errorDetails">Error
-        Details ▼</button>
+        Details</button>
     <div id="errorDetails"></div>
     <br>
 
@@ -120,7 +121,6 @@
         <p id="title" data-translate="title">Title </p>
 
         <div class="videoAudioContainer">
-            <!-- Video tab -->
             <div id="videoList">
                 <div class="separationBox">
                     <h2 id="videoHeader" data-translate="video">Video</h2>
@@ -133,11 +133,9 @@
                     <br>
                     <input type="hidden" name="url" class="url" id="url">
 
-                    <!-- Audio options for video -->
                     <div id="audioForVideo">
                         <h2 id="audioHeader" data-translate="audio">Audio</h2>
                         <label class="formatSelect" data-translate="selectAudioFormat">Select Audio Format </label>
-
 
                         <div id="audioFormatSelectContainer">
                             <select id="audioForVideoFormatSelect">
@@ -156,7 +154,6 @@
                     data-translate="moreOptions">More options</button>
             </div>
 
-            <!-- Audio tab -->
             <div id="audioList">
                 <div id="audioPresent">
                     <label class="formatSelect" data-translate="selectFormat">Select Format </label>
@@ -215,7 +212,6 @@
             </div>
         </div>
 
-        <!-- Extraction options start -->
         <div id="audioExtract">
             <h2 id="extractHeader" data-translate="extractAudio">Extract Audio</h2>
             <div>
@@ -248,23 +244,13 @@
             <br>
             <button id="extractBtn" data-translate="extract">Extract</button>
         </div>
-        <!-- Extraction options end -->
     </div>
 
-    <!-- Downloads list -->
     <div id="list"></div>
 
     <button class="blueBtn" id="clearBtn" data-translate="clearDownloads">Clear Downloads</button>
 
     <div id="goToTop"></div>
-
-    <script>
-        const os = require("os")
-
-        if (os.platform() === "darwin") {
-            document.getElementById("pasteCtrlKey").textContent = "⌘";
-        }
-    </script>
 
     <div id="popupContainer" class="popup-container"></div>
 
@@ -280,8 +266,6 @@
     <script>
         new SlimSelect({ select: '#videoFormatSelect' });
     </script>
-
-
 </body>
 
 </html>

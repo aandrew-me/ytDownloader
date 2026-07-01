@@ -1,5 +1,7 @@
 @import "./themes.css";
 
+/* 1. Base Layout & Body Defaults */
+
 body {
 	font-family: "Ubuntu";
 	text-align: center;
@@ -15,6 +17,9 @@ img {
 	-webkit-user-drag: none;
 }
 
+/* 2. Modal Popups & Overlays */
+
+/* Fullscreen modal overlays backdrop */
 #popupBox,
 #popupBoxMac {
 	width: 100vw;
@@ -27,6 +32,7 @@ img {
 	z-index: 2;
 	display: none;
 }
+
 #popup,
 #popupMac {
 	position: absolute;
@@ -49,6 +55,7 @@ img {
 	cursor: pointer;
 	position: relative;
 }
+
 #tryBtn:active {
 	border: none;
 }
@@ -62,6 +69,8 @@ img {
 	cursor: pointer;
 	transition: 0.3s;
 }
+
+/* 3. Context Menu & Drop-downs */
 
 #menu {
 	display: none;
@@ -143,11 +152,14 @@ img {
 		opacity: 0;
 		transform: translateY(-6px);
 	}
+
 	to {
 		opacity: 1;
 		transform: translateY(0);
 	}
 }
+
+/* 4. Progress Tracking & List Items */
 
 .item {
 	display: flex;
@@ -186,6 +198,7 @@ img {
 	display: flex;
 	flex-direction: column;
 }
+
 .itemIcon {
 	max-width: 160px;
 	max-height: 90px;
@@ -210,6 +223,7 @@ img {
 .itemTitle {
 	padding: 5px;
 }
+
 .itemBody {
 	height: 90%;
 	width: 100%;
@@ -217,6 +231,7 @@ img {
 	flex-direction: column;
 	justify-content: space-between;
 }
+
 .itemProgress {
 	font-weight: bold;
 	cursor: pointer;
@@ -243,6 +258,7 @@ img {
 .itemSpeed {
 	padding: 10px 5px 5px 5px;
 }
+
 .itemClose {
 	position: absolute;
 	top: 8px;
@@ -252,6 +268,7 @@ img {
 	width: 20px;
 	height: 20px;
 }
+
 .itemType {
 	font-style: italic;
 	margin-top: 5px;
@@ -259,15 +276,17 @@ img {
 }
 
 #closeHidden {
-	bottom: 7px;
+	top: 12px;
 	position: absolute;
 	right: 10px;
-	cursor: pointer;
 	cursor: pointer;
 	width: 20px;
 	height: 20px;
 }
 
+/* 5. Floating Option Panels & Extractors */
+
+/* Hidden advanced options drawer overlay */
 #hidden {
 	display: none;
 	position: absolute;
@@ -402,6 +421,8 @@ input[type="number"]::-webkit-outer-spin-button {
 	appearance: none;
 }
 
+/* 6. Control Buttons & Actions */
+
 .submitBtn {
 	padding: 15px;
 	border-radius: 10px;
@@ -414,6 +435,7 @@ input[type="number"]::-webkit-outer-spin-button {
 	outline: none;
 	position: relative;
 }
+
 .submitBtn:active {
 	background-color: var(--greenBtn-bottom);
 	border: none;
@@ -426,11 +448,9 @@ input[type="number"]::-webkit-outer-spin-button {
 	--greenHover: #10b981;
 	--greenActive: #047857;
 
-	background: linear-gradient(
-		to bottom right,
-		var(--greenTop),
-		var(--greenBottom)
-	);
+	background: linear-gradient(to bottom right,
+			var(--greenTop),
+			var(--greenBottom));
 	color: #fff;
 	font-size: 1.1rem;
 	padding: 16px 28px;
@@ -447,22 +467,18 @@ input[type="number"]::-webkit-outer-spin-button {
 
 #pasteUrl:hover,
 #pasteLink:hover {
-	background: linear-gradient(
-		to bottom right,
-		var(--greenHover),
-		var(--greenBottom)
-	);
+	background: linear-gradient(to bottom right,
+			var(--greenHover),
+			var(--greenBottom));
 	transform: translateY(-2px);
 }
 
 #pasteUrl:active,
 #pasteUrl.active,
 #pasteLink:active {
-	background: linear-gradient(
-		to bottom right,
-		var(--greenActive),
-		var(--greenBottom)
-	);
+	background: linear-gradient(to bottom right,
+			var(--greenActive),
+			var(--greenBottom));
 	transform: translateY(0);
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) inset;
 }
@@ -519,6 +535,7 @@ input[type="number"]::-webkit-outer-spin-button {
 #errorBtn {
 	display: none;
 }
+
 #errorDetails {
 	cursor: pointer;
 	font-family: monospace;
@@ -529,8 +546,8 @@ input[type="number"]::-webkit-outer-spin-button {
 	display: none;
 	transition: 0.5s all;
 }
+
 #loadingWrapper {
-	/* Default is flex */
 	display: none;
 	flex-direction: row;
 	justify-content: center;
@@ -555,9 +572,11 @@ svg {
 	color: rgb(52, 170, 234);
 	cursor: pointer;
 }
+
 #savedMsg {
 	cursor: pointer;
 }
+
 button {
 	font-family: "Ubuntu";
 	font-weight: bold;
@@ -617,6 +636,7 @@ button {
 #advanced {
 	display: none;
 }
+
 .advancedItem {
 	border-radius: 15px;
 	padding: 20px;
@@ -638,8 +658,6 @@ h2 {
 	margin: 12px;
 	font-size: 24px;
 }
-
-/* Scrollbar */
 
 body::-webkit-scrollbar {
 	width: 5px;
@@ -711,6 +729,7 @@ body::-webkit-scrollbar-thumb {
 body::-webkit-scrollbar {
 	width: 10px;
 }
+
 body::-webkit-scrollbar-thumb {
 	background: linear-gradient(rgb(110, 110, 110), rgb(77, 77, 77));
 	border-radius: 8px;
@@ -720,14 +739,17 @@ body::-webkit-scrollbar-thumb {
 	0% {
 		scale: 1;
 	}
+
 	100% {
 		scale: 0;
 	}
 }
+
 @keyframes scaleUp {
 	0% {
 		scale: 0;
 	}
+
 	100% {
 		scale: 1;
 	}
@@ -737,12 +759,12 @@ body::-webkit-scrollbar-thumb {
 	.item {
 		width: 90%;
 	}
+
 	.title {
 		width: 80%;
 	}
 }
 
-/* Compressor styles */
 #compressor-header {
 	text-align: center;
 	margin-top: 0;
@@ -812,6 +834,7 @@ body::-webkit-scrollbar-thumb {
 	display: flex;
 	align-items: center;
 }
+
 #output-suffix {
 	cursor: text;
 }
@@ -917,6 +940,8 @@ body::-webkit-scrollbar-thumb {
 		padding: 2rem;
 	}
 }
+
+/* 7. Dual-Handle Sliders */
 
 .slider-wrapper {
 	display: flex;
@@ -1059,7 +1084,8 @@ input[type="range"]::-webkit-slider-thumb:hover {
 	padding: 5px 0;
 }
 
-/* SlimeSelect styles */
+/* 8. SlimSelect Custom Styling Overrides */
+
 .ss-main {
 	background-color: var(--select);
 	color: var(--text);
@@ -1098,6 +1124,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 	border: transparent !important;
 	border-radius: 8px !important;
 }
+
 .ss-list {
 	padding: 4px !important;
 }
@@ -1105,9 +1132,11 @@ input[type="range"]::-webkit-slider-thumb:hover {
 .ss-list::-webkit-scrollbar {
 	width: 10px;
 }
+
 .ss-list::-webkit-scrollbar-track {
 	box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
 }
+
 .ss-list::-webkit-scrollbar-thumb {
 	background-color: rgb(79, 78, 78);
 	border-radius: 5px;
@@ -1118,6 +1147,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 	border-radius: 6px !important;
 	color: var(--text);
 }
+
 .ss-option:hover,
 .ss-selected,
 .ss-highlighted {
@@ -1125,7 +1155,6 @@ input[type="range"]::-webkit-slider-thumb:hover {
 	color: var(--text) !important;
 }
 
-/* Row Grid structures */
 .modern-option-row {
 	display: grid;
 	align-items: center;
@@ -1154,11 +1183,13 @@ input[type="range"]::-webkit-slider-thumb:hover {
 	opacity: 0.9;
 	white-space: normal;
 }
+
 .modern-option-row .codec-text {
 	font-size: 12px;
 	font-family: JetBrains;
 	opacity: 0.6;
 }
+
 .modern-option-row .size-text {
 	font-size: 13px;
 	font-weight: 500;
@@ -1176,6 +1207,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 	width: max-content;
 	text-align: center;
 }
+
 .badge-format {
 	background-color: var(--box-main);
 	color: var(--text);
@@ -1216,25 +1248,23 @@ input[type="range"]::-webkit-slider-thumb:hover {
 	text-overflow: ellipsis;
 }
 
-/* Resolution */
 .ss-option .main-text {
 	color: var(--text) !important;
 	opacity: 0.8;
 }
 
-/* Video codec */
 .ss-option .codec-text {
 	color: var(--text) !important;
 	opacity: 0.6;
 }
 
-/* Video/audio size */
 .ss-option .size-text {
 	color: var(--text) !important;
 	opacity: 0.8;
 }
 
-/* New Compressor UX Styles */
+/* 9. Video Compression Quality Presets & Sliders */
+
 .quality-presets {
 	display: flex;
 	flex-wrap: wrap;
@@ -1293,7 +1323,9 @@ input[type="range"]::-webkit-slider-thumb:hover {
 	transition: color 0.2s;
 }
 
-.custom-slider-container, .target-size-container, .target-percent-container {
+.custom-slider-container,
+.target-size-container,
+.target-percent-container {
 	background-color: var(--box-toggle);
 	border: 1px solid var(--box-separation);
 	padding: 18px 24px;
@@ -1309,6 +1341,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 		opacity: 0;
 		transform: translateY(-10px);
 	}
+
 	to {
 		opacity: 1;
 		transform: translateY(0);
@@ -1389,14 +1422,16 @@ input[type="range"]::-webkit-slider-thumb:hover {
 	background: var(--blueBtn-bottom);
 }
 
-.target-size-container, .target-percent-container {
+.target-size-container,
+.target-percent-container {
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
 	gap: 8px;
 }
 
-#target-size-input, #target-percent-input {
+#target-size-input,
+#target-percent-input {
 	background-color: var(--select);
 	color: var(--text);
 	border: 1px solid var(--box-separation);
@@ -1408,7 +1443,8 @@ input[type="range"]::-webkit-slider-thumb:hover {
 	transition: border-color 0.2s;
 }
 
-#target-size-input:focus, #target-percent-input:focus {
+#target-size-input:focus,
+#target-percent-input:focus {
 	border-color: var(--blueBtn);
 }
 
@@ -1465,3 +1501,259 @@ input[type="range"]::-webkit-slider-thumb:hover {
 	width: 100% !important;
 }
 
+/* 10. Search Wrappers & Results */
+
+#searchContainer {
+	margin: 25px auto 15px auto;
+	text-align: center;
+	width: 86%;
+}
+
+#searchInfo {
+	font-size: 0.85rem;
+	color: var(--text);
+	opacity: 0.7;
+	margin-top: 8px;
+	text-align: center;
+}
+
+.searchResults {
+	display: flex;
+	flex-direction: column;
+	width: 86%;
+	margin: 15px auto;
+	max-height: 420px;
+	overflow-y: auto;
+	padding-right: 5px;
+	border-radius: 10px;
+}
+
+.searchResults::-webkit-scrollbar {
+	width: 8px;
+}
+
+.searchResults::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+.searchResults::-webkit-scrollbar-thumb {
+	background: var(--box-separation);
+	border-radius: 4px;
+}
+
+.searchResults::-webkit-scrollbar-thumb:hover {
+	background: var(--item-bg);
+}
+
+.searchResultItem {
+	display: flex;
+	background-color: var(--item-bg);
+	color: var(--text);
+	border-radius: 10px;
+	padding: 10px;
+	margin-bottom: 10px;
+	align-items: center;
+	cursor: pointer;
+	transition: transform 0.15s ease, background-color 0.15s ease;
+	border: 1px solid transparent;
+}
+
+.searchResultItem:hover {
+	transform: translateY(-2px);
+	background-color: var(--box-separation);
+	border-color: rgba(80, 140, 230, 0.3);
+}
+
+.searchResultThumbnailWrapper {
+	position: relative;
+	margin-right: 15px;
+	flex-shrink: 0;
+}
+
+.searchResultThumbnail {
+	width: 120px;
+	height: 68px;
+	object-fit: cover;
+	border-radius: 6px;
+}
+
+.searchResultDuration {
+	position: absolute;
+	bottom: 4px;
+	right: 4px;
+	background-color: rgba(0, 0, 0, 0.85);
+	color: #fff;
+	padding: 2px 5px;
+	font-size: 0.75rem;
+	border-radius: 4px;
+	font-family: "JetBrains";
+}
+
+.searchResultInfo {
+	display: flex;
+	flex-direction: column;
+	text-align: left;
+	overflow: hidden;
+}
+
+.searchResultTitle {
+	font-weight: bold;
+	font-size: 0.95rem;
+	margin-bottom: 6px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.searchResultChannel {
+	font-size: 0.8rem;
+	opacity: 0.75;
+}
+
+.modernSearchWrapper {
+	display: flex;
+	align-items: center;
+
+	width: 70%;
+	max-width: 600px;
+	height: 60px;
+	margin: 50px auto;
+
+	background: rgba(14, 23, 45, 0.45);
+
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
+
+	border-radius: 999px;
+
+	border: 2px solid rgba(0, 255, 180, 0.15);
+
+	box-shadow:
+		inset 0 0 15px rgba(0, 255, 180, .04),
+		0 0 20px rgba(0, 255, 180, .08);
+
+	position: relative;
+	overflow: visible;
+
+	transition: all .3s ease;
+}
+
+.modernSearchWrapper:focus-within {
+	border-color: rgba(0, 255, 180, .35);
+
+	box-shadow:
+		inset 0 0 20px rgba(0, 255, 180, .06),
+		0 0 30px rgba(0, 255, 180, .12);
+}
+
+.modernSearchWrapper::before {
+	content: "";
+
+	position: absolute;
+
+	left: -120px;
+	top: -50px;
+
+	width: 250px;
+	height: 180px;
+
+	background:
+		radial-gradient(circle,
+			rgba(0, 255, 180, .18),
+			transparent 70%);
+
+	filter: blur(35px);
+
+	pointer-events: none;
+}
+
+.modernSearchButton {
+	width: 56px;
+	height: 56px;
+
+	margin-left: 2px;
+
+	border: none;
+	border-radius: 50%;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	cursor: pointer;
+
+	color: white;
+
+	background:
+		radial-gradient(circle at 30% 30%,
+			rgba(0, 255, 180, .45),
+			rgba(20, 80, 130, .95));
+
+	box-shadow:
+		0 0 20px rgba(0, 255, 180, .30),
+		inset 0 0 12px rgba(255, 255, 255, .15);
+
+	flex-shrink: 0;
+
+	position: relative;
+
+	transition: transform .2s ease;
+}
+
+.modernSearchButton:hover {
+	transform: scale(1.03);
+}
+
+.modernSearchButton::before {
+	content: "";
+
+	position: absolute;
+	inset: -8px;
+
+	border-radius: inherit;
+
+	background:
+		radial-gradient(circle,
+			rgba(0, 255, 180, .25),
+			transparent 75%);
+
+	filter: blur(12px);
+
+	z-index: -1;
+}
+
+.modernSearchButton svg {
+	width: 24px;
+	height: 24px;
+	margin: 0;
+	display: block;
+	stroke: white;
+	fill: none;
+	stroke-width: 2.2;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+.modernSearchInput {
+	flex: 1;
+
+	height: 100%;
+
+	background: transparent;
+
+	border: none;
+	outline: none;
+
+	padding: 0 20px;
+
+	font-size: 1.4rem;
+	font-weight: 300;
+
+	color: rgba(255, 255, 255, .92);
+
+	font-family: "Ubuntu", sans-serif;
+}
+
+.modernSearchInput::placeholder {
+	color: rgba(255, 255, 255, .45);
+}
