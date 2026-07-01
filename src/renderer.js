@@ -777,12 +777,9 @@ class YtDownloaderApp {
 	 * Attaches all necessary event listeners for the UI.
 	 */
 	_addEventListeners() {
-		const pasteBtn = $(CONSTANTS.DOM_IDS.PASTE_URL_BTN);
-		if (pasteBtn) {
-			pasteBtn.addEventListener("click", () =>
-				this.pasteAndGetInfo(),
-			);
-		}
+		$(CONSTANTS.DOM_IDS.PASTE_URL_BTN)?.addEventListener("click", () =>
+			this.pasteAndGetInfo(),
+		);
 		$(CONSTANTS.DOM_IDS.SEARCH_BTN)?.addEventListener("click", () => {
 			const query = $(CONSTANTS.DOM_IDS.SEARCH_INPUT).value.trim();
 			if (query) {
@@ -807,12 +804,10 @@ class YtDownloaderApp {
 				document.activeElement.tagName !== "TEXTAREA"
 			) {
 				const pasteBtnInner = $(CONSTANTS.DOM_IDS.PASTE_URL_BTN);
-				if (pasteBtnInner) {
-					pasteBtnInner.classList.add("active");
-					setTimeout(() => {
-						pasteBtnInner.classList.remove("active");
-					}, 150);
-				}
+				pasteBtnInner?.classList.add("active");
+				setTimeout(() => {
+					pasteBtnInner?.classList.remove("active");
+				}, 150);
 
 				this.pasteAndGetInfo();
 			}
@@ -938,8 +933,7 @@ class YtDownloaderApp {
 	 * @param {string} query The search terms.
 	 */
 	async searchYoutube(query) {
-		$(CONSTANTS.DOM_IDS.INCORRECT_MSG).textContent = "";
-		$(CONSTANTS.DOM_IDS.LOADING_WRAPPER).style.display = "flex";
+		this._resetUIForNewLink();
 		$(CONSTANTS.DOM_IDS.SEARCH_RESULTS).innerHTML = "";
 
 		try {
