@@ -110,7 +110,8 @@
 		"nsis": {
 			"allowToChangeInstallationDirectory": true,
 			"oneClick": false,
-			"deleteAppDataOnUninstall": true
+			"deleteAppDataOnUninstall": true,
+			"license": "./LICENSE"
 		},
 		"msi": {
 			"oneClick": true,
