@@ -36,6 +36,7 @@ const dom = {
 	aboutWin: getId("aboutWin"),
 	historyWin: getId("historyWin"),
 	homeWin: getId("homeWin"),
+	searchWin: getId("searchWin"),
 	encoder: getId("encoder"),
 	compressionSpeed: getId("compression-speed"),
 	videoQuality: getId("video-quality"),
@@ -796,6 +797,7 @@ const menuRoutes = {
 	aboutWin: {page: "/about.html", channel: "load-page"},
 	historyWin: {page: "/history.html", channel: "load-page"},
 	homeWin: {page: "/index.html", channel: "load-win"},
+	searchWin: {page: "/search.html", channel: "load-win"},
 };
 
 Object.entries(menuRoutes).forEach(([domKey, route]) => {
