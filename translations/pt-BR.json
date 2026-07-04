@@ -185,5 +185,10 @@
 	"qualityTargetPercent": "Target %",
 	"qualityTargetPercentDesc": "Set target % of size",
 	"targetPercentLabel": "Target Percentage (%)",
+	"searchPlaceholder": "Search on YouTube...",
+	"searchButton": "Search",
+	"searching": "Searching...",
+	"youtubeSearch": "YouTube Search",
+	"noResultsFound": "No results found.",
 	"cancel_download": "Are you sure you want to cancel the download?"
 }
