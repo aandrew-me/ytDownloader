@@ -121,6 +121,7 @@ class YtDownloaderApp {
 			// Video metadata
 			videoInfo: {
 				title: "",
+				channel: "",
 				thumbnail: "",
 				duration: 0,
 				extractor_key: "",
@@ -786,14 +787,19 @@ class YtDownloaderApp {
 				this.searchYoutube(query);
 			}
 		});
-		$(CONSTANTS.DOM_IDS.SEARCH_INPUT)?.addEventListener("keydown", (event) => {
-			if (event.key === "Enter") {
-				const query = $(CONSTANTS.DOM_IDS.SEARCH_INPUT).value.trim();
-				if (query) {
-					this.searchYoutube(query);
+		$(CONSTANTS.DOM_IDS.SEARCH_INPUT)?.addEventListener(
+			"keydown",
+			(event) => {
+				if (event.key === "Enter") {
+					const query = $(
+						CONSTANTS.DOM_IDS.SEARCH_INPUT,
+					).value.trim();
+					if (query) {
+						this.searchYoutube(query);
+					}
 				}
-			}
-		});
+			},
+		);
 		document.addEventListener("keydown", (event) => {
 			if (
 				((event.ctrlKey && event.key === "v") ||
@@ -938,13 +944,16 @@ class YtDownloaderApp {
 
 		try {
 			await this._loadSettings("https://youtube.com");
-			const {proxy, browserForCookies, configPath} = this.state.preferences;
+			const {proxy, browserForCookies, configPath} =
+				this.state.preferences;
 			const args = [
 				"--flat-playlist",
 				"-j",
 				"--no-warnings",
 				...(proxy ? ["--proxy", proxy] : []),
-				...(browserForCookies ? ["--cookies-from-browser", browserForCookies] : []),
+				...(browserForCookies
+					? ["--cookies-from-browser", browserForCookies]
+					: []),
 				...(this.state.jsRuntimePath
 					? [
 							"--no-js-runtimes",
@@ -954,7 +963,7 @@ class YtDownloaderApp {
 					: []),
 				...(configPath ? ["--config-location", configPath] : []),
 				"--",
-				`ytsearch12:${query}`
+				`ytsearch12:${query}`,
 			];
 
 			const results = await new Promise((resolve, reject) => {
@@ -984,7 +993,10 @@ class YtDownloaderApp {
 								try {
 									items.push(JSON.parse(line));
 								} catch (e) {
-									console.error("Failed to parse search line:", e);
+									console.error(
+										"Failed to parse search line:",
+										e,
+									);
 								}
 							}
 						}
@@ -1052,7 +1064,9 @@ class YtDownloaderApp {
 			if (item.duration || item.duration_string) {
 				const durationBadge = document.createElement("span");
 				durationBadge.className = "searchResultDuration";
-				durationBadge.textContent = item.duration_string || this._formatTime(Math.ceil(item.duration));
+				durationBadge.textContent =
+					item.duration_string ||
+					this._formatTime(Math.ceil(item.duration));
 				thumbWrapper.appendChild(durationBadge);
 			}
 
@@ -1114,6 +1128,7 @@ class YtDownloaderApp {
 				...this.state.videoInfo,
 				id: metadata.id,
 				title: metadata.title,
+				channel: metadata.channel || "",
 				thumbnail: metadata.thumbnail,
 				duration: durationInt,
 				extractor_key: metadata.extractor_key,
@@ -1147,6 +1162,7 @@ class YtDownloaderApp {
 			type,
 			url: this.state.videoInfo.url,
 			title: this.state.videoInfo.title,
+			channel: this.state.videoInfo.channel,
 			thumbnail: this.state.videoInfo.thumbnail,
 			options: {...this.state.downloadOptions},
 			// Capture UI values at the moment of click
@@ -1367,6 +1383,7 @@ class YtDownloaderApp {
                 </div>
                 <div class="itemBody">
                     <div class="itemTitle">${job.title}</div>
+					<div class="itemChannel">${job.channel}</div>
                     <p>${i18n.__("preparing")}</p>
                 </div>
             </div>`;
@@ -1810,9 +1827,9 @@ class YtDownloaderApp {
 
 				const audioExt = format.ext === "webm" ? "opus" : format.ext;
 
-
-				const formatNote =
-					(i18n.__(format.format_note) || i18n.__("unknownQuality"));
+				const formatNote = i18n.__(
+					format.format_note || "unknownQuality",
+				);
 
 				// HTML for Audio Grid
 				const htmlContent = `
@@ -1959,10 +1976,14 @@ class YtDownloaderApp {
                 <img src="../assets/images/close.png" class="itemClose" id="${randomId}_close">
                 <div class="itemBody">
                     <div class="itemTitle">${job.title}</div>
-                    <strong class="itemSpeed" id="${randomId}_speed"></strong>
+					<div class="itemChannel">${job.channel}</div>
+					<div class="speedContainer">
+						<span class="itemSpeed" id="${randomId}_speed"></span>
+					</div>
                     <div id="${randomId}_prog" class="itemProgress">${i18n.__(
 						"preparing",
 					)}</div>
+					<button id="${randomId}_openBtn" class="openFileBtn"><img class="btnIcon" src="../assets/images/external-link.png"/>${i18n.__("openFile")}</button>
                 </div>
             </div>`;
 		$(CONSTANTS.DOM_IDS.DOWNLOAD_LIST).insertAdjacentHTML(
@@ -2020,6 +2041,8 @@ class YtDownloaderApp {
 	 */
 	_showDownloadSuccessUI(randomId, actualFilePath, thumbnail) {
 		const progressEl = $(`${randomId}_prog`);
+		const openBtn = $(`${randomId}_openBtn`);
+
 		if (!progressEl) return;
 
 		let fullPath;
@@ -2086,13 +2109,15 @@ class YtDownloaderApp {
 		const ext = fullFilename.split(".").pop();
 
 		progressEl.innerHTML = ""; // Clear progress bar
-		const link = document.createElement("b");
-		link.textContent = i18n.__("fileSavedClickToOpen");
-		link.style.cursor = "pointer";
-		link.onclick = () => {
-			ipcRenderer.send("show-file", fullPath);
-		};
-		progressEl.appendChild(link);
+
+		if (openBtn) {
+			openBtn.style.display = "flex";
+			openBtn.onclick = () => {
+				ipcRenderer.send("show-file", fullPath);
+			};
+		}
+
+		progressEl.style.display = "none";
 		$(`${randomId}_speed`).textContent = "";
 
 		// Send desktop notification
