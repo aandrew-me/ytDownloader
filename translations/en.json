@@ -196,5 +196,9 @@
 	"general": "General",
 	"mediaSettings": "Media Settings",
 	"advancedTools": "Advanced Tools",
-	"ytDlpVersion": "yt-dlp version"
+	"ytDlpVersion": "yt-dlp version",
+	"unchanged": "Unchanged",
+	"fast": "Fast",
+	"medium": "Medium",
+	"slow": "Slow"
 }
