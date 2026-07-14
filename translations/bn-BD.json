@@ -191,5 +191,14 @@
 	"youtubeSearch": "ইউটিউব অনুসন্ধান",
 	"noResultsFound": "কোনো ফলাফল পাওয়া যায়নি।",
 	"cancel_download": "আপনি কি নিশ্চিত যে আপনি ডাউনলোডটি বাতিল করতে চান?",
-	"openFile": "ফাইল খুলুন"
+	"openFile": "ফাইল খুলুন",
+	"searchSettings": "Search settings...",
+	"general": "General",
+	"mediaSettings": "Media Settings",
+	"advancedTools": "Advanced Tools",
+	"ytDlpVersion": "yt-dlp version",
+	"unchanged": "Unchanged",
+	"fast": "Fast",
+	"medium": "Medium",
+	"slow": "Slow"
 }
