@@ -191,5 +191,14 @@
 	"youtubeSearch": "Αναζήτηση στο YouTube",
 	"noResultsFound": "Δεν βρέθηκαν αποτελέσματα.",
 	"cancel_download": "Είστε σίγουροι ότι θέλετε να ακυρώσετε τη λήψη;",
-	"openFile": "Άνοιγμα αρχείου"
+	"openFile": "Άνοιγμα αρχείου",
+	"searchSettings": "Search settings...",
+	"general": "General",
+	"mediaSettings": "Media Settings",
+	"advancedTools": "Advanced Tools",
+	"ytDlpVersion": "yt-dlp version",
+	"unchanged": "Unchanged",
+	"fast": "Fast",
+	"medium": "Medium",
+	"slow": "Slow"
 }
