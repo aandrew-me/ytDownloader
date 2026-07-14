@@ -383,7 +383,6 @@ async function buildFFmpegArgs(file, settings, outputPath) {
 						targetSizeMB * 1024 * 1024 * containerOverheadFactor;
 					const totalTargetBitrate = (targetSizeBytes * 8) / duration;
 
-					let audioBitrate = 128000;
 					if (totalTargetBitrate < 250000) {
 						audioBitrate = 64000;
 					}
@@ -429,6 +428,7 @@ async function buildFFmpegArgs(file, settings, outputPath) {
 
 					if (videoBitrate < 100000) {
 						videoBitrate = Math.max(50000, targetBitrateBits * 0.8);
+						audioBitrate = Math.max(32000, targetBitrateBits - videoBitrate);
 					}
 					useBitrate = true;
 				}
