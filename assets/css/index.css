@@ -102,8 +102,8 @@ img {
 .speedIcon {
 	width: 15px;
 	height: 15px;
-	
-	color: var(--text)
+
+	color: var(--text);
 }
 
 #menu {
@@ -333,7 +333,7 @@ img {
 	cursor: pointer;
 	width: 15px;
 	height: 15px;
-	background: color-mix(in srgb, var(--item-bg) 85%, black);
+	background: color-mix(in srgb, var(--item-bg) 95%, black);
 	padding: 5px;
 	border-radius: 50%;
 }
@@ -363,10 +363,14 @@ img {
 
 #audioExtract,
 .separationBox {
-	margin: 10px 25px;
+	margin: 10px 15px;
 	padding: 10px;
 	background-color: var(--box-separation);
 	border-radius: 10px;
+}
+
+.separationBox {
+	margin: 10px 25px;
 }
 
 #options {
@@ -385,14 +389,21 @@ img {
 	color: var(--text);
 }
 
+.flexContainer {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
 #btnContainer {
 	display: flex;
 	flex-direction: row;
 	justify-content: center;
-	padding-top: 30px;
+	padding-top: 34px;
 }
 
-.toggleBtn {
+.toggleBtnWrapper {
+	display: flex;
 	width: 47%;
 	font-size: x-large;
 	border: var(--border);
@@ -400,7 +411,43 @@ img {
 	border-radius: 10px;
 	cursor: pointer;
 	padding: 8px;
+	align-items: center;
+	justify-content: center;
+}
+
+.btnWrapper {
+	display: inline-flex;
+	cursor: pointer;
+	align-items: center;
+	justify-content: center;
+}
+
+.btn {
+	border: none;
+	color: inherit;
+	background-color: inherit;
+	font-size: inherit;
+	cursor: pointer;
+}
+
+.toggleBtnIcon {
+	width: 30px;
+	height: 30px;
+	margin: 2px 5px;
+}
+
+.btnIcon {
+	width: 20px;
+	height: 20px;
+	margin: 5px;
+}
+
+.toggleBtn {
+	font-size: x-large;
+	background-color: inherit;
+	border: none;
 	color: var(--text);
+	cursor: pointer;
 }
 
 #audioToggle {
@@ -427,6 +474,16 @@ img {
 	outline: none;
 	max-width: min(400px, 100%);
 	font-family: "JetBrains";
+}
+
+#videoAudioSeparator,
+.separator {
+	border: none;
+	height: 1px;
+	background-color: var(--text);
+	width: 90%;
+	opacity: 0.06;
+	margin: 20px auto;
 }
 
 .audioSelect {
@@ -482,7 +539,6 @@ input[type="number"]::-webkit-outer-spin-button {
 	border: none;
 	font-size: large;
 	cursor: pointer;
-	display: inline-block;
 	outline: none;
 	position: relative;
 }
@@ -499,9 +555,11 @@ input[type="number"]::-webkit-outer-spin-button {
 	--greenHover: #10b981;
 	--greenActive: #047857;
 
-	background: linear-gradient(to bottom right,
-			var(--greenTop),
-			var(--greenBottom));
+	background: linear-gradient(
+		to bottom right,
+		var(--greenTop),
+		var(--greenBottom)
+	);
 	color: #fff;
 	font-size: 1.1rem;
 	padding: 16px 28px;
@@ -518,18 +576,22 @@ input[type="number"]::-webkit-outer-spin-button {
 
 #pasteUrl:hover,
 #pasteLink:hover {
-	background: linear-gradient(to bottom right,
-			var(--greenHover),
-			var(--greenBottom));
+	background: linear-gradient(
+		to bottom right,
+		var(--greenHover),
+		var(--greenBottom)
+	);
 	transform: translateY(-2px);
 }
 
 #pasteUrl:active,
 #pasteUrl.active,
 #pasteLink:active {
-	background: linear-gradient(to bottom right,
-			var(--greenActive),
-			var(--greenBottom));
+	background: linear-gradient(
+		to bottom right,
+		var(--greenActive),
+		var(--greenBottom)
+	);
 	transform: translateY(0);
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) inset;
 }
@@ -1131,7 +1193,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 #audioFormatSelectContainer,
 #audioFormatSelectContainer {
 	display: inline-block;
-	width: min(400px, 100%);
+	width: min(450px, 100%);
 	padding: 5px 0;
 }
 
@@ -1214,11 +1276,11 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 .video-grid-extended {
-	grid-template-columns: 85px 65px 60px 1fr 120px;
+	grid-template-columns: 80px 65px 65px 1fr 120px;
 }
 
 .video-grid-compact {
-	grid-template-columns: 85px 65px 1fr 120px;
+	grid-template-columns: 85px 75px 1fr 120px;
 }
 
 .audio-grid {
@@ -1228,21 +1290,20 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
 .modern-option-row .main-text {
 	font-weight: 600;
-	font-size: 14px;
-	text-overflow: ellipsis;
+	font-size: 15px;
 	overflow: hidden;
 	opacity: 0.9;
 	white-space: normal;
 }
 
 .modern-option-row .codec-text {
-	font-size: 12px;
+	font-size: 13px;
 	font-family: JetBrains;
 	opacity: 0.6;
 }
 
 .modern-option-row .size-text {
-	font-size: 13px;
+	font-size: 14px;
 	font-weight: 500;
 	justify-self: end;
 	margin-right: 12px;
@@ -1611,7 +1672,9 @@ input[type="range"]::-webkit-slider-thumb:hover {
 	margin-bottom: 10px;
 	align-items: center;
 	cursor: pointer;
-	transition: transform 0.15s ease, background-color 0.15s ease;
+	transition:
+		transform 0.15s ease,
+		background-color 0.15s ease;
 	border: 1px solid transparent;
 }
 
@@ -1686,21 +1749,21 @@ input[type="range"]::-webkit-slider-thumb:hover {
 	border: 2px solid rgba(0, 255, 180, 0.15);
 
 	box-shadow:
-		inset 0 0 15px rgba(0, 255, 180, .04),
-		0 0 20px rgba(0, 255, 180, .08);
+		inset 0 0 15px rgba(0, 255, 180, 0.04),
+		0 0 20px rgba(0, 255, 180, 0.08);
 
 	position: relative;
 	overflow: visible;
 
-	transition: all .3s ease;
+	transition: all 0.3s ease;
 }
 
 .modernSearchWrapper:focus-within {
-	border-color: rgba(0, 255, 180, .35);
+	border-color: rgba(0, 255, 180, 0.35);
 
 	box-shadow:
-		inset 0 0 20px rgba(0, 255, 180, .06),
-		0 0 30px rgba(0, 255, 180, .12);
+		inset 0 0 20px rgba(0, 255, 180, 0.06),
+		0 0 30px rgba(0, 255, 180, 0.12);
 }
 
 .modernSearchWrapper::before {
@@ -1714,10 +1777,11 @@ input[type="range"]::-webkit-slider-thumb:hover {
 	width: 250px;
 	height: 180px;
 
-	background:
-		radial-gradient(circle,
-			rgba(0, 255, 180, .18),
-			transparent 70%);
+	background: radial-gradient(
+		circle,
+		rgba(0, 255, 180, 0.18),
+		transparent 70%
+	);
 
 	filter: blur(35px);
 
@@ -1741,20 +1805,21 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
 	color: white;
 
-	background:
-		radial-gradient(circle at 30% 30%,
-			rgba(0, 255, 180, .45),
-			rgba(20, 80, 130, .95));
+	background: radial-gradient(
+		circle at 30% 30%,
+		rgba(0, 255, 180, 0.45),
+		rgba(20, 80, 130, 0.95)
+	);
 
 	box-shadow:
-		0 0 20px rgba(0, 255, 180, .30),
-		inset 0 0 12px rgba(255, 255, 255, .15);
+		0 0 20px rgba(0, 255, 180, 0.3),
+		inset 0 0 12px rgba(255, 255, 255, 0.15);
 
 	flex-shrink: 0;
 
 	position: relative;
 
-	transition: transform .2s ease;
+	transition: transform 0.2s ease;
 }
 
 .modernSearchButton:hover {
@@ -1769,10 +1834,11 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
 	border-radius: inherit;
 
-	background:
-		radial-gradient(circle,
-			rgba(0, 255, 180, .25),
-			transparent 75%);
+	background: radial-gradient(
+		circle,
+		rgba(0, 255, 180, 0.25),
+		transparent 75%
+	);
 
 	filter: blur(12px);
 
@@ -1806,11 +1872,11 @@ input[type="range"]::-webkit-slider-thumb:hover {
 	font-size: 1.4rem;
 	font-weight: 300;
 
-	color: rgba(255, 255, 255, .92);
+	color: rgba(255, 255, 255, 0.92);
 
 	font-family: "Ubuntu", sans-serif;
 }
 
 .modernSearchInput::placeholder {
-	color: rgba(255, 255, 255, .45);
+	color: rgba(255, 255, 255, 0.45);
 }

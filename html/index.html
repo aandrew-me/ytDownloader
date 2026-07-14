@@ -114,8 +114,25 @@
     <div id="hidden">
         <img src="../assets/images/close.png" alt="close" id="closeHidden">
         <div id="btnContainer">
-            <button class="toggleBtn" id="videoToggle" data-translate="video">Video</button>
-            <button class="toggleBtn" id="audioToggle" data-translate="audio">Audio</button>
+            <div id="videoToggle" class="toggleBtnWrapper">
+                <svg class="toggleBtnIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5" />
+                    <rect x="2" y="6" width="14" height="12" rx="2" />
+                </svg>
+                <button class="toggleBtn" data-translate="video">Video</button>
+            </div>
+
+            <div id="audioToggle" class="toggleBtnWrapper">
+                <svg class="toggleBtnIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 18V5l12-2v13" />
+                    <circle cx="6" cy="18" r="3" />
+                    <circle cx="18" cy="16" r="3" />
+                </svg>
+                <button class="toggleBtn" data-translate="audio">Audio</button>
+            </div>
+
         </div>
         <p id="title" data-translate="title">Title </p>
 
@@ -132,6 +149,8 @@
 
                     <br>
                     <input type="hidden" name="url" class="url" id="url">
+
+                    <hr class="separator">
 
                     <!-- Audio options for video -->
                     <div id="audioForVideo">
@@ -151,9 +170,28 @@
                 </div>
 
                 <br>
-                <button class="submitBtn" id="videoDownload" data-translate="download">Download</button>
-                <button id="advancedVideoToggle" class="blueBtn" onClick="advancedToggle()"
-                    data-translate="moreOptions">More options</button>
+
+                <div class="flexContainer">
+                    <div class="submitBtn btnWrapper" id="videoDownload">
+                        <svg class="btnIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 17V3" />
+                            <path d="m6 11 6 6 6-6" />
+                            <path d="M19 21H5" />
+                        </svg>
+                        <button class="btn" data-translate="download">Download</button>
+                    </div>
+
+                    <div id="advancedVideoToggle" onClick="advancedToggle()" class="btnWrapper blueBtn">
+                        <button class="btn" data-translate="moreOptions">More options</button>
+                        <svg id="arrowDownVideo" class="btnIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <path d="m6 9 6 6 6-6" />
+                        </svg>
+                    </div>
+                </div>
+
             </div>
 
             <!-- Audio tab -->
@@ -168,9 +206,30 @@
 
                     <br><br>
                     <input type="hidden" name="url" class="url">
-                    <button class="submitBtn" id="audioDownload" data-translate="download">Download</button>
-                    <button id="advancedAudioToggle" class="blueBtn" onClick="advancedToggle()"
-                        data-translate="moreOptions">More options</button>
+
+                    <div class="flexContainer">
+                        <div class="submitBtn btnWrapper" id="audioDownload">
+                            <svg class="btnIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 17V3" />
+                                <path d="m6 11 6 6 6-6" />
+                                <path d="M19 21H5" />
+                            </svg>
+                            <button class="btn" data-translate="download">Download</button>
+
+                        </div>
+
+                        <div id="advancedAudioToggle" onClick="advancedToggle()" class="btnWrapper blueBtn">
+                            <button class="btn" data-translate="moreOptions">More options</button>
+
+                            <svg id="arrowDownAudio" class="btnIcon" xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m6 9 6 6 6-6" />
+                            </svg>
+                        </div>
+                    </div>
+                    
                 </div>
             </div>
         </div>
@@ -214,6 +273,7 @@
                 <input id="subChecked" class="cb" type="checkbox">
             </div>
         </div>
+
 
         <!-- Extraction options start -->
         <div id="audioExtract">
