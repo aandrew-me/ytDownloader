@@ -191,5 +191,14 @@
 	"youtubeSearch": "البحث في يوتيوب",
 	"noResultsFound": "لم يتم العثور على نتائج.",
 	"cancel_download": "هل أنت متأكد من أنك تريد إلغاء التنزيل؟",
-	"openFile": "فتح الملف"
+	"openFile": "فتح الملف",
+	"searchSettings": "إعدادات البحث...",
+	"general": "عام",
+	"mediaSettings": "إعدادات الوسائط",
+	"advancedTools": "أدوات متقدمة",
+	"ytDlpVersion": "إصدار yt-dlp",
+	"unchanged": "بدون تغيير",
+	"fast": "سريع",
+	"medium": "متوسط",
+	"slow": "بطيء"
 }

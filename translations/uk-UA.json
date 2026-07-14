@@ -191,5 +191,14 @@
 	"youtubeSearch": "Пошук у YouTube",
 	"noResultsFound": "Результатів не знайдено.",
 	"cancel_download": "Ви впевнені, що хочете скасувати завантаження?",
-	"openFile": "Відкрити файл"
+	"openFile": "Відкрити файл",
+	"searchSettings": "Налаштування пошуку...",
+	"general": "Загальні",
+	"mediaSettings": "Налаштування медіа",
+	"advancedTools": "Розширені інструменти",
+	"ytDlpVersion": "Версія yt-dlp",
+	"unchanged": "Без змін",
+	"fast": "Швидко",
+	"medium": "Середньо",
+	"slow": "Повільно"
 }

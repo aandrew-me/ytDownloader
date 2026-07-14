@@ -191,5 +191,14 @@
 	"youtubeSearch": "YouTube bilaketa",
 	"noResultsFound": "Ez da emaitzarik aurkitu.",
 	"cancel_download": "Ziur zaude deskarga bertan behera utzi nahi duzula?",
-	"openFile": "Ireki fitxategia"
+	"openFile": "Ireki fitxategia",
+	"searchSettings": "Bilaketa ezarpenak...",
+	"general": "Orokorra",
+	"mediaSettings": "Multimedia ezarpenak",
+	"advancedTools": "Tresna aurreratuak",
+	"ytDlpVersion": "yt-dlp bertsioa",
+	"unchanged": "Aldatu gabe",
+	"fast": "Azkar",
+	"medium": "Ertaina",
+	"slow": "Motel"
 }

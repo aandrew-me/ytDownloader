@@ -191,5 +191,14 @@
 	"youtubeSearch": "Ricerca YouTube",
 	"noResultsFound": "Nessun risultato trovato.",
 	"cancel_download": "Sei sicuro di voler annullare il download?",
-	"openFile": "Apri file"
+	"openFile": "Apri file",
+	"searchSettings": "Impostazioni di ricerca...",
+	"general": "Generale",
+	"mediaSettings": "Impostazioni multimediali",
+	"advancedTools": "Strumenti avanzati",
+	"ytDlpVersion": "Versione yt-dlp",
+	"unchanged": "Invariato",
+	"fast": "Veloce",
+	"medium": "Medio",
+	"slow": "Lento"
 }
