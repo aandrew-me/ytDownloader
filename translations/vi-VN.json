@@ -191,5 +191,14 @@
 	"youtubeSearch": "Tìm kiếm YouTube",
 	"noResultsFound": "Không tìm thấy kết quả.",
 	"cancel_download": "Bạn có chắc chắn muốn hủy quá trình tải xuống không?",
-	"openFile": "Mở tệp tin"
+	"openFile": "Mở tệp tin",
+	"searchSettings": "Search settings...",
+	"general": "General",
+	"mediaSettings": "Media Settings",
+	"advancedTools": "Advanced Tools",
+	"ytDlpVersion": "yt-dlp version",
+	"unchanged": "Unchanged",
+	"fast": "Fast",
+	"medium": "Medium",
+	"slow": "Slow"
 }
