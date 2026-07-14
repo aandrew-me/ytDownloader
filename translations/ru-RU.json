@@ -191,5 +191,14 @@
 	"youtubeSearch": "Поиск YouTube",
 	"noResultsFound": "Результатов не найдено.",
 	"cancel_download": "Вы уверены, что хотите отменить загрузку?",
-	"openFile": "Открыть файл"
+	"openFile": "Открыть файл",
+	"searchSettings": "Поиск настроек...",
+	"general": "Общее",
+	"mediaSettings": "Настройки мультимедиа",
+	"advancedTools": "Дополнительные инструменты",
+	"ytDlpVersion": "Версия yt-dlp",
+	"unchanged": "Unchanged",
+	"fast": "Fast",
+	"medium": "Medium",
+	"slow": "Slow"
 }
