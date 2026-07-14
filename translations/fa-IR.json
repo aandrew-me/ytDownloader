@@ -191,5 +191,14 @@
 	"youtubeSearch": "جستجوی یوتیوب",
 	"noResultsFound": "نتیجه‌ای یافت نشد.",
 	"cancel_download": "آیا مطمئن هستید که می‌خواهید دانلود را لغو کنید؟",
-	"openFile": "باز کردن فایل"
+	"openFile": "باز کردن فایل",
+	"searchSettings": "Search settings...",
+	"general": "General",
+	"mediaSettings": "Media Settings",
+	"advancedTools": "Advanced Tools",
+	"ytDlpVersion": "yt-dlp version",
+	"unchanged": "Unchanged",
+	"fast": "Fast",
+	"medium": "Medium",
+	"slow": "Slow"
 }
