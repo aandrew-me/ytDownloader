@@ -89,8 +89,24 @@
     <div id="options">
         <img src="../assets/images/close.png" alt="close" id="closeHidden">
         <div id="btnContainer">
-            <button class="toggleBtn" id="videoToggle" data-translate="video">Video</button>
-            <button class="toggleBtn" id="audioToggle" data-translate="audio">Audio</button>
+            <div id="videoToggle" class="toggleBtnWrapper">
+                <svg class="toggleBtnIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5" />
+                    <rect x="2" y="6" width="14" height="12" rx="2" />
+                </svg>
+                <button class="toggleBtn" data-translate="video">Video</button>
+            </div>
+
+            <div id="audioToggle" class="toggleBtnWrapper">
+                <svg class="toggleBtnIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 18V5l12-2v13" />
+                    <circle cx="6" cy="18" r="3" />
+                    <circle cx="18" cy="16" r="3" />
+                </svg>
+                <button class="toggleBtn" data-translate="audio">Audio</button>
+            </div>
         </div>
         <br>
         <strong id="linkTitle" data-translate="link">Link:</strong>
@@ -164,7 +180,8 @@
         <div id="advancedMenu">
             <div class="advancedItem">
                 <span id="rangeTxt" data-translate="playlistRange">Playlist range</span>
-                <input type="number" id="playlistIndex" class="input" data-translate-placeholder="start" placeholder="Start">:
+                <input type="number" id="playlistIndex" class="input" data-translate-placeholder="start"
+                    placeholder="Start">:
                 <input type="number" id="playlistEnd" data-translate-placeholder="end" class="input" placeholder="End">
                 <br><br>
             </div>
