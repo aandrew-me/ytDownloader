@@ -180,7 +180,7 @@
 	"qualityTargetSize": "Dimensione target",
 	"qualityTargetSizeDesc": "Specifica la dimensione target in MB",
 	"targetSizeMB": "Dimensione target (MB)",
-	"worst": "Bassa",
+	"worst": "Peggiore",
 	"advancedSettings": "Impostazioni avanzate",
 	"qualityTargetPercent": "Percentuale target %",
 	"qualityTargetPercentDesc": "Imposta la percentuale target della dimensione",
@@ -191,5 +191,14 @@
 	"youtubeSearch": "Ricerca YouTube",
 	"noResultsFound": "Nessun risultato trovato.",
 	"cancel_download": "Sei sicuro di voler annullare il download?",
-	"openFile": "Apri file"
+	"openFile": "Apri file",
+	"searchSettings": "Search settings...",
+	"general": "General",
+	"mediaSettings": "Media Settings",
+	"advancedTools": "Advanced Tools",
+	"ytDlpVersion": "yt-dlp version",
+	"unchanged": "Unchanged",
+	"fast": "Fast",
+	"medium": "Medium",
+	"slow": "Slow"
 }
