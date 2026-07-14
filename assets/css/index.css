@@ -363,7 +363,7 @@ img {
 
 #audioExtract,
 .separationBox {
-	margin: 10px;
+	margin: 10px 25px;
 	padding: 10px;
 	background-color: var(--box-separation);
 	border-radius: 10px;
@@ -389,11 +389,11 @@ img {
 	display: flex;
 	flex-direction: row;
 	justify-content: center;
-	padding-top: 10px;
+	padding-top: 30px;
 }
 
 .toggleBtn {
-	width: 50%;
+	width: 47%;
 	font-size: x-large;
 	border: var(--border);
 	background-color: var(--box-toggle);
@@ -404,14 +404,14 @@ img {
 }
 
 #audioToggle {
-	margin-left: 5px;
+	margin-left: 2px;
 	margin-right: 10px;
 }
 
 #videoToggle {
 	background-color: var(--box-toggleOn);
 	margin-left: 10px;
-	margin-right: 5px;
+	margin-right: 2px;
 }
 
 .select {
