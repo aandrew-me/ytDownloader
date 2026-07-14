@@ -190,5 +190,6 @@
 	"searching": "Searching...",
 	"youtubeSearch": "YouTube Search",
 	"noResultsFound": "No results found.",
-	"cancel_download": "Вы уверены, что хотите отменить загрузку?"
+	"cancel_download": "Вы уверены, что хотите отменить загрузку?",
+	"openFile": "Open file"
 }
