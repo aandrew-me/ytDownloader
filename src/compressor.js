@@ -478,134 +478,201 @@ async function buildFFmpegArgs(file, settings, outputPath) {
 			}
 			break;
 		case "qsv":
+		case "hevc_qsv": {
+			const codec = settings.encoder === "qsv" ? "h264_qsv" : "hevc_qsv";
+
 			args.push(
 				"-c:v",
-				"h264_qsv",
+				codec,
 				"-vf",
 				"format=yuv420p",
 				"-preset",
 				settings.speed,
 			);
-			if (useBitrate) {
-				args.push("-b:v", Math.round(videoBitrate).toString());
-			} else {
-				args.push("-global_quality", quality);
+
+			switch (settings.speed) {
+				case "medium":
+					args.push(
+						"-extbrc",
+						"1",
+						"-adaptive_i",
+						"1",
+						"-adaptive_b",
+						"1",
+					);
+					break;
+
+				case "slow":
+					args.push(
+						"-extbrc",
+						"1",
+						"-look_ahead_depth",
+						"40",
+						"-adaptive_i",
+						"1",
+						"-adaptive_b",
+						"1",
+						"-rdo",
+						"1",
+						"-mbbrc",
+						"1",
+					);
+					break;
 			}
-			break;
-		case "hevc_qsv":
-			args.push(
-				"-c:v",
-				"hevc_qsv",
-				"-vf",
-				"format=yuv420p",
-				"-preset",
-				settings.speed,
-			);
-			if (useBitrate) {
-				args.push("-b:v", Math.round(videoBitrate).toString());
-			} else {
-				args.push("-global_quality", quality);
-			}
-			break;
-		case "vaapi":
-			args.push(
-				"-vaapi_device",
-				vaapi_device,
-				"-vf",
-				"format=nv12,hwupload",
-				"-c:v",
-				"h264_vaapi",
-			);
-			if (useBitrate) {
-				args.push("-b:v", Math.round(videoBitrate).toString());
-			} else {
-				args.push("-qp", quality);
-			}
-			break;
-		case "hevc_vaapi":
-			args.push(
-				"-vaapi_device",
-				vaapi_device,
-				"-vf",
-				"format=nv12,hwupload",
-				"-c:v",
-				"hevc_vaapi",
-			);
-			if (useBitrate) {
-				args.push("-b:v", Math.round(videoBitrate).toString());
-			} else {
-				args.push("-qp", quality);
-			}
-			break;
-		case "nvenc":
-			args.push(
-				"-c:v",
-				"h264_nvenc",
-				"-vf",
-				"format=yuv420p",
-				"-preset",
-				getNvencPreset(settings.speed),
-			);
-			if (useBitrate) {
-				args.push("-b:v", Math.round(videoBitrate).toString());
-			} else {
-				args.push("-rc", "vbr", "-cq", quality);
-			}
-			break;
-		case "hevc_nvenc":
-			args.push(
-				"-c:v",
-				"hevc_nvenc",
-				"-vf",
-				"format=yuv420p",
-				"-preset",
-				getNvencPreset(settings.speed),
-			);
-			if (useBitrate) {
-				args.push("-b:v", Math.round(videoBitrate).toString());
-			} else {
-				args.push("-rc", "vbr", "-cq", quality);
-			}
-			break;
-		case "hevc_amf": {
-			const speedToQuality = {slow: "quality", fast: "speed"};
-			const amf_hevc_quality =
-				speedToQuality[settings.speed] || "balanced";
-			args.push(
-				"-c:v",
-				"hevc_amf",
-				"-vf",
-				"format=yuv420p",
-				"-quality",
-				amf_hevc_quality,
-			);
+
 			if (useBitrate) {
 				args.push(
-					"-rc",
-					"cbr",
+					"-b:v",
+					Math.round(videoBitrate).toString(),
+					"-rc_mode",
+					"vbr",
+				);
+			} else {
+				args.push("-global_quality", quality);
+			}
+
+			break;
+		}
+		case "vaapi":
+		case "hevc_vaapi": {
+			const codec =
+				settings.encoder === "vaapi" ? "h264_vaapi" : "hevc_vaapi";
+
+			args.push(
+				"-vaapi_device",
+				vaapi_device,
+				"-vf",
+				"format=nv12,hwupload",
+				"-c:v",
+				codec,
+			);
+
+			switch (settings.speed) {
+				case "medium":
+					args.push("-async_depth", "4");
+					break;
+
+				case "slow":
+					args.push("-async_depth", "4", "-b_depth", "2");
+					break;
+			}
+
+			if (useBitrate) {
+				args.push(
+					"-rc_mode",
+					"VBR",
 					"-b:v",
 					Math.round(videoBitrate).toString(),
 				);
 			} else {
-				args.push("-rc", "cqp", "-qp_i", quality, "-qp_p", quality);
+				args.push("-rc_mode", "ICQ", "-qp", quality);
 			}
+
+			break;
+		}
+		case "nvenc":
+		case "hevc_nvenc": {
+			const codec =
+				settings.encoder === "nvenc" ? "h264_nvenc" : "hevc_nvenc";
+
+			args.push(
+				"-c:v",
+				codec,
+				"-vf",
+				"format=yuv420p",
+				"-preset",
+				getNvencPreset(settings.speed),
+			);
+
+			switch (settings.speed) {
+				case "medium":
+					args.push("-spatial_aq", "1", "-aq-strength", "8");
+					break;
+
+				case "slow":
+					args.push(
+						"-spatial_aq",
+						"1",
+						"-temporal_aq",
+						"1",
+						"-aq-strength",
+						"8",
+						"-rc-lookahead",
+						"32",
+					);
+					break;
+			}
+
+			if (useBitrate) {
+				args.push(
+					"-rc",
+					"vbr_hq",
+					"-b:v",
+					Math.round(videoBitrate).toString(),
+				);
+
+				if (settings.speed === "medium") {
+					args.push("-multipass", "qres");
+				} else if (settings.speed === "slow") {
+					args.push("-multipass", "fullres");
+				}
+			} else {
+				args.push("-rc", "vbr", "-cq", quality);
+			}
+
 			break;
 		}
 		case "amf": {
-			const speedToQuality = {slow: "quality", fast: "speed"};
-			const amf_quality = speedToQuality[settings.speed] || "balanced";
+			const speedToQuality = {
+				fast: "speed",
+				medium: "balanced",
+				slow: "quality",
+			};
+
+			const amfQuality = speedToQuality[settings.speed] || "balanced";
+
 			args.push(
 				"-c:v",
 				"h264_amf",
 				"-vf",
 				"format=yuv420p",
 				"-quality",
-				amf_quality,
+				amfQuality,
 			);
+
+			switch (settings.speed) {
+				case "medium":
+					args.push("-vbaq", "true");
+					break;
+
+				case "slow":
+					args.push(
+						"-usage",
+						"high_quality",
+						"-preanalysis",
+						"true",
+						"-preencode",
+						"true",
+						"-vbaq",
+						"true",
+						"-pa_lookahead_buffer_depth",
+						"41",
+						"-pa_paq_mode",
+						"caq",
+						"-pa_taq_mode",
+						"2",
+						"-pa_scene_change_detection_enable",
+						"true",
+						"-pa_high_motion_quality_boost_mode",
+						"auto",
+					);
+					break;
+			}
+
 			if (useBitrate) {
 				args.push(
 					"-rc",
-					"cbr",
+					settings.speed === "fast" ? "cbr" : "hqcbr",
 					"-b:v",
 					Math.round(videoBitrate).toString(),
 				);
@@ -621,6 +688,68 @@ async function buildFFmpegArgs(file, settings, outputPath) {
 					quality,
 				);
 			}
+
+			break;
+		}
+
+		case "hevc_amf": {
+			const speedToQuality = {
+				fast: "speed",
+				medium: "balanced",
+				slow: "quality",
+			};
+
+			const amfQuality = speedToQuality[settings.speed] || "balanced";
+
+			args.push(
+				"-c:v",
+				"hevc_amf",
+				"-vf",
+				"format=yuv420p",
+				"-quality",
+				amfQuality,
+			);
+
+			switch (settings.speed) {
+				case "medium":
+					args.push("-vbaq", "true");
+					break;
+
+				case "slow":
+					args.push(
+						"-usage",
+						"high_quality",
+						"-preanalysis",
+						"true",
+						"-preencode",
+						"true",
+						"-vbaq",
+						"true",
+						"-pa_lookahead_buffer_depth",
+						"41",
+						"-pa_paq_mode",
+						"caq",
+						"-pa_taq_mode",
+						"2",
+						"-pa_scene_change_detection_enable",
+						"true",
+						"-pa_high_motion_quality_boost_mode",
+						"auto",
+					);
+					break;
+			}
+
+			if (useBitrate) {
+				args.push(
+					"-rc",
+					settings.speed === "fast" ? "cbr" : "hqcbr",
+					"-b:v",
+					Math.round(videoBitrate).toString(),
+				);
+			} else {
+				args.push("-rc", "cqp", "-qp_i", quality, "-qp_p", quality);
+			}
+
 			break;
 		}
 		case "videotoolbox":
@@ -654,7 +783,7 @@ async function buildFFmpegArgs(file, settings, outputPath) {
 	}
 
 	args.push(outputPath);
-	
+
 	return args;
 }
 
