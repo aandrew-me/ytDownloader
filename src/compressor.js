@@ -845,10 +845,16 @@ function createProgressItem(filename, status, data, itemId) {
 	newStatus.id = itemId;
 	newStatus.className = `status-item ${status}`;
 	const visibleFilename = filename.substring(0, 45);
-	newStatus.innerHTML = `
-        <div class="filename">${visibleFilename}</div>
-        <div id="${itemId}_prog" class="itemProgressInfo">${data}</div>
-    `;
+	const filenameDiv = document.createElement("div");
+	filenameDiv.className = "filename";
+	filenameDiv.textContent = visibleFilename;
+
+	const progDiv = document.createElement("div");
+	progDiv.id = `${itemId}_prog`;
+	progDiv.className = "itemProgressInfo";
+	progDiv.textContent = data;
+
+	newStatus.append(filenameDiv, progDiv);
 	dom.compressionStatus.append(newStatus);
 	dom.compressionStatus.scrollIntoView({behavior: "smooth", block: "end"});
 }
