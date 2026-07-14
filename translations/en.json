@@ -191,5 +191,10 @@
 	"youtubeSearch": "YouTube Search",
 	"noResultsFound": "No results found.",
 	"cancel_download": "Are you sure you want to cancel the download?",
-	"openFile": "Open file"
+	"openFile": "Open file",
+	"searchSettings": "Search settings...",
+	"general": "General",
+	"mediaSettings": "Media Settings",
+	"advancedTools": "Advanced Tools",
+	"ytDlpVersion": "yt-dlp version"
 }
