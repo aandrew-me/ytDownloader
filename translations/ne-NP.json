@@ -191,5 +191,14 @@
 	"youtubeSearch": "YouTube खोज",
 	"noResultsFound": "कुनै परिणाम भेटिएन।",
 	"cancel_download": "के तपाईं निश्चित रूपमा डाउनलोड रद्द गर्न चाहनुहुन्छ?",
-	"openFile": "फाइल खोल्नुहोस्"
+	"openFile": "फाइल खोल्नुहोस्",
+	"searchSettings": "खोज सेटिङ्हरू...",
+	"general": "सामान्य",
+	"mediaSettings": "मिडिया सेटिङ्हरू",
+	"advancedTools": "उन्नत उपकरणहरू",
+	"ytDlpVersion": "yt-dlp संस्करण",
+	"unchanged": "अपरिवर्तित",
+	"fast": "छिटो",
+	"medium": "मध्यम",
+	"slow": "ढिलो"
 }

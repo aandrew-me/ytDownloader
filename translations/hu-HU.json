@@ -191,5 +191,14 @@
 	"youtubeSearch": "YouTube Keresés",
 	"noResultsFound": "Nincs találat.",
 	"cancel_download": "Biztosan meg szeretné szakítani a letöltést?",
-	"openFile": "Fájl megnyitása"
+	"openFile": "Fájl megnyitása",
+	"searchSettings": "Keresési beállítások...",
+	"general": "Általános",
+	"mediaSettings": "Médiabeállítások",
+	"advancedTools": "Speciális eszközök",
+	"ytDlpVersion": "yt-dlp verzió",
+	"unchanged": "Változatlan",
+	"fast": "Gyors",
+	"medium": "Közepes",
+	"slow": "Lassú"
 }

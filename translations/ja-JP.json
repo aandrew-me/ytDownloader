@@ -191,5 +191,14 @@
 	"youtubeSearch": "YouTube検索",
 	"noResultsFound": "結果が見つかりませんでした。",
 	"cancel_download": "本当にダウンロードをキャンセルしますか？",
-	"openFile": "ファイルを開く"
+	"openFile": "ファイルを開く",
+	"searchSettings": "検索設定...",
+	"general": "一般",
+	"mediaSettings": "メディア設定",
+	"advancedTools": "高度なツール",
+	"ytDlpVersion": "yt-dlp バージョン",
+	"unchanged": "変更なし",
+	"fast": "高速",
+	"medium": "中",
+	"slow": "低速"
 }

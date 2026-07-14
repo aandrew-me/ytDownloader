@@ -191,5 +191,14 @@
 	"youtubeSearch": "YouTube Araması",
 	"noResultsFound": "Sonuç bulunamadı.",
 	"cancel_download": "İndirmeyi iptal etmek istediğinizden emin misiniz?",
-	"openFile": "Dosyayı aç"
+	"openFile": "Dosyayı aç",
+	"searchSettings": "Arama ayarları...",
+	"general": "Genel",
+	"mediaSettings": "Medya ayarları",
+	"advancedTools": "Gelişmiş araçlar",
+	"ytDlpVersion": "yt-dlp sürümü",
+	"unchanged": "Değişmedi",
+	"fast": "Hızlı",
+	"medium": "Orta",
+	"slow": "Yavaş"
 }

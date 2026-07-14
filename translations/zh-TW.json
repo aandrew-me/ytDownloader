@@ -191,5 +191,14 @@
 	"youtubeSearch": "YouTube 搜尋",
 	"noResultsFound": "未找到結果。",
 	"cancel_download": "您確定要取消下載嗎？",
-	"openFile": "開啟檔案"
+	"openFile": "開啟檔案",
+	"searchSettings": "搜尋設定...",
+	"general": "一般",
+	"mediaSettings": "媒體設定",
+	"advancedTools": "進階工具",
+	"ytDlpVersion": "yt-dlp 版本",
+	"unchanged": "保持不變",
+	"fast": "快速",
+	"medium": "中等",
+	"slow": "慢速"
 }

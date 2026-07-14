@@ -191,5 +191,14 @@
 	"youtubeSearch": "YouTube-haku",
 	"noResultsFound": "Tuloksia ei löytynyt.",
 	"cancel_download": "Oletko varma, että haluat peruuttaa latauksen?",
-	"openFile": "Avaa tiedosto"
+	"openFile": "Avaa tiedosto",
+	"searchSettings": "Hakuasetukset...",
+	"general": "Yleinen",
+	"mediaSettings": "Media-asetukset",
+	"advancedTools": "Edistyneet työkalut",
+	"ytDlpVersion": "yt-dlp versio",
+	"unchanged": "Muuttumaton",
+	"fast": "Nopea",
+	"medium": "Keskitaso",
+	"slow": "Hidas"
 }
