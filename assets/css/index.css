@@ -760,6 +760,9 @@ button {
 #path {
 	font-family: "JetBrains";
 	font-size: medium;
+	background-color: var(--box-main);
+	padding: 5px;
+	border-radius: 5px;
 }
 
 #subHeader {

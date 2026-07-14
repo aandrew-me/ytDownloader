@@ -129,6 +129,14 @@ textarea:focus {
 	box-shadow: 0 0 0 3px rgba(29, 140, 209, 0.15);
 }
 
+#proxyTxt:not(:placeholder-shown):valid {
+    border-color: green;
+}
+
+#proxyTxt:not(:placeholder-shown):invalid {
+    border-color: red;
+}
+
 .input-num {
 	width: 80px;
 	text-align: center;
