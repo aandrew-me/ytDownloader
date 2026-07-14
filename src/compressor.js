@@ -368,6 +368,9 @@ async function buildFFmpegArgs(file, settings, outputPath) {
 
 	let useBitrate = false;
 	let videoBitrate = 0;
+	let audioBitrate = 128000;
+
+	const containerOverheadFactor = 0.985;
 
 	if (settings.videoQuality === "target-size") {
 		try {
@@ -375,17 +378,25 @@ async function buildFFmpegArgs(file, settings, outputPath) {
 			if (duration > 0) {
 				const targetSizeMB = parseFloat(settings.targetSize);
 				if (!isNaN(targetSizeMB) && targetSizeMB > 0) {
-					const targetSizeBytes = targetSizeMB * 1024 * 1024;
-					const targetBitrateBits = (targetSizeBytes * 8) / duration;
+					const containerOverheadFactor = 0.985;
+					const targetSizeBytes =
+						targetSizeMB * 1024 * 1024 * containerOverheadFactor;
+					const totalTargetBitrate = (targetSizeBytes * 8) / duration;
 
-					// Reserve 128k for audio
-					const audioBitrate = 128000;
-					videoBitrate = targetBitrateBits - audioBitrate;
-
-					// Set a minimum threshold for video bitrate
-					if (videoBitrate < 100000) {
-						videoBitrate = Math.max(50000, targetBitrateBits * 0.8);
+					let audioBitrate = 128000;
+					if (totalTargetBitrate < 250000) {
+						audioBitrate = 64000;
 					}
+
+					videoBitrate = totalTargetBitrate - audioBitrate;
+
+					if (videoBitrate < 100000) {
+						videoBitrate = Math.max(
+							50000,
+							totalTargetBitrate * 0.8,
+						);
+					}
+
 					useBitrate = true;
 				}
 			}
@@ -407,15 +418,15 @@ async function buildFFmpegArgs(file, settings, outputPath) {
 					targetPercent > 0 &&
 					targetPercent <= 100
 				) {
-					// Calculate target bytes based on the input File size property
-					const targetSizeBytes = file.size * (targetPercent / 100);
+					const targetSizeBytes =
+						file.size *
+						(targetPercent / 100) *
+						containerOverheadFactor;
 					const targetBitrateBits = (targetSizeBytes * 8) / duration;
 
-					// Reserve 128k for audio
-					const audioBitrate = 128000;
+					audioBitrate = targetBitrateBits < 250000 ? 64000 : 128000;
 					videoBitrate = targetBitrateBits - audioBitrate;
 
-					// Set a minimum threshold for video bitrate
 					if (videoBitrate < 100000) {
 						videoBitrate = Math.max(50000, targetBitrateBits * 0.8);
 					}
@@ -635,11 +646,15 @@ async function buildFFmpegArgs(file, settings, outputPath) {
 			? "aac"
 			: settings.audioFormat;
 
-	args.push("-c:a", settings.audioFormat);
+	args.push("-c:a", audioFormat);
+
 	if (audioFormat !== "copy") {
-		args.push("-b:a", "128k");
+		const audioBitrateString = `${Math.round(audioBitrate / 1000)}k`;
+		args.push("-b:a", audioBitrateString);
 	}
+
 	args.push(outputPath);
+	
 	return args;
 }
 
@@ -703,7 +718,7 @@ function createProgressItem(filename, status, data, itemId) {
 	const visibleFilename = filename.substring(0, 45);
 	newStatus.innerHTML = `
         <div class="filename">${visibleFilename}</div>
-        <div id="${itemId}_prog" class="itemProgress">${data}</div>
+        <div id="${itemId}_prog" class="itemProgressInfo">${data}</div>
     `;
 	dom.compressionStatus.append(newStatus);
 	dom.compressionStatus.scrollIntoView({behavior: "smooth", block: "end"});
