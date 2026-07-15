@@ -368,6 +368,9 @@ async function buildFFmpegArgs(file, settings, outputPath) {
 
 	let useBitrate = false;
 	let videoBitrate = 0;
+	let audioBitrate = 128000;
+
+	const containerOverheadFactor = 0.985;
 
 	if (settings.videoQuality === "target-size") {
 		try {
@@ -375,17 +378,24 @@ async function buildFFmpegArgs(file, settings, outputPath) {
 			if (duration > 0) {
 				const targetSizeMB = parseFloat(settings.targetSize);
 				if (!isNaN(targetSizeMB) && targetSizeMB > 0) {
-					const targetSizeBytes = targetSizeMB * 1024 * 1024;
-					const targetBitrateBits = (targetSizeBytes * 8) / duration;
+					const containerOverheadFactor = 0.985;
+					const targetSizeBytes =
+						targetSizeMB * 1024 * 1024 * containerOverheadFactor;
+					const totalTargetBitrate = (targetSizeBytes * 8) / duration;
 
-					// Reserve 128k for audio
-					const audioBitrate = 128000;
-					videoBitrate = targetBitrateBits - audioBitrate;
-
-					// Set a minimum threshold for video bitrate
-					if (videoBitrate < 100000) {
-						videoBitrate = Math.max(50000, targetBitrateBits * 0.8);
+					if (totalTargetBitrate < 250000) {
+						audioBitrate = 64000;
 					}
+
+					videoBitrate = totalTargetBitrate - audioBitrate;
+
+					if (videoBitrate < 100000) {
+						videoBitrate = Math.max(
+							50000,
+							totalTargetBitrate * 0.8,
+						);
+					}
+
 					useBitrate = true;
 				}
 			}
@@ -407,17 +417,18 @@ async function buildFFmpegArgs(file, settings, outputPath) {
 					targetPercent > 0 &&
 					targetPercent <= 100
 				) {
-					// Calculate target bytes based on the input File size property
-					const targetSizeBytes = file.size * (targetPercent / 100);
+					const targetSizeBytes =
+						file.size *
+						(targetPercent / 100) *
+						containerOverheadFactor;
 					const targetBitrateBits = (targetSizeBytes * 8) / duration;
 
-					// Reserve 128k for audio
-					const audioBitrate = 128000;
+					audioBitrate = targetBitrateBits < 250000 ? 64000 : 128000;
 					videoBitrate = targetBitrateBits - audioBitrate;
 
-					// Set a minimum threshold for video bitrate
 					if (videoBitrate < 100000) {
 						videoBitrate = Math.max(50000, targetBitrateBits * 0.8);
+						audioBitrate = Math.max(32000, targetBitrateBits - videoBitrate);
 					}
 					useBitrate = true;
 				}
@@ -467,134 +478,201 @@ async function buildFFmpegArgs(file, settings, outputPath) {
 			}
 			break;
 		case "qsv":
+		case "hevc_qsv": {
+			const codec = settings.encoder === "qsv" ? "h264_qsv" : "hevc_qsv";
+
 			args.push(
 				"-c:v",
-				"h264_qsv",
+				codec,
 				"-vf",
 				"format=yuv420p",
 				"-preset",
 				settings.speed,
 			);
-			if (useBitrate) {
-				args.push("-b:v", Math.round(videoBitrate).toString());
-			} else {
-				args.push("-global_quality", quality);
+
+			switch (settings.speed) {
+				case "medium":
+					args.push(
+						"-extbrc",
+						"1",
+						"-adaptive_i",
+						"1",
+						"-adaptive_b",
+						"1",
+					);
+					break;
+
+				case "slow":
+					args.push(
+						"-extbrc",
+						"1",
+						"-look_ahead_depth",
+						"40",
+						"-adaptive_i",
+						"1",
+						"-adaptive_b",
+						"1",
+						"-rdo",
+						"1",
+						"-mbbrc",
+						"1",
+					);
+					break;
 			}
-			break;
-		case "hevc_qsv":
-			args.push(
-				"-c:v",
-				"hevc_qsv",
-				"-vf",
-				"format=yuv420p",
-				"-preset",
-				settings.speed,
-			);
-			if (useBitrate) {
-				args.push("-b:v", Math.round(videoBitrate).toString());
-			} else {
-				args.push("-global_quality", quality);
-			}
-			break;
-		case "vaapi":
-			args.push(
-				"-vaapi_device",
-				vaapi_device,
-				"-vf",
-				"format=nv12,hwupload",
-				"-c:v",
-				"h264_vaapi",
-			);
-			if (useBitrate) {
-				args.push("-b:v", Math.round(videoBitrate).toString());
-			} else {
-				args.push("-qp", quality);
-			}
-			break;
-		case "hevc_vaapi":
-			args.push(
-				"-vaapi_device",
-				vaapi_device,
-				"-vf",
-				"format=nv12,hwupload",
-				"-c:v",
-				"hevc_vaapi",
-			);
-			if (useBitrate) {
-				args.push("-b:v", Math.round(videoBitrate).toString());
-			} else {
-				args.push("-qp", quality);
-			}
-			break;
-		case "nvenc":
-			args.push(
-				"-c:v",
-				"h264_nvenc",
-				"-vf",
-				"format=yuv420p",
-				"-preset",
-				getNvencPreset(settings.speed),
-			);
-			if (useBitrate) {
-				args.push("-b:v", Math.round(videoBitrate).toString());
-			} else {
-				args.push("-rc", "vbr", "-cq", quality);
-			}
-			break;
-		case "hevc_nvenc":
-			args.push(
-				"-c:v",
-				"hevc_nvenc",
-				"-vf",
-				"format=yuv420p",
-				"-preset",
-				getNvencPreset(settings.speed),
-			);
-			if (useBitrate) {
-				args.push("-b:v", Math.round(videoBitrate).toString());
-			} else {
-				args.push("-rc", "vbr", "-cq", quality);
-			}
-			break;
-		case "hevc_amf": {
-			const speedToQuality = {slow: "quality", fast: "speed"};
-			const amf_hevc_quality =
-				speedToQuality[settings.speed] || "balanced";
-			args.push(
-				"-c:v",
-				"hevc_amf",
-				"-vf",
-				"format=yuv420p",
-				"-quality",
-				amf_hevc_quality,
-			);
+
 			if (useBitrate) {
 				args.push(
-					"-rc",
-					"cbr",
+					"-b:v",
+					Math.round(videoBitrate).toString(),
+					"-rc_mode",
+					"vbr",
+				);
+			} else {
+				args.push("-global_quality", quality);
+			}
+
+			break;
+		}
+		case "vaapi":
+		case "hevc_vaapi": {
+			const codec =
+				settings.encoder === "vaapi" ? "h264_vaapi" : "hevc_vaapi";
+
+			args.push(
+				"-vaapi_device",
+				vaapi_device,
+				"-vf",
+				"format=nv12,hwupload",
+				"-c:v",
+				codec,
+			);
+
+			switch (settings.speed) {
+				case "medium":
+					args.push("-async_depth", "4");
+					break;
+
+				case "slow":
+					args.push("-async_depth", "4", "-b_depth", "2");
+					break;
+			}
+
+			if (useBitrate) {
+				args.push(
+					"-rc_mode",
+					"VBR",
 					"-b:v",
 					Math.round(videoBitrate).toString(),
 				);
 			} else {
-				args.push("-rc", "cqp", "-qp_i", quality, "-qp_p", quality);
+				args.push("-rc_mode", "ICQ", "-qp", quality);
 			}
+
+			break;
+		}
+		case "nvenc":
+		case "hevc_nvenc": {
+			const codec =
+				settings.encoder === "nvenc" ? "h264_nvenc" : "hevc_nvenc";
+
+			args.push(
+				"-c:v",
+				codec,
+				"-vf",
+				"format=yuv420p",
+				"-preset",
+				getNvencPreset(settings.speed),
+			);
+
+			switch (settings.speed) {
+				case "medium":
+					args.push("-spatial_aq", "1", "-aq-strength", "8");
+					break;
+
+				case "slow":
+					args.push(
+						"-spatial_aq",
+						"1",
+						"-temporal_aq",
+						"1",
+						"-aq-strength",
+						"8",
+						"-rc-lookahead",
+						"32",
+					);
+					break;
+			}
+
+			if (useBitrate) {
+				args.push(
+					"-rc",
+					"vbr_hq",
+					"-b:v",
+					Math.round(videoBitrate).toString(),
+				);
+
+				if (settings.speed === "medium") {
+					args.push("-multipass", "qres");
+				} else if (settings.speed === "slow") {
+					args.push("-multipass", "fullres");
+				}
+			} else {
+				args.push("-rc", "vbr", "-cq", quality);
+			}
+
 			break;
 		}
 		case "amf": {
-			const speedToQuality = {slow: "quality", fast: "speed"};
-			const amf_quality = speedToQuality[settings.speed] || "balanced";
+			const speedToQuality = {
+				fast: "speed",
+				medium: "balanced",
+				slow: "quality",
+			};
+
+			const amfQuality = speedToQuality[settings.speed] || "balanced";
+
 			args.push(
 				"-c:v",
 				"h264_amf",
 				"-vf",
 				"format=yuv420p",
 				"-quality",
-				amf_quality,
+				amfQuality,
 			);
+
+			switch (settings.speed) {
+				case "medium":
+					args.push("-vbaq", "true");
+					break;
+
+				case "slow":
+					args.push(
+						"-usage",
+						"high_quality",
+						"-preanalysis",
+						"true",
+						"-preencode",
+						"true",
+						"-vbaq",
+						"true",
+						"-pa_lookahead_buffer_depth",
+						"41",
+						"-pa_paq_mode",
+						"caq",
+						"-pa_taq_mode",
+						"2",
+						"-pa_scene_change_detection_enable",
+						"true",
+						"-pa_high_motion_quality_boost_mode",
+						"auto",
+					);
+					break;
+			}
+
 			if (useBitrate) {
 				args.push(
 					"-rc",
-					"cbr",
+					settings.speed === "fast" ? "cbr" : "hqcbr",
 					"-b:v",
 					Math.round(videoBitrate).toString(),
 				);
@@ -610,6 +688,68 @@ async function buildFFmpegArgs(file, settings, outputPath) {
 					quality,
 				);
 			}
+
+			break;
+		}
+
+		case "hevc_amf": {
+			const speedToQuality = {
+				fast: "speed",
+				medium: "balanced",
+				slow: "quality",
+			};
+
+			const amfQuality = speedToQuality[settings.speed] || "balanced";
+
+			args.push(
+				"-c:v",
+				"hevc_amf",
+				"-vf",
+				"format=yuv420p",
+				"-quality",
+				amfQuality,
+			);
+
+			switch (settings.speed) {
+				case "medium":
+					args.push("-vbaq", "true");
+					break;
+
+				case "slow":
+					args.push(
+						"-usage",
+						"high_quality",
+						"-preanalysis",
+						"true",
+						"-preencode",
+						"true",
+						"-vbaq",
+						"true",
+						"-pa_lookahead_buffer_depth",
+						"41",
+						"-pa_paq_mode",
+						"caq",
+						"-pa_taq_mode",
+						"2",
+						"-pa_scene_change_detection_enable",
+						"true",
+						"-pa_high_motion_quality_boost_mode",
+						"auto",
+					);
+					break;
+			}
+
+			if (useBitrate) {
+				args.push(
+					"-rc",
+					settings.speed === "fast" ? "cbr" : "hqcbr",
+					"-b:v",
+					Math.round(videoBitrate).toString(),
+				);
+			} else {
+				args.push("-rc", "cqp", "-qp_i", quality, "-qp_p", quality);
+			}
+
 			break;
 		}
 		case "videotoolbox":
@@ -635,11 +775,15 @@ async function buildFFmpegArgs(file, settings, outputPath) {
 			? "aac"
 			: settings.audioFormat;
 
-	args.push("-c:a", settings.audioFormat);
+	args.push("-c:a", audioFormat);
+
 	if (audioFormat !== "copy") {
-		args.push("-b:a", "128k");
+		const audioBitrateString = `${Math.round(audioBitrate / 1000)}k`;
+		args.push("-b:a", audioBitrateString);
 	}
+
 	args.push(outputPath);
+
 	return args;
 }
 
@@ -701,10 +845,16 @@ function createProgressItem(filename, status, data, itemId) {
 	newStatus.id = itemId;
 	newStatus.className = `status-item ${status}`;
 	const visibleFilename = filename.substring(0, 45);
-	newStatus.innerHTML = `
-        <div class="filename">${visibleFilename}</div>
-        <div id="${itemId}_prog" class="itemProgress">${data}</div>
-    `;
+	const filenameDiv = document.createElement("div");
+	filenameDiv.className = "filename";
+	filenameDiv.textContent = visibleFilename;
+
+	const progDiv = document.createElement("div");
+	progDiv.id = `${itemId}_prog`;
+	progDiv.className = "itemProgressInfo";
+	progDiv.textContent = data;
+
+	newStatus.append(filenameDiv, progDiv);
 	dom.compressionStatus.append(newStatus);
 	dom.compressionStatus.scrollIntoView({behavior: "smooth", block: "end"});
 }
