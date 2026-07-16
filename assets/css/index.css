@@ -79,7 +79,7 @@ img {
 	border-radius: 6px;
 	text-decoration: none;
 	cursor: pointer;
-	padding: 10px;
+	padding: 6px 10px;
 	display: flex;
 	margin: 8px 0;
 	font-weight: normal;
@@ -324,7 +324,7 @@ img {
 	padding: 5px;
 	background: #1310108a;
 	color: white;
-	left: 5px;
+	left: 8px;
 	bottom: 5px;
 	border-radius: 5px;
 	font-size: 10px;

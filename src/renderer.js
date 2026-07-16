@@ -1381,10 +1381,17 @@ class YtDownloaderApp {
 						job.type === "video" ? "video" : "audio",
 					)}</span>
                 </div>
+                <img src="../assets/images/close.png" class="itemClose" id="${randomId}_close">
                 <div class="itemBody">
                     <div class="itemTitle">${job.title}</div>
 					<div class="itemChannel">${job.channel}</div>
-                    <p>${i18n.__("preparing")}</p>
+					<div class="speedContainer">
+						<span class="itemSpeed" id="${randomId}_speed"></span>
+					</div>
+                    <div id="${randomId}_prog" class="itemProgress">${i18n.__(
+						"preparing",
+					)}</div>
+					<button id="${randomId}_openBtn" class="openFileBtn"><img class="btnIcon" src="../assets/images/external-link.png"/>${i18n.__("openFile")}</button>
                 </div>
             </div>`;
 		$(CONSTANTS.DOM_IDS.DOWNLOAD_LIST).insertAdjacentHTML(
@@ -1607,6 +1614,7 @@ class YtDownloaderApp {
 			);
 			this.state.downloadControllers.delete(randomId);
 			this._processQueue();
+
 			return; // Don't treat user cancellation as an error
 		}
 		this.state.currentDownloads--;
