@@ -336,8 +336,7 @@ const playlistDownloader = {
 			"--compat-options",
 			"no-youtube-unavailable-videos",
 			"--exec",
-			// Since shell is disabled, it will not execute the code, however it will print all the info
-			`[Item info]:::%(playlist_index)q:::%(title)q:::%(thumbnail)q`,
+			`before_dl:echo [Item info]:::%(playlist_index)q:::%(title)q:::%(thumbnail)q`,
 		];
 	},
 
