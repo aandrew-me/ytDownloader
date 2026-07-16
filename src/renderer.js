@@ -1106,6 +1106,7 @@ class YtDownloaderApp {
 		try {
 			safeUrl = this.validateUrl(url);
 		} catch {
+			$(CONSTANTS.DOM_IDS.ERROR_BTN).textContent = i18n.__("errorDetails") + " ◀";
 			this._showError(i18n.__("invalidUrl"), url);
 
 			return;

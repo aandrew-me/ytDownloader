@@ -113,14 +113,15 @@ getId("goToTop").addEventListener("click", () => {
 
 // Showing and hiding error details
 function toggleErrorDetails() {
-	const status = getId("errorDetails").style.display;
-	if (status === "none") {
+	const display = getComputedStyle(getId("errorDetails")).display;
+
+	if (display === "none") {
 		getId("errorDetails").style.display = "block";
 		// @ts-ignore
-		getId("errorBtn").textContent = i18n.__("errorDetails") + " ▲";
+		getId("errorBtn").textContent = i18n.__("errorDetails") + " ▼";
 	} else {
 		getId("errorDetails").style.display = "none";
 		// @ts-ignore
-		getId("errorBtn").textContent = i18n.__("errorDetails") + " ▼";
+		getId("errorBtn").textContent = i18n.__("errorDetails") + " ◀";
 	}
 }
