@@ -1343,22 +1343,28 @@ input[type="range"]::-webkit-slider-thumb:hover {
 	border-radius: 8px;
 }
 
-.audio-indicator {
+.audio-indicator,
+.audio-no-bg {
 	font-size: 11px;
 	padding: 2px 4px;
-	color: #10b981;
 	font-weight: 500;
+	color: #10b981;
+}
+
+.audio-indicator {
 	background-color: #29974513;
 }
 
-.audio-indicator svg {
+.audio-indicator svg,
+.audio-no-bg svg {
 	width: 18px;
 	height: 18px;
 	flex-shrink: 0;
 	fill: currentColor;
 }
 
-.audio-indicator .lang-text {
+.audio-indicator .lang-text,
+.audio-no-bg .lang-text {
 	font-size: 12px;
 	color: var(--text);
 	opacity: 0.9;

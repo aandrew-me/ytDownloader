@@ -1787,15 +1787,23 @@ class YtDownloaderApp {
 				let audioMarkup = `<div class="audio-placeholder"></div>`;
 				if (format.acodec !== "none") {
 					const langName = getLanguageName(format.language);
-					const langSpan = langName
-						? `<span class="lang-text">${langName}</span>`
-						: "";
-					audioMarkup = `
-                    <div class="audio-indicator">
-                        ${speakerIconSvg}
-                        ${langSpan}
-                    </div>
-                `;
+					const langSpan = langName ? `<span class="lang-text">${langName}</span>` : "";
+					
+					if (langName) {
+						audioMarkup = `
+							<div class="audio-indicator">
+								${speakerIconSvg}
+								${langSpan}
+							</div>
+						`;
+					} else {
+						audioMarkup = `
+							<div class="audio-no-bg">
+								${speakerIconSvg}
+								${langSpan}
+							</div>
+						`;
+					}
 				}
 
 				const codecHtml = showMoreFormats
