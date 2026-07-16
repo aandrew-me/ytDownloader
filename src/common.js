@@ -77,13 +77,13 @@ let advancedHidden = true;
 function advancedToggle() {
 	if (advancedHidden) {
 		getId("advanced").style.display = "block";
-		getId("arrowDownVideo").style.transform = "rotate(180deg)";
-		getId("arrowDownAudio").style.transform = "rotate(180deg)";
+		getId("arrowLeftVideo").style.transform = "rotate(-90deg)";
+		getId("arrowLeftAudio").style.transform = "rotate(-90deg)";
 		advancedHidden = false;
 	} else {
 		getId("advanced").style.display = "none";
-		getId("arrowDownVideo").style.transform = "rotate(0deg)";
-		getId("arrowDownAudio").style.transform = "rotate(0deg)";
+		getId("arrowLeftVideo").style.transform = "rotate(0deg)";
+		getId("arrowLeftAudio").style.transform = "rotate(0deg)";
 		advancedHidden = true;
 	}
 }
