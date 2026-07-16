@@ -565,7 +565,7 @@ async function buildFFmpegArgs(file, settings, outputPath) {
 					Math.round(videoBitrate).toString(),
 				);
 			} else {
-				args.push("-rc_mode", "ICQ", "-qp", quality);
+				args.push("-qp", quality);
 			}
 
 			break;
