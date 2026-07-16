@@ -210,19 +210,21 @@ function createTray() {
 			label: i18n("pasteVideoLink"),
 			click: async () => {
 				const text = clipboard.readText();
+
 				appState.mainWindow?.show();
 				if (app.dock) app.dock.show();
-				if (appState.indexPageIsOpen) {
-					appState.mainWindow.webContents.send("link", text);
-				} else {
+
+				const wc = appState.mainWindow.webContents;
+
+				if (!appState.indexPageIsOpen) {
+					wc.once("did-finish-load", () => {
+						appState.indexPageIsOpen = true;
+						wc.send("link", text);
+					});
+
 					await appState.mainWindow.loadFile("html/index.html");
-					appState.indexPageIsOpen = true;
-					appState.mainWindow.webContents.once(
-						"did-finish-load",
-						() => {
-							appState.mainWindow.webContents.send("link", text);
-						},
-					);
+				} else {
+					wc.send("link", text);
 				}
 			},
 		},
