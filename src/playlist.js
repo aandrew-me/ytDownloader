@@ -338,7 +338,6 @@ const playlistDownloader = {
 			"--exec",
 			// Since shell is disabled, it will not execute the code, however it will print all the info
 			`[Item info]:::%(playlist_index)q:::%(title)q:::%(thumbnail)q`,
-			"echo hi"
 		];
 	},
 
@@ -357,7 +356,7 @@ const playlistDownloader = {
 			if (videoType === "mp4") {
 				formatArgs = [
 					"-f",
-					"bestvideo[height<=${quality}]+bestaudio[ext=m4a]/best[height<=${quality}]/best",
+					`bestvideo[height<=${quality}]+bestaudio[ext=m4a]/best[height<=${quality}]/best`,
 					"--merge-output-format",
 					"mp4",
 					"--recode-video",
@@ -366,7 +365,7 @@ const playlistDownloader = {
 			} else if (videoType === "webm") {
 				formatArgs = [
 					"-f",
-					"bestvideo[height<=${quality}]+bestaudio[ext=webm]/best[height<=${quality}]/best",
+					`bestvideo[height<=${quality}]+bestaudio[ext=webm]/best[height<=${quality}]/best`,
 					"--merge-output-format",
 					"webm",
 					"--recode-video",
