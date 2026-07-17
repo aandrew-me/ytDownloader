@@ -45,18 +45,16 @@ A modern GUI video and audio downloader supporting [hundreds of sites](https://g
 
 ## Screenshots
 
-<!-- ![dark](https://user-images.githubusercontent.com/66430340/196022794-885e5b90-40d2-4b58-a8fa-74f10c6e470e.png) -->
-<!-- ![light](https://user-images.githubusercontent.com/66430340/196022796-1215038d-bafb-4450-82b1-7baddd60c0e8.png) -->
-
 <!-- ![ytdownloader_dark](https://github.com/aandrew-me/ytDownloader/assets/66430340/62efbca0-28b8-4016-bcf2-1a14bcaa782c) -->
 <!-- ![ytdownloader_light](https://github.com/aandrew-me/ytDownloader/assets/66430340/34f5270f-bdea-460e-8622-6459cd147b73) -->
 
-![ss_homepage](https://github.com/user-attachments/assets/12410bca-31c3-48a0-bbd3-1d74bcc752b6)
-![ss_settings](https://github.com/user-attachments/assets/060557bc-d209-4bd0-bda4-debe42ca83a0)
-![ss_compressor](https://github.com/user-attachments/assets/52da7e50-46bb-4749-8152-5e79324a6cc3)
+<!-- ![ss_homepage](https://github.com/user-attachments/assets/12410bca-31c3-48a0-bbd3-1d74bcc752b6) -->
+<!-- ![ss_compressor](https://github.com/user-attachments/assets/52da7e50-46bb-4749-8152-5e79324a6cc3) -->
 
-<!-- ![ytdownloader_dark](https://github.com/aandrew-me/ytDownloader/assets/66430340/2f6695e7-6ca0-4f7c-91a0-0ad735c1e3af) -->
-<!-- ![ytdownloader_light](https://github.com/aandrew-me/ytDownloader/assets/66430340/3c974ab0-8257-4b8a-88ec-ee6bd119751e) -->
+<img width="3178" height="1870" alt="ss_homepage" src="https://github.com/user-attachments/assets/cff15ee5-a78b-43d1-adce-19c7f5d59221" />
+<img width="2848" height="1842" alt="ss_compressor" src="https://github.com/user-attachments/assets/e5d4fac3-9688-4617-960b-1cd0960e6ba0" />
+
+
 
 # Installation
 
