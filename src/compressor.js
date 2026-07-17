@@ -281,22 +281,27 @@ async function compressVideo(file, settings, itemId, outputPath) {
 		});
 
 		let video_info = {duration: ""};
+		let stderrOutput = "";
 
 		createProgressItem(
 			path.basename(file.path),
 			"progress",
-			`Starting...`,
+			"Starting...",
 			itemId,
 		);
 
 		child.stderr.on("data", (data) => {
 			const dataStr = data.toString();
 
+			stderrOutput += dataStr;
+
+			// Parse duration
 			const duration_match = dataStr.match(/Duration:\s*([\d:.]+)/);
 			if (duration_match) {
 				video_info.duration = duration_match[1];
 			}
 
+			// Parse progress
 			const progressTime = dataStr.match(/time=(\d+:\d+:\d+\.\d+)/);
 			const totalSeconds = timeToSeconds(video_info.duration);
 			const currentSeconds =
@@ -308,14 +313,22 @@ async function compressVideo(file, settings, itemId, outputPath) {
 				const progress = Math.round(
 					(currentSeconds / totalSeconds) * 100,
 				);
+
 				const progElem = getId(itemId + "_prog");
 
 				if (progElem) {
 					let progressBar = progElem.querySelector(
 						".progressBarCompress",
 					);
+
 					if (!progressBar) {
-						progElem.innerHTML = `<progress class="progressBarCompress" min="0" max="100" value="${progress}"></progress>`;
+						progElem.innerHTML = `
+							<progress
+								class="progressBarCompress"
+								min="0"
+								max="100"
+								value="${progress}">
+							</progress>`;
 					} else {
 						progressBar.value = progress;
 					}
@@ -323,11 +336,18 @@ async function compressVideo(file, settings, itemId, outputPath) {
 			}
 		});
 
-		child.on("error", (err) => reject(err));
+		child.on("error", reject);
+
 		child.on("close", (code) => {
-			if (code !== 0 && !isCancelled)
-				reject(new Error(`Process exited with code ${code}`));
-			else resolve();
+			if (code !== 0 && !isCancelled) {
+				reject(
+					new Error(
+						`FFmpeg exited with code ${code}\n\n${stderrOutput.trim()}`,
+					),
+				);
+			} else {
+				resolve();
+			}
 		});
 	});
 }
@@ -428,7 +448,10 @@ async function buildFFmpegArgs(file, settings, outputPath) {
 
 					if (videoBitrate < 100000) {
 						videoBitrate = Math.max(50000, targetBitrateBits * 0.8);
-						audioBitrate = Math.max(32000, targetBitrateBits - videoBitrate);
+						audioBitrate = Math.max(
+							32000,
+							targetBitrateBits - videoBitrate,
+						);
 					}
 					useBitrate = true;
 				}
