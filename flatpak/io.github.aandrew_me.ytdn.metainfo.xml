@@ -55,6 +55,19 @@
   <content_rating type="oars-1.1" />
 
   <releases>
+    <release version="3.22.0" date="2026-07-17">
+      <description>
+        <p>Improved format listing UI</p>
+        <p>Redesigned Preferences page</p>
+        <p>Added Youtube Search feature</p>
+        <p>Added output template support for video/audio files</p>
+        <p>Added URL validation to prevent XSS attacks</p>
+        <p>Added automatic system proxy detection</p>
+        <p>Playlist improvements: Improved UI of download items, added cancel button</p>
+        <p>Minor bug fixes</p>
+      </description>
+    </release>
+
     <release version="3.20.3" date="2026-06-11">
       <description>
         <p>Minor fixes and enhancements</p>
