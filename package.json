@@ -32,7 +32,7 @@
 	"description": "Download videos and audios from YouTube and many other sites",
 	"devDependencies": {
 		"electron": "^30.5.1",
-		"electron-builder": "^26.15.3",
+		"electron-builder": "^26.0.12",
 		"typescript": "^5.3.3"
 	},
 	"build": {
