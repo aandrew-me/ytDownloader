@@ -384,6 +384,26 @@ async function buildFFmpegArgs(file, settings, outputPath) {
 	const inputPath = file.path;
 	console.log("Output path: " + outputPath);
 
+	const resolvedSettings = {...settings};
+
+	if (resolvedSettings.encoder === "auto") {
+		try {
+			const codec = await getVideoCodec(inputPath);
+
+			if (["hevc", "h265", "av1", "av01", "vp9"].includes(codec)) {
+				resolvedSettings.encoder = "x265";
+			} else {
+				resolvedSettings.encoder = "x264";
+			}
+		} catch (error) {
+			console.error(
+				"Failed to detect input codec, falling back to x264",
+				error,
+			);
+			resolvedSettings.encoder = "x264";
+		}
+	}
+
 	const args = ["-hide_banner", "-y", "-stats", "-i", inputPath];
 
 	let useBitrate = false;
@@ -392,11 +412,11 @@ async function buildFFmpegArgs(file, settings, outputPath) {
 
 	const containerOverheadFactor = 0.985;
 
-	if (settings.videoQuality === "target-size") {
+	if (resolvedSettings.videoQuality === "target-size") {
 		try {
 			const duration = await getVideoDuration(inputPath);
 			if (duration > 0) {
-				const targetSizeMB = parseFloat(settings.targetSize);
+				const targetSizeMB = parseFloat(resolvedSettings.targetSize);
 				if (!isNaN(targetSizeMB) && targetSizeMB > 0) {
 					const containerOverheadFactor = 0.985;
 					const targetSizeBytes =
@@ -427,11 +447,13 @@ async function buildFFmpegArgs(file, settings, outputPath) {
 		}
 	}
 
-	if (settings.videoQuality === "target-percent") {
+	if (resolvedSettings.videoQuality === "target-percent") {
 		try {
 			const duration = await getVideoDuration(inputPath);
 			if (duration > 0) {
-				const targetPercent = parseFloat(settings.targetPercent);
+				const targetPercent = parseFloat(
+					resolvedSettings.targetPercent,
+				);
 				if (
 					!isNaN(targetPercent) &&
 					targetPercent > 0 &&
@@ -464,9 +486,9 @@ async function buildFFmpegArgs(file, settings, outputPath) {
 		}
 	}
 
-	const quality = getCRFValue(settings);
+	const quality = getCRFValue(resolvedSettings);
 
-	switch (settings.encoder) {
+	switch (resolvedSettings.encoder) {
 		case "copy":
 			args.push("-c:v", "copy");
 			break;
@@ -475,7 +497,7 @@ async function buildFFmpegArgs(file, settings, outputPath) {
 				"-c:v",
 				"libx264",
 				"-preset",
-				settings.speed,
+				resolvedSettings.speed,
 				"-vf",
 				"format=yuv420p",
 			);
@@ -492,7 +514,7 @@ async function buildFFmpegArgs(file, settings, outputPath) {
 				"-vf",
 				"format=yuv420p",
 				"-preset",
-				settings.speed,
+				resolvedSettings.speed,
 			);
 			if (useBitrate) {
 				args.push("-b:v", Math.round(videoBitrate).toString());
@@ -502,7 +524,8 @@ async function buildFFmpegArgs(file, settings, outputPath) {
 			break;
 		case "qsv":
 		case "hevc_qsv": {
-			const codec = settings.encoder === "qsv" ? "h264_qsv" : "hevc_qsv";
+			const codec =
+				resolvedSettings.encoder === "qsv" ? "h264_qsv" : "hevc_qsv";
 
 			args.push(
 				"-c:v",
@@ -510,10 +533,10 @@ async function buildFFmpegArgs(file, settings, outputPath) {
 				"-vf",
 				"format=yuv420p",
 				"-preset",
-				settings.speed,
+				resolvedSettings.speed,
 			);
 
-			switch (settings.speed) {
+			switch (resolvedSettings.speed) {
 				case "medium":
 					args.push(
 						"-extbrc",
@@ -559,7 +582,9 @@ async function buildFFmpegArgs(file, settings, outputPath) {
 		case "vaapi":
 		case "hevc_vaapi": {
 			const codec =
-				settings.encoder === "vaapi" ? "h264_vaapi" : "hevc_vaapi";
+				resolvedSettings.encoder === "vaapi"
+					? "h264_vaapi"
+					: "hevc_vaapi";
 
 			args.push(
 				"-vaapi_device",
@@ -570,7 +595,7 @@ async function buildFFmpegArgs(file, settings, outputPath) {
 				codec,
 			);
 
-			switch (settings.speed) {
+			switch (resolvedSettings.speed) {
 				case "medium":
 					args.push("-async_depth", "4");
 					break;
@@ -596,7 +621,9 @@ async function buildFFmpegArgs(file, settings, outputPath) {
 		case "nvenc":
 		case "hevc_nvenc": {
 			const codec =
-				settings.encoder === "nvenc" ? "h264_nvenc" : "hevc_nvenc";
+				resolvedSettings.encoder === "nvenc"
+					? "h264_nvenc"
+					: "hevc_nvenc";
 
 			args.push(
 				"-c:v",
@@ -604,10 +631,10 @@ async function buildFFmpegArgs(file, settings, outputPath) {
 				"-vf",
 				"format=yuv420p",
 				"-preset",
-				getNvencPreset(settings.speed),
+				getNvencPreset(resolvedSettings.speed),
 			);
 
-			switch (settings.speed) {
+			switch (resolvedSettings.speed) {
 				case "medium":
 					args.push("-spatial_aq", "1", "-aq-strength", "8");
 					break;
@@ -634,9 +661,9 @@ async function buildFFmpegArgs(file, settings, outputPath) {
 					Math.round(videoBitrate).toString(),
 				);
 
-				if (settings.speed === "medium") {
+				if (resolvedSettings.speed === "medium") {
 					args.push("-multipass", "qres");
-				} else if (settings.speed === "slow") {
+				} else if (resolvedSettings.speed === "slow") {
 					args.push("-multipass", "fullres");
 				}
 			} else {
@@ -652,7 +679,8 @@ async function buildFFmpegArgs(file, settings, outputPath) {
 				slow: "quality",
 			};
 
-			const amfQuality = speedToQuality[settings.speed] || "balanced";
+			const amfQuality =
+				speedToQuality[resolvedSettings.speed] || "balanced";
 
 			args.push(
 				"-c:v",
@@ -663,7 +691,7 @@ async function buildFFmpegArgs(file, settings, outputPath) {
 				amfQuality,
 			);
 
-			switch (settings.speed) {
+			switch (resolvedSettings.speed) {
 				case "medium":
 					args.push("-vbaq", "true");
 					break;
@@ -695,7 +723,7 @@ async function buildFFmpegArgs(file, settings, outputPath) {
 			if (useBitrate) {
 				args.push(
 					"-rc",
-					settings.speed === "fast" ? "cbr" : "hqcbr",
+					resolvedSettings.speed === "fast" ? "cbr" : "hqcbr",
 					"-b:v",
 					Math.round(videoBitrate).toString(),
 				);
@@ -722,7 +750,8 @@ async function buildFFmpegArgs(file, settings, outputPath) {
 				slow: "quality",
 			};
 
-			const amfQuality = speedToQuality[settings.speed] || "balanced";
+			const amfQuality =
+				speedToQuality[resolvedSettings.speed] || "balanced";
 
 			args.push(
 				"-c:v",
@@ -733,7 +762,7 @@ async function buildFFmpegArgs(file, settings, outputPath) {
 				amfQuality,
 			);
 
-			switch (settings.speed) {
+			switch (resolvedSettings.speed) {
 				case "medium":
 					args.push("-vbaq", "true");
 					break;
@@ -765,7 +794,7 @@ async function buildFFmpegArgs(file, settings, outputPath) {
 			if (useBitrate) {
 				args.push(
 					"-rc",
-					settings.speed === "fast" ? "cbr" : "hqcbr",
+					resolvedSettings.speed === "fast" ? "cbr" : "hqcbr",
 					"-b:v",
 					Math.round(videoBitrate).toString(),
 				);
@@ -794,9 +823,9 @@ async function buildFFmpegArgs(file, settings, outputPath) {
 	}
 
 	const audioFormat =
-		useBitrate && settings.audioFormat === "copy"
+		useBitrate && resolvedSettings.audioFormat === "copy"
 			? "aac"
-			: settings.audioFormat;
+			: resolvedSettings.audioFormat;
 
 	args.push("-c:a", audioFormat);
 
@@ -1025,6 +1054,44 @@ function getVideoDuration(filePath) {
 		child.on("error", (err) => {
 			clearTimeout(timeout);
 			reject(err);
+		});
+	});
+}
+
+function getVideoCodec(filePath) {
+	const ffprobe = getFfprobePath();
+	return new Promise((resolve) => {
+		const child = spawn(ffprobe, [
+			"-v",
+			"error",
+			"-select_streams",
+			"v:0",
+			"-show_entries",
+			"stream=codec_name",
+			"-of",
+			"default=noprint_wrappers=1:nokey=1",
+			filePath,
+		]);
+		let output = "";
+		const timeout = setTimeout(() => {
+			child.kill();
+			resolve("h264"); // Fallback if probe times out
+		}, 5000);
+
+		child.stdout.on("data", (data) => {
+			output += data.toString();
+		});
+		child.on("close", (code) => {
+			clearTimeout(timeout);
+			if (code === 0) {
+				resolve(output.trim().toLowerCase());
+			} else {
+				resolve("h264");
+			}
+		});
+		child.on("error", () => {
+			clearTimeout(timeout);
+			resolve("h264");
 		});
 	});
 }
