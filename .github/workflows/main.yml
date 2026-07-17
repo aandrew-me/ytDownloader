@@ -7,7 +7,24 @@ permissions:
     contents: write
 
 jobs:
+    create_draft:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v7
+
+            - name: Create Draft Release
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  # Extract version directly from package.json
+                  VERSION=$(node -p "require('./package.json').version")
+                  
+                  # Create the draft. If it already exists (e.g., on workflow re-runs), fail gracefully without stopping the script.
+                  gh release create "v${VERSION}" --draft --title "v${VERSION}" --notes "Automated build artifacts." || echo "Draft already exists, proceeding..."
+
     build_and_release:
+        needs: create_draft
         runs-on: ${{ matrix.os }}
         env:
             SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_TOKEN }}
@@ -17,7 +34,7 @@ jobs:
                 os:
                     [
                         macos-latest,
-                        macos-15-intel,
+                        macos-26-intel,
                         ubuntu-latest,
                         windows-latest,
                     ]
