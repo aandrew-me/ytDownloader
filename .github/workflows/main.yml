@@ -2,6 +2,7 @@ name: Build and Release
 on:
     push:
         branches: [release]
+    workflow_dispatch:
 
 permissions:
     contents: write
@@ -19,7 +20,7 @@ jobs:
               run: |
                   # Extract version directly from package.json
                   VERSION=$(node -p "require('./package.json').version")
-                  
+
                   # Create the draft. If it already exists (e.g., on workflow re-runs), fail gracefully without stopping the script.
                   gh release create "v${VERSION}" --draft --title "v${VERSION}" --notes "Automated build artifacts." || echo "Draft already exists, proceeding..."
 
