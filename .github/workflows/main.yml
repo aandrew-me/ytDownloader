@@ -67,7 +67,7 @@ jobs:
                   npm run gh-linux
 
             - name: Macos Intel Build
-              if: matrix.os == 'macos-15-intel'
+              if: matrix.os == 'macos-26-intel'
               run: |
                   mkdir -p ffmpeg/bin
                   curl -L https://github.com/aandrew-me/ffmpeg-builds/releases/download/v8/ffmpeg_macos_amd64 -o ffmpeg/bin/ffmpeg
