@@ -14,6 +14,7 @@ const fs = require("fs").promises;
 const {existsSync, readFileSync} = require("fs");
 const path = require("path");
 const DownloadHistory = require("./src/history");
+const {platform} = require("os");
 
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = "true";
 autoUpdater.autoDownload = false;
@@ -482,23 +483,66 @@ function registerIpcHandlers() {
 	);
 }
 
+function isZipBuild() {
+	if (!app.isPackaged || platform() !== "win32") return false;
+
+	const exeDir = path.dirname(app.getPath("exe"));
+
+	const uninstallerPath = path.join(exeDir, "Uninstall YTDownloader.exe");
+
+	return !existsSync(uninstallerPath);
+}
+
 function registerAutoUpdaterEvents() {
 	autoUpdater.on("update-available", async (info) => {
-		const dialogOpts = {
-			type: "info",
-			buttons: [i18n("update"), i18n("no")],
-			title: "Update Available",
-			message: i18n("updateAvailablePrompt"),
-			detail:
-				info.releaseNotes?.toString().replace(/<[^>]*>?/gm, "") ||
-				"No details available.",
-		};
-		const {response} = await dialog.showMessageBox(
-			appState.mainWindow,
-			dialogOpts,
-		);
-		if (response === 0) {
-			autoUpdater.downloadUpdate();
+		if (isZipBuild() || platform() === "darwin") {
+			const dialogOpts = {
+				type: "info",
+				buttons: [i18n("download"), i18n("no")],
+				title: "Update Available",
+				detail: info.releaseNotes?.toString().replace(/<[^>]*>?/gm, "") || "",
+				message: i18n(
+					"updateAvailableDownloadPrompt",
+				),
+			};
+			dialog.showMessageBox(dialogOpts).then((returnValue) => {
+				if (returnValue.response === 0) {
+					if (platform() === "win32") {
+						shell.openExternal(
+							"https://github.com/aandrew-me/ytDownloader/releases/latest/download/YTDownloader_Win.zip",
+						);
+					} else if (platform() === "darwin") {
+						if (process.arch === "x64") {
+							shell.openExternal(
+								"https://github.com/aandrew-me/ytDownloader/releases/latest/download/YTDownloader_Mac_x64.dmg",
+							);
+						} else {
+							shell.openExternal(
+								"https://github.com/aandrew-me/ytDownloader/releases/latest/download/YTDownloader_Mac_arm64.dmg",
+							);
+						}
+					} else {
+						shell.openExternal("https://github.com/aandrew-me/ytDownloader/releases/latest")
+					}
+				}
+			});
+		} else {
+			const dialogOpts = {
+				type: "info",
+				buttons: [i18n("update"), i18n("no")],
+				title: "Update Available",
+				message: i18n("updateAvailablePrompt"),
+				detail:
+					info.releaseNotes?.toString().replace(/<[^>]*>?/gm, "") ||
+					"No details available.",
+			};
+			const {response} = await dialog.showMessageBox(
+				appState.mainWindow,
+				dialogOpts,
+			);
+			if (response === 0) {
+				autoUpdater.downloadUpdate();
+			}
 		}
 	});
 
