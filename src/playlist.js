@@ -28,8 +28,8 @@ const playlistDownloader = {
 		filenameFormat: "%(playlist_index)s.%(title)s.%(ext)s",
 		proxy: "",
 		cookie: {
-			browser: "",
 			arg: "",
+			val: "",
 		},
 		configFile: {
 			arg: "",
@@ -323,8 +323,9 @@ const playlistDownloader = {
 				? ["--no-js-runtimes", "--js-runtime", this.state.jsRuntimePath]
 				: []),
 
-			this.config.cookie.arg,
-			this.config.cookie.browser,
+			...(this.config.cookie.arg && this.config.cookie.val
+				? [this.config.cookie.arg, this.config.cookie.val]
+				: []),
 
 			this.config.configFile.arg,
 			this.config.configFile.path,
@@ -664,10 +665,29 @@ const playlistDownloader = {
 			this.config.proxy = proxy;
 		}
 
-		this.config.cookie.browser = localStorage.getItem("browser") || "";
-		this.config.cookie.arg = this.config.cookie.browser
-			? "--cookies-from-browser"
-			: "";
+		const cookieSource =
+			localStorage.getItem("cookieSource") ||
+			(localStorage.getItem("browser") ? "browser" : "none");
+		const cookiesPath = await ipcRenderer.invoke("get-cookies-path");
+
+		if (
+			cookieSource === "file" &&
+			cookiesPath &&
+			fs.existsSync(cookiesPath) &&
+			fs.statSync(cookiesPath).size > 0
+		) {
+			this.config.cookie.arg = "--cookies";
+			this.config.cookie.val = cookiesPath;
+		} else if (
+			cookieSource === "browser" &&
+			localStorage.getItem("browser")
+		) {
+			this.config.cookie.arg = "--cookies-from-browser";
+			this.config.cookie.val = localStorage.getItem("browser");
+		} else {
+			this.config.cookie.arg = "";
+			this.config.cookie.val = "";
+		}
 		const configPath = localStorage.getItem("configPath");
 		this.config.configFile.path = configPath ? `"${configPath}"` : "";
 		this.config.configFile.arg = configPath ? "--config-location" : "";

@@ -10,6 +10,8 @@ const {
 	existsSync,
 	cpSync,
 	copyFileSync,
+	writeFileSync,
+	statSync,
 } = require("fs");
 const {execSync, spawn} = require("child_process");
 
@@ -84,6 +86,8 @@ const CONSTANTS = {
 		PREFERRED_AUDIO_QUALITY: "preferredAudioQuality",
 		PREFERRED_VIDEO_CODEC: "preferredVideoCodec",
 		SHOW_MORE_FORMATS: "showMoreFormats",
+		COOKIE_SOURCE: "cookieSource",
+		NETSCAPE_COOKIES: "netscapeCookies",
 		BROWSER_COOKIES: "browser",
 		PROXY: "proxy",
 		CONFIG_PATH: "configPath",
@@ -141,6 +145,9 @@ class YtDownloaderApp {
 				videoCodec: "avc1",
 				showMoreFormats: false,
 				proxy: "",
+				cookieSource: "none",
+				cookiesPath: "",
+				netscapeCookies: "",
 				browserForCookies: "",
 				customYtDlpArgs: "",
 				videoOutputTemplate: "%(title)s.%(ext)s",
@@ -737,6 +744,36 @@ class YtDownloaderApp {
 			}
 		}
 
+		prefs.cookieSource =
+			localStorage.getItem(
+				CONSTANTS.LOCAL_STORAGE_KEYS.COOKIE_SOURCE,
+			) ||
+			(localStorage.getItem(
+				CONSTANTS.LOCAL_STORAGE_KEYS.BROWSER_COOKIES,
+			)
+				? "browser"
+				: "none");
+		prefs.netscapeCookies =
+			localStorage.getItem(
+				CONSTANTS.LOCAL_STORAGE_KEYS.NETSCAPE_COOKIES,
+			) || "";
+		try {
+			prefs.cookiesPath = await ipcRenderer.invoke("get-cookies-path");
+			if (
+				prefs.cookieSource === "file" &&
+				prefs.cookiesPath &&
+				prefs.netscapeCookies &&
+				prefs.netscapeCookies.trim()
+			) {
+				writeFileSync(prefs.cookiesPath, prefs.netscapeCookies, {
+					encoding: "utf8",
+					mode: 0o600,
+				});
+			}
+		} catch (e) {
+			console.error("Error setting up cookies path:", e);
+		}
+
 		prefs.browserForCookies =
 			localStorage.getItem(
 				CONSTANTS.LOCAL_STORAGE_KEYS.BROWSER_COOKIES,
@@ -772,6 +809,27 @@ class YtDownloaderApp {
 			this.state.downloadDir = downloadDir;
 			$(CONSTANTS.DOM_IDS.PATH_DISPLAY).textContent = downloadDir;
 		}
+	}
+
+	/**
+	 * Returns yt-dlp cookie arguments based on user preference.
+	 * @returns {string[]}
+	 */
+	_getCookieArgs() {
+		const {cookieSource, browserForCookies, cookiesPath} =
+			this.state.preferences;
+		if (
+			cookieSource === "file" &&
+			cookiesPath &&
+			existsSync(cookiesPath) &&
+			statSync(cookiesPath).size > 0
+		) {
+			return ["--cookies", cookiesPath];
+		}
+		if (cookieSource === "browser" && browserForCookies) {
+			return ["--cookies-from-browser", browserForCookies];
+		}
+		return [];
 	}
 
 	/**
@@ -944,16 +1002,14 @@ class YtDownloaderApp {
 
 		try {
 			await this._loadSettings("https://youtube.com");
-			const {proxy, browserForCookies, configPath} =
+			const {proxy, configPath} =
 				this.state.preferences;
 			const args = [
 				"--flat-playlist",
 				"-j",
 				"--no-warnings",
 				...(proxy ? ["--proxy", proxy] : []),
-				...(browserForCookies
-					? ["--cookies-from-browser", browserForCookies]
-					: []),
+				...this._getCookieArgs(),
 				...(this.state.jsRuntimePath
 					? [
 							"--no-js-runtimes",
@@ -1194,7 +1250,7 @@ class YtDownloaderApp {
 	 */
 	_fetchVideoMetadata(url) {
 		return new Promise((resolve, reject) => {
-			const {proxy, browserForCookies, configPath} =
+			const {proxy, configPath} =
 				this.state.preferences;
 			const args = [
 				"-j",
@@ -1203,9 +1259,7 @@ class YtDownloaderApp {
 
 				...(proxy ? ["--proxy", proxy] : []),
 
-				...(browserForCookies
-					? ["--cookies-from-browser", browserForCookies]
-					: []),
+				...this._getCookieArgs(),
 
 				...(this.state.jsRuntimePath
 					? [
@@ -1491,9 +1545,7 @@ class YtDownloaderApp {
 			"--no-playlist",
 			"--no-mtime",
 
-			...(browserForCookies
-				? ["--cookies-from-browser", browserForCookies]
-				: []),
+			...this._getCookieArgs(),
 
 			...(proxy ? ["--proxy", proxy] : []),
 

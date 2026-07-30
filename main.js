@@ -369,6 +369,10 @@ function registerIpcHandlers() {
 		}
 	});
 
+	ipcMain.handle("get-cookies-path", () => {
+		return path.join(USER_DATA_PATH, "cookies.txt");
+	});
+
 	ipcMain.on("useTray", (_event, enabled) => {
 		appState.trayEnabled = enabled;
 		if (enabled) createTray();
