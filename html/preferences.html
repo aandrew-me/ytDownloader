@@ -229,12 +229,20 @@
 
                 <div class="prefBox">
                     <div>
-                        <span id="browserTxt" data-translate="selectBrowserForCookies">Select browser to use cookies
-                            from</span>
-                        <span id="browserInfo" class="info-icon" data-translate-title="cookiesWarning">&#9432;</span>
+                        <span id="cookieSourceTxt" data-translate="selectCookieSource">Select cookies source</span>
+                        <!-- <span id="browserInfo" class="info-icon" data-translate-title="cookiesWarning">&#9432;</span> -->
+                        <a id="learnMoreCookies" class="link-info" data-translate="learnMore">Learn more</a>
                     </div>
+                    <select id="cookieSource">
+                        <option value="none" id="none" data-translate="none">None</option>
+                        <option value="browser" data-translate="cookiesFromBrowser">Browser</option>
+                        <option value="file" data-translate="cookiesFromFile">File (Netscape format)</option>
+                    </select>
+                </div>
+
+                <div class="prefBox" id="browserSelectBox">
+                    <span id="browserTxt" data-translate="selectBrowserForCookies">Select browser to use cookies from</span>
                     <select id="browser">
-                        <option value="" id="none" data-translate="none">None</option>
                         <option value="chrome">Chrome</option>
                         <option value="firefox">Firefox</option>
                         <option value="brave">Brave</option>
@@ -243,6 +251,14 @@
                         <option value="safari">Safari</option>
                         <option value="vivaldi">Vivaldi</option>
                     </select>
+                </div>
+
+                <div class="prefBox" id="netscapeCookiesBox" style="display: none; flex-direction: column; align-items: stretch; gap: 12px; width: 100%;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                        <span id="netscapeCookiesTxt" data-translate="netscapeCookiesLabel">Netscape Formatted Cookies</span>
+                        <button id="addCookieBlockBtn" class="btn greenBtn sm" data-translate="addCookieBlock">+ Add Cookie Block</button>
+                    </div>
+                    <div id="cookieBlocksContainer" style="display: flex; flex-direction: column; gap: 14px; width: 100%;"></div>
                 </div>
             </section>
 

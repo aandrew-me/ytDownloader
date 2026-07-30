@@ -1,5 +1,6 @@
 const {ipcRenderer, shell} = require("electron");
 const {accessSync, constants} = require("original-fs");
+const fs = require("fs");
 const {join} = require("path");
 const {homedir, platform} = require("os");
 const {exec} = require("child_process");
@@ -265,13 +266,207 @@ getId("select").addEventListener("change", (e) => {
 	updateDirectionality();
 });
 
-const savedBrowser = localStorage.getItem("browser");
-if (savedBrowser) {
-	getId("browser").value = savedBrowser;
+// Cookie Source & Netscape Cookies Setup
+const savedCookieSource =
+	localStorage.getItem("cookieSource") ||
+	(localStorage.getItem("browser") ? "browser" : "none");
+const cookieSourceSelect = getId("cookieSource");
+const browserSelectBox = getId("browserSelectBox");
+const netscapeCookiesBox = getId("netscapeCookiesBox");
+
+function updateCookieSourceUI(source) {
+	if (source === "browser") {
+		if (browserSelectBox) browserSelectBox.style.display = "flex";
+		if (netscapeCookiesBox) netscapeCookiesBox.style.display = "none";
+	} else if (source === "file") {
+		if (browserSelectBox) browserSelectBox.style.display = "none";
+		if (netscapeCookiesBox) netscapeCookiesBox.style.display = "flex";
+	} else {
+		if (browserSelectBox) browserSelectBox.style.display = "none";
+		if (netscapeCookiesBox) netscapeCookiesBox.style.display = "none";
+	}
 }
-getId("browser").addEventListener("change", (e) => {
-	localStorage.setItem("browser", e.target.value);
-});
+
+if (cookieSourceSelect) {
+	cookieSourceSelect.value = savedCookieSource;
+	updateCookieSourceUI(savedCookieSource);
+
+	cookieSourceSelect.addEventListener("change", (e) => {
+		const newSource = e.target.value;
+		localStorage.setItem("cookieSource", newSource);
+		updateCookieSourceUI(newSource);
+	});
+}
+
+const savedBrowser = localStorage.getItem("browser") || "chrome";
+if (getId("browser")) {
+	getId("browser").value = savedBrowser;
+	getId("browser").addEventListener("change", (e) => {
+		localStorage.setItem("browser", e.target.value);
+	});
+}
+
+function extractDomainsFromNetscape(text) {
+	if (!text) return [];
+	const lines = text.split("\n");
+	const domains = new Set();
+	for (let line of lines) {
+		line = line.trim();
+		if (!line) continue;
+		if (line.startsWith("#HttpOnly_")) {
+			line = line.replace("#HttpOnly_", "");
+		} else if (line.startsWith("#")) {
+			continue;
+		}
+		const parts = line.split(/\s+/);
+		if (parts.length >= 7) {
+			let domain = parts[0].trim();
+			if (domain.startsWith(".")) domain = domain.substring(1);
+			if (domain) domains.add(domain);
+		}
+	}
+	return Array.from(domains);
+}
+
+// Cookie blocks storage state
+let cookieBlocks = [];
+try {
+	const rawBlocks = localStorage.getItem("netscapeCookieBlocks");
+	if (rawBlocks) {
+		cookieBlocks = JSON.parse(rawBlocks);
+	}
+} catch (e) {
+	cookieBlocks = [];
+}
+
+const savedNetscapeCookies = localStorage.getItem("netscapeCookies") || "";
+
+if (!Array.isArray(cookieBlocks) || cookieBlocks.length === 0) {
+	if (savedNetscapeCookies.trim().length > 0) {
+		cookieBlocks = [
+			{ id: Date.now().toString(), content: savedNetscapeCookies },
+		];
+	} else {
+		cookieBlocks = [{ id: Date.now().toString(), content: "" }];
+	}
+}
+
+async function syncCookiesToFile(combinedText) {
+	try {
+		const cookiesPath = await ipcRenderer.invoke("get-cookies-path");
+		if (cookiesPath) {
+			if (!combinedText || !combinedText.trim()) {
+				if (fs.existsSync(cookiesPath)) {
+					try {
+						fs.unlinkSync(cookiesPath);
+					} catch (e) {
+						fs.writeFileSync(cookiesPath, "", {
+							encoding: "utf8",
+							mode: 0o600,
+						});
+					}
+				}
+			} else {
+				fs.writeFileSync(cookiesPath, combinedText, {
+					encoding: "utf8",
+					mode: 0o600,
+				});
+			}
+		}
+	} catch (err) {
+		console.error("Failed to save cookies.txt:", err);
+	}
+}
+
+function saveAndSyncCookieBlocks() {
+	localStorage.setItem("netscapeCookieBlocks", JSON.stringify(cookieBlocks));
+	const combinedText = cookieBlocks
+		.map((b) => b.content.trim())
+		.filter(Boolean)
+		.join("\n\n");
+	localStorage.setItem("netscapeCookies", combinedText);
+	syncCookiesToFile(combinedText);
+}
+
+function renderCookieBlocks() {
+	const container = getId("cookieBlocksContainer");
+	if (!container) return;
+	container.innerHTML = "";
+
+	cookieBlocks.forEach((block, index) => {
+		const domains = extractDomainsFromNetscape(block.content);
+		const card = document.createElement("div");
+		card.className = "cookie-block-card";
+
+		const header = document.createElement("div");
+		header.className = "cookie-block-header";
+
+		const badge = document.createElement("span");
+		badge.className = "cookie-domain-badge";
+		const domainText =
+			domains.length > 0
+				? `🌐 ${domains.join(", ")}`
+				: window.i18n
+					? window.i18n.__("noDomainDetected")
+					: "No domain detected";
+		badge.textContent = domainText;
+
+		const removeBtn = document.createElement("button");
+		removeBtn.className = "btn redBtn sm";
+		removeBtn.textContent = window.i18n
+			? window.i18n.__("remove")
+			: "Remove";
+		removeBtn.addEventListener("click", () => {
+			cookieBlocks.splice(index, 1);
+			if (cookieBlocks.length === 0) {
+				cookieBlocks.push({ id: Date.now().toString(), content: "" });
+			}
+			saveAndSyncCookieBlocks();
+			renderCookieBlocks();
+		});
+
+		header.appendChild(badge);
+		header.appendChild(removeBtn);
+
+		const textarea = document.createElement("textarea");
+		textarea.className = "cookie-block-textarea";
+		textarea.spellcheck = false;
+		textarea.placeholder = window.i18n
+			? window.i18n.__("cookieBlockPlaceholder")
+			: "# Paste Netscape formatted cookies here";
+		textarea.value = block.content;
+
+		textarea.addEventListener("input", (e) => {
+			block.content = e.target.value;
+			saveAndSyncCookieBlocks();
+			const updatedDomains = extractDomainsFromNetscape(block.content);
+			badge.textContent =
+				updatedDomains.length > 0
+					? `🌐 ${updatedDomains.join(", ")}`
+					: window.i18n
+						? window.i18n.__("noDomainDetected")
+						: "No domain detected";
+		});
+
+		card.appendChild(header);
+		card.appendChild(textarea);
+		container.appendChild(card);
+	});
+}
+
+const addCookieBlockBtn = getId("addCookieBlockBtn");
+if (addCookieBlockBtn) {
+	addCookieBlockBtn.addEventListener("click", () => {
+		cookieBlocks.push({ id: Date.now().toString(), content: "" });
+		saveAndSyncCookieBlocks();
+		renderCookieBlocks();
+	});
+}
+
+renderCookieBlocks();
+if (savedCookieSource === "file") {
+	saveAndSyncCookieBlocks();
+}
 
 if (platform() === "darwin") {
 	getId("ytdlpSourceBox").style.display = "none";
@@ -324,6 +519,10 @@ getId("learnMoreYtdlpArgs").addEventListener("click", () => {
 	shell.openExternal(
 		"https://github.com/aandrew-me/ytDownloader/wiki/Custom-yt%E2%80%90dlp-options",
 	);
+});
+
+getId("learnMoreCookies")?.addEventListener("click", () => {
+	shell.openExternal("https://github.com/aandrew-me/ytDownloader/wiki/Cookies-Guide");
 });
 
 getId("learnMoreOutputTemplates").addEventListener("click", () => {

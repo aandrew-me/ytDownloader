@@ -246,18 +246,54 @@ select {
 	gap: 12px;
 }
 
-/* Custom Arguments Textarea Styles */
-#customArgsInput {
+/* Custom Arguments & Cookies Textarea Styles */
+#customArgsInput,
+#netscapeCookiesInput,
+.cookie-block-textarea {
 	padding: 12px;
 	width: 100%;
-	margin-top: 10px;
+	margin-top: 6px;
 	outline: none;
 	font-family: "JetBrains Mono", monospace;
 	background-color: var(--background);
 	color: var(--text);
 	border: 1px solid var(--box-separation);
 	border-radius: 6px;
-	resize: none;
+	resize: vertical;
+	min-height: 100px;
+	box-sizing: border-box;
+}
+
+.cookie-block-card {
+	background: var(--box);
+	border: 1px solid var(--box-separation);
+	border-radius: 8px;
+	padding: 12px;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.cookie-block-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	width: 100%;
+}
+
+.cookie-domain-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	background: var(--box-toggleOn, #54abde22);
+	color: var(--text);
+	border: 1px solid var(--box-separation);
+	padding: 4px 10px;
+	border-radius: 16px;
+	font-size: 0.85rem;
+	font-weight: 500;
 }
 
 /* Interactive Sliders (Replacing Checkboxes for Premium Experience) */
