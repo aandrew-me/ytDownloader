@@ -1432,6 +1432,13 @@ class YtDownloaderApp {
                     <img src="${
 						job.thumbnail || "../assets/images/thumb.png"
 					}" alt="thumbnail" class="itemIcon" crossorigin="anonymous">
+                    ${
+						this._isSafeWebUrl(job.thumbnail)
+							? `<button id="${randomId}_thumbOpen" class="openThumbBtn" title="${i18n.__(
+									"thumbnail",
+							  )}"><img src="../assets/images/external-link.png" alt="Open Thumbnail"/></button>`
+							: ""
+					}
                     <span class="itemType">${i18n.__(
 						job.type === "video" ? "video" : "audio",
 					)}</span>
@@ -1453,6 +1460,20 @@ class YtDownloaderApp {
 			"beforeend",
 			itemHTML,
 		);
+
+		if (this._isSafeWebUrl(job.thumbnail)) {
+			$(`${randomId}_thumbOpen`)?.addEventListener("click", (e) => {
+				e.stopPropagation();
+				try {
+					const u = new URL(job.thumbnail);
+					if (u.protocol === "http:" || u.protocol === "https:") {
+						shell.openExternal(job.thumbnail);
+					}
+				} catch (err) {
+					console.error("Invalid thumbnail URL:", err);
+				}
+			});
+		}
 	}
 
 	/**
@@ -2038,6 +2059,13 @@ class YtDownloaderApp {
                     <img src="${
 						job.thumbnail || "../assets/images/thumb.png"
 					}" alt="thumbnail" class="itemIcon" crossorigin="anonymous">
+                    ${
+						this._isSafeWebUrl(job.thumbnail)
+							? `<button id="${randomId}_thumbOpen" class="openThumbBtn" title="${i18n.__(
+									"thumbnail",
+							  )}"><img src="../assets/images/external-link.png" alt="Open Thumbnail"/></button>`
+							: ""
+					}
                     <span class="itemType">${i18n.__(
 						job.type === "video" ? "video" : "audio",
 					)}</span>
@@ -2063,6 +2091,20 @@ class YtDownloaderApp {
 		$(`${randomId}_close`).addEventListener("click", () =>
 			this._cancelDownload(randomId),
 		);
+
+		if (this._isSafeWebUrl(job.thumbnail)) {
+			$(`${randomId}_thumbOpen`)?.addEventListener("click", (e) => {
+				e.stopPropagation();
+				try {
+					const u = new URL(job.thumbnail);
+					if (u.protocol === "http:" || u.protocol === "https:") {
+						shell.openExternal(job.thumbnail);
+					}
+				} catch (err) {
+					console.error("Invalid thumbnail URL:", err);
+				}
+			});
+		}
 	}
 
 	/**
@@ -2531,6 +2573,21 @@ class YtDownloaderApp {
 		maxSlider.value = defaultMax;
 
 		this._updateSliderUI(null);
+	}
+
+	/**
+	 * Checks if a given URL is a valid http or https URL.
+	 * @param {string} rawUrl - The URL to check.
+	 * @returns {boolean}
+	 */
+	_isSafeWebUrl(rawUrl) {
+		if (!rawUrl) return false;
+		try {
+			const u = new URL(rawUrl);
+			return u.protocol === "http:" || u.protocol === "https:";
+		} catch {
+			return false;
+		}
 	}
 
 	/**

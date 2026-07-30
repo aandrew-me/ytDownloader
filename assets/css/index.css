@@ -242,6 +242,33 @@ img {
 	margin: 0 10px 0 5px;
 }
 
+.openThumbBtn {
+	position: absolute;
+	top: 5px;
+	right: 15px;
+	background: #1310108a;
+	border: none;
+	padding: 5px;
+	border-radius: 5px;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: background-color 0.2s ease, transform 0.15s ease;
+	z-index: 2;
+}
+
+.openThumbBtn:hover {
+	background: rgba(0, 0, 0, 0.9);
+	transform: scale(1.1);
+}
+
+.openThumbBtn img {
+	width: 12px;
+	height: 12px;
+	filter: brightness(0) invert(1);
+}
+
 .title {
 	padding: 12px 10px;
 	border-radius: 8px;
