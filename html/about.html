@@ -8,6 +8,7 @@
     <title data-translate="about">About</title>
     <link rel="stylesheet" href="../assets/css/extra.css">
 
+    <script src="../translations/i18n.js" defer></script>
     <script src="../translations/i18n-init.js" defer></script>
 </head>
 
@@ -29,7 +30,7 @@
         data-translate="here">here</a>
 
     <script>
-        const { ipcRenderer, shell } = require("electron");
+        const { ipcRenderer, shell } = window.electronAPI;
 
 
         document.addEventListener('translations-loaded', () => {

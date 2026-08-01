@@ -447,10 +447,11 @@
 
     <div id="popupContainer" class="popup-container"></div>
 
+    <script src="../translations/i18n.js"></script>
     <script src="../translations/i18n-init.js"></script>
 
     <script>
-        const { ipcRenderer } = require("electron");
+        const { ipcRenderer, clipboard } = window.electronAPI;
 
         document.addEventListener('translations-loaded', () => {
             window.i18n.translatePage();
@@ -714,7 +715,6 @@
         }
 
         function copyToClipboard(text) {
-            const { clipboard } = require("electron");
             clipboard.writeText(text);
             showPopup(i18n.__("urlCopiedToClipboard"));
         }

@@ -108,8 +108,10 @@ function createWindow() {
 		show: false,
 		icon: path.join(__dirname, "/assets/images/icon.png"),
 		webPreferences: {
-			nodeIntegration: true,
-			contextIsolation: false,
+			nodeIntegration: false,
+			contextIsolation: true,
+			sandbox: false,
+			preload: path.join(__dirname, "preload.js"),
 			spellcheck: false,
 		},
 	});
@@ -163,8 +165,10 @@ function createSecondaryWindow(file) {
 		modal: true,
 		show: false,
 		webPreferences: {
-			nodeIntegration: true,
-			contextIsolation: false,
+			nodeIntegration: false,
+			contextIsolation: true,
+			sandbox: false,
+			preload: path.join(__dirname, "preload.js"),
 		},
 		width: 1000,
 		height: 800,
@@ -305,13 +309,31 @@ function registerIpcHandlers() {
 		}
 	});
 
+	function resolveHtmlPath(file) {
+		if (existsSync(file)) {
+			return file;
+		}
+		const basename = path.basename(file);
+		const htmlPath = path.join(__dirname, "html", basename);
+		if (existsSync(htmlPath)) {
+			return htmlPath;
+		}
+		const rootPath = path.join(__dirname, file);
+		if (existsSync(rootPath)) {
+			return rootPath;
+		}
+		return file;
+	}
+
 	ipcMain.on("load-win", (_event, file) => {
 		appState.indexPageIsOpen = file.includes("index.html");
-		appState.mainWindow?.loadFile(file);
+		const targetPath = resolveHtmlPath(file);
+		appState.mainWindow?.loadFile(targetPath);
 	});
 
 	ipcMain.on("load-page", (_event, file) => {
-		createSecondaryWindow(file);
+		const targetPath = resolveHtmlPath(file);
+		createSecondaryWindow(targetPath);
 	});
 
 	ipcMain.on("close-secondary", () => {

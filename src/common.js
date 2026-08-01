@@ -1,4 +1,3 @@
-const electron = require("electron");
 /**
  *
  * @param {string} id

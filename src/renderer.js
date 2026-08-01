@@ -1,9 +1,13 @@
-const {shell, ipcRenderer, clipboard} = require("electron");
-const {default: YTDlpWrap} = require("yt-dlp-wrap-plus");
-const {constants} = require("fs/promises");
-const {homedir, platform} = require("os");
-const {join} = require("path");
 const {
+	shell,
+	ipcRenderer,
+	clipboard,
+	YTDlpWrap,
+	constants,
+	homedir,
+	platform,
+	tmpdir,
+	join,
 	mkdirSync,
 	accessSync,
 	promises,
@@ -11,9 +15,17 @@ const {
 	cpSync,
 	copyFileSync,
 	writeFileSync,
+	unlinkSync,
+	readFileSync,
+	readdirSync,
 	statSync,
-} = require("fs");
-const {execSync, spawn} = require("child_process");
+	execSync,
+	spawn,
+	env,
+	setEnv,
+	windowsStore,
+	__dirname,
+} = window.electronAPI;
 
 const CONSTANTS = {
 	DOM_IDS: {
@@ -272,8 +284,8 @@ class YtDownloaderApp {
 			autoUpdate = false;
 		}
 		if (
-			process.windowsStore ||
-			process.env.YTDOWNLOADER_AUTO_UPDATES === "0"
+			windowsStore ||
+			(env && env.YTDOWNLOADER_AUTO_UPDATES === "0")
 		) {
 			autoUpdate = false;
 		}
@@ -310,9 +322,9 @@ class YtDownloaderApp {
 		let executablePath = null;
 
 		// PRIORITY 1: Environment Variable
-		if (process.env.YTDOWNLOADER_YTDLP_PATH) {
-			if (existsSync(process.env.YTDOWNLOADER_YTDLP_PATH)) {
-				executablePath = process.env.YTDOWNLOADER_YTDLP_PATH;
+		if (env && env.YTDOWNLOADER_YTDLP_PATH) {
+			if (existsSync(env.YTDOWNLOADER_YTDLP_PATH)) {
+				executablePath = env.YTDOWNLOADER_YTDLP_PATH;
 			} else {
 				throw new Error(
 					"YTDOWNLOADER_YTDLP_PATH is set, but no file exists there.",
@@ -552,9 +564,9 @@ class YtDownloaderApp {
 	 */
 	async _findFfmpeg() {
 		// Priority 1: Environment Variable
-		if (process.env.YTDOWNLOADER_FFMPEG_PATH) {
-			if (existsSync(process.env.YTDOWNLOADER_FFMPEG_PATH)) {
-				return process.env.YTDOWNLOADER_FFMPEG_PATH;
+		if (env && env.YTDOWNLOADER_FFMPEG_PATH) {
+			if (existsSync(env.YTDOWNLOADER_FFMPEG_PATH)) {
+				return env.YTDOWNLOADER_FFMPEG_PATH;
 			}
 			throw new Error(
 				"YTDOWNLOADER_FFMPEG_PATH is set, but no file exists there.",
@@ -616,13 +628,13 @@ class YtDownloaderApp {
 			return;
 		}
 
-		const current = process.env.LD_LIBRARY_PATH;
+		const current = env ? env.LD_LIBRARY_PATH : undefined;
 		if (current) {
 			if (!current.split(":").includes(libDir)) {
-				process.env.LD_LIBRARY_PATH = `${libDir}:${current}`;
+				setEnv("LD_LIBRARY_PATH", `${libDir}:${current}`);
 			}
 		} else {
-			process.env.LD_LIBRARY_PATH = libDir;
+			setEnv("LD_LIBRARY_PATH", libDir);
 		}
 	}
 
@@ -634,18 +646,18 @@ class YtDownloaderApp {
 		const exeName = "node";
 
 		// Priority 1: Environment Variable (Node)
-		if (process.env.YTDOWNLOADER_NODE_PATH) {
-			if (existsSync(process.env.YTDOWNLOADER_NODE_PATH)) {
-				return `$node:${process.env.YTDOWNLOADER_NODE_PATH}`;
+		if (env && env.YTDOWNLOADER_NODE_PATH) {
+			if (existsSync(env.YTDOWNLOADER_NODE_PATH)) {
+				return `$node:${env.YTDOWNLOADER_NODE_PATH}`;
 			}
 
 			return "";
 		}
 
 		// Priority 2: Environment Variable (Deno)
-		if (process.env.YTDOWNLOADER_DENO_PATH) {
-			if (existsSync(process.env.YTDOWNLOADER_DENO_PATH)) {
-				return `$deno:${process.env.YTDOWNLOADER_DENO_PATH}`;
+		if (env && env.YTDOWNLOADER_DENO_PATH) {
+			if (existsSync(env.YTDOWNLOADER_DENO_PATH)) {
+				return `$deno:${env.YTDOWNLOADER_DENO_PATH}`;
 			}
 
 			return "";
@@ -1388,13 +1400,12 @@ class YtDownloaderApp {
 			.once("close", (code) => {
 				if (existsSync(tempFilePath)) {
 					try {
-						const fileContent = require("fs")
-							.readFileSync(tempFilePath, "utf-8")
+						const fileContent = readFileSync(tempFilePath, "utf-8")
 							.trim();
 						if (fileContent) {
 							actualFilePath = fileContent;
 						}
-						require("fs").unlinkSync(tempFilePath);
+						unlinkSync(tempFilePath);
 					} catch (e) {
 						console.error("Error reading temp file:", e);
 					}
@@ -1410,7 +1421,7 @@ class YtDownloaderApp {
 			.once("error", (error) => {
 				if (existsSync(tempFilePath)) {
 					try {
-						require("fs").unlinkSync(tempFilePath);
+						unlinkSync(tempFilePath);
 					} catch (e) {}
 				}
 				this.state.downloadedItems.add(randomId);
@@ -1633,7 +1644,7 @@ class YtDownloaderApp {
 		);
 
 		// Create a unique temporary file path to capture the exact filename from yt-dlp
-		const tmpDir = require("os").tmpdir();
+		const tmpDir = tmpdir();
 		const tempFilePath = join(tmpDir, `ytdlp_path_${randomId}.txt`);
 
 		// Tell yt-dlp to output the absolute final file path directly to the temp file
@@ -2184,7 +2195,7 @@ class YtDownloaderApp {
 		) {
 			try {
 				const originalTitle = this.state.videoInfo.title;
-				const dirFiles = require("fs").readdirSync(
+				const dirFiles = readdirSync(
 					this.state.downloadDir,
 				);
 				const looseTitle = originalTitle
