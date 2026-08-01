@@ -1,4 +1,5 @@
-const {ipcRenderer} = require("electron");
+const getIpcRenderer = () =>
+	window.electronAPI ? window.electronAPI.ipcRenderer : null;
 
 function normalizeLocale(locale) {
 	if (!locale) return "en";
@@ -35,9 +36,10 @@ async function getLocale() {
 
 	let locale = null;
 	try {
-		locale = await ipcRenderer.invoke("get-system-locale");
+		const ipc = getIpcRenderer();
+		if (ipc) locale = await ipc.invoke("get-system-locale");
 	} catch (e) {
-		console.log(e)
+		console.log(e);
 	}
 
 	if (!locale && typeof navigator !== "undefined") {
@@ -62,10 +64,13 @@ function I18n() {
 	this.init = async () => {
 		try {
 			this.locale = await getLocale();
-			this.loadedLanguage = await ipcRenderer.invoke(
-				"get-translation",
-				this.locale
-			);
+			const ipc = getIpcRenderer();
+			if (ipc) {
+				this.loadedLanguage = await ipc.invoke(
+					"get-translation",
+					this.locale,
+				);
+			}
 		} catch (error) {
 			console.error("Error loading translations:", error);
 			this.loadedLanguage = {};
@@ -102,14 +107,20 @@ function I18n() {
 	this.setLocale = async function (newLocale) {
 		const normalized = normalizeLocale(newLocale);
 		localStorage.setItem("locale", normalized);
-		this.loadedLanguage = await ipcRenderer.invoke(
-			"get-translation",
-			normalized
-		);
+		const ipc = getIpcRenderer();
+		if (ipc) {
+			this.loadedLanguage = await ipc.invoke(
+				"get-translation",
+				normalized,
+			);
+		}
 		this.locale = normalized;
 
 		this.translatePage();
 	};
 }
 
-module.exports = I18n;
+window.I18n = I18n;
+if (typeof module !== "undefined") {
+	module.exports = I18n;
+}

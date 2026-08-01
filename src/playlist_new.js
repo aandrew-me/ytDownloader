@@ -1,14 +1,21 @@
-const { clipboard, shell, ipcRenderer } = require("electron");
-const { default: YTDlpWrap } = require("yt-dlp-wrap-plus");
-const path = require("path");
-const os = require("os");
-const fs = require("fs");
-const { execSync, exec, spawnSync } = require("child_process");
+const {
+	clipboard,
+	shell,
+	ipcRenderer,
+	YTDlpWrap,
+	path,
+	os,
+	fs,
+	execSync,
+	exec,
+	spawnSync,
+	__dirname,
+} = window.electronAPI;
 let url;
 const ytDlp = localStorage.getItem("ytdlp");
 const ytdlp = new YTDlpWrap(ytDlp);
 const downloadDir = localStorage.getItem("downloadPath");
-const i18n = new (require("../translations/i18n"))();
+const i18n = window.i18n;
 let cookieArg = "";
 let browser = "";
 const formats = {

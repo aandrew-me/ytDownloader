@@ -1,10 +1,15 @@
-const {clipboard, ipcRenderer} = require("electron");
-const {default: YTDlpWrap} = require("yt-dlp-wrap-plus");
-const path = require("path");
-const os = require("os");
-const fs = require("fs");
-const {execSync} = require("child_process");
-const {constants} = require("fs/promises");
+const {
+	clipboard,
+	ipcRenderer,
+	YTDlpWrap,
+	path,
+	os,
+	fs,
+	execSync,
+	constants,
+	env,
+	__dirname,
+} = window.electronAPI;
 
 const playlistDownloader = {
 	// State and config
@@ -511,6 +516,7 @@ const playlistDownloader = {
 
 				count++;
 				this.state.originalCount++;
+				this.state.currentLocalCount = count;
 				this.updatePlaylistUI(videoInfo, count, type);
 			}
 		});
@@ -545,15 +551,32 @@ const playlistDownloader = {
 				console.error("Failed to abort controller:", e);
 			}
 		}
-		if (
-			this.state.currentDownloadProcess &&
-			this.state.currentDownloadProcess.ytDlpProcess
-		) {
+		if (this.state.currentDownloadProcess) {
 			try {
-				this.state.currentDownloadProcess.ytDlpProcess.kill();
-			} catch (e) {
-				console.error("Failed to kill ytDlpProcess:", e);
+				if (typeof this.state.currentDownloadProcess.kill === "function") {
+					this.state.currentDownloadProcess.kill();
+				}
+			} catch (e) {}
+			if (
+				this.state.currentDownloadProcess.ytDlpProcess &&
+				typeof this.state.currentDownloadProcess.ytDlpProcess.kill === "function"
+			) {
+				try {
+					this.state.currentDownloadProcess.ytDlpProcess.kill();
+				} catch (e) {}
 			}
+		}
+		this.handleCancellation(this.state.currentLocalCount || 0);
+	},
+
+	handleCancellation(count) {
+		this.state.isDownloading = false;
+		this.ui.stopDownloadBtn.style.display = "none";
+		this.ui.pasteLinkBtn.style.display = "inline-block";
+		const targetCount = count !== undefined ? count : (this.state.currentLocalCount || 0);
+		const lastProgress = document.getElementById(`p${targetCount}`);
+		if (lastProgress) {
+			lastProgress.textContent = window.i18n ? window.i18n.__("cancel") : "Cancelled";
 		}
 	},
 
@@ -725,20 +748,13 @@ const playlistDownloader = {
 	},
 
 	finishDownload(count) {
+		if (this.state.isCancelled) {
+			this.handleCancellation(count);
+			return;
+		}
 		if (!this.state.isDownloading) return;
 		this.state.isDownloading = false;
 		this.ui.stopDownloadBtn.style.display = "none";
-
-		if (this.state.isCancelled) {
-			this.state.isCancelled = false;
-			const lastProgress = document.getElementById(`p${count}`);
-			if (lastProgress) {
-				lastProgress.textContent = window.i18n.__("cancel");
-			}
-			// this.ui.playlistNameDisplay.textContent = window.i18n.__("cancel");
-			this.ui.pasteLinkBtn.style.display = "inline-block";
-			return;
-		}
 
 		const lastProgress = document.getElementById(`p${count}`);
 		if (lastProgress)
@@ -755,15 +771,12 @@ const playlistDownloader = {
 	},
 
 	showError(error) {
-		const wasDownloading = this.state.isDownloading;
-		this.state.isDownloading = false;
-		this.ui.stopDownloadBtn.style.display = "none";
-
-		if (this.state.isCancelled && wasDownloading) {
-			this.state.isCancelled = false;
-			this.ui.pasteLinkBtn.style.display = "inline-block";
+		if (this.state.isCancelled) {
+			this.handleCancellation(this.state.currentLocalCount || 0);
 			return;
 		}
+		this.state.isDownloading = false;
+		this.ui.stopDownloadBtn.style.display = "none";
 
 		console.error("Download Error:", error.toString());
 		this.ui.pasteLinkBtn.style.display = "inline-block";
@@ -848,12 +861,13 @@ const playlistDownloader = {
 
 	getFfmpegPath() {
 		if (
-			process.env.YTDOWNLOADER_FFMPEG_PATH &&
-			fs.existsSync(process.env.YTDOWNLOADER_FFMPEG_PATH)
+			env &&
+			env.YTDOWNLOADER_FFMPEG_PATH &&
+			fs.existsSync(env.YTDOWNLOADER_FFMPEG_PATH)
 		) {
 			console.log("Using FFMPEG from YTDOWNLOADER_FFMPEG_PATH");
 
-			return process.env.YTDOWNLOADER_FFMPEG_PATH;
+			return env.YTDOWNLOADER_FFMPEG_PATH;
 		}
 
 		switch (os.platform()) {
@@ -885,17 +899,17 @@ const playlistDownloader = {
 		{
 			const exeName = "node";
 
-			if (process.env.YTDOWNLOADER_NODE_PATH) {
-				if (fs.existsSync(process.env.YTDOWNLOADER_NODE_PATH)) {
-					return `$node:${process.env.YTDOWNLOADER_NODE_PATH}`;
+			if (env && env.YTDOWNLOADER_NODE_PATH) {
+				if (fs.existsSync(env.YTDOWNLOADER_NODE_PATH)) {
+					return `$node:${env.YTDOWNLOADER_NODE_PATH}`;
 				}
 
 				return "";
 			}
 
-			if (process.env.YTDOWNLOADER_DENO_PATH) {
-				if (fs.existsSync(process.env.YTDOWNLOADER_DENO_PATH)) {
-					return `$deno:${process.env.YTDOWNLOADER_DENO_PATH}`;
+			if (env && env.YTDOWNLOADER_DENO_PATH) {
+				if (fs.existsSync(env.YTDOWNLOADER_DENO_PATH)) {
+					return `$deno:${env.YTDOWNLOADER_DENO_PATH}`;
 				}
 
 				return "";
