@@ -137,15 +137,23 @@ const playlistDownloader = {
 		this.state.ffmpegPath = this.getFfmpegPath();
 		this.state.jsRuntimePath = this.getJsRuntimePath();
 
-		if (localStorage.getItem("preferredVideoQuality")) {
-			this.ui.videoQualitySelect.value = localStorage.getItem(
-				"preferredVideoQuality",
-			);
+		const preferredVideo = localStorage.getItem("preferredVideoQuality");
+		if (preferredVideo) {
+			this.ui.videoQualitySelect.value = preferredVideo;
 		}
-		if (localStorage.getItem("preferredAudioQuality")) {
-			this.ui.audioQualitySelect.value = localStorage.getItem(
-				"preferredAudioQuality",
-			);
+		if (!this.ui.videoQualitySelect.value) {
+			this.ui.videoQualitySelect.value = "best";
+		}
+
+		const preferredAudioFormat = localStorage.getItem("preferredAudioQuality");
+		if (preferredAudioFormat && this.ui.audioTypeSelect) {
+			this.ui.audioTypeSelect.value = preferredAudioFormat;
+		}
+		if (this.ui.audioTypeSelect && !this.ui.audioTypeSelect.value) {
+			this.ui.audioTypeSelect.value = "mp3";
+		}
+		if (this.ui.audioQualitySelect && !this.ui.audioQualitySelect.value) {
+			this.ui.audioQualitySelect.value = "auto";
 		}
 	},
 
