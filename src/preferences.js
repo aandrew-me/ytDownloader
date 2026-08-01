@@ -3,7 +3,7 @@ const {accessSync, constants} = require("original-fs");
 const fs = require("fs");
 const {join} = require("path");
 const {homedir, platform} = require("os");
-const {exec} = require("child_process");
+const {exec, execFile} = require("child_process");
 
 function getId(id) {
 	return document.getElementById(id);
@@ -125,7 +125,7 @@ updateDirectionality();
 const ytdlpPath = localStorage.getItem("ytdlp");
 console.log("yt-dlp path:", ytdlpPath);
 if (ytdlpPath) {
-	exec(`"${ytdlpPath}" --version`, (error, stdout, _stderr) => {
+	execFile(ytdlpPath, ["--version"], (error, stdout, _stderr) => {
 		if (error) {
 			console.error("Error executing yt-dlp:", error);
 		} else {
