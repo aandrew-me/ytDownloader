@@ -596,7 +596,7 @@ class YtDownloaderApp {
 		if (!existsSync(targetFfmpegFile)) {
 			if (existsSync(bundledDir)) {
 				try {
-					cpSync(bundledDir, targetDir, {recursive: true});
+					cpSync(bundledDir, targetDir, {recursive: true, dereference: true});
 				} catch {
 					console.error("Failed to copy bundled ffmpeg.");
 
