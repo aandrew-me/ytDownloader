@@ -11,3 +11,6 @@ ffmpeg.patch
 deno*
 node.exe
 node
+test-downloads*
+test-results
+playwright-report

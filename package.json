@@ -9,6 +9,8 @@
 	"main": "main.js",
 	"scripts": {
 		"start": "electron .",
+		"test": "playwright test",
+		"test:e2e": "playwright test",
 		"dist": "electron-builder",
 		"debug": "electron --inspect=5858 .",
 		"windows": "electron-builder -w",
@@ -31,6 +33,7 @@
 	"license": "GPL-3.0",
 	"description": "Download videos and audios from YouTube and many other sites",
 	"devDependencies": {
+		"@playwright/test": "^1.62.1",
 		"electron": "^30.5.1",
 		"electron-builder": "^26.0.12",
 		"typescript": "^5.3.3"
