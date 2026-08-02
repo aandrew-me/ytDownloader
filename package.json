@@ -42,6 +42,7 @@
 		"files": [
 			"./resources/**/*",
 			"main.js",
+			"preload.js",
 			"./html/**/*",
 			"./resources/**/*",
 			"./public/**/*",

@@ -8,6 +8,7 @@
     <title data-translate="downloadPlaylistButton">Playlist download</title>
     <link rel="stylesheet" href="../assets/css/index.css">
 
+    <script src="../translations/i18n.js" defer></script>
     <script src="../translations/i18n-init.js" defer></script>
     <script src="../src/playlist.js" defer></script>
     <script src="../src/common.js" defer></script>
@@ -132,7 +133,7 @@
             <div id="typeSelectBox">
                 <label id="videoQualityTxt" data-translate="selectVideoFormat">Select video quality</label>
                 <select id="videoTypeSelect" class="select">
-                    <option value="auto" id="autoTxt" data-translate="auto">Auto</option>
+                    <option value="auto" id="autoTxt" data-translate="auto" selected>Auto</option>
                     <option value="mp4">Mp4</option>
                     <option value="webm">WebM</option>
                 </select>
@@ -146,7 +147,7 @@
 
             <label id="audioFormat" data-translate="selectAudioFormat">Select Audio format </label>
             <select id="audioSelect" class="select">
-                <option value="mp3">Mp3</option>
+                <option value="mp3" selected>Mp3</option>
                 <option value="m4a">M4a</option>
                 <option value="opus">Opus</option>
                 <option value="wav">Wav</option>
@@ -158,7 +159,7 @@
             <label class="audioQualitySelect" id="audioQualitySelectTxt" data-translate="selectQuality">Select
                 Quality</label>
             <select id="audioQualitySelect" class="select">
-                <option id="audioQualityAuto" value="auto" data-translate="auto">Auto</option>
+                <option id="audioQualityAuto" value="auto" data-translate="auto" selected>Auto</option>
                 <option id="audioQualityNormal" value="5" data-translate="qualityNormal">Normal</option>
                 <option id="audioQualityBest" value="0" data-translate="best">Best</option>
                 <option id="audioQualityGood" value="2" data-translate="qualityGood">Good</option>

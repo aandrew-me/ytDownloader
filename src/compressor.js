@@ -1,10 +1,15 @@
-const {spawn, execSync} = require("child_process");
-const path = require("path");
-const {ipcRenderer} = require("electron");
-const os = require("os");
-const si = require("systeminformation");
-const {existsSync} = require("fs");
-const crypto = require("crypto");
+const {
+	spawn,
+	execSync,
+	path,
+	ipcRenderer,
+	os,
+	si,
+	fs: {existsSync},
+	crypto,
+	env,
+	__dirname,
+} = window.electronAPI;
 
 document.addEventListener("translations-loaded", () => {
 	window.i18n.translatePage();
@@ -932,11 +937,12 @@ function timeToSeconds(timeStr) {
 
 function getFfmpegPath() {
 	if (
-		process.env.YTDOWNLOADER_FFMPEG_PATH &&
-		existsSync(process.env.YTDOWNLOADER_FFMPEG_PATH)
+		env &&
+		env.YTDOWNLOADER_FFMPEG_PATH &&
+		existsSync(env.YTDOWNLOADER_FFMPEG_PATH)
 	) {
 		console.log("Using FFMPEG from YTDOWNLOADER_FFMPEG_PATH");
-		return process.env.YTDOWNLOADER_FFMPEG_PATH;
+		return env.YTDOWNLOADER_FFMPEG_PATH;
 	}
 
 	switch (os.platform()) {

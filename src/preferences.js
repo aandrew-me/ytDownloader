@@ -1,9 +1,16 @@
-const {ipcRenderer, shell} = require("electron");
-const {accessSync, constants} = require("original-fs");
-const fs = require("fs");
-const {join} = require("path");
-const {homedir, platform} = require("os");
-const {exec, execFile} = require("child_process");
+const {
+	ipcRenderer,
+	shell,
+	accessSync,
+	constants,
+	fs,
+	join,
+	homedir,
+	platform,
+	exec,
+	execFile,
+	env,
+} = window.electronAPI;
 
 function getId(id) {
 	return document.getElementById(id);
@@ -184,7 +191,7 @@ document.addEventListener("translations-loaded", () => {
 	window.i18n.translatePage();
 	document.title = window.i18n.__("preferences");
 
-	if (process.env.FLATPAK_ID) {
+	if (env && env.FLATPAK_ID) {
 		const flatpakEl = getId("flatpakTxt");
 		flatpakEl.addEventListener("click", () => {
 			shell.openExternal(
