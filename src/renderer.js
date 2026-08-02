@@ -1618,8 +1618,8 @@ class YtDownloaderApp {
 			downloadArgs = ["-f", formatString, ...outputArgs, ...baseArgs];
 		}
 
-		if (subs) downloadArgs.push(subs);
-		if (subLangs) downloadArgs.push(subLangs);
+		if (subs) downloadArgs.push(...subs.split(/\s+/));
+		if (subLangs) downloadArgs.push(...subLangs.split(/\s+/));
 		if (rangeOption) downloadArgs.push(rangeOption, rangeCmd);
 
 		const customArgsString = $(
