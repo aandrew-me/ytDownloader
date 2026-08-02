@@ -1738,7 +1738,8 @@ class YtDownloaderApp {
 		}
 
 		if ($(CONSTANTS.DOM_IDS.SUB_CHECKED).checked) {
-			this.state.downloadOptions.subs = "--write-subs";
+			this.state.downloadOptions.subs =
+				"--write-subs --sub-format srt/best --convert-subs srt";
 			this.state.downloadOptions.subLangs = "--sub-langs all";
 		} else {
 			this.state.downloadOptions.subs = "";
