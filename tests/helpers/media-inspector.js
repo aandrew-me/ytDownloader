@@ -33,6 +33,16 @@ function getFfprobeExecutable() {
   return binaryName;
 }
 
+function isFfprobeAvailable() {
+  try {
+    const ffprobePath = getFfprobeExecutable();
+    execSync(`"${ffprobePath}" -version`, { encoding: 'utf-8', stdio: 'ignore' });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function getMediaInfo(filePath) {
   if (!fs.existsSync(filePath)) {
     throw new Error(`File does not exist: ${filePath}`);
@@ -57,6 +67,7 @@ function getAudioCodec(filePath) {
 
 module.exports = {
   getFfprobeExecutable,
+  isFfprobeAvailable,
   getMediaInfo,
   getVideoHeight,
   getAudioCodec,

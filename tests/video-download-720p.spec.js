@@ -1,14 +1,18 @@
 const { test, expect, _electron: electron } = require('@playwright/test');
 const path = require('path');
 const fs = require('fs');
-const { getVideoHeight } = require('./helpers/media-inspector');
+const { getVideoHeight, isFfprobeAvailable } = require('./helpers/media-inspector');
 
-const TEST_URL = 'https://youtu.be/_Sl8diqCAFw';
+const TEST_URL = process.env.YTDOWNLOADER_TEST_URL || 'https://youtu.be/_Sl8diqCAFw';
 const DOWNLOAD_DIR = path.join(__dirname, '../test-downloads-720p');
+const RUN_NETWORK_TESTS = process.env.YTDOWNLOADER_RUN_NETWORK_TESTS === '1';
 
 test.describe('Video Download - 720p Resolution Test', () => {
   let electronApp;
   let window;
+
+  test.skip(!RUN_NETWORK_TESTS, 'Requires live network access to YouTube; set YTDOWNLOADER_RUN_NETWORK_TESTS=1 to run.');
+  test.skip(!isFfprobeAvailable(), 'ffprobe executable is not available in this environment.');
 
   test.beforeAll(() => {
     if (!fs.existsSync(DOWNLOAD_DIR)) {
@@ -25,10 +29,9 @@ test.describe('Video Download - 720p Resolution Test', () => {
 
     await window.evaluate(({ dir }) => {
       localStorage.setItem('downloadPath', dir);
-      if (window.ytDownloader && window.ytDownloader.state) {
-        window.ytDownloader.state.downloadDir = dir;
-      }
     }, { dir: DOWNLOAD_DIR });
+    await window.reload();
+    await window.waitForLoadState('domcontentloaded');
   });
 
   test.afterEach(async () => {
@@ -69,13 +72,7 @@ test.describe('Video Download - 720p Resolution Test', () => {
 
     expect(select720pOption).toBeTruthy();
 
-    await window.evaluate(() => {
-      if (window.ytDownloader && window.ytDownloader.handleDownloadRequest) {
-        window.ytDownloader.handleDownloadRequest('video');
-      } else {
-        document.getElementById('videoDownload')?.click();
-      }
-    });
+    await window.click('#videoDownload');
 
     await expect.poll(() => {
       if (!fs.existsSync(DOWNLOAD_DIR)) return 0;

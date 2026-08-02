@@ -1,14 +1,18 @@
 const { test, expect, _electron: electron } = require('@playwright/test');
 const path = require('path');
 const fs = require('fs');
-const { getAudioCodec } = require('./helpers/media-inspector');
+const { getAudioCodec, isFfprobeAvailable } = require('./helpers/media-inspector');
 
-const TEST_URL = 'https://youtu.be/_Sl8diqCAFw';
+const TEST_URL = process.env.YTDOWNLOADER_TEST_URL || 'https://youtu.be/_Sl8diqCAFw';
 const DOWNLOAD_DIR = path.join(__dirname, '../test-downloads-mp3');
+const RUN_NETWORK_TESTS = process.env.YTDOWNLOADER_RUN_NETWORK_TESTS === '1';
 
 test.describe('Audio Extraction - MP3 Test', () => {
   let electronApp;
   let window;
+
+  test.skip(!RUN_NETWORK_TESTS, 'Requires live network access to YouTube; set YTDOWNLOADER_RUN_NETWORK_TESTS=1 to run.');
+  test.skip(!isFfprobeAvailable(), 'ffprobe executable is not available in this environment.');
 
   test.beforeAll(() => {
     if (!fs.existsSync(DOWNLOAD_DIR)) {
@@ -25,10 +29,9 @@ test.describe('Audio Extraction - MP3 Test', () => {
 
     await window.evaluate(({ dir }) => {
       localStorage.setItem('downloadPath', dir);
-      if (window.ytDownloader && window.ytDownloader.state) {
-        window.ytDownloader.state.downloadDir = dir;
-      }
     }, { dir: DOWNLOAD_DIR });
+    await window.reload();
+    await window.waitForLoadState('domcontentloaded');
   });
 
   test.afterEach(async () => {
@@ -56,13 +59,7 @@ test.describe('Audio Extraction - MP3 Test', () => {
     const selectedFormat = await window.$eval('#extractSelection', el => el.value);
     expect(selectedFormat).toBe('mp3');
 
-    await window.evaluate(() => {
-      if (window.ytDownloader && window.ytDownloader.handleDownloadRequest) {
-        window.ytDownloader.handleDownloadRequest('extract');
-      } else {
-        document.getElementById('extractBtn')?.click();
-      }
-    });
+    await window.click('#extractBtn');
 
     await expect.poll(() => {
       if (!fs.existsSync(DOWNLOAD_DIR)) return 0;
