@@ -146,7 +146,7 @@ if (ytdlpPath) {
 			systemPath = stdout.trim().split("\n")[0];
 			console.log("System yt-dlp path:", systemPath);
 
-			exec(`"${systemPath}" --version`, (error, stdout, _stderr) => {
+			execFile(systemPath, ["--version"], (error, stdout, _stderr) => {
 				if (error) {
 					console.error("Error executing yt-dlp:", error);
 				} else {
@@ -163,7 +163,7 @@ if (ytdlpPath) {
 				return;
 			}
 			systemPath = stdout.trim();
-			exec(`"${systemPath}" --version`, (error, stdout, _stderr) => {
+			execFile(systemPath, ["--version"], (error, stdout, _stderr) => {
 				if (error) {
 					console.error("Error executing yt-dlp:", error);
 				}
