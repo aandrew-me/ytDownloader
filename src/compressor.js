@@ -278,7 +278,10 @@ async function compressVideo(file, settings, itemId, outputPath) {
 	console.log("Command: " + args.join(" "));
 
 	return new Promise((resolve, reject) => {
-		const child = spawn(ffmpeg, args);
+		const isTestMode = Boolean(window.electronAPI && window.electronAPI.isTest);
+		const mockSpawn = isTestMode ? (window.__mockSpawn || window.__mockFfmpeg) : null;
+		const spawnFn = mockSpawn || spawn;
+		const child = spawnFn(ffmpeg, args);
 
 		activeProcesses.add(child);
 		child.on("exit", () => {
@@ -936,6 +939,7 @@ function timeToSeconds(timeStr) {
 }
 
 function getFfmpegPath() {
+	if (window.electronAPI && window.electronAPI.isTest && (window.__mockYtDlp || window.__mockSpawn || window.__mockFfmpeg)) return "ffmpeg";
 	if (
 		env &&
 		env.YTDOWNLOADER_FFMPEG_PATH &&
@@ -1027,7 +1031,10 @@ function getFfprobePath() {
 function getVideoDuration(filePath) {
 	const ffprobe = getFfprobePath();
 	return new Promise((resolve, reject) => {
-		const child = spawn(ffprobe, [
+		const isTestMode = Boolean(window.electronAPI && window.electronAPI.isTest);
+		const mockSpawn = isTestMode ? (window.__mockSpawn || window.__mockFfmpeg) : null;
+		const spawnFn = mockSpawn || spawn;
+		const child = spawnFn(ffprobe, [
 			"-v",
 			"error",
 			"-show_entries",
@@ -1036,6 +1043,7 @@ function getVideoDuration(filePath) {
 			"default=noprint_wrappers=1:nokey=1",
 			filePath,
 		]);
+
 		let output = "";
 		const timeout = setTimeout(() => {
 			child.kill();
@@ -1067,7 +1075,10 @@ function getVideoDuration(filePath) {
 function getVideoCodec(filePath) {
 	const ffprobe = getFfprobePath();
 	return new Promise((resolve) => {
-		const child = spawn(ffprobe, [
+		const isTestMode = Boolean(window.electronAPI && window.electronAPI.isTest);
+		const mockSpawn = isTestMode ? (window.__mockSpawn || window.__mockFfmpeg) : null;
+		const spawnFn = mockSpawn || spawn;
+		const child = spawnFn(ffprobe, [
 			"-v",
 			"error",
 			"-select_streams",
