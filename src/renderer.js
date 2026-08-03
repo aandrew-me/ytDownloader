@@ -183,11 +183,13 @@ class YtDownloaderApp {
 		this._configureAutoUpdate();
 
 		try {
-			this.state.ytDlpPath = await this._findOrDownloadYtDlp();
-			this.state.ytDlp = new YTDlpWrap(this.state.ytDlpPath);
-			this.state.ffmpegPath = await this._findFfmpeg();
+			const isTestMode = Boolean(window.electronAPI && window.electronAPI.isTest);
+			const mockYtDlp = isTestMode ? window.__mockYtDlp : null;
+			this.state.ytDlpPath = mockYtDlp ? "mock-ytdlp" : await this._findOrDownloadYtDlp();
+			this.state.ytDlp = mockYtDlp || new YTDlpWrap(this.state.ytDlpPath);
+			this.state.ffmpegPath = mockYtDlp ? "ffmpeg" : await this._findFfmpeg();
 			this._ensureFfmpegLibsLoadable(this.state.ffmpegPath);
-			this.state.jsRuntimePath = await this._getJsRuntimePath();
+			this.state.jsRuntimePath = mockYtDlp ? "" : await this._getJsRuntimePath();
 
 			console.log("yt-dlp path:", this.state.ytDlpPath);
 			console.log("ffmpeg path:", this.state.ffmpegPath);
@@ -2625,5 +2627,6 @@ class YtDownloaderApp {
 // --- Application Entry Point ---
 document.addEventListener("DOMContentLoaded", () => {
 	const app = new YtDownloaderApp();
+	window.app = app;
 	app.initialize();
 });

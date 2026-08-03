@@ -1,0 +1,171 @@
+const { test, expect } = require("@playwright/test");
+const {
+	launchApp,
+	getExecutedCommands,
+	clearExecutedCommands,
+} = require("./helpers/electronApp");
+
+async function waitForInfoPanel(page) {
+	await page.waitForFunction(() => {
+		const el = document.getElementById("hidden");
+		return el && el.style.display === "inline-block";
+	});
+}
+
+async function triggerClick(page, elementId) {
+	await page.evaluate((id) => {
+		const el = document.getElementById(id);
+		if (el) el.click();
+	}, elementId);
+}
+
+test.describe("Main Page Download Tests", () => {
+	let electronApp;
+	let page;
+
+	test.beforeEach(async () => {
+		const res = await launchApp();
+		electronApp = res.app;
+		page = res.page;
+	});
+
+	test.afterEach(async () => {
+		if (electronApp) {
+			await electronApp.close();
+		}
+	});
+
+	test("video download produces correct yt-dlp command", async () => {
+		const testUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+
+		await page.evaluate((url) => {
+			window.electronAPI.clipboard.writeText(url);
+		}, testUrl);
+
+		// Click paste button to fetch info
+		await page.click("#pasteUrl");
+
+		// Wait for info panel to be populated and displayed
+		await waitForInfoPanel(page);
+
+		await clearExecutedCommands(page);
+
+		// Trigger "Download Video"
+		await triggerClick(page, "videoDownload");
+
+		await page.waitForFunction(() => {
+			const cmds = window.__executedCommands || [];
+			return cmds.some((cmd) => cmd.includes("-f"));
+		});
+
+		// Retrieve executed commands
+		const commands = await getExecutedCommands(page);
+		expect(commands.length).toBeGreaterThan(0);
+
+		// Find download command (the one with -f flag)
+		const downloadCmd = commands.find((cmd) => cmd.includes("-f"));
+		expect(downloadCmd).toBeDefined();
+
+		// Verify command structure
+		expect(downloadCmd).toContain("-f");
+		expect(downloadCmd).toContain("-P");
+		expect(downloadCmd).toContain("-o");
+		expect(downloadCmd).toContain("--ffmpeg-location");
+		expect(downloadCmd.join(" ")).toContain("dQw4w9WgXcQ");
+	});
+
+	test("audio download produces correct yt-dlp command", async () => {
+		const testUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+
+		await page.evaluate((url) => {
+			window.electronAPI.clipboard.writeText(url);
+		}, testUrl);
+
+		// Fetch info
+		await page.click("#pasteUrl");
+		await waitForInfoPanel(page);
+
+		// Switch to Audio tab
+		await page.evaluate(() => document.getElementById("audioToggle").click());
+
+		// Ensure audio format select has a valid option value selected
+		await page.evaluate(() => {
+			const sel = document.getElementById("audioFormatSelect");
+			if (!sel.value && sel.options.length > 0) {
+				sel.value = sel.options[0].value;
+			}
+		});
+
+		await clearExecutedCommands(page);
+
+		// Trigger "Download Audio"
+		await triggerClick(page, "audioDownload");
+
+		await page.waitForFunction(() => {
+			const cmds = window.__executedCommands || [];
+			return cmds.some((cmd) => cmd.includes("-f"));
+		});
+
+		const commands = await getExecutedCommands(page);
+		expect(commands.length).toBeGreaterThan(0);
+
+		const downloadCmd = commands.find((cmd) => cmd.includes("-f"));
+		expect(downloadCmd).toBeDefined();
+
+		// Verify audio download args
+		expect(downloadCmd).toContain("-f");
+		expect(downloadCmd).toContain("-P");
+		expect(downloadCmd).toContain("-o");
+		expect(downloadCmd.join(" ")).toContain("dQw4w9WgXcQ");
+	});
+
+	test("audio extract produces correct yt-dlp command", async () => {
+		const testUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+
+		await page.evaluate((url) => {
+			window.electronAPI.clipboard.writeText(url);
+		}, testUrl);
+
+		// Fetch info
+		await page.click("#pasteUrl");
+		await waitForInfoPanel(page);
+
+		// Switch to Audio tab
+		await page.evaluate(() => document.getElementById("audioToggle").click());
+
+		// Select extract format mp3
+		await page.evaluate(() => {
+			const sel = document.getElementById("extractSelection");
+			if (sel) {
+				sel.value = "mp3";
+				sel.dispatchEvent(new Event("change", { bubbles: true }));
+			}
+		});
+
+		await clearExecutedCommands(page);
+
+		// Trigger Extract
+		await triggerClick(page, "extractBtn");
+
+		await page.waitForFunction(() => {
+			const cmds = window.__executedCommands || [];
+			return cmds.some((cmd) => cmd.includes("-x"));
+		});
+
+		const commands = await getExecutedCommands(page);
+		expect(commands.length).toBeGreaterThan(0);
+
+		const extractCmd = commands.find((cmd) => cmd.includes("-x"));
+		expect(extractCmd).toBeDefined();
+
+		// Verify extract args
+		expect(extractCmd).toContain("-x");
+		expect(extractCmd).toContain("--audio-format");
+		expect(extractCmd).toContain("mp3");
+		expect(extractCmd).toContain("--audio-quality");
+		expect(extractCmd).toContain("--embed-thumbnail");
+		expect(extractCmd).toContain("-P");
+		expect(extractCmd).toContain("-o");
+		expect(extractCmd.some((arg) => arg.includes("dQw4w9WgXcQ"))).toBe(true);
+	});
+});

@@ -115,8 +115,10 @@ const playlistDownloader = {
 
 	loadInitialConfig() {
 		// yt-dlp path
-		this.state.ytDlpPath = localStorage.getItem("ytdlp");
-		this.state.ytDlpWrap = new YTDlpWrap(this.state.ytDlpPath);
+		const isTestMode = Boolean(window.electronAPI && window.electronAPI.isTest);
+		const mockYtDlp = isTestMode ? window.__mockYtDlp : null;
+		this.state.ytDlpPath = mockYtDlp ? "mock-ytdlp" : localStorage.getItem("ytdlp");
+		this.state.ytDlpWrap = mockYtDlp || new YTDlpWrap(this.state.ytDlpPath);
 
 		const defaultDownloadsDir = path.join(os.homedir(), "Downloads");
 		let preferredDir =
@@ -872,6 +874,7 @@ const playlistDownloader = {
 	},
 
 	getFfmpegPath() {
+		if (window.electronAPI && window.electronAPI.isTest && window.__mockYtDlp) return "ffmpeg";
 		if (
 			env &&
 			env.YTDOWNLOADER_FFMPEG_PATH &&
@@ -908,6 +911,7 @@ const playlistDownloader = {
 	},
 
 	getJsRuntimePath() {
+		if (window.electronAPI && window.electronAPI.isTest && window.__mockYtDlp) return "";
 		{
 			const exeName = "node";
 
@@ -966,4 +970,5 @@ const playlistDownloader = {
 	},
 };
 
+window.playlistDownloader = playlistDownloader;
 playlistDownloader.init();

@@ -8,6 +8,8 @@ const crypto = require("crypto");
 const si = require("systeminformation");
 const { default: YTDlpWrap } = require("yt-dlp-wrap-plus");
 
+const isTest = process.env.NODE_ENV === "test" || process.env.YTDOWNLOADER_TEST === "true" || (process.argv && process.argv.includes("--is-test"));
+
 function normalizeSignal(options, cancellationSignal) {
 	let signalToUse = null;
 	const localOpts = options ? { ...options } : {};
@@ -226,8 +228,14 @@ contextBridge.exposeInMainWorld("electronAPI", {
 		openPath: (p) => shell.openPath(p),
 	},
 	clipboard: {
-		readText: () => clipboard.readText(),
-		writeText: (text) => clipboard.writeText(text),
+		readText: () => (isTest ? window.__testClipboardText || "" : clipboard.readText()),
+		writeText: (text) => {
+			if (isTest) {
+				window.__testClipboardText = text;
+			} else {
+				clipboard.writeText(text);
+			}
+		},
 	},
 	path: {
 		join: (...args) => path.join(...args),
@@ -357,6 +365,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
 		process.env[key] = value;
 		envObj[key] = value;
 	},
+	isTest: process.env.NODE_ENV === "test" || process.argv.includes("--is-test") || process.env.YTDOWNLOADER_TEST === "true",
 	windowsStore: process.windowsStore,
 	__dirname: path.join(__dirname, "html"),
 });

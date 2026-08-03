@@ -38,13 +38,14 @@ const appState = {
 	autoUpdateEnabled: false,
 };
 
-const gotTheLock = app.requestSingleInstanceLock();
+const isTestEnv = process.env.NODE_ENV === "test" || process.argv.includes("--is-test") || process.env.YTDOWNLOADER_TEST === "true";
+const gotTheLock = isTestEnv ? true : app.requestSingleInstanceLock();
 
 if (!gotTheLock) {
 	app.quit();
 } else {
 	app.on("second-instance", () => {
-		if (appState.mainWindow) {
+		if (appState.mainWindow && !isTestEnv) {
 			if (appState.mainWindow.isMinimized())
 				appState.mainWindow.restore();
 			appState.mainWindow.show();
@@ -122,7 +123,9 @@ function createWindow() {
 		if (appState.config.isMaximized) {
 			appState.mainWindow.maximize();
 		}
-		appState.mainWindow.show();
+		if (!isTestEnv) {
+			appState.mainWindow.show();
+		}
 	});
 
 	const saveBounds = () => {
