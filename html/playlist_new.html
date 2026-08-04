@@ -9,8 +9,9 @@
     <link rel="stylesheet" href="../assets/css/index.css">
     <script src="../translations/i18n.js" defer></script>
     <script src="../translations/i18n-init.js" defer></script>
-    <script src="../src/playlist_new.js" defer></script>
-    <script src="../src/common.js" defer></script>
+    <script type="module" src="../src/playlist_new.js"></script>
+    <script type="module" src="../src/common.js"></script>
+
     <style>
         .playlistCheck {
             position: absolute;
@@ -68,8 +69,9 @@
     </div>
 
     <p id="incorrectMsg"></p>
-    <button class="advancedToggle" id="errorBtn" onclick="toggleErrorDetails()">Error Details ▼</button>
-    <div id="errorDetails" onclick="copyErrorToClipboard()"></div>
+    <button class="advancedToggle" id="errorBtn">Error Details ▼</button>
+    <div id="errorDetails"></div>
+
     <div id="data">
     </div>
     <div id="goToTop"></div>

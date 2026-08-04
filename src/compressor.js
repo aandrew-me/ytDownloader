@@ -1,3 +1,5 @@
+import { getId, formatBytes } from "./utils.js";
+
 const {
 	spawn,
 	execSync,
@@ -16,13 +18,6 @@ document.addEventListener("translations-loaded", () => {
 });
 
 let menuIsOpen = false;
-
-/**
- * @param {string} id
- */
-function getId(id) {
-	return document.getElementById(id);
-}
 
 const dom = {
 	menuIcon: getId("menuIcon"),
@@ -919,15 +914,7 @@ function createProgressItem(filename, status, data, itemId) {
 	dom.compressionStatus.scrollIntoView({behavior: "smooth", block: "end"});
 }
 
-/**
- * @param {number} bytes
- */
-function formatBytes(bytes) {
-	if (bytes === 0) return "0 B";
-	const units = ["B", "KB", "MB", "GB"];
-	const i = Math.floor(Math.log(bytes) / Math.log(1024));
-	return `${(bytes / Math.pow(1024, i)).toFixed(2)} ${units[i]}`;
-}
+
 
 /**
  * @param {string} timeStr

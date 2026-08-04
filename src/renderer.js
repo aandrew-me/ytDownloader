@@ -1,3 +1,7 @@
+import { getId as $, showPopup, formatTime } from "./utils.js";
+import { selectVideo, selectAudio } from "./index.js";
+
+
 const {
 	shell,
 	ipcRenderer,
@@ -117,12 +121,7 @@ const CONSTANTS = {
 	},
 };
 
-/**
- * Shorthand for document.getElementById.
- * @param {string} id The ID of the DOM element.
- * @returns {HTMLElement | null}
- */
-const $ = (id) => document.getElementById(id);
+
 
 class YtDownloaderApp {
 	constructor() {
@@ -298,17 +297,25 @@ class YtDownloaderApp {
 	 * Waits for the i18n module to load and then translates the static page content.
 	 */
 	async _initializeTranslations() {
+		if (window.i18n && window.i18n.translations) {
+			window.i18n.translatePage();
+			return;
+		}
 		return new Promise((resolve) => {
-			document.addEventListener(
-				"translations-loaded",
-				() => {
+			const handler = () => {
+				if (window.i18n) window.i18n.translatePage();
+				resolve();
+			};
+			document.addEventListener("translations-loaded", handler, {once: true});
+			setTimeout(() => {
+				if (window.i18n && window.i18n.translatePage) {
 					window.i18n.translatePage();
-					resolve();
-				},
-				{once: true},
-			);
+				}
+				resolve();
+			}, 100);
 		});
 	}
+
 
 	/**
 	 * Locates the yt-dlp executable path from various sources or downloads it.
@@ -2307,36 +2314,7 @@ class YtDownloaderApp {
 	 * Displays a temporary popup message.
 	 */
 	_showPopup(text, isError = false) {
-		let popupContainer = document.getElementById("popupContainer");
-
-		if (!popupContainer) {
-			popupContainer = document.createElement("div");
-			popupContainer.id = "popupContainer";
-			popupContainer.className = "popup-container";
-			document.body.appendChild(popupContainer);
-		}
-
-		const popup = document.createElement("span");
-		popup.textContent = text;
-		popup.classList.add("popup-item");
-
-		popup.style.background = isError ? "#ff6b6b" : "#54abde";
-
-		if (isError) {
-			popup.classList.add("popup-error");
-		}
-
-		popupContainer.appendChild(popup);
-
-		setTimeout(() => {
-			popup.style.opacity = "0";
-			setTimeout(() => {
-				popup.remove();
-				if (popupContainer.childElementCount === 0) {
-					popupContainer.remove();
-				}
-			}, 1000);
-		}, 2200);
+		showPopup(text, isError);
 	}
 
 	/**
@@ -2455,24 +2433,7 @@ class YtDownloaderApp {
 	}
 
 	_formatTime(duration) {
-		if (duration === null) {
-			return "";
-		}
-
-		const hrs = Math.floor(duration / 3600);
-		const mins = Math.floor((duration % 3600) / 60);
-		const secs = Math.floor(duration % 60);
-
-		const paddedMins = String(mins).padStart(2, "0");
-		const paddedSecs = String(secs).padStart(2, "0");
-
-		if (hrs > 0) {
-			// H:MM:SS format
-			return `${hrs}:${paddedMins}:${paddedSecs}`;
-		} else {
-			// MM:SS format
-			return `${paddedMins}:${paddedSecs}`;
-		}
+		return formatTime(duration);
 	}
 
 	/**
@@ -2625,8 +2586,15 @@ class YtDownloaderApp {
 }
 
 // --- Application Entry Point ---
-document.addEventListener("DOMContentLoaded", () => {
+function initApp() {
 	const app = new YtDownloaderApp();
 	window.app = app;
 	app.initialize();
-});
+}
+
+if (document.readyState === "loading") {
+	document.addEventListener("DOMContentLoaded", initApp);
+} else {
+	initApp();
+}
+

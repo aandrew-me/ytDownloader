@@ -1,4 +1,7 @@
+import { getId, formatTime } from "./utils.js";
+
 const {
+
 	clipboard,
 	shell,
 	ipcRenderer,
@@ -55,9 +58,7 @@ let filenameFormat = "%(playlist_index)s.%(title)s.%(ext)s";
 let playlistIndex = 1;
 let playlistEnd = "";
 
-function getId(id) {
-	return document.getElementById(id);
-}
+
 
 function pasteLink() {
 	const clipboardText = clipboard.readText();
@@ -143,25 +144,7 @@ document.addEventListener("keydown", (event) => {
 	}
 });
 
-function formatTime(seconds) {
-	let hours = Math.floor(seconds / 3600);
-	let minutes = Math.floor((seconds - hours * 3600) / 60);
-	seconds = seconds - hours * 3600 - minutes * 60;
-	let formattedTime = "";
 
-	if (hours > 0) {
-		formattedTime += hours + ":";
-	}
-	if (minutes < 10 && hours > 0) {
-		formattedTime += "0";
-	}
-	formattedTime += minutes + ":";
-	if (seconds < 10) {
-		formattedTime += "0";
-	}
-	formattedTime += seconds;
-	return formattedTime;
-}
 function closeMenu() {
 	getId("menuIcon").style.transform = "rotate(0deg)";
 	menuIsOpen = false;

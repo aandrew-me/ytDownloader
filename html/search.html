@@ -15,9 +15,10 @@
 
     <script src="../translations/i18n.js" defer></script>
     <script src="../translations/i18n-init.js" defer></script>
-    <script src="../src/renderer.js" defer></script>
-    <script src="../src/index.js" defer></script>
-    <script src="../src/common.js" defer></script>
+    <script type="module" src="../src/renderer.js"></script>
+    <script type="module" src="../src/index.js"></script>
+    <script type="module" src="../src/common.js"></script>
+
 </head>
 
 <body>
@@ -108,7 +109,7 @@
 
     <div id="searchResults" class="searchResults"></div>
     <p id="incorrectMsg"></p>
-    <button class="advancedToggle" id="errorBtn" onclick="toggleErrorDetails()" data-translate="errorDetails">Error
+    <button class="advancedToggle" id="errorBtn" data-translate="errorDetails">Error
         Details</button>
     <div id="errorDetails"></div>
     <br>
@@ -179,7 +180,7 @@
 
                     </div>
 
-                    <div id="advancedVideoToggle" onClick="advancedToggle()" class="btnWrapper blueBtn">
+                    <div id="advancedVideoToggle" class="btnWrapper blueBtn">
                         <button class="btn" data-translate="moreOptions">More options</button>
 
                         <svg id="arrowLeftVideo" class="btnIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
@@ -216,7 +217,7 @@
 
                         </div>
 
-                        <div id="advancedAudioToggle" onClick="advancedToggle()" class="btnWrapper blueBtn">
+                        <div id="advancedAudioToggle" class="btnWrapper blueBtn">
                             <button class="btn" data-translate="moreOptions">More options</button>
 
                             <svg id="arrowLeftAudio" class="btnIcon" xmlns="http://www.w3.org/2000/svg"

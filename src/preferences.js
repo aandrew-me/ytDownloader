@@ -1,3 +1,5 @@
+import { getId, showPopup } from "./utils.js";
+
 const {
 	ipcRenderer,
 	shell,
@@ -11,9 +13,6 @@ const {
 	env,
 } = window.electronAPI;
 
-function getId(id) {
-	return document.getElementById(id);
-}
 
 const tabButtons = document.querySelectorAll(".tab-btn");
 const tabContents = document.querySelectorAll(".tab-content");
@@ -631,29 +630,4 @@ if (localStorage.getItem("closeToTray") === "true") {
 bindCheckboxToStorage("autoUpdateDisabled", "autoUpdate", "false", "true");
 bindCheckboxToStorage("showMoreFormats", "showMoreFormats", "true", "false");
 
-function showPopup(text, isError = false) {
-	let popupContainer = getId("popupContainer");
-	if (!popupContainer) {
-		popupContainer = document.createElement("div");
-		popupContainer.id = "popupContainer";
-		popupContainer.className = "popup-container";
-		document.body.appendChild(popupContainer);
-	}
 
-	const popup = document.createElement("span");
-	popup.textContent = text;
-	popup.classList.add("popup-item");
-	popup.style.background = isError ? "#ff6b6b" : "#54abde";
-
-	popupContainer.appendChild(popup);
-
-	setTimeout(() => {
-		popup.style.opacity = "0";
-		setTimeout(() => {
-			popup.remove();
-			if (popupContainer.childElementCount === 0) {
-				popupContainer.remove();
-			}
-		}, 400);
-	}, 2200);
-}
