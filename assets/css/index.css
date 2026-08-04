@@ -627,6 +627,14 @@ input[type="number"]::-webkit-outer-spin-button {
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) inset;
 }
 
+#pasteUrl:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+	pointer-events: none;
+	transform: none;
+	box-shadow: none;
+}
+
 .paste-keys {
 	margin-left: 4px;
 }
