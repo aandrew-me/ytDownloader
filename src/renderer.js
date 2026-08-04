@@ -133,6 +133,7 @@ class YtDownloaderApp {
 			downloadDir: "",
 			maxActiveDownloads: 5,
 			currentDownloads: 0,
+			isFetchingInfo: false,
 			// Video metadata
 			videoInfo: {
 				title: "",
@@ -889,7 +890,11 @@ class YtDownloaderApp {
 				document.activeElement.tagName !== "TEXTAREA"
 			) {
 				const pasteBtnInner = $(CONSTANTS.DOM_IDS.PASTE_URL_BTN);
+
+				if (pasteBtnInner && pasteBtnInner.disabled) return;
+				
 				pasteBtnInner?.classList.add("active");
+
 				setTimeout(() => {
 					pasteBtnInner?.classList.remove("active");
 				}, 150);
@@ -1090,6 +1095,8 @@ class YtDownloaderApp {
 			$(CONSTANTS.DOM_IDS.INCORRECT_MSG).textContent = error.message;
 		} finally {
 			$(CONSTANTS.DOM_IDS.LOADING_WRAPPER).style.display = "none";
+			const pasteBtn = $(CONSTANTS.DOM_IDS.PASTE_URL_BTN);
+			if (pasteBtn) pasteBtn.disabled = false;
 		}
 	}
 
@@ -1171,6 +1178,9 @@ class YtDownloaderApp {
 	 * Pastes URL from clipboard and initiates fetching video info.
 	 */
 	pasteAndGetInfo() {
+		const pasteBtn = $(CONSTANTS.DOM_IDS.PASTE_URL_BTN);
+		if (pasteBtn && pasteBtn.disabled) return;
+		if (this.state.isFetchingInfo) return;
 		this.getInfo(clipboard.readText());
 	}
 
@@ -1179,12 +1189,21 @@ class YtDownloaderApp {
 	 * @param {string} url The video URL.
 	 */
 	async getInfo(url) {
+		const pasteBtn = $(CONSTANTS.DOM_IDS.PASTE_URL_BTN);
+		if (pasteBtn && pasteBtn.disabled) return;
+		if (this.state.isFetchingInfo) return;
+
+		this.state.isFetchingInfo = true;
+		if (pasteBtn) pasteBtn.disabled = true;
+
 		let safeUrl;
 		try {
 			safeUrl = this.validateUrl(url);
 		} catch {
 			$(CONSTANTS.DOM_IDS.ERROR_BTN).textContent = i18n.__("errorDetails") + " ◀";
 			this._showError(i18n.__("invalidUrl"), url);
+			this.state.isFetchingInfo = false;
+			if (pasteBtn) pasteBtn.disabled = false;
 
 			return;
 		}
@@ -1225,7 +1244,9 @@ class YtDownloaderApp {
 				this._showError(error.message, url);
 			}
 		} finally {
+			this.state.isFetchingInfo = false;
 			$(CONSTANTS.DOM_IDS.LOADING_WRAPPER).style.display = "none";
+			if (pasteBtn) pasteBtn.disabled = false;
 		}
 	}
 
@@ -1770,6 +1791,8 @@ class YtDownloaderApp {
 		const noAudioTxt = i18n.__("noAudio");
 		$(CONSTANTS.DOM_IDS.AUDIO_FOR_VIDEO_FORMAT_SELECT).innerHTML =
 			`<option value="none|none">${noAudioTxt}</option>`;
+		const pasteBtn = $(CONSTANTS.DOM_IDS.PASTE_URL_BTN);
+		if (pasteBtn) pasteBtn.disabled = true;
 	}
 
 	/**

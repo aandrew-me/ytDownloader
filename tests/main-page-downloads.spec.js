@@ -35,6 +35,29 @@ test.describe("Main Page Download Tests", () => {
 		}
 	});
 
+	test("paste button is disabled during link fetching and re-enabled after completion", async () => {
+		const testUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+
+		await page.evaluate((url) => {
+			window.electronAPI.clipboard.writeText(url);
+		}, testUrl);
+
+		// Trigger click and check disabled state immediately (synchronously set on click)
+		const isDisabledDuringFetch = await page.evaluate(() => {
+			const btn = document.getElementById("pasteUrl");
+			btn.click();
+			return btn.disabled;
+		});
+		expect(isDisabledDuringFetch).toBe(true);
+
+		// Wait for info panel to be populated and displayed
+		await waitForInfoPanel(page);
+
+		// Verify paste button is re-enabled after fetching completes
+		const isEnabledAfter = await page.$eval("#pasteUrl", (btn) => !btn.disabled);
+		expect(isEnabledAfter).toBe(true);
+	});
+
 	test("video download produces correct yt-dlp command", async () => {
 		const testUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
 
