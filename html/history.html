@@ -413,7 +413,7 @@
     <div class="history-container">
         <div class="history-header">
             <h1 id="historyTitle" data-translate="downloadHistory">Download History</h1>
-            <button id="closeBtn" class="submitBtn close-btn" onclick="window.close()"
+            <button id="closeBtn" class="submitBtn close-btn"
                 data-translate="close">Close</button>
         </div>
 
@@ -435,10 +435,10 @@
         <div class="history-stats" id="statsContainer"></div>
 
         <div class="action-buttons">
-            <button id="exportJsonBtn" onclick="exportHistoryJSON()" data-translate="exportAsJson">Export as
+            <button id="exportJsonBtn" data-translate="exportAsJson">Export as
                 JSON</button>
-            <button id="exportCsvBtn" onclick="exportHistoryCSV()" data-translate="exportAsCsv">Export as CSV</button>
-            <button id="clearAllBtn" class="danger-btn" onclick="clearAllHistory()"
+            <button id="exportCsvBtn" data-translate="exportAsCsv">Export as CSV</button>
+            <button id="clearAllBtn" class="danger-btn"
                 data-translate="clearAllHistory">Clear All History</button>
         </div>
 
@@ -481,6 +481,10 @@
         function setupEventListeners() {
             document.getElementById("searchBox").addEventListener("input", filterHistory);
             document.getElementById("formatFilter").addEventListener("change", filterHistory);
+            document.getElementById("closeBtn")?.addEventListener("click", () => window.close());
+            document.getElementById("exportJsonBtn")?.addEventListener("click", exportHistoryJSON);
+            document.getElementById("exportCsvBtn")?.addEventListener("click", exportHistoryCSV);
+            document.getElementById("clearAllBtn")?.addEventListener("click", clearAllHistory);
         }
 
         function loadHistory() {

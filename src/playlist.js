@@ -1,3 +1,5 @@
+import { getId } from "./utils.js";
+
 const {
 	clipboard,
 	ipcRenderer,

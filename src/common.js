@@ -1,11 +1,5 @@
-/**
- *
- * @param {string} id
- * @returns {any}
- */
-function getId(id) {
-	return document.getElementById(id);
-}
+import { getId } from "./utils.js";
+
 
 getId("menuIcon").addEventListener("click", () => {
 	const menuDisplay = getId("menu").style.display;
@@ -73,7 +67,7 @@ if (storageTheme) {
 ////
 let advancedHidden = true;
 
-function advancedToggle() {
+export function advancedToggle() {
 	if (advancedHidden) {
 		getId("advanced").style.display = "block";
 		getId("arrowLeftVideo").style.transform = "rotate(-90deg)";
@@ -86,6 +80,7 @@ function advancedToggle() {
 		advancedHidden = true;
 	}
 }
+window.advancedToggle = advancedToggle;
 
 // Check scroll go to top
 
@@ -111,7 +106,7 @@ getId("goToTop").addEventListener("click", () => {
 });
 
 // Showing and hiding error details
-function toggleErrorDetails() {
+export function toggleErrorDetails() {
 	const display = getComputedStyle(getId("errorDetails")).display;
 
 	if (display === "none") {
@@ -124,3 +119,9 @@ function toggleErrorDetails() {
 		getId("errorBtn").textContent = i18n.__("errorDetails") + " ◀";
 	}
 }
+window.toggleErrorDetails = toggleErrorDetails;
+
+getId("errorBtn")?.addEventListener("click", toggleErrorDetails);
+getId("advancedVideoToggle")?.addEventListener("click", advancedToggle);
+getId("advancedAudioToggle")?.addEventListener("click", advancedToggle);
+
