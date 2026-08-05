@@ -97,18 +97,84 @@ const playlistDownloader = {
 		searchWinBtn: document.getElementById("searchWin"),
 	},
 
-	init() {
-		this.loadInitialConfig();
-		this.initEventListeners();
+	initUI() {
+		const container = document.getElementById("view-playlist") || document;
 
-		// Set initial UI state
-		this.ui.pathDisplay.textContent = this.state.downloadDir;
-		this.ui.videoToggle.style.backgroundColor = "var(--box-toggleOn)";
-		this.updateVideoTypeVisibility();
+		this.ui = {
+			pasteLinkBtn: container.querySelector("#pasteLink") || container.querySelector("#pasteLinkPlaylist") || document.getElementById("pasteLink"),
+			linkDisplay: container.querySelector("#link") || document.getElementById("link"),
+			optionsContainer: container.querySelector("#options") || document.getElementById("options"),
+			downloadList: container.querySelector("#listPlaylist") || container.querySelector("#list") || document.getElementById("list"),
+
+			downloadVideoBtn: container.querySelector("#download") || document.getElementById("download"),
+			downloadAudioBtn: container.querySelector("#audioDownloadPlaylist") || container.querySelector("#audioDownload"),
+			downloadThumbnailsBtn: container.querySelector("#downloadThumbnails") || document.getElementById("downloadThumbnails"),
+			saveLinksBtn: container.querySelector("#saveLinks") || document.getElementById("saveLinks"),
+
+			selectLocationBtn: container.querySelector("#selectLocationPlaylist") || container.querySelector("#selectLocation") || document.getElementById("selectLocation"),
+			pathDisplay: container.querySelector("#pathPlaylist") || container.querySelector("#path") || document.getElementById("path"),
+			openDownloadsBtn: container.querySelector("#openDownloads") || document.getElementById("openDownloads"),
+			stopDownloadBtn: container.querySelector("#stopDownload") || document.getElementById("stopDownload"),
+
+			videoToggle: container.querySelector("#videoTogglePlaylist") || container.querySelector("#videoToggle") || document.getElementById("videoToggle"),
+			audioToggle: container.querySelector("#audioTogglePlaylist") || container.querySelector("#audioToggle") || document.getElementById("audioToggle"),
+			advancedToggle: container.querySelector("#advancedToggle") || document.getElementById("advancedToggle"),
+			videoBox: container.querySelector("#videoBox") || document.getElementById("videoBox"),
+			audioBox: container.querySelector("#audioBox") || document.getElementById("audioBox"),
+			videoQualitySelect: container.querySelector("#select") || document.getElementById("select"),
+			videoTypeSelect: container.querySelector("#videoTypeSelect") || document.getElementById("videoTypeSelect"),
+			typeSelectBox: container.querySelector("#typeSelectBox") || document.getElementById("typeSelectBox"),
+			audioTypeSelect: container.querySelector("#audioSelect") || document.getElementById("audioSelect"),
+			audioQualitySelect: container.querySelector("#audioQualitySelect") || document.getElementById("audioQualitySelect"),
+
+			advancedMenu: container.querySelector("#advancedMenu") || document.getElementById("advancedMenu"),
+			playlistIndexInput: container.querySelector("#playlistIndex") || document.getElementById("playlistIndex"),
+			playlistEndInput: container.querySelector("#playlistEnd") || document.getElementById("playlistEnd"),
+			subtitlesCheckbox: container.querySelector("#subCheckedPlaylist") || container.querySelector("#subChecked") || document.getElementById("subChecked"),
+			closeHiddenBtn: container.querySelector("#closeHiddenPlaylist") || container.querySelector("#closeHidden") || document.getElementById("closeHidden"),
+
+			playlistNameDisplay: container.querySelector("#playlistName") || document.getElementById("playlistName"),
+			errorMsgDisplay: container.querySelector("#incorrectMsgPlaylist") || container.querySelector("#incorrectMsg") || document.getElementById("incorrectMsg"),
+			errorBtn: container.querySelector("#errorBtnPlaylist") || container.querySelector("#errorBtn") || document.getElementById("errorBtn"),
+			errorDetails: container.querySelector("#errorDetailsPlaylist") || container.querySelector("#errorDetails") || document.getElementById("errorDetails"),
+
+			menuIcon: document.getElementById("menuIcon"),
+			menu: document.getElementById("menu"),
+			preferenceWinBtn: document.getElementById("preferenceWin"),
+			aboutWinBtn: document.getElementById("aboutWin"),
+			historyWinBtn: document.getElementById("historyWin"),
+			homeWinBtn: document.getElementById("homeWin"),
+			compressorWinBtn: document.getElementById("compressorWin"),
+			searchWinBtn: document.getElementById("searchWin"),
+		};
+	},
+
+	init() {
+		const setup = () => {
+			this.initUI();
+			this.loadInitialConfig();
+			this.initEventListeners();
+
+			if (this.ui.pathDisplay) {
+				this.ui.pathDisplay.textContent = this.state.downloadDir;
+			}
+			if (this.ui.videoToggle) {
+				this.ui.videoToggle.style.backgroundColor = "var(--box-toggleOn)";
+			}
+			this.updateVideoTypeVisibility();
+		};
+
+		if (document.readyState === "loading") {
+			document.addEventListener("DOMContentLoaded", () => setup());
+		} else {
+			setup();
+		}
 
 		// Load translations when ready
 		document.addEventListener("translations-loaded", () => {
-			window.i18n.translatePage();
+			if (window.i18n && window.i18n.translatePage) {
+				window.i18n.translatePage();
+			}
 		});
 
 		console.log(`yt-dlp path: ${this.state.ytDlpPath}`);
@@ -116,11 +182,24 @@ const playlistDownloader = {
 	},
 
 	loadInitialConfig() {
-		// yt-dlp path
+		if (!this.ui.videoQualitySelect || !this.ui.videoQualitySelect.options) {
+			this.initUI();
+		}
+
 		const isTestMode = Boolean(window.electronAPI && window.electronAPI.isTest);
 		const mockYtDlp = isTestMode ? window.__mockYtDlp : null;
-		this.state.ytDlpPath = mockYtDlp ? "mock-ytdlp" : localStorage.getItem("ytdlp");
-		this.state.ytDlpWrap = mockYtDlp || new YTDlpWrap(this.state.ytDlpPath);
+
+		if (window.AppBinaries && !mockYtDlp) {
+			this.state.ytDlpPath = window.AppBinaries.ytDlpPath;
+			this.state.ytDlpWrap = window.AppBinaries.ytDlp;
+			this.state.ffmpegPath = window.AppBinaries.ffmpegPath;
+			this.state.jsRuntimePath = window.AppBinaries.jsRuntimePath;
+		} else {
+			this.state.ytDlpPath = mockYtDlp ? "mock-ytdlp" : localStorage.getItem("ytdlp");
+			this.state.ytDlpWrap = mockYtDlp || new YTDlpWrap(this.state.ytDlpPath);
+			this.state.ffmpegPath = mockYtDlp ? "ffmpeg" : this.getFfmpegPath();
+			this.state.jsRuntimePath = mockYtDlp ? "" : this.getJsRuntimePath();
+		}
 
 		const defaultDownloadsDir = path.join(os.homedir(), "Downloads");
 		let preferredDir =
@@ -137,15 +216,11 @@ const playlistDownloader = {
 			localStorage.setItem("downloadPath", defaultDownloadsDir);
 		}
 
-		// ffmpeg and js runtime path setup
-		this.state.ffmpegPath = this.getFfmpegPath();
-		this.state.jsRuntimePath = this.getJsRuntimePath();
-
 		const preferredVideo = localStorage.getItem("preferredVideoQuality");
-		if (preferredVideo) {
+		if (preferredVideo && this.ui.videoQualitySelect) {
 			this.ui.videoQualitySelect.value = preferredVideo;
 		}
-		if (!this.ui.videoQualitySelect.value) {
+		if (this.ui.videoQualitySelect && !this.ui.videoQualitySelect.value) {
 			this.ui.videoQualitySelect.value = "best";
 		}
 
@@ -164,14 +239,20 @@ const playlistDownloader = {
 	initEventListeners() {
 		this.ui.pasteLinkBtn.addEventListener("click", () => this.pasteLink());
 		document.addEventListener("keydown", (event) => {
-			if (
-				(event.ctrlKey && event.key === "v") ||
-				(event.metaKey &&
-					event.key === "v" &&
-					os.platform() === "darwin" &&
-					document.activeElement.tagName !== "INPUT" &&
-					document.activeElement.tagName !== "TEXTAREA")
-			) {
+			const viewPlaylist = document.getElementById("view-playlist");
+			if (!viewPlaylist || viewPlaylist.classList.contains("hidden")) return;
+
+			const isCtrlV =
+				(event.ctrlKey || (event.metaKey && os.platform() === "darwin")) &&
+				(event.key?.toLowerCase() === "v" || event.code === "KeyV");
+
+			const isInput =
+				document.activeElement &&
+				(document.activeElement.tagName === "INPUT" ||
+					document.activeElement.tagName === "TEXTAREA" ||
+					document.activeElement.isContentEditable);
+
+			if (isCtrlV && !isInput) {
 				if (!this.state.isDownloading) {
 					this.pasteLink();
 				}
@@ -860,17 +941,20 @@ const playlistDownloader = {
 	},
 
 	navigate(type, page) {
-		if (this.state.isDownloading) {
-			const confirmMsg = window.i18n
-				? window.i18n.__("cancel_download") + "?"
-				: "Are you sure you want to cancel the download?";
-			const choice = confirm(confirmMsg);
-			if (!choice) {
-				return;
-			}
-			this.stopDownload();
-		}
 		this.closeMenu();
+		const viewMap = {
+			"/index.html": "view-home",
+			"/search.html": "view-search",
+			"/playlist.html": "view-playlist",
+			"/compressor.html": "view-compressor",
+			"/history.html": "view-history",
+			"/preferences.html": "view-preferences",
+			"/about.html": "view-about",
+		};
+		if (viewMap[page] && typeof window.switchView === "function") {
+			window.switchView(viewMap[page]);
+			return;
+		}
 		const event = type === "page" ? "load-page" : "load-win";
 		ipcRenderer.send(event, path.join(__dirname, page));
 	},

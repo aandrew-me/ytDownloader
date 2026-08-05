@@ -9,12 +9,12 @@ const {
 	clipboard,
 	session,
 } = require("electron");
-const {autoUpdater} = require("electron-updater");
+const { autoUpdater } = require("electron-updater");
 const fs = require("fs").promises;
-const {existsSync, readFileSync} = require("fs");
+const { existsSync, readFileSync } = require("fs");
 const path = require("path");
 const DownloadHistory = require("./src/history");
-const {platform} = require("os");
+const { platform } = require("os");
 
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = "true";
 autoUpdater.autoDownload = false;
@@ -239,9 +239,10 @@ function createTray() {
 		{
 			label: i18n("downloadPlaylistButton"),
 			click: () => {
-				appState.indexPageIsOpen = false;
-				appState.mainWindow?.loadFile("html/playlist.html");
-				appState.mainWindow?.show();
+				if (appState.mainWindow) {
+					appState.mainWindow.show();
+					appState.mainWindow.webContents.send("navigate-view", "view-playlist");
+				}
 				if (app.dock) app.dock.show();
 			},
 		},
@@ -284,7 +285,7 @@ function registerIpcHandlers() {
 		try {
 			await fs.stat(fullPath);
 			shell.showItemInFolder(fullPath);
-		} catch (error) {}
+		} catch (error) { }
 	});
 
 	ipcMain.handle("show-file", async (_event, fullPath) => {
@@ -292,9 +293,9 @@ function registerIpcHandlers() {
 			await fs.stat(fullPath);
 			shell.showItemInFolder(fullPath);
 
-			return {success: true};
+			return { success: true };
 		} catch (error) {
-			return {success: false, error: error.message};
+			return { success: false, error: error.message };
 		}
 	});
 
@@ -303,12 +304,12 @@ function registerIpcHandlers() {
 			await fs.stat(folderPath);
 			const result = await shell.openPath(folderPath);
 			if (result) {
-				return {success: false, error: result};
+				return { success: false, error: result };
 			} else {
-				return {success: true};
+				return { success: true };
 			}
 		} catch (error) {
-			return {success: false, error: error.message};
+			return { success: false, error: error.message };
 		}
 	});
 
@@ -349,9 +350,9 @@ function registerIpcHandlers() {
 
 	ipcMain.on("select-location-main", async () => {
 		if (!appState.mainWindow) return;
-		const {canceled, filePaths} = await dialog.showOpenDialog(
+		const { canceled, filePaths } = await dialog.showOpenDialog(
 			appState.mainWindow,
-			{properties: ["openDirectory"]},
+			{ properties: ["openDirectory"] },
 		);
 		if (!canceled && filePaths.length > 0) {
 			appState.mainWindow.webContents.send("downloadPath", filePaths);
@@ -360,9 +361,9 @@ function registerIpcHandlers() {
 
 	ipcMain.on("select-location-secondary", async () => {
 		if (!appState.secondaryWindow) return;
-		const {canceled, filePaths} = await dialog.showOpenDialog(
+		const { canceled, filePaths } = await dialog.showOpenDialog(
 			appState.secondaryWindow,
-			{properties: ["openDirectory"]},
+			{ properties: ["openDirectory"] },
 		);
 		if (!canceled && filePaths.length > 0) {
 			appState.secondaryWindow.webContents.send(
@@ -374,9 +375,9 @@ function registerIpcHandlers() {
 
 	ipcMain.on("get-directory", async () => {
 		if (!appState.mainWindow) return;
-		const {canceled, filePaths} = await dialog.showOpenDialog(
+		const { canceled, filePaths } = await dialog.showOpenDialog(
 			appState.mainWindow,
-			{properties: ["openDirectory"]},
+			{ properties: ["openDirectory"] },
 		);
 		if (!canceled && filePaths.length > 0) {
 			appState.mainWindow.webContents.send("directory-path", filePaths);
@@ -385,9 +386,9 @@ function registerIpcHandlers() {
 
 	ipcMain.on("select-config", async () => {
 		if (!appState.secondaryWindow) return;
-		const {canceled, filePaths} = await dialog.showOpenDialog(
+		const { canceled, filePaths } = await dialog.showOpenDialog(
 			appState.secondaryWindow,
-			{properties: ["openFile"]},
+			{ properties: ["openFile"] },
 		);
 		if (!canceled && filePaths.length > 0) {
 			appState.secondaryWindow.webContents.send("configPath", filePaths);
@@ -412,7 +413,7 @@ function registerIpcHandlers() {
 	});
 
 	ipcMain.on("error_dialog", async (_event, message) => {
-		const {response} = await dialog.showMessageBox(appState.mainWindow, {
+		const { response } = await dialog.showMessageBox(appState.mainWindow, {
 			type: "error",
 			title: "Error",
 			message: message,
@@ -444,7 +445,7 @@ function registerIpcHandlers() {
 			}
 		}
 
-		const mergedTranslations = {...fallbackData, ...localeData};
+		const mergedTranslations = { ...fallbackData, ...localeData };
 
 		return mergedTranslations;
 	});
@@ -565,7 +566,7 @@ function registerAutoUpdaterEvents() {
 					info.releaseNotes?.toString().replace(/<[^>]*>?/gm, "") ||
 					"No details available.",
 			};
-			const {response} = await dialog.showMessageBox(
+			const { response } = await dialog.showMessageBox(
 				appState.mainWindow,
 				dialogOpts,
 			);
@@ -583,7 +584,7 @@ function registerAutoUpdaterEvents() {
 			title: "Update Ready",
 			message: i18n("installAndRestartPrompt"),
 		};
-		const {response} = await dialog.showMessageBox(
+		const { response } = await dialog.showMessageBox(
 			appState.mainWindow,
 			dialogOpts,
 		);
@@ -626,7 +627,7 @@ async function loadConfiguration() {
 			error.message,
 		);
 		appState.config = {
-			bounds: {width: 1024, height: 768},
+			bounds: { width: 1024, height: 768 },
 			isMaximized: false,
 		};
 	}
@@ -642,7 +643,7 @@ async function saveConfiguration() {
 
 async function loadTranslations() {
 	const locale = app.getSystemLocale();
-	console.log({locale});
+	console.log({ locale });
 	const defaultLangPath = path.join(__dirname, "translations", "en.json");
 	let langPath = path.join(__dirname, "translations", `${locale}.json`);
 

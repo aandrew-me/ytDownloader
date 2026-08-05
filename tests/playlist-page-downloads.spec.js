@@ -14,7 +14,7 @@ async function waitForPlaylistOptions(page) {
 
 async function triggerClick(page, elementId) {
 	await page.evaluate((id) => {
-		const el = document.getElementById(id);
+		const el = document.getElementById(id) || document.getElementById(id + "Playlist");
 		if (el) el.click();
 	}, elementId);
 }
@@ -24,9 +24,11 @@ test.describe("Playlist Page Download Tests", () => {
 	let page;
 
 	test.beforeEach(async () => {
-		const res = await launchApp({}, undefined, "html/playlist.html");
+		const res = await launchApp();
 		electronApp = res.app;
 		page = res.page;
+		await page.waitForFunction(() => typeof window.switchView === "function");
+		await page.click("#playlistWin");
 	});
 
 	test.afterEach(async () => {
@@ -73,14 +75,14 @@ test.describe("Playlist Page Download Tests", () => {
 		await page.click("#pasteLink");
 		await waitForPlaylistOptions(page);
 
-		await triggerClick(page, "audioToggle");
+		await triggerClick(page, "audioTogglePlaylist");
 
 		await page.selectOption("#audioSelect", "mp3");
 		await page.selectOption("#audioQualitySelect", "0");
 
 		await clearExecutedCommands(page);
 
-		await triggerClick(page, "audioDownload");
+		await page.click("#audioDownloadPlaylist");
 
 		const commands = await getExecutedCommands(page);
 		expect(commands.length).toBeGreaterThan(0);
@@ -196,7 +198,7 @@ test.describe("Playlist Page Download Tests", () => {
 
 		await triggerClick(page, "advancedToggle");
 
-		await page.check("#subChecked");
+		await page.check("#subCheckedPlaylist");
 
 		await clearExecutedCommands(page);
 

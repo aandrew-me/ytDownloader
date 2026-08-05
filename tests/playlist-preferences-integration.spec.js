@@ -45,10 +45,12 @@ test.describe("Playlist Preferences Integration Tests", () => {
 			downloadPath: customDir,
 			foldernameFormat: customFolder,
 			filenameFormat: customFile,
-		}, undefined, "html/playlist.html");
+		});
 
 		electronApp = res.app;
 		page = res.page;
+		await page.waitForFunction(() => typeof window.switchView === "function");
+		await page.click("#playlistWin");
 
 		const playlistUrl = "https://www.youtube.com/playlist?list=PL123456789";
 
@@ -78,10 +80,12 @@ test.describe("Playlist Preferences Integration Tests", () => {
 		const res = await launchApp({
 			preferredVideoQuality: "720",
 			preferredAudioQuality: "flac",
-		}, undefined, "html/playlist.html");
+		});
 
 		electronApp = res.app;
 		page = res.page;
+		await page.waitForFunction(() => typeof window.switchView === "function");
+		await page.click("#playlistWin");
 
 		const selectedVideo = await page.$eval("#select", (el) => el.value);
 		expect(selectedVideo).toBe("720");
@@ -94,10 +98,12 @@ test.describe("Playlist Preferences Integration Tests", () => {
 		const res = await launchApp({
 			cookieSource: "browser",
 			browser: "chrome",
-		}, undefined, "html/playlist.html");
+		});
 
 		electronApp = res.app;
 		page = res.page;
+		await page.waitForFunction(() => typeof window.switchView === "function");
+		await page.click("#playlistWin");
 
 		const playlistUrl = "https://www.youtube.com/playlist?list=PL123456789";
 		await page.evaluate((url) => window.electronAPI.clipboard.writeText(url), playlistUrl);
@@ -120,10 +126,12 @@ test.describe("Playlist Preferences Integration Tests", () => {
 		const proxyUrl = "http://127.0.0.1:8080";
 		const res = await launchApp({
 			proxy: proxyUrl,
-		}, undefined, "html/playlist.html");
+		});
 
 		electronApp = res.app;
 		page = res.page;
+		await page.waitForFunction(() => typeof window.switchView === "function");
+		await page.click("#playlistWin");
 
 		const playlistUrl = "https://www.youtube.com/playlist?list=PL123456789";
 		await page.evaluate((url) => window.electronAPI.clipboard.writeText(url), playlistUrl);

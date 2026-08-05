@@ -191,6 +191,13 @@ class YtDownloaderApp {
 			this._ensureFfmpegLibsLoadable(this.state.ffmpegPath);
 			this.state.jsRuntimePath = mockYtDlp ? "" : await this._getJsRuntimePath();
 
+			window.AppBinaries = {
+				ytDlpPath: this.state.ytDlpPath,
+				ytDlp: this.state.ytDlp,
+				ffmpegPath: this.state.ffmpegPath,
+				jsRuntimePath: this.state.jsRuntimePath,
+			};
+
 			console.log("yt-dlp path:", this.state.ytDlpPath);
 			console.log("ffmpeg path:", this.state.ffmpegPath);
 			console.log("JS runtime:", this.state.jsRuntimePath);
@@ -881,18 +888,24 @@ class YtDownloaderApp {
 			},
 		);
 		document.addEventListener("keydown", (event) => {
-			if (
-				((event.ctrlKey && event.key === "v") ||
-					(event.metaKey &&
-						event.key === "v" &&
-						platform() === "darwin")) &&
-				document.activeElement.tagName !== "INPUT" &&
-				document.activeElement.tagName !== "TEXTAREA"
-			) {
+			const viewHome = document.getElementById("view-home");
+			if (!viewHome || viewHome.classList.contains("hidden")) return;
+
+			const isCtrlV =
+				(event.ctrlKey || (event.metaKey && platform() === "darwin")) &&
+				(event.key?.toLowerCase() === "v" || event.code === "KeyV");
+
+			const isInput =
+				document.activeElement &&
+				(document.activeElement.tagName === "INPUT" ||
+					document.activeElement.tagName === "TEXTAREA" ||
+					document.activeElement.isContentEditable);
+
+			if (isCtrlV && !isInput) {
 				const pasteBtnInner = $(CONSTANTS.DOM_IDS.PASTE_URL_BTN);
 
 				if (pasteBtnInner && pasteBtnInner.disabled) return;
-				
+
 				pasteBtnInner?.classList.add("active");
 
 				setTimeout(() => {
@@ -967,32 +980,7 @@ class YtDownloaderApp {
 			$(CONSTANTS.DOM_IDS.UPDATE_POPUP).style.display = "none";
 		});
 
-		// Menu Listeners
-		const menuMapping = {
-			[CONSTANTS.DOM_IDS.PREFERENCE_WIN]: "/preferences.html",
-			[CONSTANTS.DOM_IDS.ABOUT_WIN]: "/about.html",
-			[CONSTANTS.DOM_IDS.HISTORY_WIN]: "/history.html",
-		};
-		const windowMapping = {
-			[CONSTANTS.DOM_IDS.PLAYLIST_WIN]: "/playlist.html",
-			[CONSTANTS.DOM_IDS.COMPRESSOR_WIN]: "/compressor.html",
-			[CONSTANTS.DOM_IDS.SEARCH_WIN]: "/search.html",
-			[CONSTANTS.DOM_IDS.HOME_WIN]: "/index.html",
-		};
 
-		Object.entries(menuMapping).forEach(([id, page]) => {
-			$(id)?.addEventListener("click", () => {
-				this._closeMenu();
-				ipcRenderer.send("load-page", join(__dirname, page));
-			});
-		});
-
-		Object.entries(windowMapping).forEach(([id, page]) => {
-			$(id)?.addEventListener("click", () => {
-				this._closeMenu();
-				ipcRenderer.send("load-win", join(__dirname, page));
-			});
-		});
 
 		const minSlider = $(CONSTANTS.DOM_IDS.MIN_SLIDER);
 		const maxSlider = $(CONSTANTS.DOM_IDS.MAX_SLIDER);
@@ -1025,6 +1013,9 @@ class YtDownloaderApp {
 	async searchYoutube(query) {
 		this._resetUIForNewLink();
 		$(CONSTANTS.DOM_IDS.SEARCH_RESULTS).innerHTML = "";
+
+		const searchLoading = document.getElementById("loadingWrapperSearch") || $(CONSTANTS.DOM_IDS.LOADING_WRAPPER);
+		if (searchLoading) searchLoading.style.display = "flex";
 
 		try {
 			await this._loadSettings("https://youtube.com");
@@ -1094,6 +1085,7 @@ class YtDownloaderApp {
 			console.error("Search failed:", error);
 			$(CONSTANTS.DOM_IDS.INCORRECT_MSG).textContent = error.message;
 		} finally {
+			if (searchLoading) searchLoading.style.display = "none";
 			$(CONSTANTS.DOM_IDS.LOADING_WRAPPER).style.display = "none";
 			const pasteBtn = $(CONSTANTS.DOM_IDS.PASTE_URL_BTN);
 			if (pasteBtn) pasteBtn.disabled = false;
@@ -1125,6 +1117,9 @@ class YtDownloaderApp {
 			const card = document.createElement("div");
 			card.className = "searchResultItem";
 			card.addEventListener("click", () => {
+				if (window.switchView) {
+					window.switchView("view-home");
+				}
 				this.getInfo(item.url);
 			});
 

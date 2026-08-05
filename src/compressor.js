@@ -963,12 +963,6 @@ function getFfmpegPath() {
 	}
 }
 
-dom.themeToggle.addEventListener("change", () => {
-	const theme = dom.themeToggle.value;
-	document.documentElement.setAttribute("theme", theme);
-	localStorage.setItem("theme", theme);
-});
-
 dom.outputFolderInput.addEventListener("change", (e) => {
 	const checked = e.target.checked;
 	if (!checked) {
@@ -980,16 +974,11 @@ dom.outputFolderInput.addEventListener("change", (e) => {
 	}
 });
 
-const storageTheme = localStorage.getItem("theme") || "frappe";
-document.documentElement.setAttribute("theme", storageTheme);
-dom.themeToggle.value = storageTheme;
-
 ipcRenderer.on("directory-path", (_event, msg) => {
 	dom.customFolderPath.textContent = msg;
 	dom.customFolderPath.style.display = "inline";
 });
 
-// DRWed Menu Router Engine
 const menuRoutes = {
 	preferenceWin: {page: "/preferences.html", channel: "load-page"},
 	playlistWin: {page: "/playlist.html", channel: "load-win"},
@@ -999,9 +988,22 @@ const menuRoutes = {
 	searchWin: {page: "/search.html", channel: "load-win"},
 };
 
+const routeToViewMap = {
+	preferenceWin: "view-preferences",
+	playlistWin: "view-playlist",
+	aboutWin: "view-about",
+	historyWin: "view-history",
+	homeWin: "view-home",
+	searchWin: "view-search",
+};
+
 Object.entries(menuRoutes).forEach(([domKey, route]) => {
 	dom[domKey]?.addEventListener("click", () => {
 		closeMenu();
+		if (routeToViewMap[domKey] && typeof window.switchView === "function") {
+			window.switchView(routeToViewMap[domKey]);
+			return;
+		}
 		ipcRenderer.send(route.channel, __dirname + route.page);
 	});
 });

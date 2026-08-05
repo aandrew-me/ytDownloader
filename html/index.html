@@ -2,7 +2,6 @@
 <html lang="en">
 
 <head>
-    <header></header>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,6 +16,10 @@
     <script src="../translations/i18n-init.js" defer></script>
     <script type="module" src="../src/renderer.js"></script>
     <script type="module" src="../src/index.js"></script>
+    <script type="module" src="../src/playlist.js"></script>
+    <script type="module" src="../src/compressor.js"></script>
+    <script type="module" src="../src/preferences.js"></script>
+    <script type="module" src="../src/history_ui.js"></script>
     <script type="module" src="../src/common.js"></script>
 
 </head>
@@ -25,7 +28,7 @@
     <div id="popupBox">
         <div id="popup">
             <p data-translate="downloadingNecessaryFilesWait">Please wait, necessary files are being downloaded</p>
-            <svg id="popupSvg" version="1.1" id="L4" xmlns="http://www.w3.org/2000/svg"
+            <svg id="popupSvg" version="1.1" xmlns="http://www.w3.org/2000/svg"
                 xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 100 100"
                 enable-background="new 0 0 0 0" xml:space="preserve">
                 <circle fill="rgb(84, 171, 222)" stroke="none" cx="6" cy="50" r="6">
@@ -44,8 +47,7 @@
 
     <div id="popupBoxMac">
         <div id="popupMac">
-            <p id="popupMacTxt" data-translate="homebrewYtDlpWarning">You need to download yt-dlp from homebrew first
-            </p>
+            <p id="popupMacTxt" data-translate="homebrewYtDlpWarning">You need to download yt-dlp from homebrew first</p>
             <div style="display: flex;">
                 <a class="blueBtn" id="openHomebrew" target="_blank" href="https://formulae.brew.sh/formula/yt-dlp"
                     data-translate="openHomebrew">Open Homebrew</a>
@@ -54,297 +56,916 @@
         </div>
     </div>
 
-    <!-- Menu icon -->
-    <img src="../assets/images/menu.png" alt="menu" id="menuIcon">
+    <!-- Hidden legacy menu elements for compatibility -->
+    <div id="menu" class="menu" style="display: none;"></div>
+    <img src="../assets/images/menu.png" alt="menu" id="menuIcon" style="display: none;">
 
-    <!-- Menu -->
-    <div id="menu" class="menu">
-        <a id="searchWin" class="menuItem" data-translate="youtubeSearch">YouTube Search</a>
-        <a id="playlistWin" class="menuItem" data-translate="downloadPlaylistButton">Download Playlist</a>
-        <a id="preferenceWin" class="menuItem" data-translate="preferences">Preferences</a>
-        <a id="compressorWin" class="menuItem" data-translate="compressor">Compressor</a>
-        <a id="historyWin" class="menuItem" data-translate="downloadHistory">History</a>
-        <a id="aboutWin" class="menuItem" data-translate="about">About</a>
-
-        <div class="menuDivider"></div>
-
-        <label for="themeToggle" id="themeTxt" class="menuLabel" data-translate="theme">Theme</label>
-        <select name="themeToggle" id="themeToggle" class="themeSelect">
-            <option id="lightTxt" value="light" data-translate="themeLight">Light</option>
-            <option id="darkTxt" value="dark" data-translate="themeDark">Dark</option>
-            <option id="frappeTxt" value="frappe" data-translate="themeFrappe">Frappé</option>
-            <option id="onedarkTxt" value="onedark" data-translate="themeOneDark">One dark</option>
-            <option id="matrixTxt" value="matrix" data-translate="themeMatrix">Matrix</option>
-            <option id="githubTxt" value="github">Github</option>
-            <option id="latteTxt" value="latte">Latte</option>
-            <option id="solarizedDarkTxt" value="solarized-dark" data-translate="themeSolarizedDark">Solarized Dark
-            </option>
-            <option id="guvboxTxt" value="gruvbox">Gruvbox</option>
-        </select>
-    </div>
-
-
-    <button id="pasteUrl">
-        <span id="pasteText" data-translate="pasteText">Click to paste video link from clipboard</span>
-        <span class="paste-keys">
-            <span class="key" id="pasteCtrlKey">Ctrl</span><span class="key">V</span>
-        </span>
-    </button>
-
-
-    <div id="loadingWrapper">
-        <span id="processing" data-translate="processing">Loading </span>
-        <svg version="1.1" id="L4" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
-            y="0px" viewBox="0 0 100 100" enable-background="new 0 0 0 0" xml:space="preserve">
-            <circle fill="rgb(84, 171, 222)" stroke="none" cx="6" cy="50" r="6">
-                <animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite" begin="0.1" />
-            </circle>
-            <circle fill="rgb(84, 171, 222)" stroke="none" cx="26" cy="50" r="6">
-                <animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite" begin="0.2" />
-            </circle>
-            <circle fill="rgb(84, 171, 222)" stroke="none" cx="46" cy="50" r="6">
-                <animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite" begin="0.3" />
-            </circle>
-        </svg>
-    </div>
-    <p id="incorrectMsg"></p>
-    <button class="advancedToggle" id="errorBtn" data-translate="errorDetails">Error
-        Details ▼</button>
-    <div id="errorDetails"></div>
-    <br>
-
-    <div id="hidden">
-        <img src="../assets/images/close.png" alt="close" id="closeHidden">
-        <div id="btnContainer">
-            <div id="videoToggle" class="toggleBtnWrapper">
-                <svg class="toggleBtnIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5" />
-                    <rect x="2" y="6" width="14" height="12" rx="2" />
-                </svg>
-                <button class="toggleBtn" data-translate="video">Video</button>
+    <div class="app-layout">
+        <!-- Persistent Modern Sidebar Navigation -->
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-brand">
+                <span class="sidebar-brand-title">YTDownloader</span>
+                <button id="sidebarCollapseBtn" class="sidebar-toggle-btn" title="Toggle Sidebar">
+                    <svg viewBox="0 0 24 24">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="9" y1="3" x2="9" y2="21"></line>
+                    </svg>
+                </button>
             </div>
 
-            <div id="audioToggle" class="toggleBtnWrapper">
-                <svg class="toggleBtnIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M9 18V5l12-2v13" />
-                    <circle cx="6" cy="18" r="3" />
-                    <circle cx="18" cy="16" r="3" />
-                </svg>
-                <button class="toggleBtn" data-translate="audio">Audio</button>
+            <nav class="sidebar-nav">
+                <button class="nav-item active" id="homeWin" data-target="view-home" title="Homepage">
+                    <svg viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    <span data-translate="homepage">Homepage</span>
+                </button>
+
+                <button class="nav-item" id="searchWin" data-target="view-search" title="YouTube Search">
+                    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <span data-translate="youtubeSearch">YouTube Search</span>
+                </button>
+
+                <button class="nav-item" id="playlistWin" data-target="view-playlist" title="Download Playlist">
+                    <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                    <span data-translate="downloadPlaylistButton">Download Playlist</span>
+                </button>
+
+                <button class="nav-item" id="compressorWin" data-target="view-compressor" title="Compressor">
+                    <svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="15" x2="23" y2="15"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="15" x2="4" y2="15"/></svg>
+                    <span data-translate="compressor">Compressor</span>
+                </button>
+
+                <button class="nav-item" id="historyWin" data-target="view-history" title="History">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <span data-translate="downloadHistory">History</span>
+                </button>
+
+                <button class="nav-item" id="preferenceWin" data-target="view-preferences" title="Preferences">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    <span data-translate="preferences">Preferences</span>
+                </button>
+
+                <button class="nav-item" id="aboutWin" data-target="view-about" title="About">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                    <span data-translate="about">About</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <span class="sidebar-footer-label" data-translate="theme">Theme</span>
+                <select name="themeToggle" id="themeToggle" class="themeSelect">
+                    <option id="lightTxt" value="light" data-translate="themeLight">Light</option>
+                    <option id="darkTxt" value="dark" data-translate="themeDark">Dark</option>
+                    <option id="frappeTxt" value="frappe" data-translate="themeFrappe">Frappé</option>
+                    <option id="onedarkTxt" value="onedark" data-translate="themeOneDark">One dark</option>
+                    <option id="matrixTxt" value="matrix" data-translate="themeMatrix">Matrix</option>
+                    <option id="githubTxt" value="github">Github</option>
+                    <option id="latteTxt" value="latte">Latte</option>
+                    <option id="solarizedDarkTxt" value="solarized-dark" data-translate="themeSolarizedDark">Solarized Dark</option>
+                    <option id="guvboxTxt" value="gruvbox">Gruvbox</option>
+                </select>
             </div>
+        </aside>
 
-        </div>
-        <p id="title" data-translate="title">Title </p>
+        <!-- Main View Panels Wrapper -->
+        <main class="main-content-wrapper">
 
-        <div class="videoAudioContainer">
-            <!-- Video tab -->
-            <div id="videoList">
-                <div class="separationBox">
-                    <h2 id="videoHeader" data-translate="video">Video</h2>
-                    <label class="formatSelect" data-translate="selectFormat">Select Format </label>
-                    <div id="videoFormatSelectContainer">
-                        <select id="videoFormatSelect">
-                        </select>
+            <!-- View 1: Homepage Downloader -->
+            <section id="view-home" class="page-view active">
+                <button id="pasteUrl">
+                    <span id="pasteText" data-translate="pasteText">Click to paste video link from clipboard</span>
+                    <span class="paste-keys">
+                        <span class="key" id="pasteCtrlKey">Ctrl</span><span class="key">V</span>
+                    </span>
+                </button>
+
+                <div id="loadingWrapper">
+                    <span id="processing" data-translate="processing">Loading </span>
+                    <svg version="1.1" id="L4" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
+                        y="0px" viewBox="0 0 100 100" enable-background="new 0 0 0 0" xml:space="preserve">
+                        <circle fill="rgb(84, 171, 222)" stroke="none" cx="6" cy="50" r="6">
+                            <animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite" begin="0.1" />
+                        </circle>
+                        <circle fill="rgb(84, 171, 222)" stroke="none" cx="26" cy="50" r="6">
+                            <animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite" begin="0.2" />
+                        </circle>
+                        <circle fill="rgb(84, 171, 222)" stroke="none" cx="46" cy="50" r="6">
+                            <animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite" begin="0.3" />
+                        </circle>
+                    </svg>
+                </div>
+                <p id="incorrectMsg"></p>
+                <button class="advancedToggle" id="errorBtn" data-translate="errorDetails">Error Details ▼</button>
+                <div id="errorDetails"></div>
+                <br>
+
+                <div id="hidden">
+                    <img src="../assets/images/close.png" alt="close" id="closeHidden">
+                    <div id="btnContainer">
+                        <div id="videoToggle" class="toggleBtnWrapper">
+                            <svg class="toggleBtnIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5" />
+                                <rect x="2" y="6" width="14" height="12" rx="2" />
+                            </svg>
+                            <button class="toggleBtn" data-translate="video">Video</button>
+                        </div>
+
+                        <div id="audioToggle" class="toggleBtnWrapper">
+                            <svg class="toggleBtnIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M9 18V5l12-2v13" />
+                                <circle cx="6" cy="18" r="3" />
+                                <circle cx="18" cy="16" r="3" />
+                            </svg>
+                            <button class="toggleBtn" data-translate="audio">Audio</button>
+                        </div>
+                    </div>
+                    <p id="title" data-translate="title">Title </p>
+
+                    <div class="videoAudioContainer">
+                        <div id="videoList">
+                            <div class="separationBox">
+                                <h2 id="videoHeader" data-translate="video">Video</h2>
+                                <label class="formatSelect" data-translate="selectFormat">Select Format </label>
+                                <div id="videoFormatSelectContainer">
+                                    <select id="videoFormatSelect"></select>
+                                </div>
+
+                                <br>
+                                <input type="hidden" name="url" class="url" id="url">
+                                <hr class="separator">
+
+                                <div id="audioForVideo">
+                                    <h2 id="audioHeader" data-translate="audio">Audio</h2>
+                                    <label class="formatSelect" data-translate="selectAudioFormat">Select Audio Format </label>
+                                    <div id="audioFormatSelectContainer">
+                                        <select id="audioForVideoFormatSelect"></select>
+                                    </div>
+                                    <br>
+                                    <input type="hidden" name="url" class="url">
+                                </div>
+                                <br>
+                            </div>
+                            <br>
+
+                            <div class="flexContainer">
+                                <div class="submitBtn btnWrapper" id="videoDownload">
+                                    <svg class="btnIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M12 17V3" />
+                                        <path d="m6 11 6 6 6-6" />
+                                        <path d="M19 21H5" />
+                                    </svg>
+                                    <button class="btn" data-translate="download">Download</button>
+                                </div>
+
+                                <div id="advancedVideoToggle" class="btnWrapper blueBtn">
+                                    <button class="btn" data-translate="moreOptions">More options</button>
+                                    <svg id="arrowLeftVideo" class="btnIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round">
+                                        <path d="m15 18-6-6 6-6" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="audioList">
+                            <div id="audioPresent">
+                                <label class="formatSelect" data-translate="selectFormat">Select Format </label>
+                                <div id="audioFormatSelectContainer">
+                                    <select id="audioFormatSelect"></select>
+                                </div>
+                                <br><br>
+                                <input type="hidden" name="url" class="url">
+
+                                <div class="flexContainer">
+                                    <div class="submitBtn btnWrapper" id="audioDownload">
+                                        <svg class="btnIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M12 17V3" />
+                                            <path d="m6 11 6 6 6-6" />
+                                            <path d="M19 21H5" />
+                                        </svg>
+                                        <button class="btn" data-translate="download">Download</button>
+                                    </div>
+
+                                    <div id="advancedAudioToggle" class="btnWrapper blueBtn">
+                                        <button class="btn" data-translate="moreOptions">More options</button>
+                                        <svg id="arrowLeftAudio" class="btnIcon" xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="m15 18-6-6 6-6" />
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <br>
-                    <input type="hidden" name="url" class="url" id="url">
+                    <div id="advanced">
+                        <div class="advancedItem">
+                            <p id="customArgsHeader" data-translate="customArgsTxt">Custom yt-dlp arguments</p>
+                            <textarea id="customArgsInputHome" placeholder="--sponsorblock-remove all"></textarea>
+                        </div>
+                        <div class="advancedItem">
+                            <span id="quitTxt" data-translate="closeAppOnFinish">Close app when download finishes</span>
+                            <input type="checkbox" id="quitChecked" class="cb">
+                        </div>
 
-                    <hr class="separator">
+                        <div class="advancedItem">
+                            <strong id="rangeText" data-translate="downloadTimeRange">Download particular time-range</strong>
+                            <br><br>
+                            <div class="slider-wrapper">
+                                <input type="text" id="min-time" class="time-display" value="0:00:00">
+                                <div class="slider-container">
+                                    <div class="track-background"></div>
+                                    <div id="range-highlight"></div>
+                                    <input type="range" id="min-slider" min="0" max="0" value="0">
+                                    <input type="range" id="max-slider" min="0" max="0" value="0">
+                                </div>
+                                <input type="text" id="max-time" class="time-display" value="0:00:00">
+                            </div>
+                        </div>
 
-                    <!-- Audio options for video -->
-                    <div id="audioForVideo">
-                        <h2 id="audioHeader" data-translate="audio">Audio</h2>
-                        <label class="formatSelect" data-translate="selectAudioFormat">Select Audio Format </label>
+                        <div class="advancedItem">
+                            <div><span id="clText" data-translate="currentDownloadLocation">Current download location - </span><span id="path"></span></div>
+                            <br>
+                            <button id="selectLocation" class="submitBtn" data-translate="selectDownloadLocation">Select Download Location</button>
+                        </div>
 
+                        <div class="advancedItem">
+                            <p id="subHeader" data-translate="subtitles">Subtitles</p>
+                            <span id="subTxt" data-translate="downloadSubtitlesAvailable">Download subtitles if available</span>
+                            <input id="subChecked" class="cb" type="checkbox">
+                        </div>
+                    </div>
 
-                        <div id="audioFormatSelectContainer">
-                            <select id="audioForVideoFormatSelect">
-                            </select>
+                    <div id="audioExtract">
+                        <h2 id="extractHeader" data-translate="extractAudio">Extract Audio</h2>
+                        <div>
+                            <div>
+                                <label class="formatSelect" data-translate="selectFormat">Select Format </label>
+                                <select id="extractSelection" class="select audioSelect">
+                                    <option value="mp3">Mp3</option>
+                                    <option value="m4a">M4a</option>
+                                    <option value="opus">Opus</option>
+                                    <option value="wav">Wav</option>
+                                    <option value="alac">Alac</option>
+                                    <option value="flac">Flac</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="extractQualitySelect" id="extractQualitySelectTxt" data-translate="selectQuality">Select Quality</label>
+                                <select id="extractQualitySelect" class="select audioSelect">
+                                    <option id="extractQualityNormal" value="5" data-translate="qualityNormal">Normal</option>
+                                    <option id="extractQualityBest" value="0" data-translate="best">Best</option>
+                                    <option id="extractQualityGood" value="2" data-translate="qualityGood">Good</option>
+                                    <option id="extractQualityBad" value="8" data-translate="qualityBad">Bad</option>
+                                    <option id="extractQualityWorst" value="10" data-translate="qualityWorst">Worst</option>
+                                </select>
+                            </div>
                         </div>
 
                         <br>
-                        <input type="hidden" name="url" class="url">
+                        <button id="extractBtn" data-translate="extract">Extract</button>
+                    </div>
+                </div>
+
+                <div id="list"></div>
+                <button class="blueBtn" id="clearBtn" data-translate="clearDownloads">Clear Downloads</button>
+                <div id="goToTop"></div>
+            </section>
+
+            <!-- View 2: YouTube Search -->
+            <section id="view-search" class="page-view hidden">
+                <div class="modernSearchWrapper">
+                    <button id="searchBtn" class="modernSearchButton">
+                        <svg viewBox="0 0 24 24">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </button>
+                    <input type="text" id="searchQuery" class="modernSearchInput" data-translate-placeholder="searchPlaceholder"
+                        placeholder="Search YouTube videos...">
+                </div>
+
+                <div id="loadingWrapperSearch" style="display: none;">
+                    <span id="processingSearch" data-translate="processing">Loading </span>
+                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
+                        y="0px" viewBox="0 0 100 100" enable-background="new 0 0 0 0" xml:space="preserve">
+                        <circle fill="rgb(84, 171, 222)" stroke="none" cx="6" cy="50" r="6">
+                            <animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite" begin="0.1" />
+                        </circle>
+                        <circle fill="rgb(84, 171, 222)" stroke="none" cx="26" cy="50" r="6">
+                            <animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite" begin="0.2" />
+                        </circle>
+                        <circle fill="rgb(84, 171, 222)" stroke="none" cx="46" cy="50" r="6">
+                            <animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite" begin="0.3" />
+                        </circle>
+                    </svg>
+                </div>
+
+                <div id="searchResults" class="searchResults"></div>
+            </section>
+
+            <!-- View 3: Download Playlist -->
+            <section id="view-playlist" class="page-view hidden">
+                <button id="pasteLink">
+                    <span id="pasteTextPlaylist" data-translate="pastePlaylistLinkTooltip">Click to paste playlist link from clipboard</span>
+                    <span class="paste-keys">
+                        <span class="key" id="pasteCtrlKeyPlaylist">Ctrl</span><span class="key">V</span>
+                    </span>
+                </button>
+
+                <div id="options">
+                    <img src="../assets/images/close.png" alt="close" id="closeHiddenPlaylist" style="display: none;">
+                    <div id="btnContainerPlaylist">
+                        <div id="videoTogglePlaylist" class="toggleBtnWrapper">
+                            <button class="toggleBtn" data-translate="video">Video</button>
+                        </div>
+                        <div id="audioTogglePlaylist" class="toggleBtnWrapper">
+                            <button class="toggleBtn" data-translate="audio">Audio</button>
+                        </div>
                     </div>
                     <br>
-                </div>
-
-                <br>
-
-                <div class="flexContainer">
-                    <div class="submitBtn btnWrapper" id="videoDownload">
-                        <svg class="btnIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M12 17V3" />
-                            <path d="m6 11 6 6 6-6" />
-                            <path d="M19 21H5" />
-                        </svg>
-                        <button class="btn" data-translate="download">Download</button>
-                    </div>
-
-                    <div id="advancedVideoToggle" class="btnWrapper blueBtn">
-                        <button class="btn" data-translate="moreOptions">More options</button>
-
-                        <svg id="arrowLeftVideo" class="btnIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round">
-                            <path d="m15 18-6-6 6-6" />
-                        </svg>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- Audio tab -->
-            <div id="audioList">
-                <div id="audioPresent">
-                    <label class="formatSelect" data-translate="selectFormat">Select Format </label>
-
-                    <div id="audioFormatSelectContainer">
-                        <select id="audioFormatSelect">
-                        </select>
-                    </div>
-
+                    <strong id="linkTitle" data-translate="link">Link:</strong>
+                    <span id="link"></span>
                     <br><br>
-                    <input type="hidden" name="url" class="url">
+                    <div id="videoBox">
+                        <label id="videoFormat" data-translate="videoQuality">Select Video Quality </label>
+                        <select id="select" class="select">
+                            <option value="best" id="bestVideoOption" data-translate="best" selected>Best</option>
+                            <option value="worst" id="worstVideoOption" data-translate="qualityWorst">Worst</option>
+                            <option value="useConfig" id="useConfigTxt" data-translate="useConfigFileCheckbox">Use config file</option>
+                            <option value="144">144p</option>
+                            <option value="240">240p</option>
+                            <option value="360">360p</option>
+                            <option value="480">480p</option>
+                            <option value="720">720p (HD)</option>
+                            <option value="1080">1080p (FHD)</option>
+                            <option value="1440">1440p</option>
+                            <option value="2160">2160p (4k)</option>
+                        </select>
+                        <br>
+                        <div id="typeSelectBox">
+                            <label id="videoQualityTxt" data-translate="selectVideoFormat">Select video quality</label>
+                            <select id="videoTypeSelect" class="select">
+                                <option value="auto" id="autoTxt" data-translate="auto" selected>Auto</option>
+                                <option value="mp4">Mp4</option>
+                                <option value="webm">WebM</option>
+                            </select>
+                        </div>
+                        <br>
+                        <div class="flexContainer">
+                            <button class="submitBtn" id="download" data-translate="download">Download</button>
+                        </div>
+                    </div>
 
+                    <div id="audioBox">
+                        <label id="audioFormat" data-translate="selectAudioFormat">Select Audio format </label>
+                        <select id="audioSelect" class="select">
+                            <option value="mp3" selected>Mp3</option>
+                            <option value="m4a">M4a</option>
+                            <option value="opus">Opus</option>
+                            <option value="wav">Wav</option>
+                            <option value="alac">Alac</option>
+                            <option value="flac">Flac</option>
+                        </select>
+                        <br>
+                        <label class="audioQualitySelect" id="audioQualitySelectTxt" data-translate="selectQuality">Select Quality</label>
+                        <select id="audioQualitySelect" class="select">
+                            <option id="audioQualityAuto" value="auto" data-translate="auto" selected>Auto</option>
+                            <option id="audioQualityNormal" value="5" data-translate="qualityNormal">Normal</option>
+                            <option id="audioQualityBest" value="0" data-translate="best">Best</option>
+                            <option id="audioQualityGood" value="2" data-translate="qualityGood">Good</option>
+                            <option id="audioQualityBad" value="8" data-translate="qualityBad">Bad</option>
+                            <option id="audioQualityWorst" value="10" data-translate="qualityWorst">Worst</option>
+                        </select>
+                        <br><br>
+                        <div class="flexContainer">
+                            <button class="submitBtn" id="audioDownloadPlaylist" data-translate="download">Download</button>
+                        </div>
+                    </div>
+
+                    <br>
                     <div class="flexContainer">
-                        <div class="submitBtn btnWrapper" id="audioDownload">
-                            <svg class="btnIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M12 17V3" />
-                                <path d="m6 11 6 6 6-6" />
-                                <path d="M19 21H5" />
-                            </svg>
-                            <button class="btn" data-translate="download">Download</button>
+                        <button id="advancedToggle" class="blueBtn" data-translate="moreOptions">More options</button>
+                    </div>
+                    <br>
 
+                    <div id="advancedMenu">
+                        <div class="advancedItem">
+                            <span id="rangeTxt" data-translate="playlistRange">Playlist range</span>
+                            <input type="number" id="playlistIndex" class="input" placeholder="Start">:
+                            <input type="number" id="playlistEnd" class="input" placeholder="End">
+                            <br><br>
                         </div>
-
-                        <div id="advancedAudioToggle" class="btnWrapper blueBtn">
-                            <button class="btn" data-translate="moreOptions">More options</button>
-
-                            <svg id="arrowLeftAudio" class="btnIcon" xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                stroke-linecap="round" stroke-linejoin="round">
-                                <path d="m15 18-6-6 6-6" />
-                            </svg>
+                        <div class="advancedItem">
+                            <div><span id="clTextPlaylist" data-translate="currentDownloadLocation">Current download location - </span><span id="pathPlaylist"></span></div>
+                            <br>
+                            <div class="flexContainer">
+                                <button id="selectLocationPlaylist" class="submitBtn" data-translate="selectDownloadLocation">Select Download Location</button>
+                            </div>
+                        </div>
+                        <div class="advancedItem">
+                            <p id="subHeaderPlaylist" data-translate="subtitles">Subtitles</p>
+                            <span id="subTxtPlaylist" data-translate="downloadSubtitlesAvailable">Download subtitles if available</span>
+                            <input id="subCheckedPlaylist" class="cb" type="checkbox">
+                        </div>
+                        <br>
+                        <div class="flexContainer" style="gap: 12px; margin-top: 10px;">
+                            <button class="submitBtn" id="downloadThumbnails" data-translate="downloadThumbnails">Download thumbnails</button>
+                            <button class="submitBtn" id="saveLinks" data-translate="saveVideoLinksToFile">Save video links</button>
                         </div>
                     </div>
 
+                    <p id="incorrectMsgPlaylist"></p>
+                    <button class="advancedToggle" id="errorBtnPlaylist" data-translate="errorDetails">Error Details ▼</button>
+                    <div id="errorDetailsPlaylist"></div>
                 </div>
-            </div>
-        </div>
 
-        <div id="advanced">
-            <div class="advancedItem">
-                <p id="customArgsHeader" data-translate="customArgsTxt">Custom yt-dlp arguments</p>
-                <textarea id="customArgsInput" placeholder="--sponsorblock-remove all"></textarea>
-            </div>
-            <div class="advancedItem">
-                <span id="quitTxt" data-translate="closeAppOnFinish">Close app when download finishes</span>
-                <input type="checkbox" id="quitChecked" class="cb">
-            </div>
-
-            <div class="advancedItem">
-                <strong id="rangeText" data-translate="downloadTimeRange">Download particular time-range</strong>
+                <h2 id="playlistName"></h2>
+                <div class="flexContainer" style="gap: 12px; margin: 15px 0;">
+                    <button class="submitBtn" id="openDownloads" data-translate="openDownloadFolder">Open download folder</button>
+                    <button class="submitBtn danger-btn" id="stopDownload" data-translate="cancel">Cancel</button>
+                </div>
                 <br><br>
-                <div class="slider-wrapper">
-                    <input type="text" id="min-time" class="time-display" value="0:00:00">
-                    <div class="slider-container">
-                        <div class="track-background"></div>
-                        <div id="range-highlight"></div>
-                        <input type="range" id="min-slider" min="0" max="0" value="0">
-                        <input type="range" id="max-slider" min="0" max="0" value="0">
+                <div id="listPlaylist"></div>
+            </section>
+
+            <!-- View 4: Video Compressor -->
+            <section id="view-compressor" class="page-view hidden">
+                <div class="container">
+                    <h1 id="compressor-header" data-translate="compressor">Video Compressor</h1>
+                    <div class="drop-zone">
+                        <p data-translate="dragAndDropFiles">Drag and drop file(s)</p>
+                        <input type="file" id="fileInput" multiple hidden>
+                        <label for="fileInput" class="fileinput-btn" data-translate="chooseFiles">Choose File(s)</label>
+                        <div id="selected-files" data-translate="noFilesSelected">No files selected</div>
                     </div>
-                    <input type="text" id="max-time" class="time-display" value="0:00:00">
+
+                    <div class="main-quality-container">
+                        <input type="hidden" id="video-quality" value="balanced">
+                        <div class="settings-group full-width-settings">
+                            <label class="compress-label" data-translate="videoQuality">Video Quality</label>
+                            <div class="quality-presets">
+                                <button type="button" class="preset-btn" data-quality="small">
+                                    <span class="preset-title" data-translate="qualitySmallFile">Small File</span>
+                                    <span class="preset-desc" data-translate="qualitySmallFileDesc">Decent quality, smaller size</span>
+                                </button>
+                                <button type="button" class="preset-btn active" data-quality="balanced">
+                                    <span class="preset-title" data-translate="qualityBalanced">Balanced</span>
+                                    <span class="preset-desc" data-translate="qualityBalancedDesc">Recommended</span>
+                                </button>
+                                <button type="button" class="preset-btn" data-quality="high">
+                                    <span class="preset-title" data-translate="qualityHigh">High Quality</span>
+                                    <span class="preset-desc" data-translate="qualityHighDesc">Excellent detail, larger size</span>
+                                </button>
+                                <button type="button" class="preset-btn" id="custom-quality-btn" data-quality="custom">
+                                    <span class="preset-title" data-translate="qualityCustom">Custom</span>
+                                    <span class="preset-desc" data-translate="qualityCustomDesc">Choose exact CRF</span>
+                                </button>
+                                <button type="button" class="preset-btn" id="target-size-btn" data-quality="target-size">
+                                    <span class="preset-title" data-translate="qualityTargetSize">Target Size</span>
+                                    <span class="preset-desc" data-translate="qualityTargetSizeDesc">Specify target MB</span>
+                                </button>
+                                <button type="button" class="preset-btn" id="target-percent-btn" data-quality="target-percent">
+                                    <span class="preset-title" data-translate="qualityTargetPercent">Target %</span>
+                                    <span class="preset-desc" data-translate="qualityTargetPercentDesc">Compress to % of size</span>
+                                </button>
+                            </div>
+
+                            <div id="custom-quality-container" class="custom-slider-container" style="display: none;">
+                                <div class="slider-header">
+                                    <span class="crf-value-label">CRF: <span id="crf-val">23</span></span>
+                                    <span class="crf-description" id="crf-desc" data-translate="qualityBalancedDesc">Recommended</span>
+                                </div>
+                                <div class="slider-wrapper">
+                                    <span class="slider-extremes" data-translate="worst">Worst</span>
+                                    <input type="range" id="quality-slider" min="18" max="51" step="1" value="46">
+                                    <span class="slider-extremes" data-translate="best">Best</span>
+                                </div>
+                            </div>
+
+                            <div id="target-size-container" class="target-size-container" style="display: none;">
+                                <label class="compress-label" for="target-size-input" data-translate="targetSizeMB">Target Size (MB)</label>
+                                <input type="number" id="target-size-input" class="select compress-select" min="1" max="10000" value="25" placeholder="e.g. 25">
+                            </div>
+
+                            <div id="target-percent-container" class="target-percent-container" style="display: none;">
+                                <label class="compress-label" for="target-percent-input" data-translate="targetPercentLabel">Target Percentage (%)</label>
+                                <input type="number" id="target-percent-input" class="select compress-select" min="1" max="99" value="50" placeholder="e.g. 50">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="button" class="advanced-toggle-btn" id="advanced-toggle-btn">
+                        <span class="toggle-icon">▸</span> <span data-translate="advancedSettings">Advanced Settings</span>
+                    </button>
+
+                    <div id="advanced-settings-collapse" class="advanced-settings-collapse collapsed">
+                        <div id="settings-group-container">
+                            <div class="settings-group">
+                                <label class="compress-label" for="file_extension" data-translate="videoFormat">Video format</label>
+                                <select class="select compress-select" id="file_extension">
+                                    <option value="unchanged" data-translate="unchanged">Unchanged</option>
+                                    <option value="mp4">mp4</option>
+                                    <option value="mkv">mkv</option>
+                                </select>
+                            </div>
+
+                            <div class="settings-group">
+                                <label class="compress-label" for="encoder" data-translate="videoEncoder">Video Encoder</label>
+                                <select class="select compress-select" id="encoder">
+                                    <option value="auto" data-translate="auto">Auto</option>
+                                    <option value="x264">x264</option>
+                                    <option value="x265">x265</option>
+                                    <option class="qsv_opt" value="qsv">x264 (Intel QSV Hardware Acceleration)</option>
+                                    <option class="qsv_opt" value="hevc_qsv">x265 (Intel QSV Hardware Acceleration)</option>
+                                    <option class="amf_opt" value="amf">x264 (AMD Hardware Acceleration)</option>
+                                    <option class="amf_opt" value="hevc_amf">x265 (AMD Hardware Acceleration)</option>
+                                    <option class="nvidia_opt" value="nvenc">x264 (NVIDIA Hardware Acceleration)</option>
+                                    <option class="nvidia_opt" value="hevc_nvenc">x265 (NVIDIA Hardware Acceleration)</option>
+                                    <option class="vaapi_opt" value="vaapi">x264 (VA-API Hardware Acceleration)</option>
+                                    <option class="vaapi_opt" value="hevc_vaapi">x265 (VA-API Hardware Acceleration)</option>
+                                    <option class="videotoolbox_opt" value="videotoolbox">x264 (VideoToolbox Hardware Acceleration)</option>
+                                    <option class="videotoolbox_opt" value="hevc_videotoolbox">x265 (VideoToolbox Hardware Acceleration)</option>
+                                    <option value="copy">Copy video</option>
+                                </select>
+                            </div>
+
+                            <div class="settings-group">
+                                <label class="compress-label" for="compression-speed" data-translate="compressionSpeed">Compression Speed</label>
+                                <select class="select compress-select" id="compression-speed">
+                                    <option data-translate="fast" value="fast">Fast</option>
+                                    <option data-translate="medium" selected value="medium">Medium</option>
+                                    <option data-translate="slow" value="slow">Slow</option>
+                                </select>
+                            </div>
+
+                            <div class="settings-group">
+                                <label class="compress-label" for="audio-format" data-translate="audioFormat">Audio Format</label>
+                                <select class="select compress-select" id="audio-format">
+                                    <option value="copy" data-translate="unchanged">Unchanged</option>
+                                    <option value="aac">aac</option>
+                                    <option value="mp3">mp3</option>
+                                </select>
+                            </div>
+
+                            <div class="settings-group">
+                                <div class="compress-label" data-translate="outputSuffix">Output suffix</div>
+                                <input type="text" name="suffix" id="output-suffix" class="select compress-select"
+                                    placeholder="No suffix needs different output folder" value="_compressed">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="output-folder-box">
+                        <div class="output-folder-conf">
+                            <span class="compress-label" data-translate="outputInSameFolder">Output in same folder</span>
+                            <input checked type="checkbox" name="output-folder" id="output-folder-input">
+                        </div>
+                        <div class="output-folder-conf">
+                            <button class="blueBtn" id="custom-folder-select" data-translate="selectCustomFolder">Select Custom Folder</button>
+                            <span id="custom-folder-path"></span>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button class="blueBtn" id="compress-btn" data-translate="startCompression">Start Compression</button>
+                        <button class="advancedToggle" id="cancel-btn" data-translate="cancel">Cancel</button>
+                    </div>
                 </div>
-            </div>
+                <div id="compression-status"></div>
+            </section>
 
-            <div class="advancedItem">
-                <div><span id="clText" data-translate="currentDownloadLocation">Current download location - </span><span
-                        id="path"></span></div>
-                <br>
-                <button id="selectLocation" class="submitBtn" data-translate="selectDownloadLocation">Select Download
-                    Location</button>
-            </div>
-
-            <div class="advancedItem">
-                <p id="subHeader" data-translate="subtitles">Subtitles</p>
-                <span id="subTxt" data-translate="downloadSubtitlesAvailable">Download subtitles if available</span>
-                <input id="subChecked" class="cb" type="checkbox">
-            </div>
-        </div>
-
-
-        <!-- Extraction options start -->
-        <div id="audioExtract">
-            <h2 id="extractHeader" data-translate="extractAudio">Extract Audio</h2>
-            <div>
-                <div>
-                    <label class="formatSelect" data-translate="selectFormat">Select Format </label>
-                    <select id="extractSelection" class="select audioSelect">
-                        <option value="mp3">Mp3</option>
-                        <option value="m4a">M4a</option>
-                        <option value="opus">Opus</option>
-                        <option value="wav">Wav</option>
-                        <option value="alac">Alac</option>
-                        <option value="flac">Flac</option>
-                    </select>
+            <!-- View 5: Download History -->
+            <section id="view-history" class="page-view hidden">
+                <div class="history-container">
+                    <div class="history-header">
+                        <h1 data-translate="downloadHistory">Download History</h1>
+                    </div>
+                    <div class="history-controls">
+                        <input type="text" id="searchBox" placeholder="Search history...">
+                        <select id="formatFilter">
+                            <option value="">All Formats</option>
+                            <option value="mp4">MP4</option>
+                            <option value="mp3">MP3</option>
+                            <option value="m4a">M4A</option>
+                            <option value="webm">WebM</option>
+                        </select>
+                        <button id="clearAllBtn" class="danger-btn" data-translate="clearAllHistory">Clear All History</button>
+                    </div>
+                    <div id="historyListContainer" class="history-list"></div>
                 </div>
+            </section>
 
-                <div>
-                    <label class="extractQualitySelect" id="extractQualitySelectTxt"
-                        data-translate="selectQuality">Select
-                        Quality</label>
-                    <select id="extractQualitySelect" class="select audioSelect">
-                        <option id="extractQualityNormal" value="5" data-translate="qualityNormal">Normal</option>
-                        <option id="extractQualityBest" value="0" data-translate="best">Best</option>
-                        <option id="extractQualityGood" value="2" data-translate="qualityGood">Good</option>
-                        <option id="extractQualityBad" value="8" data-translate="qualityBad">Bad</option>
-                        <option id="extractQualityWorst" value="10" data-translate="qualityWorst">Worst</option>
-                    </select>
-                </div>
-            </div>
+            <!-- View 6: Preferences -->
+            <section id="view-preferences" class="page-view hidden">
+                <header class="main-header">
+                    <div class="header-core">
+                        <h1 id="preferences" data-translate="preferences">Preferences</h1>
+                        <div class="search-wrapper">
+                            <span class="search-icon">&#128269;</span>
+                            <input type="search" data-translate-placeholder="searchSettings" id="settingsSearch" placeholder="Search settings...">
+                        </div>
+                        <div id="top">
+                            <a id="restart" class="btn redBtn" data-translate="restartApp">Restart app</a>
+                        </div>
+                    </div>
+                    <nav class="tab-container">
+                        <button class="tab-btn active" data-translate="general" data-tab="general">General</button>
+                        <button class="tab-btn" data-translate="mediaSettings" data-tab="media">Media Settings</button>
+                        <button class="tab-btn" data-translate="advancedTools" data-tab="advanced">Advanced Tools</button>
+                    </nav>
+                </header>
 
-            <br>
-            <button id="extractBtn" data-translate="extract">Extract</button>
-        </div>
-        <!-- Extraction options end -->
+                <main class="settings-container">
+                    <div id="generalTab" class="tab-content active">
+                        <section class="settings-section">
+                            <div class="prefBox title-box">
+                                <strong id="dlText" data-translate="downloadLocation">Download location</strong>
+                            </div>
+                            <div class="prefBox">
+                                <div class="label-group">
+                                    <span id="clText" data-translate="currentDownloadLocation">Current download location</span>
+                                    <span id="path" class="path-display"></span>
+                                </div>
+                                <button id="selectLocation" class="btn greenBtn" data-translate="selectDownloadLocation">Select Download Location</button>
+                            </div>
+                            <p id="msg"></p>
+                        </section>
+
+                        <section class="settings-section">
+                            <div class="prefBox">
+                                <label id="selectLn" for="selectLanguage" data-translate="selectLanguageRelaunch">Select Language (Requires reload)</label>
+                                <select id="selectLanguage">
+                                    <option value="en">English</option>
+                                    <option value="de-DE">Deutsch</option>
+                                    <option value="es-ES">Español</option>
+                                    <option value="fa-IR">فارسی</option>
+                                    <option value="el-GR">Ελληνικά</option>
+                                    <option value="fr-FR">Français</option>
+                                    <option value="it-IT">Italiano</option>
+                                    <option value="ja-JP">Japanese</option>
+                                    <option value="hu-HU">Magyar</option>
+                                    <option value="pl-PL">Polski</option>
+                                    <option value="pt-BR">Português</option>
+                                    <option value="ru-RU">Русский</option>
+                                    <option value="fi-FI">Finnish</option>
+                                    <option value="uk-UA">Українська</option>
+                                    <option value="tr-TR">Türkçe</option>
+                                    <option value="vi-VN">Vietnamese</option>
+                                    <option value="ar-SA">اَلْعَرَبِيَّةُ</option>
+                                    <option value="zh-CN">简体中文</option>
+                                    <option value="zh-TW">繁體中文</option>
+                                    <option value="bn-BD">বাংলা</option>
+                                    <option value="hi-IN">हिन्दी</option>
+                                    <option value="ne-NP">नेपाली</option>
+                                    <option value="eu-ES">Basque</option>
+                                </select>
+                            </div>
+                        </section>
+
+                        <section class="settings-section">
+                            <div class="prefBox">
+                                <span id="maxTxt" data-translate="maxActiveDownloads">Maximum number of active downloads</span>
+                                <input type="number" min="1" class="input input-num" id="maxDownloads" value="5">
+                            </div>
+                        </section>
+
+                        <section class="settings-section">
+                            <div class="prefBox">
+                                <span id="trayTxt" data-translate="closeAppToTray">Close to system tray</span>
+                                <label class="switch">
+                                    <input type="checkbox" id="closeToTray">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </section>
+
+                        <section class="settings-section">
+                            <div class="prefBox" id="autoUpdatesBox">
+                                <span id="autoUpdateTxt" data-translate="disableAutoUpdates">Disable auto updates</span>
+                                <label class="switch">
+                                    <input type="checkbox" id="autoUpdateDisabled">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </section>
+                    </div>
+
+                    <div id="mediaTab" class="tab-content">
+                        <section class="settings-section">
+                            <div class="prefBox">
+                                <span id="preferredVideoTxt" data-translate="preferredVideoQuality">Preferred video quality</span>
+                                <select id="preferredVideoQuality">
+                                    <option value="144">144p</option>
+                                    <option value="240">240p</option>
+                                    <option value="360">360p</option>
+                                    <option value="480">480p</option>
+                                    <option value="720">720p (HD)</option>
+                                    <option value="1080">1080p (FHD)</option>
+                                    <option value="1440">1440p</option>
+                                    <option value="2160">2160p (4k)</option>
+                                </select>
+                            </div>
+
+                            <div class="prefBox">
+                                <span id="preferredVideoCodecTxt" data-translate="preferredVideoCodec">Preferred video codec</span>
+                                <select id="preferredVideoCodec">
+                                    <option value="avc1">AVC1</option>
+                                    <option value="av01">AV1</option>
+                                    <option value="vp9">VP9</option>
+                                    <option value="mp4v">MP4V</option>
+                                </select>
+                            </div>
+
+                            <div class="prefBox">
+                                <span id="preferredAudioTxt" data-translate="preferredAudioFormat">Preferred audio format</span>
+                                <select id="preferredAudioQuality">
+                                    <option value="mp3">Mp3</option>
+                                    <option value="aac">Aac</option>
+                                    <option value="m4a">M4a</option>
+                                    <option value="opus">Opus</option>
+                                    <option value="wav">Wav</option>
+                                    <option value="alac">Alac</option>
+                                    <option value="flac">Flac</option>
+                                </select>
+                            </div>
+
+                            <div class="prefBox">
+                                <span id="showMoreFormatsTxt" data-translate="showMoreFormatOptions">Show more format options</span>
+                                <label class="switch">
+                                    <input type="checkbox" id="showMoreFormats">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </section>
+                    </div>
+
+                    <div id="advancedTab" class="tab-content">
+                        <section id="outputTemplateBox" class="settings-section">
+                            <p id="outputTemplateTxt">
+                                <span data-translate="outputTemplates">Output Templates</span>
+                                <a id="learnMoreOutputTemplates" class="link-info" data-translate="learnMore">Learn more</a>
+                            </p>
+
+                            <div class="outputTemplateItem">
+                                <span data-translate="audioFilenameTemplate">Filename template for audios</span>
+                                <div class="input-action-group">
+                                    <input type="text" id="filenameTemplateAudio" placeholder="yt-dlp format style" value="%(title)s.%(ext)s">
+                                    <button class="btn redBtn sm" id="resetAudioFilenameTemplate" data-translate="resetToDefault">Reset</button>
+                                </div>
+                            </div>
+
+                            <div class="outputTemplateItem">
+                                <span data-translate="videoFilenameTemplate">Filename template for videos</span>
+                                <div class="input-action-group">
+                                    <input type="text" id="filenameTemplateVideo" placeholder="yt-dlp format style" value="%(title)s.%(ext)s">
+                                    <button class="btn redBtn sm" id="resetFilenameTemplateVideo" data-translate="resetToDefault">Reset</button>
+                                </div>
+                            </div>
+
+                            <div class="outputTemplateItem">
+                                <span id="fileFormatTxt" data-translate="playlistFilenameFormat">Filename format for playlists</span>
+                                <div class="input-action-group">
+                                    <input type="text" id="filenameFormat" placeholder="yt-dlp format style" value="%(playlist_index)s.%(title)s.%(ext)s">
+                                    <button class="btn redBtn sm" id="resetFilenameFormat" data-translate="resetToDefault">Reset</button>
+                                </div>
+                            </div>
+
+                            <div class="outputTemplateItem">
+                                <span id="dirFormatTxt" data-translate="playlistFolderNameFormat">Folder name format for playlists</span>
+                                <div class="input-action-group">
+                                    <input type="text" id="foldernameFormat" value="%(playlist_title)s" placeholder="yt-dlp format style">
+                                    <button class="btn redBtn sm" id="resetFoldernameFormat" data-translate="resetToDefault">Reset</button>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="settings-section">
+                            <p id="flatpakTxt" data-translate="flatsealPermissionWarning"></p>
+                            <div class="prefBox">
+                                <div>
+                                    <span id="cookieSourceTxt" data-translate="selectCookieSource">Select cookies source</span>
+                                    <a id="learnMoreCookies" class="link-info" data-translate="learnMore">Learn more</a>
+                                </div>
+                                <select id="cookieSource">
+                                    <option value="none" id="none" data-translate="none">None</option>
+                                    <option value="browser" data-translate="cookiesFromBrowser">Browser</option>
+                                    <option value="file" data-translate="cookiesFromFile">File (Netscape format)</option>
+                                </select>
+                            </div>
+
+                            <div class="prefBox" id="browserSelectBox">
+                                <span id="browserTxt" data-translate="selectBrowserForCookies">Select browser to use cookies from</span>
+                                <select id="browser">
+                                    <option value="chrome">Chrome</option>
+                                    <option value="firefox">Firefox</option>
+                                    <option value="brave">Brave</option>
+                                    <option value="edge">Edge</option>
+                                    <option value="chromium">Chromium</option>
+                                    <option value="safari">Safari</option>
+                                    <option value="vivaldi">Vivaldi</option>
+                                </select>
+                            </div>
+
+                            <div class="prefBox" id="netscapeCookiesBox" style="display: none; flex-direction: column; align-items: stretch; gap: 12px; width: 100%;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                    <span id="netscapeCookiesTxt" data-translate="netscapeCookiesLabel">Netscape Formatted Cookies</span>
+                                    <button id="addCookieBlockBtn" class="btn greenBtn sm" data-translate="addCookieBlock">+ Add Cookie Block</button>
+                                </div>
+                                <div id="cookieBlocksContainer" style="display: flex; flex-direction: column; gap: 14px; width: 100%;"></div>
+                            </div>
+                        </section>
+
+                        <section class="settings-section">
+                            <div class="prefBox">
+                                <span id="proxyTitle" data-translate="proxy">Proxy</span>
+                                <input type="text" id="proxyTxt" placeholder="http://localhost:8080"
+                                    pattern="^(https?:\/\/|socks5:\/\/)?[a-zA-Z0-9.\-]+:\d+$"
+                                    title="Examples: localhost:8080, http://localhost:8080, https://example.com:443, socks5://127.0.0.1:9050">
+                            </div>
+                        </section>
+
+                        <section id="ytdlpInfoBox" class="settings-section">
+                            <div class="ytdlpInfoItem">
+                                <span data-translate="ytDlpVersion">yt-dlp version</span>
+                                <span id="ytDlpVersion" class="badge"></span>
+                            </div>
+                            <div class="ytdlpInfoItem">
+                                <span id="ytDlpPathTxt" data-translate="ytDlpPath">yt-dlp path</span>
+                                <span id="ytDlpPath" class="path"></span>
+                            </div>
+                            <div class="ytdlpInfoItem" id="ytdlpSourceBox">
+                                <span id="ytdlpSourceTxt" data-translate="ytdlpSource">yt-dlp source</span>
+                                <select id="ytdlpSource">
+                                    <option value="nightly" data-translate="ytdlpSourceNightly">Nightly (auto-updating)</option>
+                                    <option value="system" data-translate="ytdlpSourceSystem">System yt-dlp</option>
+                                </select>
+                            </div>
+                        </section>
+
+                        <section id="pathConfig" class="settings-section">
+                            <div id="ytDlpArgBox">
+                                <p>
+                                    <span data-translate="customArgsTxt">Set custom yt-dlp arguments.</span>
+                                    <a data-translate="learnMore" id="learnMoreYtdlpArgs" class="link-info">Learn more</a>
+                                </p>
+                                <textarea spellcheck="false" id="customArgsInput" placeholder="--sponsorblock-remove all"></textarea>
+                            </div>
+                            <br>
+                            <div class="configBox">
+                                <span id="configTxt" data-translate="useConfigFile">Use configuration file</span>
+                                <label class="switch">
+                                    <input type="checkbox" id="configCheck">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div id="configOpts">
+                                <button class="btn greenBtn" id="configBtn" data-translate="selectConfigFile">Select config file</button>
+                                <div class="path-readout">
+                                    <strong id="configPathTxt" data-translate="path">Path:</strong>
+                                    <span id="configPath"></span>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </main>
+            </section>
+
+            <!-- View 7: About -->
+            <section id="view-about" class="page-view hidden">
+                <h1>ytDownloader <span id="version"></span></h1>
+                <p id="txt1" data-translate="appDescription">ytDownloader lets you download videos and audios from hundreds of sites like Youtube, Facebook, Instagram, Tiktok, Twitter and so on.</p>
+                <p id="txt2" data-translate="aboutAppDescription">It's a Free and Open Source app built on top of Node.js and Electron.</p>
+                <span id="txt3" data-translate="sourceCodeAvailable">Source Code is available </span>
+                <a class="link-info" id="sourceLink" data-translate="here" href="https://github.com/aandrew-me/ytDownloader" target="_blank">here</a>
+            </section>
+        </main>
     </div>
 
-    <!-- Downloads list -->
-    <div id="list"></div>
-
-    <button class="blueBtn" id="clearBtn" data-translate="clearDownloads">Clear Downloads</button>
-
-    <div id="goToTop"></div>
-
-    <script>
-        const os = window.electronAPI.os;
-
-        if (os.platform() === "darwin") {
-            document.getElementById("pasteCtrlKey").textContent = "⌘";
-        }
-    </script>
-
     <div id="popupContainer" class="popup-container"></div>
-
     <div id="updatePopup">
         <span class="update-label" data-translate="downloadingUpdate">Downloading update</span>
-
         <div class="progress-track">
             <div id="progressBarFill"></div>
         </div>
-
         <span id="updateProgress">0.0%</span>
     </div>
+
+    <script>
+        const os = window.electronAPI.os;
+        if (os && os.platform() === "darwin") {
+            const el = document.getElementById("pasteCtrlKey");
+            if (el) el.textContent = "⌘";
+        }
+    </script>
     <script>
         new SlimSelect({ select: '#videoFormatSelect' });
     </script>
-
-
 </body>
-
 </html>

@@ -6,9 +6,11 @@ test.describe("Preferences Page Tests", () => {
 	let page;
 
 	test.beforeEach(async () => {
-		const res = await launchApp({}, undefined, "html/preferences.html");
+		const res = await launchApp();
 		electronApp = res.app;
 		page = res.page;
+		await page.waitForFunction(() => typeof window.switchView === "function");
+		await page.click("#preferenceWin");
 	});
 
 	test.afterEach(async () => {
@@ -49,7 +51,7 @@ test.describe("Preferences Page Tests", () => {
 	});
 
 	test("general settings update localStorage", async () => {
-		await page.selectOption("#select", "es-ES");
+		await page.selectOption("#selectLanguage", "es-ES");
 		const savedLocale = await page.evaluate(() => localStorage.getItem("locale"));
 		expect(savedLocale).toBe("es-ES");
 
