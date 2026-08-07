@@ -16,7 +16,7 @@ const {
 } = window.electronAPI;
 let url;
 const ytDlp = localStorage.getItem("ytdlp");
-const ytdlp = new YTDlpWrap(ytDlp);
+const ytdlp = YTDlpWrap.new(ytDlp);
 const downloadDir = localStorage.getItem("downloadPath");
 const i18n = window.i18n;
 let cookieArg = "";

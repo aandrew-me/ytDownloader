@@ -196,7 +196,7 @@ const playlistDownloader = {
 			this.state.jsRuntimePath = window.AppBinaries.jsRuntimePath;
 		} else {
 			this.state.ytDlpPath = mockYtDlp ? "mock-ytdlp" : localStorage.getItem("ytdlp");
-			this.state.ytDlpWrap = mockYtDlp || new YTDlpWrap(this.state.ytDlpPath);
+			this.state.ytDlpWrap = mockYtDlp || YTDlpWrap.new(this.state.ytDlpPath);
 			this.state.ffmpegPath = mockYtDlp ? "ffmpeg" : this.getFfmpegPath();
 			this.state.jsRuntimePath = mockYtDlp ? "" : this.getJsRuntimePath();
 		}
