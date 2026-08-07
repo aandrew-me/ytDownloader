@@ -1,4 +1,4 @@
-import type { YTDlpEventEmitter, YTDlpOptions } from "yt-dlp-wrap-plus";
+import type YTDlpWrapClass from "yt-dlp-wrap-plus";
 import type { ChildProcess, SpawnSyncReturns, ExecException } from "child_process";
 import type { Stats } from "fs";
 
@@ -27,25 +27,13 @@ type info = {
     extractor_key: string,
 }
 
-/** Minimal proxy of a YTDlpWrap instance returned through contextBridge */
-interface YTDlpWrapInstance {
-    exec(args?: string[], options?: YTDlpOptions, abortSignal?: AbortSignal | null): YTDlpEventEmitter;
-    execPromise(args?: string[], options?: YTDlpOptions, abortSignal?: AbortSignal | null): Promise<string>;
-    getVersion(): Promise<string>;
-    getVideoInfo(args: string | string[]): Promise<any>;
-    getBinaryPath(): string;
-    setBinaryPath(path: string): void;
-}
+/** Derived from the library — stays in sync automatically on updates */
+type YTDlpWrapInstance = InstanceType<typeof YTDlpWrapClass>;
 
 /** Plain object exposed via contextBridge as window.electronAPI.YTDlpWrap */
 interface YTDlpWrapBridge {
     new(binaryPath: string): YTDlpWrapInstance;
-    downloadFromGithub(
-        filePath?: string,
-        version?: string,
-        platform?: string,
-        onProgress?: (progress: number, downloaded: number, total: number) => void,
-    ): Promise<void>;
+    downloadFromGithub: typeof YTDlpWrapClass.downloadFromGithub;
 }
 
 interface SpawnChildWrapper {
