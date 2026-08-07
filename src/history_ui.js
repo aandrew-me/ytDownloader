@@ -272,8 +272,6 @@ document.addEventListener("DOMContentLoaded", () => {
 			}
 		});
 	}
-
-	loadHistory();
 });
 
 window.loadHistory = loadHistory;

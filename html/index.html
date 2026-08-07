@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>YtDownloader</title>
 
-    <script src="../assets/slimselect.js"></script>
+    <script src="../assets/slimselect.js" defer></script>
     <link href="../assets/slimselect.css" rel="stylesheet">
 
     <link rel="stylesheet" href="../assets/css/index.css">
@@ -965,7 +965,11 @@
         }
     </script>
     <script>
-        new SlimSelect({ select: '#videoFormatSelect' });
+        document.addEventListener("DOMContentLoaded", () => {
+            if (typeof SlimSelect !== "undefined") {
+                new SlimSelect({ select: '#videoFormatSelect' });
+            }
+        });
     </script>
 </body>
 </html>

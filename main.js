@@ -85,8 +85,7 @@ app.on("window-all-closed", () => {
  * and setting up handlers.
  */
 async function initialize() {
-	await loadConfiguration();
-	await loadTranslations();
+	await Promise.all([loadConfiguration(), loadTranslations()]);
 
 	registerIpcHandlers();
 	registerAutoUpdaterEvents();
