@@ -94,54 +94,63 @@ console.log(ffmpeg);
 const vaapi_device = "/dev/dri/renderD128";
 
 let gpuChecked = false;
+let gpuChecking = false;
+
 export function initCompressorGPU() {
-	if (gpuChecked) return;
-	gpuChecked = true;
+	if (gpuChecked || gpuChecking) return;
+	gpuChecking = true;
 
 	// Checking GPU
-	si.graphics().then((info) => {
-		console.log({gpuInfo: info});
-		const platform = os.platform();
+	si.graphics()
+		.then((info) => {
+			console.log({gpuInfo: info});
+			const platform = os.platform();
 
-		const selectorMap = {
-			nvidia: ".nvidia_opt",
-			amf: platform === "win32" ? ".amf_opt" : ".vaapi_opt",
-			qsv:
-				platform === "win32"
-					? ".qsv_opt"
-					: platform !== "darwin"
-						? ".vaapi_opt"
-						: null,
-			videotoolbox: platform === "darwin" ? ".videotoolbox_opt" : null,
-		};
+			const selectorMap = {
+				nvidia: ".nvidia_opt",
+				amf: platform === "win32" ? ".amf_opt" : ".vaapi_opt",
+				qsv:
+					platform === "win32"
+						? ".qsv_opt"
+						: platform !== "darwin"
+							? ".vaapi_opt"
+							: null,
+				videotoolbox: platform === "darwin" ? ".videotoolbox_opt" : null,
+			};
 
-		info.controllers.forEach((gpu) => {
-			const gpuName = gpu.vendor.toLowerCase();
-			const gpuModel = gpu.model.toLowerCase();
-			let selector = null;
+			info.controllers.forEach((gpu) => {
+				const gpuName = gpu.vendor.toLowerCase();
+				const gpuModel = gpu.model.toLowerCase();
+				let selector = null;
 
-			if (gpuName.includes("nvidia") || gpuModel.includes("nvidia")) {
-				selector = selectorMap.nvidia;
-			} else if (
-				gpuName.includes("advanced micro devices") ||
-				gpuModel.includes("amd")
-			) {
-				selector = selectorMap.amf;
-			} else if (gpuName.includes("intel")) {
-				selector = selectorMap.qsv;
-			} else if (platform === "darwin") {
-				selector = selectorMap.videotoolbox;
-			}
+				if (gpuName.includes("nvidia") || gpuModel.includes("nvidia")) {
+					selector = selectorMap.nvidia;
+				} else if (
+					gpuName.includes("advanced micro devices") ||
+					gpuModel.includes("amd")
+				) {
+					selector = selectorMap.amf;
+				} else if (gpuName.includes("intel")) {
+					selector = selectorMap.qsv;
+				} else if (platform === "darwin") {
+					selector = selectorMap.videotoolbox;
+				}
 
-			if (selector) {
-				document.querySelectorAll(selector).forEach((opt) => {
-					opt.style.display = "block";
-				});
-			}
+				if (selector) {
+					document.querySelectorAll(selector).forEach((opt) => {
+						opt.style.display = "block";
+					});
+				}
+			});
+			gpuChecked = true;
+		})
+		.catch((err) => {
+			console.error("Failed to check GPU options:", err);
+			gpuChecked = false;
+		})
+		.finally(() => {
+			gpuChecking = false;
 		});
-	}).catch((err) => {
-		console.error("Failed to check GPU options:", err);
-	});
 }
 window.initCompressorGPU = initCompressorGPU;
 
