@@ -541,6 +541,7 @@ class YtDownloaderApp {
 							i18n.__("progress") +
 							`: ${(progress * 100).toFixed(2)}%`;
 					},
+					"nightly"
 				);
 
 				$(CONSTANTS.DOM_IDS.POPUP_BOX).style.display = "none";
