@@ -13,7 +13,7 @@
 	"selectDownloadLocation": "Valitse kohdekansio lataukselle",
 	"moreOptions": "Lisävaihtoehdot",
 	"start": "Aloita",
-	"selectLanguageRelaunch": "Valitse kieli (uudelleenkäynnistys tarvitaan)",
+	"selectLanguageRelaunch": "Valitse kieli",
 	"downloadTimeRange": "Lataa tietty aikaväli",
 	"end": "Loppu",
 	"timeRangeStartEmptyHint": "Mikäli tyhjänä, tämä alkaa alusta",

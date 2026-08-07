@@ -13,7 +13,7 @@
 	"selectDownloadLocation": "Selecionar local para salvar",
 	"moreOptions": "Mais opções",
 	"start": "Início",
-	"selectLanguageRelaunch": "Selecionar Idioma (Requer reinicialização)",
+	"selectLanguageRelaunch": "Selecionar Idioma",
 	"downloadTimeRange": "Baixar intervalo de tempo específico",
 	"end": "Fim",
 	"timeRangeStartEmptyHint": "Se não informado, começará do início",

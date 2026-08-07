@@ -13,7 +13,7 @@
 	"selectDownloadLocation": "選取下載位置",
 	"moreOptions": "更多選項",
 	"start": "開始",
-	"selectLanguageRelaunch": "選擇語言（需重新啟動）",
+	"selectLanguageRelaunch": "選擇語言",
 	"downloadTimeRange": "下載特定時間範圍",
 	"end": "結束",
 	"timeRangeStartEmptyHint": "若保留空白，將從頭開始",

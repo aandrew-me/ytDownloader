@@ -13,7 +13,7 @@
 	"selectDownloadLocation": "Seleccione la ubicación de la descarga",
 	"moreOptions": "Mas opciones",
 	"start": "Inicio",
-	"selectLanguageRelaunch": "Seleccionar idioma (Requiere relanzar)",
+	"selectLanguageRelaunch": "Seleccionar idioma",
 	"downloadTimeRange": "Descargar un rango de tiempo particular",
 	"end": "Término",
 	"timeRangeStartEmptyHint": "Si se mantiene vacío, comenzará desde el principio",

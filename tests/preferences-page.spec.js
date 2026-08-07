@@ -54,6 +54,7 @@ test.describe("Preferences Page Tests", () => {
 		await page.selectOption("#selectLanguage", "es-ES");
 		const savedLocale = await page.evaluate(() => localStorage.getItem("locale"));
 		expect(savedLocale).toBe("es-ES");
+		await expect(page.locator("#selectLn")).toHaveText("Seleccionar idioma");
 
 		await page.fill("#maxDownloads", "8");
 		const savedMax = await page.evaluate(() => localStorage.getItem("maxActiveDownloads"));

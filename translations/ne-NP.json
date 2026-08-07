@@ -13,7 +13,7 @@
 	"selectDownloadLocation": "डाउनलोड स्थान चयन गर्नुहोस्",
 	"moreOptions": "थप विकल्पहरू",
 	"start": "सुरु",
-	"selectLanguageRelaunch": "भाषा चयन गर्नुहोस् (पुनः सुरु गर्नु पर्छ)",
+	"selectLanguageRelaunch": "भाषा चयन गर्नुहोस्",
 	"downloadTimeRange": "समय दायरा डाउनलोड",
 	"end": "समाप्ति",
 	"timeRangeStartEmptyHint": "यदि खाली राखियो भने, यो सुरु देखि हुनेछ",

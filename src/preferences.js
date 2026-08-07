@@ -204,9 +204,8 @@ function initPreferences() {
 	}
 
 	if (langSelectEl) {
-		const updateLang = (e) => {
+		const updateLang = async (e) => {
 			const chosenLang = e.target.value;
-			localStorage.setItem("locale", chosenLang);
 			if (
 				chosenLang === "fa" ||
 				chosenLang === "ar" ||
@@ -216,6 +215,11 @@ function initPreferences() {
 				localStorage.setItem("rightToLeft", "true");
 			} else {
 				localStorage.setItem("rightToLeft", "false");
+			}
+			if (window.i18n && typeof window.i18n.setLocale === "function") {
+				await window.i18n.setLocale(chosenLang);
+			} else {
+				localStorage.setItem("locale", chosenLang);
 			}
 			updateDirectionality();
 		};

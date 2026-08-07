@@ -13,7 +13,7 @@
 	"selectDownloadLocation": "ফাইল ডাউনলোড এর স্থান বেছে নিন",
 	"moreOptions": "আরও অপশন দেখান",
 	"start": "শুরু",
-	"selectLanguageRelaunch": "ভাষা বেছে নিন (বন্ধ করে চালু করতে হবে)",
+	"selectLanguageRelaunch": "ভাষা বেছে নিন",
 	"downloadTimeRange": "নির্ধারিত সময় সীমা এর মাঝের টুকু ডাউনলোড করো",
 	"end": "শেষ",
 	"timeRangeStartEmptyHint": "খালি রাখলে প্রথম থেকে শুরু হবে",

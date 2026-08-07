@@ -445,6 +445,10 @@ function registerIpcHandlers() {
 		}
 
 		const mergedTranslations = { ...fallbackData, ...localeData };
+		appState.loadedLanguage = mergedTranslations;
+		if (appState.trayEnabled && appState.tray) {
+			createTray();
+		}
 
 		return mergedTranslations;
 	});
