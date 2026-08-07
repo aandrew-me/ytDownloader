@@ -186,7 +186,7 @@ class YtDownloaderApp {
 			const isTestMode = Boolean(window.electronAPI && window.electronAPI.isTest);
 			const mockYtDlp = isTestMode ? window.__mockYtDlp : null;
 			this.state.ytDlpPath = mockYtDlp ? "mock-ytdlp" : await this._findOrDownloadYtDlp();
-			this.state.ytDlp = mockYtDlp || new YTDlpWrap(this.state.ytDlpPath);
+			this.state.ytDlp = mockYtDlp || YTDlpWrap.new(this.state.ytDlpPath);
 			this.state.ffmpegPath = mockYtDlp ? "ffmpeg" : await this._findFfmpeg();
 			this._ensureFfmpegLibsLoadable(this.state.ffmpegPath);
 			this.state.jsRuntimePath = mockYtDlp ? "" : await this._getJsRuntimePath();

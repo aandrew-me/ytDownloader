@@ -130,19 +130,17 @@ function createYTDlpWrapInstance(binaryPath) {
 	};
 }
 
-function YTDlpWrapConstructor(binaryPath) {
-	return createYTDlpWrapInstance(binaryPath);
-}
-
-YTDlpWrapConstructor.downloadFromGithub = (filePath, version, platform, callback) => {
-	return YTDlpWrap.downloadFromGithub(
-		filePath,
-		version,
-		platform,
-		(progress, downloaded, total) => {
-			if (callback) callback(progress, downloaded, total);
-		},
-	);
+const YTDlpWrapBridge = {
+	new: (binaryPath) => createYTDlpWrapInstance(binaryPath),
+	downloadFromGithub: (filePath, version, platform, callback) =>
+		YTDlpWrap.downloadFromGithub(
+			filePath,
+			version,
+			platform,
+			(progress, downloaded, total) => {
+				if (callback) callback(progress, downloaded, total);
+			},
+		),
 };
 
 const spawnWrapper = (command, args = [], options = {}) => {
@@ -358,7 +356,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
 		randomUUID: () => crypto.randomUUID(),
 		randomBytes: (size) => crypto.randomBytes(size),
 	},
-	YTDlpWrap: YTDlpWrapConstructor,
+	YTDlpWrap: YTDlpWrapBridge,
 	getEnv: (key) => process.env[key],
 	env: envObj,
 	setEnv: (key, value) => {
