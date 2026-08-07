@@ -62,7 +62,7 @@
 
     <div class="app-layout">
         <!-- Persistent Modern Sidebar Navigation -->
-        <aside id="sidebar" class="sidebar">
+        <aside id="sidebar" class="sidebar collapsed">
             <div class="sidebar-brand">
                 <span class="sidebar-brand-title">YTDownloader</span>
                 <button id="sidebarCollapseBtn" class="sidebar-toggle-btn" title="Toggle Sidebar">
@@ -127,7 +127,7 @@
         </aside>
 
         <!-- Main View Panels Wrapper -->
-        <main class="main-content-wrapper">
+        <main class="main-content-wrapper sidebar-collapsed">
 
             <!-- View 1: Homepage Downloader -->
             <section id="view-home" class="page-view active">
@@ -498,7 +498,6 @@
             <!-- View 4: Video Compressor -->
             <section id="view-compressor" class="page-view hidden">
                 <div class="container">
-                    <h1 id="compressor-header" data-translate="compressor">Video Compressor</h1>
                     <div class="drop-zone">
                         <p data-translate="dragAndDropFiles">Drag and drop file(s)</p>
                         <input type="file" id="fileInput" multiple hidden>

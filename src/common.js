@@ -65,7 +65,9 @@ window.toggleSidebar = toggleSidebar;
 document.addEventListener("DOMContentLoaded", () => {
 	getId("sidebarCollapseBtn")?.addEventListener("click", () => toggleSidebar());
 
-	if (localStorage.getItem("sidebarCollapsed") === "true") {
+	if (localStorage.getItem("sidebarCollapsed") === "false") {
+		toggleSidebar(false);
+	} else {
 		toggleSidebar(true);
 	}
 
