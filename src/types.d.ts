@@ -1,3 +1,7 @@
+import type { YTDlpEventEmitter, YTDlpOptions } from "yt-dlp-wrap-plus";
+import type { ChildProcess, SpawnSyncReturns, ExecException } from "child_process";
+import type { Stats } from "fs";
+
 type format = {
     vcodec?: string,
     acodec?: string,
@@ -23,7 +27,112 @@ type info = {
     extractor_key: string,
 }
 
-export {
-    format,
-    info
+/** Minimal proxy of a YTDlpWrap instance returned through contextBridge */
+interface YTDlpWrapInstance {
+    exec(args?: string[], options?: YTDlpOptions, abortSignal?: AbortSignal | null): YTDlpEventEmitter;
+    execPromise(args?: string[], options?: YTDlpOptions, abortSignal?: AbortSignal | null): Promise<string>;
+    getVersion(): Promise<string>;
+    getVideoInfo(args: string | string[]): Promise<any>;
+    getBinaryPath(): string;
+    setBinaryPath(path: string): void;
 }
+
+/** Plain object exposed via contextBridge as window.electronAPI.YTDlpWrap */
+interface YTDlpWrapBridge {
+    new(binaryPath: string): YTDlpWrapInstance;
+    downloadFromGithub(
+        filePath?: string,
+        version?: string,
+        platform?: string,
+        onProgress?: (progress: number, downloaded: number, total: number) => void,
+    ): Promise<void>;
+}
+
+interface SpawnChildWrapper {
+    stdout: { on(event: string, cb: (data: string) => void): void };
+    stderr: { on(event: string, cb: (data: string) => void): void };
+    ytDlpProcess: {
+        spawnargs: string[];
+        kill(signal?: string): void;
+        readonly killed: boolean;
+        readonly pid: number | undefined;
+        stdout: { on(event: string, cb: (data: string) => void): void } | null;
+        stderr: { on(event: string, cb: (data: string) => void): void } | null;
+    };
+    kill(signal?: string): void;
+    readonly killed: boolean;
+    on(event: string, cb: (...args: any[]) => void): void;
+    once(event: string, cb: (...args: any[]) => void): void;
+}
+
+interface FsPromises {
+    readFile(path: string, options?: { encoding?: BufferEncoding }): Promise<string | Buffer>;
+    writeFile(path: string, data: any, options?: { encoding?: BufferEncoding }): Promise<void>;
+    access(path: string, mode?: number): Promise<void>;
+    unlink(path: string): Promise<void>;
+    stat(path: string): Promise<Stats>;
+    lstat(path: string): Promise<Stats>;
+    mkdir(path: string, options?: { recursive?: boolean }): Promise<string | undefined>;
+    readdir(path: string, options?: any): Promise<string[]>;
+}
+
+interface ElectronAPI {
+    shell: {
+        openExternal(url: string): Promise<void>;
+        openPath(path: string): Promise<string>;
+        showItemInFolder(path: string): void;
+    };
+    ipcRenderer: {
+        send(channel: string, ...args: any[]): void;
+        on(channel: string, listener: (event: any, ...args: any[]) => void): void;
+        once(channel: string, listener: (event: any, ...args: any[]) => void): void;
+        removeListener(channel: string, listener: (...args: any[]) => void): void;
+    };
+    clipboard: {
+        readText(): string;
+        writeText(text: string): void;
+    };
+    YTDlpWrap: YTDlpWrapBridge;
+    homedir: string;
+    platform: string;
+    tmpdir: string;
+    join(...paths: string[]): string;
+    mkdirSync(path: string, options?: { recursive?: boolean }): string | undefined;
+    accessSync(path: string, mode?: number): void;
+    promises: FsPromises;
+    existsSync(path: string): boolean;
+    cpSync(src: string, dest: string, options?: any): void;
+    copyFileSync(src: string, dest: string, flags?: number): void;
+    writeFileSync(path: string, data: any, options?: any): void;
+    unlinkSync(path: string): void;
+    readFileSync(path: string, options?: any): string | Buffer;
+    readdirSync(path: string, options?: any): string[];
+    statSync(path: string): Stats;
+    lstatSync(path: string): Stats;
+    execSync(command: string, options?: any): Buffer | string;
+    spawn(command: string, args?: string[], options?: any): SpawnChildWrapper;
+    spawnSync(command: string, args?: string[], options?: any): SpawnSyncReturns<Buffer>;
+    exec(command: string, options: any, callback: (err: ExecException | null, stdout: string, stderr: string) => void): ChildProcess;
+    env: Record<string, string | undefined>;
+    getEnv(key: string): string | undefined;
+    setEnv(key: string, value: string): void;
+    constants: { W_OK: number; F_OK: number; R_OK: number; X_OK: number };
+    isTest: boolean;
+    windowsStore: boolean;
+    __dirname: string;
+    si: { graphics(): Promise<any> };
+    crypto: {
+        randomUUID(): string;
+        randomBytes(size: number): Buffer;
+    };
+    rmSync(path: string, options?: { recursive?: boolean; force?: boolean }): void;
+}
+
+declare global {
+    interface Window {
+        electronAPI: ElectronAPI;
+        __mockYtDlp?: YTDlpWrapInstance;
+    }
+}
+
+export { format, info };
