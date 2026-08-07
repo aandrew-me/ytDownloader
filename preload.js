@@ -132,7 +132,7 @@ function createYTDlpWrapInstance(binaryPath) {
 
 const YTDlpWrapBridge = {
 	new: (binaryPath) => createYTDlpWrapInstance(binaryPath),
-	downloadFromGithub: (filePath, version, platform, callback) =>
+	downloadFromGithub: (filePath, version, platform, callback, build) =>
 		YTDlpWrap.downloadFromGithub(
 			filePath,
 			version,
@@ -140,6 +140,7 @@ const YTDlpWrapBridge = {
 			(progress, downloaded, total) => {
 				if (callback) callback(progress, downloaded, total);
 			},
+			build
 		),
 };
 
