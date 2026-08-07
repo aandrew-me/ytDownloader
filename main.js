@@ -446,7 +446,11 @@ function registerIpcHandlers() {
 
 		const mergedTranslations = { ...fallbackData, ...localeData };
 		appState.loadedLanguage = mergedTranslations;
-		if (appState.trayEnabled && appState.tray) {
+		if (appState.trayEnabled) {
+			if (appState.tray) {
+				appState.tray.destroy();
+				appState.tray = null;
+			}
 			createTray();
 		}
 
