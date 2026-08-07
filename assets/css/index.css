@@ -408,6 +408,22 @@ img {
 	animation: fadeIn 0.25s ease-out;
 }
 
+@media (min-width: 768px) {
+	#menu {
+		width: 270px;
+		padding: 16px;
+		font-size: 1rem;
+	}
+}
+
+@media (min-width: 1200px) {
+	#menu {
+		width: 300px;
+		padding: 18px;
+		font-size: 1.05rem;
+	}
+}
+
 .menuItem {
 	cursor: pointer;
 	padding: 10px 12px;
@@ -671,8 +687,8 @@ img {
 	margin: 20px auto;
 	background-color: var(--box-main);
 	border-radius: 15px;
-	width: 85%;
-	max-width: 800px;
+	width: 92%;
+	max-width: 1150px;
 	padding: 20px;
 	color: var(--text);
 	border: var(--border);
@@ -2366,11 +2382,6 @@ input[type="range"]::-webkit-slider-thumb:hover {
 	background: var(--redBtn-bottom, #ff5252);
 }
 
-/* ==========================================================================
-   MERGED PREFERENCES & COMPONENT STYLES (formerly extra.css)
-   ========================================================================== */
-
-/* RTL Global Mirroring Adjustments */
 body.rtl {
 	text-align: right;
 }
@@ -2602,6 +2613,7 @@ select {
 
 /* Custom Arguments & Cookies Textarea Styles */
 #customArgsInput,
+#customArgsInputHome,
 #netscapeCookiesInput,
 .cookie-block-textarea {
 	padding: 12px;
