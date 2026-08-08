@@ -13,7 +13,7 @@
 	"selectDownloadLocation": "Оберіть шлях для завантаження",
 	"moreOptions": "Більше опцій",
 	"start": "Початок",
-	"selectLanguageRelaunch": "Оберіть мову (потребує перезапуску)",
+	"selectLanguageRelaunch": "Оберіть мову",
 	"downloadTimeRange": "Завантажити певний проміжок часу",
 	"end": "Кінець",
 	"timeRangeStartEmptyHint": "Якщо залишити порожнім, почнеться з початку",

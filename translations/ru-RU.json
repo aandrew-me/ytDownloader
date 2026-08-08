@@ -13,7 +13,7 @@
 	"selectDownloadLocation": "Выберите папку для загрузки",
 	"moreOptions": "Дополнительные опции",
 	"start": "Начало",
-	"selectLanguageRelaunch": "Выберите язык (требуется перезапуск)",
+	"selectLanguageRelaunch": "Выберите язык",
 	"downloadTimeRange": "Скачать определённый фрагмент",
 	"end": "Конец",
 	"timeRangeStartEmptyHint": "Если оставить пустым, начнётся с начала",

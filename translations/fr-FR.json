@@ -13,7 +13,7 @@
 	"selectDownloadLocation": "Choisir l'emplacement de téléchargement",
 	"moreOptions": "Plus d'options",
 	"start": "Début",
-	"selectLanguageRelaunch": "Choix de la langue (nécessite un redémarrage)",
+	"selectLanguageRelaunch": "Choix de la langue",
 	"downloadTimeRange": "Télécharger un extrait",
 	"end": "Fin",
 	"timeRangeStartEmptyHint": "Si laissé vide, commencera depuis le début",

@@ -13,7 +13,7 @@
 	"selectDownloadLocation": "انتخاب مکان بارگیری",
 	"moreOptions": "گزینه‌های بیشتر",
 	"start": "ابتدا",
-	"selectLanguageRelaunch": "انتخاب زبان (نیازمند راه‌اندازی‌مجدد)",
+	"selectLanguageRelaunch": "انتخاب زبان",
 	"downloadTimeRange": "بارگیری بازه‌ی زمانی خاص",
 	"end": "انتها",
 	"timeRangeStartEmptyHint": "اگر خالی گذاشته‌شود، از ابتدا شروع خواهد کرد",

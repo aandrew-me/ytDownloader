@@ -13,7 +13,7 @@
 	"selectDownloadLocation": "Letöltési hely kiválasztása",
 	"moreOptions": "További beállítások",
 	"start": "Indít",
-	"selectLanguageRelaunch": "Nyelv kiválasztása (újraindítás szükséges)",
+	"selectLanguageRelaunch": "Nyelv kiválasztása",
 	"downloadTimeRange": "Idősáv letöltése",
 	"end": "Vége",
 	"timeRangeStartEmptyHint": "Elejéről kezdi, ha üresen hagyja",

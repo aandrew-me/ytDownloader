@@ -13,7 +13,7 @@
 	"selectDownloadLocation": "Chọn nơi tải xuống",
 	"moreOptions": "Các tuỳ chọn khác",
 	"start": "Bắt đầu",
-	"selectLanguageRelaunch": "Lựa chọn ngôn ngữ (Cần khởi động lại)",
+	"selectLanguageRelaunch": "Lựa chọn ngôn ngữ",
 	"downloadTimeRange": "Tải xuống với khoảng thời gian tùy chỉnh",
 	"end": "Đến",
 	"timeRangeStartEmptyHint": "Để trống sẽ bắt đầu từ đầu",

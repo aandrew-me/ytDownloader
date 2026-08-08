@@ -13,7 +13,7 @@
 	"selectDownloadLocation": "Wybierz lokalizację pobierania",
 	"moreOptions": "Więcej opcji",
 	"start": "Początek",
-	"selectLanguageRelaunch": "Wybierz język (Wymaga ponownego uruchomienia)",
+	"selectLanguageRelaunch": "Wybierz język",
 	"downloadTimeRange": "Pobierz określony czasowo wycinek",
 	"end": "Koniec",
 	"timeRangeStartEmptyHint": "Jeśli pole jest puste, zacznie od samego początku",

@@ -93,48 +93,66 @@ console.log(ffmpeg);
 
 const vaapi_device = "/dev/dri/renderD128";
 
-// Checking GPU
-si.graphics().then((info) => {
-	console.log({gpuInfo: info});
-	const platform = os.platform();
+let gpuChecked = false;
+let gpuChecking = false;
 
-	const selectorMap = {
-		nvidia: ".nvidia_opt",
-		amf: platform === "win32" ? ".amf_opt" : ".vaapi_opt",
-		qsv:
-			platform === "win32"
-				? ".qsv_opt"
-				: platform !== "darwin"
-					? ".vaapi_opt"
-					: null,
-		videotoolbox: platform === "darwin" ? ".videotoolbox_opt" : null,
-	};
+export function initCompressorGPU() {
+	if (gpuChecked || gpuChecking) return;
+	gpuChecking = true;
 
-	info.controllers.forEach((gpu) => {
-		const gpuName = gpu.vendor.toLowerCase();
-		const gpuModel = gpu.model.toLowerCase();
-		let selector = null;
+	// Checking GPU
+	si.graphics()
+		.then((info) => {
+			console.log({gpuInfo: info});
+			const platform = os.platform();
 
-		if (gpuName.includes("nvidia") || gpuModel.includes("nvidia")) {
-			selector = selectorMap.nvidia;
-		} else if (
-			gpuName.includes("advanced micro devices") ||
-			gpuModel.includes("amd")
-		) {
-			selector = selectorMap.amf;
-		} else if (gpuName.includes("intel")) {
-			selector = selectorMap.qsv;
-		} else if (platform === "darwin") {
-			selector = selectorMap.videotoolbox;
-		}
+			const selectorMap = {
+				nvidia: ".nvidia_opt",
+				amf: platform === "win32" ? ".amf_opt" : ".vaapi_opt",
+				qsv:
+					platform === "win32"
+						? ".qsv_opt"
+						: platform !== "darwin"
+							? ".vaapi_opt"
+							: null,
+				videotoolbox: platform === "darwin" ? ".videotoolbox_opt" : null,
+			};
 
-		if (selector) {
-			document.querySelectorAll(selector).forEach((opt) => {
-				opt.style.display = "block";
+			info.controllers.forEach((gpu) => {
+				const gpuName = gpu.vendor.toLowerCase();
+				const gpuModel = gpu.model.toLowerCase();
+				let selector = null;
+
+				if (gpuName.includes("nvidia") || gpuModel.includes("nvidia")) {
+					selector = selectorMap.nvidia;
+				} else if (
+					gpuName.includes("advanced micro devices") ||
+					gpuModel.includes("amd")
+				) {
+					selector = selectorMap.amf;
+				} else if (gpuName.includes("intel")) {
+					selector = selectorMap.qsv;
+				} else if (platform === "darwin") {
+					selector = selectorMap.videotoolbox;
+				}
+
+				if (selector) {
+					document.querySelectorAll(selector).forEach((opt) => {
+						opt.style.display = "block";
+					});
+				}
 			});
-		}
-	});
-});
+			gpuChecked = true;
+		})
+		.catch((err) => {
+			console.error("Failed to check GPU options:", err);
+			gpuChecked = false;
+		})
+		.finally(() => {
+			gpuChecking = false;
+		});
+}
+window.initCompressorGPU = initCompressorGPU;
 
 /** @type {File[]} */
 let files = [];
@@ -963,12 +981,6 @@ function getFfmpegPath() {
 	}
 }
 
-dom.themeToggle.addEventListener("change", () => {
-	const theme = dom.themeToggle.value;
-	document.documentElement.setAttribute("theme", theme);
-	localStorage.setItem("theme", theme);
-});
-
 dom.outputFolderInput.addEventListener("change", (e) => {
 	const checked = e.target.checked;
 	if (!checked) {
@@ -980,16 +992,11 @@ dom.outputFolderInput.addEventListener("change", (e) => {
 	}
 });
 
-const storageTheme = localStorage.getItem("theme") || "frappe";
-document.documentElement.setAttribute("theme", storageTheme);
-dom.themeToggle.value = storageTheme;
-
 ipcRenderer.on("directory-path", (_event, msg) => {
 	dom.customFolderPath.textContent = msg;
 	dom.customFolderPath.style.display = "inline";
 });
 
-// DRWed Menu Router Engine
 const menuRoutes = {
 	preferenceWin: {page: "/preferences.html", channel: "load-page"},
 	playlistWin: {page: "/playlist.html", channel: "load-win"},
@@ -999,9 +1006,22 @@ const menuRoutes = {
 	searchWin: {page: "/search.html", channel: "load-win"},
 };
 
+const routeToViewMap = {
+	preferenceWin: "view-preferences",
+	playlistWin: "view-playlist",
+	aboutWin: "view-about",
+	historyWin: "view-history",
+	homeWin: "view-home",
+	searchWin: "view-search",
+};
+
 Object.entries(menuRoutes).forEach(([domKey, route]) => {
 	dom[domKey]?.addEventListener("click", () => {
 		closeMenu();
+		if (routeToViewMap[domKey] && typeof window.switchView === "function") {
+			window.switchView(routeToViewMap[domKey]);
+			return;
+		}
 		ipcRenderer.send(route.channel, __dirname + route.page);
 	});
 });

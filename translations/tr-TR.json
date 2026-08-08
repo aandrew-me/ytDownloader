@@ -13,7 +13,7 @@
 	"selectDownloadLocation": "İndirme dizinini seç",
 	"moreOptions": "Daha fazla ayar",
 	"start": "Başlangıç",
-	"selectLanguageRelaunch": "Dil seçin (Yeniden başlatma gerekir)",
+	"selectLanguageRelaunch": "Dil seçin",
 	"downloadTimeRange": "Belirli bir zaman aralığını indir",
 	"end": "Bitiş",
 	"timeRangeStartEmptyHint": "Eğer boş bırakılırsa, başlangıçtan başlayacaktır",

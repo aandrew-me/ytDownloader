@@ -117,6 +117,7 @@ function I18n() {
 		this.locale = normalized;
 
 		this.translatePage();
+		document.dispatchEvent(new Event("translations-loaded"));
 	};
 }
 

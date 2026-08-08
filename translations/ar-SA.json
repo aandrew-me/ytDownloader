@@ -13,7 +13,7 @@
 	"selectDownloadLocation": "اختر مسار التنزيل",
 	"moreOptions": "المزيد من الخيارات",
 	"start": "ابدأ",
-	"selectLanguageRelaunch": "اختر اللغة (يحتاج إعادة تشغيل للبرنامج)",
+	"selectLanguageRelaunch": "اختر اللغة",
 	"downloadTimeRange": "تنزيل نطاق زمني محدد",
 	"end": "إنهاء",
 	"timeRangeStartEmptyHint": "إذا تُركت فارغة، ستبدأ من البداية",

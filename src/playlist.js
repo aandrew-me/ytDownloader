@@ -50,65 +50,131 @@ const playlistDownloader = {
 
 	// DOM elements
 	ui: {
-		pasteLinkBtn: document.getElementById("pasteLink"),
-		linkDisplay: document.getElementById("link"),
-		optionsContainer: document.getElementById("options"),
-		downloadList: document.getElementById("list"),
+		pasteLinkBtn: getId("pasteLink"),
+		linkDisplay: getId("link"),
+		optionsContainer: getId("options"),
+		downloadList: getId("list"),
 
-		downloadVideoBtn: document.getElementById("download"),
-		downloadAudioBtn: document.getElementById("audioDownload"),
-		downloadThumbnailsBtn: document.getElementById("downloadThumbnails"),
-		saveLinksBtn: document.getElementById("saveLinks"),
+		downloadVideoBtn: getId("download"),
+		downloadAudioBtn: getId("audioDownload"),
+		downloadThumbnailsBtn: getId("downloadThumbnails"),
+		saveLinksBtn: getId("saveLinks"),
 
-		selectLocationBtn: document.getElementById("selectLocation"),
-		pathDisplay: document.getElementById("path"),
-		openDownloadsBtn: document.getElementById("openDownloads"),
-		stopDownloadBtn: document.getElementById("stopDownload"),
+		selectLocationBtn: getId("selectLocation"),
+		pathDisplay: getId("path"),
+		openDownloadsBtn: getId("openDownloads"),
+		stopDownloadBtn: getId("stopDownload"),
 
-		videoToggle: document.getElementById("videoToggle"),
-		audioToggle: document.getElementById("audioToggle"),
-		advancedToggle: document.getElementById("advancedToggle"),
-		videoBox: document.getElementById("videoBox"),
-		audioBox: document.getElementById("audioBox"),
-		videoQualitySelect: document.getElementById("select"),
-		videoTypeSelect: document.getElementById("videoTypeSelect"),
-		typeSelectBox: document.getElementById("typeSelectBox"),
-		audioTypeSelect: document.getElementById("audioSelect"),
-		audioQualitySelect: document.getElementById("audioQualitySelect"),
+		videoToggle: getId("videoToggle"),
+		audioToggle: getId("audioToggle"),
+		advancedToggle: getId("advancedToggle"),
+		videoBox: getId("videoBox"),
+		audioBox: getId("audioBox"),
+		videoQualitySelect: getId("select"),
+		videoTypeSelect: getId("videoTypeSelect"),
+		typeSelectBox: getId("typeSelectBox"),
+		audioTypeSelect: getId("audioSelect"),
+		audioQualitySelect: getId("audioQualitySelect"),
 
-		advancedMenu: document.getElementById("advancedMenu"),
-		playlistIndexInput: document.getElementById("playlistIndex"),
-		playlistEndInput: document.getElementById("playlistEnd"),
-		subtitlesCheckbox: document.getElementById("subChecked"),
-		closeHiddenBtn: document.getElementById("closeHidden"),
+		advancedMenu: getId("advancedMenu"),
+		playlistIndexInput: getId("playlistIndex"),
+		playlistEndInput: getId("playlistEnd"),
+		subtitlesCheckbox: getId("subChecked"),
+		closeHiddenBtn: getId("closeHidden"),
 
-		playlistNameDisplay: document.getElementById("playlistName"),
-		errorMsgDisplay: document.getElementById("incorrectMsgPlaylist"),
-		errorBtn: document.getElementById("errorBtn"),
-		errorDetails: document.getElementById("errorDetails"),
+		playlistNameDisplay: getId("playlistName"),
+		errorMsgDisplay: getId("incorrectMsgPlaylist"),
+		errorBtn: getId("errorBtn"),
+		errorDetails: getId("errorDetails"),
 
-		menuIcon: document.getElementById("menuIcon"),
-		menu: document.getElementById("menu"),
-		preferenceWinBtn: document.getElementById("preferenceWin"),
-		aboutWinBtn: document.getElementById("aboutWin"),
-		historyWinBtn: document.getElementById("historyWin"),
-		homeWinBtn: document.getElementById("homeWin"),
-		compressorWinBtn: document.getElementById("compressorWin"),
-		searchWinBtn: document.getElementById("searchWin"),
+		menuIcon: getId("menuIcon"),
+		menu: getId("menu"),
+		preferenceWinBtn: getId("preferenceWin"),
+		aboutWinBtn: getId("aboutWin"),
+		historyWinBtn: getId("historyWin"),
+		homeWinBtn: getId("homeWin"),
+		compressorWinBtn: getId("compressorWin"),
+		searchWinBtn: getId("searchWin"),
+	},
+
+	initUI() {
+		const container = getId("view-playlist") || document;
+
+		this.ui = {
+			pasteLinkBtn: container.querySelector("#pasteLink") || container.querySelector("#pasteLinkPlaylist") || getId("pasteLink"),
+			linkDisplay: container.querySelector("#link") || getId("link"),
+			optionsContainer: container.querySelector("#options") || getId("options"),
+			downloadList: container.querySelector("#listPlaylist") || container.querySelector("#list") || getId("list"),
+
+			downloadVideoBtn: container.querySelector("#download") || getId("download"),
+			downloadAudioBtn: container.querySelector("#audioDownloadPlaylist") || container.querySelector("#audioDownload"),
+			downloadThumbnailsBtn: container.querySelector("#downloadThumbnails") || getId("downloadThumbnails"),
+			saveLinksBtn: container.querySelector("#saveLinks") || getId("saveLinks"),
+
+			selectLocationBtn: container.querySelector("#selectLocationPlaylist") || container.querySelector("#selectLocation") || getId("selectLocation"),
+			pathDisplay: container.querySelector("#pathPlaylist") || container.querySelector("#path") || getId("path"),
+			openDownloadsBtn: container.querySelector("#openDownloads") || getId("openDownloads"),
+			stopDownloadBtn: container.querySelector("#stopDownload") || getId("stopDownload"),
+
+			videoToggle: container.querySelector("#videoTogglePlaylist") || container.querySelector("#videoToggle") || getId("videoToggle"),
+			audioToggle: container.querySelector("#audioTogglePlaylist") || container.querySelector("#audioToggle") || getId("audioToggle"),
+			advancedToggle: container.querySelector("#advancedToggle") || getId("advancedToggle"),
+			videoBox: container.querySelector("#videoBox") || getId("videoBox"),
+			audioBox: container.querySelector("#audioBox") || getId("audioBox"),
+			videoQualitySelect: container.querySelector("#select") || getId("select"),
+			videoTypeSelect: container.querySelector("#videoTypeSelect") || getId("videoTypeSelect"),
+			typeSelectBox: container.querySelector("#typeSelectBox") || getId("typeSelectBox"),
+			audioTypeSelect: container.querySelector("#audioSelect") || getId("audioSelect"),
+			audioQualitySelect: container.querySelector("#audioQualitySelect") || getId("audioQualitySelect"),
+
+			advancedMenu: container.querySelector("#advancedMenu") || getId("advancedMenu"),
+			playlistIndexInput: container.querySelector("#playlistIndex") || getId("playlistIndex"),
+			playlistEndInput: container.querySelector("#playlistEnd") || getId("playlistEnd"),
+			subtitlesCheckbox: container.querySelector("#subCheckedPlaylist") || container.querySelector("#subChecked") || getId("subChecked"),
+			closeHiddenBtn: container.querySelector("#closeHiddenPlaylist") || container.querySelector("#closeHidden") || getId("closeHidden"),
+
+			playlistNameDisplay: container.querySelector("#playlistName") || getId("playlistName"),
+			errorMsgDisplay: container.querySelector("#incorrectMsgPlaylist") || container.querySelector("#incorrectMsg") || getId("incorrectMsg"),
+			errorBtn: container.querySelector("#errorBtnPlaylist") || container.querySelector("#errorBtn") || getId("errorBtn"),
+			errorDetails: container.querySelector("#errorDetailsPlaylist") || container.querySelector("#errorDetails") || getId("errorDetails"),
+
+			menuIcon: getId("menuIcon"),
+			menu: getId("menu"),
+			preferenceWinBtn: getId("preferenceWin"),
+			aboutWinBtn: getId("aboutWin"),
+			historyWinBtn: getId("historyWin"),
+			homeWinBtn: getId("homeWin"),
+			compressorWinBtn: getId("compressorWin"),
+			searchWinBtn: getId("searchWin"),
+		};
 	},
 
 	init() {
-		this.loadInitialConfig();
-		this.initEventListeners();
+		const setup = () => {
+			this.initUI();
+			this.loadInitialConfig();
+			this.initEventListeners();
 
-		// Set initial UI state
-		this.ui.pathDisplay.textContent = this.state.downloadDir;
-		this.ui.videoToggle.style.backgroundColor = "var(--box-toggleOn)";
-		this.updateVideoTypeVisibility();
+			if (this.ui.pathDisplay) {
+				this.ui.pathDisplay.textContent = this.state.downloadDir;
+			}
+			if (this.ui.videoToggle) {
+				this.ui.videoToggle.style.backgroundColor = "var(--box-toggleOn)";
+			}
+			this.updateVideoTypeVisibility();
+		};
+
+		if (document.readyState === "loading") {
+			document.addEventListener("DOMContentLoaded", () => setup());
+		} else {
+			setup();
+		}
 
 		// Load translations when ready
 		document.addEventListener("translations-loaded", () => {
-			window.i18n.translatePage();
+			if (window.i18n && window.i18n.translatePage) {
+				window.i18n.translatePage();
+			}
 		});
 
 		console.log(`yt-dlp path: ${this.state.ytDlpPath}`);
@@ -116,11 +182,24 @@ const playlistDownloader = {
 	},
 
 	loadInitialConfig() {
-		// yt-dlp path
+		if (!this.ui.videoQualitySelect || !this.ui.videoQualitySelect.options) {
+			this.initUI();
+		}
+
 		const isTestMode = Boolean(window.electronAPI && window.electronAPI.isTest);
 		const mockYtDlp = isTestMode ? window.__mockYtDlp : null;
-		this.state.ytDlpPath = mockYtDlp ? "mock-ytdlp" : localStorage.getItem("ytdlp");
-		this.state.ytDlpWrap = mockYtDlp || new YTDlpWrap(this.state.ytDlpPath);
+
+		if (window.AppBinaries && !mockYtDlp) {
+			this.state.ytDlpPath = window.AppBinaries.ytDlpPath;
+			this.state.ytDlpWrap = window.AppBinaries.ytDlp;
+			this.state.ffmpegPath = window.AppBinaries.ffmpegPath;
+			this.state.jsRuntimePath = window.AppBinaries.jsRuntimePath;
+		} else {
+			this.state.ytDlpPath = mockYtDlp ? "mock-ytdlp" : localStorage.getItem("ytdlp");
+			this.state.ytDlpWrap = mockYtDlp || YTDlpWrap.new(this.state.ytDlpPath);
+			this.state.ffmpegPath = mockYtDlp ? "ffmpeg" : this.getFfmpegPath();
+			this.state.jsRuntimePath = mockYtDlp ? "" : this.getJsRuntimePath();
+		}
 
 		const defaultDownloadsDir = path.join(os.homedir(), "Downloads");
 		let preferredDir =
@@ -137,15 +216,11 @@ const playlistDownloader = {
 			localStorage.setItem("downloadPath", defaultDownloadsDir);
 		}
 
-		// ffmpeg and js runtime path setup
-		this.state.ffmpegPath = this.getFfmpegPath();
-		this.state.jsRuntimePath = this.getJsRuntimePath();
-
 		const preferredVideo = localStorage.getItem("preferredVideoQuality");
-		if (preferredVideo) {
+		if (preferredVideo && this.ui.videoQualitySelect) {
 			this.ui.videoQualitySelect.value = preferredVideo;
 		}
-		if (!this.ui.videoQualitySelect.value) {
+		if (this.ui.videoQualitySelect && !this.ui.videoQualitySelect.value) {
 			this.ui.videoQualitySelect.value = "best";
 		}
 
@@ -164,14 +239,20 @@ const playlistDownloader = {
 	initEventListeners() {
 		this.ui.pasteLinkBtn.addEventListener("click", () => this.pasteLink());
 		document.addEventListener("keydown", (event) => {
-			if (
-				(event.ctrlKey && event.key === "v") ||
-				(event.metaKey &&
-					event.key === "v" &&
-					os.platform() === "darwin" &&
-					document.activeElement.tagName !== "INPUT" &&
-					document.activeElement.tagName !== "TEXTAREA")
-			) {
+			const viewPlaylist = getId("view-playlist");
+			if (!viewPlaylist || viewPlaylist.classList.contains("hidden")) return;
+
+			const isCtrlV =
+				(event.ctrlKey || (event.metaKey && os.platform() === "darwin")) &&
+				(event.key?.toLowerCase() === "v" || event.code === "KeyV");
+
+			const isInput =
+				document.activeElement &&
+				(document.activeElement.tagName === "INPUT" ||
+					document.activeElement.tagName === "TEXTAREA" ||
+					document.activeElement.isContentEditable);
+
+			if (isCtrlV && !isInput) {
 				if (!this.state.isDownloading) {
 					this.pasteLink();
 				}
@@ -538,7 +619,7 @@ const playlistDownloader = {
 		});
 
 		process.on("progress", (progress) => {
-			const progressElement = document.getElementById(`p${count}`);
+			const progressElement = getId(`p${count}`);
 			if (!progressElement) return;
 
 			if (progress.percent === 100) {
@@ -590,7 +671,7 @@ const playlistDownloader = {
 		this.ui.stopDownloadBtn.style.display = "none";
 		this.ui.pasteLinkBtn.style.display = "inline-block";
 		const targetCount = count !== undefined ? count : (this.state.currentLocalCount || 0);
-		const lastProgress = document.getElementById(`p${targetCount}`);
+		const lastProgress = getId(`p${targetCount}`);
 		if (lastProgress) {
 			lastProgress.textContent = window.i18n ? window.i18n.__("cancel") : "Cancelled";
 		}
@@ -625,7 +706,7 @@ const playlistDownloader = {
 		}
 
 		if (count > 1) {
-			const prevProgress = document.getElementById(`p${count - 1}`);
+			const prevProgress = getId(`p${count - 1}`);
 			if (prevProgress)
 				prevProgress.textContent = window.i18n.__("fileSaved");
 		}
@@ -772,7 +853,7 @@ const playlistDownloader = {
 		this.state.isDownloading = false;
 		this.ui.stopDownloadBtn.style.display = "none";
 
-		const lastProgress = document.getElementById(`p${count}`);
+		const lastProgress = getId(`p${count}`);
 		if (lastProgress)
 			lastProgress.textContent = window.i18n.__("fileSaved");
 		this.ui.pasteLinkBtn.style.display = "inline-block";
@@ -860,17 +941,20 @@ const playlistDownloader = {
 	},
 
 	navigate(type, page) {
-		if (this.state.isDownloading) {
-			const confirmMsg = window.i18n
-				? window.i18n.__("cancel_download") + "?"
-				: "Are you sure you want to cancel the download?";
-			const choice = confirm(confirmMsg);
-			if (!choice) {
-				return;
-			}
-			this.stopDownload();
-		}
 		this.closeMenu();
+		const viewMap = {
+			"/index.html": "view-home",
+			"/search.html": "view-search",
+			"/playlist.html": "view-playlist",
+			"/compressor.html": "view-compressor",
+			"/history.html": "view-history",
+			"/preferences.html": "view-preferences",
+			"/about.html": "view-about",
+		};
+		if (viewMap[page] && typeof window.switchView === "function") {
+			window.switchView(viewMap[page]);
+			return;
+		}
 		const event = type === "page" ? "load-page" : "load-win";
 		ipcRenderer.send(event, path.join(__dirname, page));
 	},

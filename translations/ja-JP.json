@@ -13,7 +13,7 @@
 	"selectDownloadLocation": "ダウンロード先を選択",
 	"moreOptions": "その他のオプション",
 	"start": "開始",
-	"selectLanguageRelaunch": "言語を選択 (アプリの再起動が必要)",
+	"selectLanguageRelaunch": "言語を選択",
 	"downloadTimeRange": "特定の時間範囲をダウンロード",
 	"end": "終了",
 	"timeRangeStartEmptyHint": "空のままの場合、最初からやり直しになります",

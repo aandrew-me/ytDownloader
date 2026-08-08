@@ -13,7 +13,7 @@
 	"selectDownloadLocation": "Επιλέξτε τοποθεσία λήψεων",
 	"moreOptions": "Περισσότερες επιλογές",
 	"start": "Έναρξη",
-	"selectLanguageRelaunch": "Επιλέξτε Γλώσσα (Απαιτεί επανεκκίνηση)",
+	"selectLanguageRelaunch": "Επιλέξτε Γλώσσα",
 	"downloadTimeRange": "Κατεβάστε συγκεκριμένα χρονικά διαστήματα του βίντεο",
 	"end": "Tέλος",
 	"timeRangeStartEmptyHint": "Αν παραμείνει κενό, θα ξεκινήσει από την αρχή",

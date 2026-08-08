@@ -35,9 +35,11 @@ test.describe("Compressor Page Tests", () => {
 	let page;
 
 	test.beforeEach(async () => {
-		const res = await launchApp({}, undefined, "html/compressor.html");
+		const res = await launchApp();
 		electronApp = res.app;
 		page = res.page;
+		await page.waitForFunction(() => typeof window.switchView === "function");
+		await page.click("#compressorWin");
 	});
 
 	test.afterEach(async () => {
