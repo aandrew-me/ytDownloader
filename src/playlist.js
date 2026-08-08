@@ -50,102 +50,102 @@ const playlistDownloader = {
 
 	// DOM elements
 	ui: {
-		pasteLinkBtn: document.getElementById("pasteLink"),
-		linkDisplay: document.getElementById("link"),
-		optionsContainer: document.getElementById("options"),
-		downloadList: document.getElementById("list"),
+		pasteLinkBtn: getId("pasteLink"),
+		linkDisplay: getId("link"),
+		optionsContainer: getId("options"),
+		downloadList: getId("list"),
 
-		downloadVideoBtn: document.getElementById("download"),
-		downloadAudioBtn: document.getElementById("audioDownload"),
-		downloadThumbnailsBtn: document.getElementById("downloadThumbnails"),
-		saveLinksBtn: document.getElementById("saveLinks"),
+		downloadVideoBtn: getId("download"),
+		downloadAudioBtn: getId("audioDownload"),
+		downloadThumbnailsBtn: getId("downloadThumbnails"),
+		saveLinksBtn: getId("saveLinks"),
 
-		selectLocationBtn: document.getElementById("selectLocation"),
-		pathDisplay: document.getElementById("path"),
-		openDownloadsBtn: document.getElementById("openDownloads"),
-		stopDownloadBtn: document.getElementById("stopDownload"),
+		selectLocationBtn: getId("selectLocation"),
+		pathDisplay: getId("path"),
+		openDownloadsBtn: getId("openDownloads"),
+		stopDownloadBtn: getId("stopDownload"),
 
-		videoToggle: document.getElementById("videoToggle"),
-		audioToggle: document.getElementById("audioToggle"),
-		advancedToggle: document.getElementById("advancedToggle"),
-		videoBox: document.getElementById("videoBox"),
-		audioBox: document.getElementById("audioBox"),
-		videoQualitySelect: document.getElementById("select"),
-		videoTypeSelect: document.getElementById("videoTypeSelect"),
-		typeSelectBox: document.getElementById("typeSelectBox"),
-		audioTypeSelect: document.getElementById("audioSelect"),
-		audioQualitySelect: document.getElementById("audioQualitySelect"),
+		videoToggle: getId("videoToggle"),
+		audioToggle: getId("audioToggle"),
+		advancedToggle: getId("advancedToggle"),
+		videoBox: getId("videoBox"),
+		audioBox: getId("audioBox"),
+		videoQualitySelect: getId("select"),
+		videoTypeSelect: getId("videoTypeSelect"),
+		typeSelectBox: getId("typeSelectBox"),
+		audioTypeSelect: getId("audioSelect"),
+		audioQualitySelect: getId("audioQualitySelect"),
 
-		advancedMenu: document.getElementById("advancedMenu"),
-		playlistIndexInput: document.getElementById("playlistIndex"),
-		playlistEndInput: document.getElementById("playlistEnd"),
-		subtitlesCheckbox: document.getElementById("subChecked"),
-		closeHiddenBtn: document.getElementById("closeHidden"),
+		advancedMenu: getId("advancedMenu"),
+		playlistIndexInput: getId("playlistIndex"),
+		playlistEndInput: getId("playlistEnd"),
+		subtitlesCheckbox: getId("subChecked"),
+		closeHiddenBtn: getId("closeHidden"),
 
-		playlistNameDisplay: document.getElementById("playlistName"),
-		errorMsgDisplay: document.getElementById("incorrectMsgPlaylist"),
-		errorBtn: document.getElementById("errorBtn"),
-		errorDetails: document.getElementById("errorDetails"),
+		playlistNameDisplay: getId("playlistName"),
+		errorMsgDisplay: getId("incorrectMsgPlaylist"),
+		errorBtn: getId("errorBtn"),
+		errorDetails: getId("errorDetails"),
 
-		menuIcon: document.getElementById("menuIcon"),
-		menu: document.getElementById("menu"),
-		preferenceWinBtn: document.getElementById("preferenceWin"),
-		aboutWinBtn: document.getElementById("aboutWin"),
-		historyWinBtn: document.getElementById("historyWin"),
-		homeWinBtn: document.getElementById("homeWin"),
-		compressorWinBtn: document.getElementById("compressorWin"),
-		searchWinBtn: document.getElementById("searchWin"),
+		menuIcon: getId("menuIcon"),
+		menu: getId("menu"),
+		preferenceWinBtn: getId("preferenceWin"),
+		aboutWinBtn: getId("aboutWin"),
+		historyWinBtn: getId("historyWin"),
+		homeWinBtn: getId("homeWin"),
+		compressorWinBtn: getId("compressorWin"),
+		searchWinBtn: getId("searchWin"),
 	},
 
 	initUI() {
-		const container = document.getElementById("view-playlist") || document;
+		const container = getId("view-playlist") || document;
 
 		this.ui = {
-			pasteLinkBtn: container.querySelector("#pasteLink") || container.querySelector("#pasteLinkPlaylist") || document.getElementById("pasteLink"),
-			linkDisplay: container.querySelector("#link") || document.getElementById("link"),
-			optionsContainer: container.querySelector("#options") || document.getElementById("options"),
-			downloadList: container.querySelector("#listPlaylist") || container.querySelector("#list") || document.getElementById("list"),
+			pasteLinkBtn: container.querySelector("#pasteLink") || container.querySelector("#pasteLinkPlaylist") || getId("pasteLink"),
+			linkDisplay: container.querySelector("#link") || getId("link"),
+			optionsContainer: container.querySelector("#options") || getId("options"),
+			downloadList: container.querySelector("#listPlaylist") || container.querySelector("#list") || getId("list"),
 
-			downloadVideoBtn: container.querySelector("#download") || document.getElementById("download"),
+			downloadVideoBtn: container.querySelector("#download") || getId("download"),
 			downloadAudioBtn: container.querySelector("#audioDownloadPlaylist") || container.querySelector("#audioDownload"),
-			downloadThumbnailsBtn: container.querySelector("#downloadThumbnails") || document.getElementById("downloadThumbnails"),
-			saveLinksBtn: container.querySelector("#saveLinks") || document.getElementById("saveLinks"),
+			downloadThumbnailsBtn: container.querySelector("#downloadThumbnails") || getId("downloadThumbnails"),
+			saveLinksBtn: container.querySelector("#saveLinks") || getId("saveLinks"),
 
-			selectLocationBtn: container.querySelector("#selectLocationPlaylist") || container.querySelector("#selectLocation") || document.getElementById("selectLocation"),
-			pathDisplay: container.querySelector("#pathPlaylist") || container.querySelector("#path") || document.getElementById("path"),
-			openDownloadsBtn: container.querySelector("#openDownloads") || document.getElementById("openDownloads"),
-			stopDownloadBtn: container.querySelector("#stopDownload") || document.getElementById("stopDownload"),
+			selectLocationBtn: container.querySelector("#selectLocationPlaylist") || container.querySelector("#selectLocation") || getId("selectLocation"),
+			pathDisplay: container.querySelector("#pathPlaylist") || container.querySelector("#path") || getId("path"),
+			openDownloadsBtn: container.querySelector("#openDownloads") || getId("openDownloads"),
+			stopDownloadBtn: container.querySelector("#stopDownload") || getId("stopDownload"),
 
-			videoToggle: container.querySelector("#videoTogglePlaylist") || container.querySelector("#videoToggle") || document.getElementById("videoToggle"),
-			audioToggle: container.querySelector("#audioTogglePlaylist") || container.querySelector("#audioToggle") || document.getElementById("audioToggle"),
-			advancedToggle: container.querySelector("#advancedToggle") || document.getElementById("advancedToggle"),
-			videoBox: container.querySelector("#videoBox") || document.getElementById("videoBox"),
-			audioBox: container.querySelector("#audioBox") || document.getElementById("audioBox"),
-			videoQualitySelect: container.querySelector("#select") || document.getElementById("select"),
-			videoTypeSelect: container.querySelector("#videoTypeSelect") || document.getElementById("videoTypeSelect"),
-			typeSelectBox: container.querySelector("#typeSelectBox") || document.getElementById("typeSelectBox"),
-			audioTypeSelect: container.querySelector("#audioSelect") || document.getElementById("audioSelect"),
-			audioQualitySelect: container.querySelector("#audioQualitySelect") || document.getElementById("audioQualitySelect"),
+			videoToggle: container.querySelector("#videoTogglePlaylist") || container.querySelector("#videoToggle") || getId("videoToggle"),
+			audioToggle: container.querySelector("#audioTogglePlaylist") || container.querySelector("#audioToggle") || getId("audioToggle"),
+			advancedToggle: container.querySelector("#advancedToggle") || getId("advancedToggle"),
+			videoBox: container.querySelector("#videoBox") || getId("videoBox"),
+			audioBox: container.querySelector("#audioBox") || getId("audioBox"),
+			videoQualitySelect: container.querySelector("#select") || getId("select"),
+			videoTypeSelect: container.querySelector("#videoTypeSelect") || getId("videoTypeSelect"),
+			typeSelectBox: container.querySelector("#typeSelectBox") || getId("typeSelectBox"),
+			audioTypeSelect: container.querySelector("#audioSelect") || getId("audioSelect"),
+			audioQualitySelect: container.querySelector("#audioQualitySelect") || getId("audioQualitySelect"),
 
-			advancedMenu: container.querySelector("#advancedMenu") || document.getElementById("advancedMenu"),
-			playlistIndexInput: container.querySelector("#playlistIndex") || document.getElementById("playlistIndex"),
-			playlistEndInput: container.querySelector("#playlistEnd") || document.getElementById("playlistEnd"),
-			subtitlesCheckbox: container.querySelector("#subCheckedPlaylist") || container.querySelector("#subChecked") || document.getElementById("subChecked"),
-			closeHiddenBtn: container.querySelector("#closeHiddenPlaylist") || container.querySelector("#closeHidden") || document.getElementById("closeHidden"),
+			advancedMenu: container.querySelector("#advancedMenu") || getId("advancedMenu"),
+			playlistIndexInput: container.querySelector("#playlistIndex") || getId("playlistIndex"),
+			playlistEndInput: container.querySelector("#playlistEnd") || getId("playlistEnd"),
+			subtitlesCheckbox: container.querySelector("#subCheckedPlaylist") || container.querySelector("#subChecked") || getId("subChecked"),
+			closeHiddenBtn: container.querySelector("#closeHiddenPlaylist") || container.querySelector("#closeHidden") || getId("closeHidden"),
 
-			playlistNameDisplay: container.querySelector("#playlistName") || document.getElementById("playlistName"),
-			errorMsgDisplay: container.querySelector("#incorrectMsgPlaylist") || container.querySelector("#incorrectMsg") || document.getElementById("incorrectMsg"),
-			errorBtn: container.querySelector("#errorBtnPlaylist") || container.querySelector("#errorBtn") || document.getElementById("errorBtn"),
-			errorDetails: container.querySelector("#errorDetailsPlaylist") || container.querySelector("#errorDetails") || document.getElementById("errorDetails"),
+			playlistNameDisplay: container.querySelector("#playlistName") || getId("playlistName"),
+			errorMsgDisplay: container.querySelector("#incorrectMsgPlaylist") || container.querySelector("#incorrectMsg") || getId("incorrectMsg"),
+			errorBtn: container.querySelector("#errorBtnPlaylist") || container.querySelector("#errorBtn") || getId("errorBtn"),
+			errorDetails: container.querySelector("#errorDetailsPlaylist") || container.querySelector("#errorDetails") || getId("errorDetails"),
 
-			menuIcon: document.getElementById("menuIcon"),
-			menu: document.getElementById("menu"),
-			preferenceWinBtn: document.getElementById("preferenceWin"),
-			aboutWinBtn: document.getElementById("aboutWin"),
-			historyWinBtn: document.getElementById("historyWin"),
-			homeWinBtn: document.getElementById("homeWin"),
-			compressorWinBtn: document.getElementById("compressorWin"),
-			searchWinBtn: document.getElementById("searchWin"),
+			menuIcon: getId("menuIcon"),
+			menu: getId("menu"),
+			preferenceWinBtn: getId("preferenceWin"),
+			aboutWinBtn: getId("aboutWin"),
+			historyWinBtn: getId("historyWin"),
+			homeWinBtn: getId("homeWin"),
+			compressorWinBtn: getId("compressorWin"),
+			searchWinBtn: getId("searchWin"),
 		};
 	},
 
@@ -239,7 +239,7 @@ const playlistDownloader = {
 	initEventListeners() {
 		this.ui.pasteLinkBtn.addEventListener("click", () => this.pasteLink());
 		document.addEventListener("keydown", (event) => {
-			const viewPlaylist = document.getElementById("view-playlist");
+			const viewPlaylist = getId("view-playlist");
 			if (!viewPlaylist || viewPlaylist.classList.contains("hidden")) return;
 
 			const isCtrlV =
@@ -619,7 +619,7 @@ const playlistDownloader = {
 		});
 
 		process.on("progress", (progress) => {
-			const progressElement = document.getElementById(`p${count}`);
+			const progressElement = getId(`p${count}`);
 			if (!progressElement) return;
 
 			if (progress.percent === 100) {
@@ -671,7 +671,7 @@ const playlistDownloader = {
 		this.ui.stopDownloadBtn.style.display = "none";
 		this.ui.pasteLinkBtn.style.display = "inline-block";
 		const targetCount = count !== undefined ? count : (this.state.currentLocalCount || 0);
-		const lastProgress = document.getElementById(`p${targetCount}`);
+		const lastProgress = getId(`p${targetCount}`);
 		if (lastProgress) {
 			lastProgress.textContent = window.i18n ? window.i18n.__("cancel") : "Cancelled";
 		}
@@ -706,7 +706,7 @@ const playlistDownloader = {
 		}
 
 		if (count > 1) {
-			const prevProgress = document.getElementById(`p${count - 1}`);
+			const prevProgress = getId(`p${count - 1}`);
 			if (prevProgress)
 				prevProgress.textContent = window.i18n.__("fileSaved");
 		}
@@ -853,7 +853,7 @@ const playlistDownloader = {
 		this.state.isDownloading = false;
 		this.ui.stopDownloadBtn.style.display = "none";
 
-		const lastProgress = document.getElementById(`p${count}`);
+		const lastProgress = getId(`p${count}`);
 		if (lastProgress)
 			lastProgress.textContent = window.i18n.__("fileSaved");
 		this.ui.pasteLinkBtn.style.display = "inline-block";

@@ -569,7 +569,7 @@ class YtDownloaderApp {
 					// TODO: Improve it
 					ipcRenderer.send("reload");
 				});
-				document.getElementById("popup").appendChild(tryAgainBtn);
+				$("popup").appendChild(tryAgainBtn);
 
 				throw new Error("Failed to download yt-dlp.");
 			}
