@@ -37,7 +37,7 @@ function killProcessSafely(proc, signal) {
 	if (!proc) return;
 	try {
 		if (process.platform === "win32" && proc.pid) {
-			execSync(`taskkill /pid ${proc.pid} /T /F`);
+			execSync(`taskkill /pid ${proc.pid} /T /F`, { stdio: "pipe" });
 		} else {
 			proc.kill(signal || "SIGKILL");
 		}
