@@ -728,14 +728,16 @@ function initDependenciesTab() {
 				}
 				if (targetPath && fs && fs.existsSync && fs.existsSync(targetPath)) {
 					checkYtdlp();
+					window.dispatchEvent(new CustomEvent("ytdownloader-reload-binaries"));
 				} else {
+					// switchYtdlpChannel starts async download and dispatches ytdownloader-reload-binaries in its .then() when finished
 					switchYtdlpChannel(depYtdlpChannel ? depYtdlpChannel.value : "nightly");
 				}
 			} else {
 				if (depYtdlpChannelBox) depYtdlpChannelBox.style.display = "none";
 				checkYtdlp();
+				window.dispatchEvent(new CustomEvent("ytdownloader-reload-binaries"));
 			}
-			window.dispatchEvent(new CustomEvent("ytdownloader-reload-binaries"));
 		});
 	}
 

@@ -218,34 +218,52 @@ class YtDownloaderApp {
 
 	/**
 	 * Dynamically re-resolves binary paths (yt-dlp, ffmpeg, JS runtime) in-memory
-	 * without requiring an application window reload.
+	 * without requiring an application window reload. Protected against concurrent invocations.
 	 */
 	async reloadBinaries() {
-		try {
-			const isTestMode = Boolean(window.electronAPI && window.electronAPI.isTest);
-			const mockYtDlp = isTestMode ? window.__mockYtDlp : null;
+		if (this._reloadingBinariesPromise) {
+			await this._reloadingBinariesPromise;
+		}
 
-			const ytdlpSource = localStorage.getItem(CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_SOURCE) || "bundled";
-			if (ytdlpSource === CONSTANTS.YT_DLP_SOURCE.SYSTEM || ytdlpSource === "system") {
-				localStorage.removeItem(CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_PATH);
+		this._reloadingBinariesPromise = (async () => {
+			try {
+				const isTestMode = Boolean(window.electronAPI && window.electronAPI.isTest);
+				const mockYtDlp = isTestMode ? window.__mockYtDlp : null;
+
+				const ytdlpSource = localStorage.getItem(CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_SOURCE) || "bundled";
+				if (ytdlpSource === CONSTANTS.YT_DLP_SOURCE.SYSTEM || ytdlpSource === "system") {
+					localStorage.removeItem(CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_PATH);
+				}
+
+				const ytDlpPath = mockYtDlp ? "mock-ytdlp" : await this._findOrDownloadYtDlp();
+				const ytDlp = mockYtDlp || YTDlpWrap.new(ytDlpPath);
+				const ffmpegPath = mockYtDlp ? "ffmpeg" : await this._findFfmpeg();
+				this._ensureFfmpegLibsLoadable(ffmpegPath);
+				const jsRuntimePath = mockYtDlp ? "" : await this._getJsRuntimePath();
+
+				// Atomic update of state once all resolvers complete
+				this.state.ytDlpPath = ytDlpPath;
+				this.state.ytDlp = ytDlp;
+				this.state.ffmpegPath = ffmpegPath;
+				this.state.jsRuntimePath = jsRuntimePath;
+
+				window.AppBinaries = {
+					ytDlpPath: this.state.ytDlpPath,
+					ytDlp: this.state.ytDlp,
+					ffmpegPath: this.state.ffmpegPath,
+					jsRuntimePath: this.state.jsRuntimePath,
+				};
+
+				console.log("Re-resolved binary paths in-memory:", window.AppBinaries);
+			} catch (error) {
+				console.error("Binary re-resolution failed:", error);
 			}
+		})();
 
-			this.state.ytDlpPath = mockYtDlp ? "mock-ytdlp" : await this._findOrDownloadYtDlp();
-			this.state.ytDlp = mockYtDlp || YTDlpWrap.new(this.state.ytDlpPath);
-			this.state.ffmpegPath = mockYtDlp ? "ffmpeg" : await this._findFfmpeg();
-			this._ensureFfmpegLibsLoadable(this.state.ffmpegPath);
-			this.state.jsRuntimePath = mockYtDlp ? "" : await this._getJsRuntimePath();
-
-			window.AppBinaries = {
-				ytDlpPath: this.state.ytDlpPath,
-				ytDlp: this.state.ytDlp,
-				ffmpegPath: this.state.ffmpegPath,
-				jsRuntimePath: this.state.jsRuntimePath,
-			};
-
-			console.log("Re-resolved binary paths in-memory:", window.AppBinaries);
-		} catch (error) {
-			console.error("Binary re-resolution failed:", error);
+		try {
+			await this._reloadingBinariesPromise;
+		} finally {
+			this._reloadingBinariesPromise = null;
 		}
 	}
 
