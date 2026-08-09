@@ -201,18 +201,6 @@ const playlistDownloader = {
 			this.state.jsRuntimePath = mockYtDlp ? "" : this.getJsRuntimePath();
 		}
 
-		if (!this._hasReloadListener) {
-			this._hasReloadListener = true;
-			window.addEventListener("ytdownloader-reload-binaries", () => {
-				if (window.AppBinaries && !mockYtDlp) {
-					this.state.ytDlpPath = window.AppBinaries.ytDlpPath;
-					this.state.ytDlpWrap = window.AppBinaries.ytDlp;
-					this.state.ffmpegPath = window.AppBinaries.ffmpegPath;
-					this.state.jsRuntimePath = window.AppBinaries.jsRuntimePath;
-				}
-			});
-		}
-
 		const defaultDownloadsDir = path.join(os.homedir(), "Downloads");
 		let preferredDir =
 			localStorage.getItem("downloadPath") || defaultDownloadsDir;

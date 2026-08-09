@@ -217,8 +217,8 @@ class YtDownloaderApp {
 	}
 
 	/**
-	 * Dynamically re-resolves binary paths (yt-dlp, ffmpeg, JS runtime) in-memory
-	 * without requiring an application window reload. Protected against concurrent invocations.
+	 * Dynamically re-resolves binary paths (yt-dlp, ffmpeg) in-memory
+	 * without requiring an application window reload.
 	 */
 	async reloadBinaries() {
 		if (this._reloadingBinariesPromise) {
