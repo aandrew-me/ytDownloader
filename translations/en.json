@@ -218,5 +218,16 @@
 	"aboutBuiltWith": "Built with",
 	"aboutDownloader": "Downloader",
 	"aboutGithub": "GitHub",
-	"aboutMadeBy": "Made with ❤️ by"
+	"aboutMadeBy": "Made with ❤️ by",
+	"dependencies": "Dependencies",
+	"dependencySource": "Source",
+	"appBundled": "App bundled",
+	"systemPath": "System (PATH)",
+	"ytDlpChannel": "Channel",
+	"channelNightly": "Nightly",
+	"channelStable": "Stable",
+	"channelMaster": "Master",
+	"jsRuntime": "JS Runtime",
+	"appBundledNode": "App bundled (Node.js)",
+	"notFound": "Not found"
 }

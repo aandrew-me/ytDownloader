@@ -678,6 +678,7 @@
                         <button class="tab-btn active" data-translate="general" data-tab="general">General</button>
                         <button class="tab-btn" data-translate="mediaSettings" data-tab="media">Media Settings</button>
                         <button class="tab-btn" data-translate="advancedTools" data-tab="advanced">Advanced Tools</button>
+                        <button class="tab-btn" data-translate="dependencies" data-tab="dependencies">Dependencies</button>
                     </nav>
                 </header>
 
@@ -890,24 +891,6 @@
                             </div>
                         </section>
 
-                        <section id="ytdlpInfoBox" class="settings-section">
-                            <div class="ytdlpInfoItem">
-                                <span data-translate="ytDlpVersion">yt-dlp version</span>
-                                <span id="ytDlpVersion" class="badge"></span>
-                            </div>
-                            <div class="ytdlpInfoItem">
-                                <span id="ytDlpPathTxt" data-translate="ytDlpPath">yt-dlp path</span>
-                                <span id="ytDlpPath" class="path"></span>
-                            </div>
-                            <div class="ytdlpInfoItem" id="ytdlpSourceBox">
-                                <span id="ytdlpSourceTxt" data-translate="ytdlpSource">yt-dlp source</span>
-                                <select id="ytdlpSource">
-                                    <option value="nightly" data-translate="ytdlpSourceNightly">Nightly (auto-updating)</option>
-                                    <option value="system" data-translate="ytdlpSourceSystem">System yt-dlp</option>
-                                </select>
-                            </div>
-                        </section>
-
                         <section id="pathConfig" class="settings-section">
                             <div id="ytDlpArgBox">
                                 <p>
@@ -932,6 +915,172 @@
                                 </div>
                             </div>
                         </section>
+                    </div>
+
+                    <div id="dependenciesTab" class="tab-content">
+                        <!-- yt-dlp Card -->
+                        <div class="dep-card">
+                            <div class="dep-card-header">
+                                <div class="dep-card-icon dep-icon-dark">
+                                    <img src="../assets/images/yt-dlp.png" alt="yt-dlp" class="dep-icon-img" />
+                                </div>
+                                <div class="dep-card-title-group">
+                                    <div class="dep-title-row">
+                                        <h3 class="dep-title">yt-dlp</h3>
+                                        <span id="depYtdlpVersion" class="dep-version-badge">Checking...</span>
+                                    </div>
+                                    <span class="dep-subtitle">Video &amp; audio download engine</span>
+                                </div>
+                            </div>
+
+                            <div class="dep-segmented-group">
+                                <label class="dep-label" data-translate="dependencySource">Source</label>
+                                <div class="dep-segmented-control" id="depYtdlpSegmented">
+                                    <button class="dep-segment-btn active" data-value="bundled" data-translate="appBundled">App bundled</button>
+                                    <button class="dep-segment-btn" data-value="system" data-translate="systemPath">System (PATH)</button>
+                                </div>
+                                <select id="depYtdlpSource" class="dep-hidden-select">
+                                    <option value="bundled" data-translate="appBundled">App bundled</option>
+                                    <option value="system" data-translate="systemPath">System (PATH)</option>
+                                </select>
+                            </div>
+
+                            <div id="depYtdlpChannelBox" class="dep-options-container">
+                                <label class="dep-label" data-translate="ytDlpChannel">Release Channel</label>
+                                <div class="dep-option-list">
+                                    <div class="dep-option-item active" data-channel="nightly">
+                                        <div class="dep-radio-circle"></div>
+                                        <div class="dep-option-content">
+                                            <span class="dep-option-title" data-translate="channelNightly">Nightly</span>
+                                            <span class="dep-option-desc">Newest features &amp; quick fixes (Recommended)</span>
+                                        </div>
+                                        <span class="dep-active-tag">Active</span>
+                                    </div>
+                                    <div class="dep-option-item" data-channel="stable">
+                                        <div class="dep-radio-circle"></div>
+                                        <div class="dep-option-content">
+                                            <span class="dep-option-title" data-translate="channelStable">Stable</span>
+                                            <span class="dep-option-desc">Latest official stable release</span>
+                                        </div>
+                                        <span class="dep-active-tag">Active</span>
+                                    </div>
+                                    <div class="dep-option-item" data-channel="master">
+                                        <div class="dep-radio-circle"></div>
+                                        <div class="dep-option-content">
+                                            <span class="dep-option-title" data-translate="channelMaster">Master</span>
+                                            <span class="dep-option-desc">Bleeding edge development build</span>
+                                        </div>
+                                        <span class="dep-active-tag">Active</span>
+                                    </div>
+                                </div>
+                                <select id="depYtdlpChannel" class="dep-hidden-select">
+                                    <option value="nightly">Nightly</option>
+                                    <option value="stable">Stable</option>
+                                    <option value="master">Master</option>
+                                </select>
+                            </div>
+
+                            <div class="dep-card-footer">
+                                <div class="dep-path-info">
+                                    <span data-translate="path">Path:</span>
+                                    <span id="depYtdlpPath" class="path"></span>
+                                </div>
+                                <a href="#" id="linkYtdlpGithub" class="dep-github-link">
+                                    <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                                    <span>yt-dlp/yt-dlp</span>
+                                    <svg class="ext-icon" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- ffmpeg & ffprobe Card -->
+                        <div class="dep-card">
+                            <div class="dep-card-header">
+                                <div class="dep-card-icon dep-icon-light">
+                                    <img src="../assets/images/ffmpeg.png" alt="ffmpeg" class="dep-icon-img" />
+                                </div>
+                                <div class="dep-card-title-group">
+                                    <div class="dep-title-row">
+                                        <h3 class="dep-title">ffmpeg &amp; ffprobe</h3>
+                                    </div>
+                                    <span class="dep-subtitle">Media converter, multiplexer &amp; stream prober</span>
+                                </div>
+                            </div>
+
+                            <div class="dep-segmented-group">
+                                <label class="dep-label" data-translate="dependencySource">Source</label>
+                                <div class="dep-segmented-control" id="depFfmpegSegmented">
+                                    <button class="dep-segment-btn active" data-value="bundled" data-translate="appBundled">App bundled</button>
+                                    <button class="dep-segment-btn" data-value="system" data-translate="systemPath">System (PATH)</button>
+                                </div>
+                                <select id="depFfmpegSource" class="dep-hidden-select">
+                                    <option value="bundled" data-translate="appBundled">App bundled</option>
+                                    <option value="system" data-translate="systemPath">System (PATH)</option>
+                                </select>
+                            </div>
+
+                            <div class="dep-sub-details">
+                                <div class="dep-detail-row">
+                                    <span class="dep-detail-label">ffmpeg version</span>
+                                    <span id="depFfmpegVersion" class="dep-version-badge">Checking...</span>
+                                </div>
+                                <div class="dep-detail-row">
+                                    <span class="dep-detail-label">ffprobe version</span>
+                                    <span id="depFfprobeVersion" class="dep-version-badge">Checking...</span>
+                                </div>
+                            </div>
+
+                            <div class="dep-card-footer">
+                                <div class="dep-path-info">
+                                    <span data-translate="path">Path:</span>
+                                    <span id="depFfmpegPath" class="path"></span>
+                                </div>
+                                <a href="#" id="linkFfmpegWebsite" class="dep-github-link">
+                                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                                    <span>ffmpeg.org</span>
+                                    <svg class="ext-icon" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- JS Runtime Card -->
+                        <div class="dep-card">
+                            <div class="dep-card-header">
+                                <div class="dep-card-icon dep-icon-green">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                                </div>
+                                <div class="dep-card-title-group">
+                                    <div class="dep-title-row">
+                                        <h3 class="dep-title" data-translate="jsRuntime">JS Runtime</h3>
+                                        <span id="depJsRuntimeVersion" class="dep-version-badge">Checking...</span>
+                                    </div>
+                                    <span class="dep-subtitle">JavaScript execution environment for extractors</span>
+                                </div>
+                            </div>
+
+                            <div class="dep-segmented-group">
+                                <label class="dep-label" data-translate="dependencySource">Source</label>
+                                <div class="dep-segmented-control disabled">
+                                    <button class="dep-segment-btn active" data-translate="appBundledNode">App bundled (Node.js)</button>
+                                </div>
+                                <select id="depJsRuntimeSource" class="dep-hidden-select" disabled>
+                                    <option value="bundled" selected data-translate="appBundledNode">App bundled (Node.js)</option>
+                                </select>
+                            </div>
+
+                            <div class="dep-options-container">
+                                <div class="dep-option-list">
+                                    <div class="dep-option-item active disabled-item">
+                                        <div class="dep-radio-circle"></div>
+                                        <div class="dep-option-content">
+                                            <span class="dep-option-title">Node.js</span>
+                                            <span class="dep-option-desc">Built-in runtime environment</span>
+                                        </div>
+                                        <span class="dep-active-tag">Active</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </main>
             </section>

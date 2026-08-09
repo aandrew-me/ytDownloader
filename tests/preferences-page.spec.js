@@ -32,6 +32,49 @@ test.describe("Preferences Page Tests", () => {
 		await page.click('button[data-tab="advanced"]');
 		await expect(page.locator("#advancedTab")).toHaveClass(/active/);
 		await expect(page.locator("#mediaTab")).not.toHaveClass(/active/);
+
+		// Click Dependencies tab
+		await page.click('button[data-tab="dependencies"]');
+		await expect(page.locator("#dependenciesTab")).toHaveClass(/active/);
+		await expect(page.locator("#advancedTab")).not.toHaveClass(/active/);
+	});
+
+	test("dependencies settings options update localStorage and toggle channel visibility", async () => {
+		await page.click('button[data-tab="dependencies"]');
+		await expect(page.locator("#dependenciesTab")).toHaveClass(/active/);
+
+		// Default yt-dlp channel box should be visible for bundled source
+		await expect(page.locator("#depYtdlpChannelBox")).toBeVisible();
+
+		// Change yt-dlp source to system
+		await page.selectOption("#depYtdlpSource", "system");
+		let savedYtdlpSource = await page.evaluate(() => localStorage.getItem("ytdlpSource"));
+		expect(savedYtdlpSource).toBe("system");
+		await expect(page.locator("#depYtdlpChannelBox")).toBeHidden();
+
+		// Change yt-dlp source back to bundled
+		await page.selectOption("#depYtdlpSource", "bundled");
+		savedYtdlpSource = await page.evaluate(() => localStorage.getItem("ytdlpSource"));
+		expect(savedYtdlpSource).toBe("bundled");
+		await expect(page.locator("#depYtdlpChannelBox")).toBeVisible();
+
+		// Change yt-dlp channel to master
+		await page.selectOption("#depYtdlpChannel", "master");
+		const savedChannel = await page.evaluate(() => localStorage.getItem("ytdlpChannel"));
+		expect(savedChannel).toBe("master");
+
+		// Change ffmpeg source to system
+		await page.selectOption("#depFfmpegSource", "system");
+		const savedFfmpegSource = await page.evaluate(() => localStorage.getItem("ffmpegSource"));
+		expect(savedFfmpegSource).toBe("system");
+
+		// JS runtime source should be disabled
+		const jsRuntimeDisabled = await page.$eval("#depJsRuntimeSource", (el) => el.disabled);
+		expect(jsRuntimeDisabled).toBe(true);
+
+		// Check version indicators exist
+		const jsVersionText = await page.textContent("#depJsRuntimeVersion");
+		expect(jsVersionText.length).toBeGreaterThan(0);
 	});
 
 	test("settings search filters matching preferences items", async () => {
