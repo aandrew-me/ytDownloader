@@ -938,11 +938,65 @@
 
             <!-- View 7: About -->
             <section id="view-about" class="page-view hidden">
-                <h1>ytDownloader <span id="version"></span></h1>
-                <p id="txt1" data-translate="appDescription">ytDownloader lets you download videos and audios from hundreds of sites like Youtube, Facebook, Instagram, Tiktok, Twitter and so on.</p>
-                <p id="txt2" data-translate="aboutAppDescription">It's a Free and Open Source app built on top of Node.js and Electron.</p>
-                <span id="txt3" data-translate="sourceCodeAvailable">Source Code is available </span>
-                <a class="link-info" id="sourceLink" data-translate="here" href="https://github.com/aandrew-me/ytDownloader" target="_blank">here</a>
+                <div class="about-hero">
+                    <div class="about-logo-wrap">
+                        <img class="about-logo" src="../assets/images/icon.png" alt="YTDownloader logo">
+                    </div>
+                    <div class="about-hero-text">
+                        <h1 class="about-app-name">YTDownloader</h1>
+                        <span class="about-version-badge" id="version"></span>
+                    </div>
+                </div>
+
+                <p class="about-tagline" data-translate="appDescription">Download videos and audios from YouTube, Instagram, TikTok, Twitter, Facebook and hundreds of other sites.</p>
+
+                <div class="about-info-grid">
+                    <div class="about-info-card">
+                        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 12h6M9 15h4"/></svg>
+                        <div>
+                            <span class="about-info-label" data-translate="aboutLicense">License</span>
+                            <span class="about-info-value">GPL-3.0</span>
+                        </div>
+                    </div>
+                    <div class="about-info-card">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                        <div>
+                            <span class="about-info-label" data-translate="aboutPlatform">Platform</span>
+                            <span class="about-info-value" id="about-platform">—</span>
+                        </div>
+                    </div>
+                    <div class="about-info-card">
+                        <svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                        <div>
+                            <span class="about-info-label" data-translate="aboutBuiltWith">Built with</span>
+                            <span class="about-info-value">Electron &amp; Node.js</span>
+                        </div>
+                    </div>
+                    <div class="about-info-card">
+                        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                        <div>
+                            <span class="about-info-label" data-translate="aboutDownloader">Downloader</span>
+                            <span class="about-info-value">yt-dlp</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="about-desc" data-translate="aboutAppDescription">A free and open-source desktop app built on top of Node.js and Electron, with yt-dlp powering the downloads.</div>
+
+                <div class="about-links">
+                    <button class="about-link-btn about-link-primary" id="sourceLink">
+                        <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                        <span data-translate="aboutGithub">GitHub</span>
+                    </button>
+                    <button class="about-link-btn about-link-secondary" id="homepageLink">
+                        <svg viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                        <span data-translate="homepage">Homepage</span>
+                    </button>
+                </div>
+
+                <div class="about-footer-note">
+                    <span data-translate="aboutMadeBy">Made with ❤️ by</span> <button class="about-author-link" id="aboutAuthorLink">Andrew</button>
+                </div>
             </section>
         </main>
     </div>
@@ -962,6 +1016,29 @@
             const el = document.getElementById("pasteCtrlKey");
             if (el) el.textContent = "⌘";
         }
+    </script>
+    <script>
+        // Populate about section info
+        document.addEventListener("DOMContentLoaded", () => {
+            try {
+                const pkgPath = window.electronAPI.path.join(window.electronAPI.__dirname, "../package.json");
+                const pkg = JSON.parse(window.electronAPI.readFileSync(pkgPath, "utf8"));
+                const verEl = document.getElementById("version");
+                if (verEl && pkg.version) verEl.textContent = "v" + pkg.version;
+            } catch (_) {}
+
+            const platEl = document.getElementById("about-platform");
+            if (platEl && window.electronAPI.os) {
+                const p = window.electronAPI.os.platform();
+                const names = { win32: "Windows", darwin: "macOS", linux: "Linux" };
+                platEl.textContent = names[p] || p;
+            }
+
+            const openExt = (url) => window.electronAPI.shell.openExternal(url);
+            document.getElementById("sourceLink")?.addEventListener("click", () => openExt("https://github.com/aandrew-me/ytDownloader"));
+            document.getElementById("homepageLink")?.addEventListener("click", () => openExt("https://ytdn.netlify.app"));
+            document.getElementById("aboutAuthorLink")?.addEventListener("click", () => openExt("https://github.com/aandrew-me"));
+        });
     </script>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
