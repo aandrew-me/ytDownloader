@@ -34,7 +34,7 @@ function initPreferencesUI() {
 			const query = e.target.value.toLowerCase().trim();
 			const tabContainer = document.querySelector(".tab-container");
 			const tabContents = document.querySelectorAll(".tab-content");
-			const structuralSections = document.querySelectorAll(".settings-section");
+			const structuralSections = document.querySelectorAll(".settings-section, .dep-card");
 
 			if (query.length > 0) {
 				tabContainer.classList.add("search-active");
@@ -44,45 +44,53 @@ function initPreferencesUI() {
 
 				structuralSections.forEach((section) => {
 					const headerEl = section.querySelector(
-						"#outputTemplateTxt, .title-box",
+						"#outputTemplateTxt, .title-box, .dep-title",
 					);
 					const headerMatches =
 						headerEl && headerEl.textContent.toLowerCase().includes(query);
 
 					const searchableItems = section.querySelectorAll(
-						".prefBox, .outputTemplateItem, .ytdlpInfoItem, #ytDlpArgBox, .configBox",
+						".prefBox, .outputTemplateItem, .ytdlpInfoItem, #ytDlpArgBox, .configBox, #configOpts, .dep-segmented-group, .dep-options-container, .dep-sub-details, .dep-card-footer",
 					);
 					let visibleChildrenCount = 0;
 
-					searchableItems.forEach((item) => {
-						if (headerMatches) {
-							item.classList.remove("item-hidden");
-							visibleChildrenCount++;
-						} else {
-							const innerTextData = item.textContent.toLowerCase();
-							const interactiveInputs = item.querySelectorAll(
-								"input, select, textarea",
-							);
-							let inputPlaceholdersText = "";
-							interactiveInputs.forEach(
-								(i) =>
-									(inputPlaceholdersText +=
-										(i.placeholder || "") + " " + (i.value || "")),
-							);
-
-							const totalHaystack =
-								innerTextData +
-								" " +
-								inputPlaceholdersText.toLowerCase();
-
-							if (totalHaystack.includes(query)) {
+					if (searchableItems.length > 0) {
+						searchableItems.forEach((item) => {
+							if (headerMatches) {
 								item.classList.remove("item-hidden");
 								visibleChildrenCount++;
 							} else {
-								item.classList.add("item-hidden");
+								const innerTextData = item.textContent.toLowerCase();
+								const interactiveInputs = item.querySelectorAll(
+									"input, select, textarea",
+								);
+								let inputPlaceholdersText = "";
+								interactiveInputs.forEach(
+									(i) =>
+										(inputPlaceholdersText +=
+											(i.placeholder || "") + " " + (i.value || "")),
+								);
+
+								const totalHaystack =
+									innerTextData +
+									" " +
+									inputPlaceholdersText.toLowerCase();
+
+								if (totalHaystack.includes(query)) {
+									item.classList.remove("item-hidden");
+									visibleChildrenCount++;
+								} else {
+									item.classList.add("item-hidden");
+								}
 							}
+						});
+					} else {
+						// Fallback if section has no searchable child items directly
+						const sectionText = section.textContent.toLowerCase();
+						if (headerMatches || sectionText.includes(query)) {
+							visibleChildrenCount = 1;
 						}
-					});
+					}
 
 					if (visibleChildrenCount > 0 || headerMatches) {
 						section.classList.remove("item-hidden");
@@ -98,7 +106,7 @@ function initPreferencesUI() {
 
 				document
 					.querySelectorAll(
-						".prefBox, .outputTemplateItem, .ytdlpInfoItem, #ytDlpArgBox, .configBox, .settings-section",
+						".prefBox, .outputTemplateItem, .ytdlpInfoItem, #ytDlpArgBox, .configBox, #configOpts, .settings-section, .dep-card, .dep-segmented-group, .dep-options-container, .dep-sub-details, .dep-card-footer",
 					)
 					.forEach((item) => item.classList.remove("item-hidden"));
 			}
@@ -444,6 +452,390 @@ function initPreferences() {
 
 	bindCheckboxToStorage("autoUpdateDisabled", "autoUpdate", "false", "true");
 	bindCheckboxToStorage("showMoreFormats", "showMoreFormats", "true", "false");
+
+	initDependenciesTab();
+}
+
+function initDependenciesTab() {
+	const depYtdlpSource = getId("depYtdlpSource");
+	const depYtdlpChannel = getId("depYtdlpChannel");
+	const depYtdlpChannelBox = getId("depYtdlpChannelBox");
+	const depFfmpegSource = getId("depFfmpegSource");
+
+	const rawYtdlpSource = localStorage.getItem("ytdlpSource") || "bundled";
+	const currentYtdlpSource = rawYtdlpSource === "system" ? "system" : "bundled";
+	const currentYtdlpChannel = localStorage.getItem("ytdlpChannel") || (["nightly", "stable", "master"].includes(rawYtdlpSource) ? rawYtdlpSource : "nightly");
+	const currentFfmpegSource = localStorage.getItem("ffmpegSource") || "bundled";
+
+	if (depYtdlpSource) {
+		depYtdlpSource.value = currentYtdlpSource;
+	}
+	if (depYtdlpChannel) {
+		depYtdlpChannel.value = currentYtdlpChannel;
+	}
+	if (depYtdlpChannelBox) {
+		depYtdlpChannelBox.style.display = currentYtdlpSource === "bundled" ? "block" : "none";
+	}
+	if (depFfmpegSource) {
+		depFfmpegSource.value = currentFfmpegSource;
+	}
+
+	const notFoundText = () => (window.i18n ? window.i18n.__("notFound") : "Not found");
+	const isTestMode = window.electronAPI && window.electronAPI.isTest;
+
+	function checkYtdlp() {
+		const source = depYtdlpSource ? depYtdlpSource.value : currentYtdlpSource;
+		const channel = depYtdlpChannel ? depYtdlpChannel.value : currentYtdlpChannel;
+
+		const versionEl = getId("depYtdlpVersion");
+		const pathEl = getId("depYtdlpPath");
+		const legacyVerEl = getId("ytDlpVersion");
+		const legacyPathEl = getId("ytDlpPath");
+
+		const setUI = (versionText, pathText, isError = false) => {
+			if (versionEl) {
+				versionEl.textContent = versionText;
+				versionEl.style.color = isError ? "var(--red, #ff5555)" : "";
+			}
+			if (pathEl) pathEl.textContent = pathText;
+			if (legacyVerEl) legacyVerEl.textContent = versionText;
+			if (legacyPathEl) legacyPathEl.textContent = pathText;
+		};
+
+		if (isTestMode) {
+			setUI(source === "system" ? "2024.12.13 (system)" : `2024.12.13 (${channel})`, "mock-ytdlp", false);
+			return;
+		}
+
+		if (source === "system") {
+			if (!exec || !platform) {
+				setUI(notFoundText(), "", true);
+				return;
+			}
+			const cmd = platform() === "win32" ? "where yt-dlp" : "which yt-dlp";
+			exec(cmd, (err, stdout) => {
+				if (err || !stdout || !stdout.trim()) {
+					setUI(notFoundText(), notFoundText(), true);
+				} else {
+					const sysPath = stdout.trim().split(/\r?\n/)[0].trim();
+					exec(`"${sysPath}" --version`, (verErr, verOut) => {
+						if (verErr || !verOut) {
+							setUI(notFoundText(), sysPath, true);
+						} else {
+							setUI(verOut.trim(), sysPath, false);
+						}
+					});
+				}
+			});
+		} else {
+			const savedPath = localStorage.getItem("ytdlp");
+			let targetPath = savedPath;
+			if (!targetPath && homedir) {
+				const exeName = platform && platform() === "win32" ? "ytdlp.exe" : "ytdlp";
+				targetPath = join(homedir(), ".ytDownloader", exeName);
+			}
+			if (targetPath && fs && fs.existsSync && fs.existsSync(targetPath)) {
+				exec(`"${targetPath}" --version`, (err, stdout) => {
+					if (!err && stdout) {
+						setUI(`${stdout.trim()} (${channel})`, targetPath, false);
+					} else {
+						setUI(`Bundled (${channel})`, targetPath, false);
+					}
+				});
+			} else {
+				setUI(`Bundled (${channel})`, targetPath || "", false);
+			}
+		}
+	}
+
+	function checkFfmpegAndFfprobe() {
+		const source = depFfmpegSource ? depFfmpegSource.value : currentFfmpegSource;
+
+		const ffmpegVerEl = getId("depFfmpegVersion");
+		const ffprobeVerEl = getId("depFfprobeVersion");
+		const ffmpegPathEl = getId("depFfmpegPath");
+
+		const setFfmpegUI = (ver, p, isErr) => {
+			if (ffmpegVerEl) {
+				ffmpegVerEl.textContent = ver;
+				ffmpegVerEl.style.color = isErr ? "var(--red, #ff5555)" : "";
+			}
+			if (ffmpegPathEl) ffmpegPathEl.textContent = p;
+		};
+		const setFfprobeUI = (ver, isErr) => {
+			if (ffprobeVerEl) {
+				ffprobeVerEl.textContent = ver;
+				ffprobeVerEl.style.color = isErr ? "var(--red, #ff5555)" : "";
+			}
+		};
+
+		if (isTestMode) {
+			setFfmpegUI("6.0", "mock-ffmpeg", false);
+			setFfprobeUI("6.0", false);
+			return;
+		}
+
+		if (source === "system") {
+			if (!exec || !platform) {
+				setFfmpegUI(notFoundText(), "", true);
+				setFfprobeUI(notFoundText(), true);
+				return;
+			}
+			const ffmpegCmd = platform() === "win32" ? "where ffmpeg" : "which ffmpeg";
+			exec(ffmpegCmd, (err, stdout) => {
+				if (err || !stdout || !stdout.trim()) {
+					setFfmpegUI(notFoundText(), notFoundText(), true);
+				} else {
+					const sysPath = stdout.trim().split(/\r?\n/)[0].trim();
+					exec(`"${sysPath}" -version`, (verErr, verOut) => {
+						if (verErr || !verOut) {
+							setFfmpegUI(notFoundText(), sysPath, true);
+						} else {
+							const firstLine = verOut.trim().split(/\r?\n/)[0] || "";
+							const versionMatch = firstLine.match(/ffmpeg version (\S+)/i);
+							setFfmpegUI(versionMatch ? versionMatch[1] : firstLine, sysPath, false);
+						}
+					});
+				}
+			});
+
+			const ffprobeCmd = platform() === "win32" ? "where ffprobe" : "which ffprobe";
+			exec(ffprobeCmd, (err, stdout) => {
+				if (err || !stdout || !stdout.trim()) {
+					setFfprobeUI(notFoundText(), true);
+				} else {
+					const sysPath = stdout.trim().split(/\r?\n/)[0].trim();
+					exec(`"${sysPath}" -version`, (verErr, verOut) => {
+						if (verErr || !verOut) {
+							setFfprobeUI(notFoundText(), true);
+						} else {
+							const firstLine = verOut.trim().split(/\r?\n/)[0] || "";
+							const versionMatch = firstLine.match(/ffprobe version (\S+)/i);
+							setFfprobeUI(versionMatch ? versionMatch[1] : firstLine, false);
+						}
+					});
+				}
+			});
+		} else {
+			let bundledFfmpegBin = "";
+			if (homedir) {
+				const exeName = platform && platform() === "win32" ? "ffmpeg.exe" : "ffmpeg";
+				bundledFfmpegBin = join(homedir(), ".ytDownloader", "ffmpeg", "bin", exeName);
+			}
+			if (bundledFfmpegBin && fs && fs.existsSync && fs.existsSync(bundledFfmpegBin)) {
+				exec(`"${bundledFfmpegBin}" -version`, (err, stdout) => {
+					if (!err && stdout) {
+						const firstLine = stdout.trim().split(/\r?\n/)[0] || "";
+						const match = firstLine.match(/ffmpeg version (\S+)/i);
+						setFfmpegUI(match ? match[1] : "Bundled", bundledFfmpegBin, false);
+					} else {
+						setFfmpegUI("Bundled", bundledFfmpegBin, false);
+					}
+				});
+				const bundledFfprobeBin = bundledFfmpegBin.replace(/ffmpeg(\.exe)?$/, "ffprobe$1");
+				if (fs.existsSync(bundledFfprobeBin)) {
+					exec(`"${bundledFfprobeBin}" -version`, (err, stdout) => {
+						if (!err && stdout) {
+							const firstLine = stdout.trim().split(/\r?\n/)[0] || "";
+							const match = firstLine.match(/ffprobe version (\S+)/i);
+							setFfprobeUI(match ? match[1] : "Bundled", false);
+						} else {
+							setFfprobeUI("Bundled", false);
+						}
+					});
+				} else {
+					setFfprobeUI("Bundled", false);
+				}
+			} else {
+				setFfmpegUI("Bundled", bundledFfmpegBin || "", false);
+				setFfprobeUI("Bundled", false);
+			}
+		}
+	}
+
+	function checkJsRuntime() {
+		const versionEl = getId("depJsRuntimeVersion");
+		if (versionEl) {
+			if (typeof process !== "undefined" && process.version) {
+				versionEl.textContent = process.version;
+			} else if (exec) {
+				exec("node -v", (err, stdout) => {
+					if (!err && stdout) {
+						versionEl.textContent = stdout.trim();
+					} else {
+						versionEl.textContent = "Node.js";
+					}
+				});
+			} else {
+				versionEl.textContent = "Node.js";
+			}
+		}
+	}
+
+	function switchYtdlpChannel(channelVal) {
+		if (isTestMode) {
+			checkYtdlp();
+			return;
+		}
+
+		const versionEl = getId("depYtdlpVersion");
+		if (versionEl) versionEl.textContent = `Installing (${channelVal})...`;
+
+		let targetPath = localStorage.getItem("ytdlp");
+		if (!targetPath && homedir) {
+			const exeName = platform && platform() === "win32" ? "ytdlp.exe" : "ytdlp";
+			targetPath = join(homedir(), ".ytDownloader", exeName);
+		}
+
+		if (window.electronAPI && window.electronAPI.YTDlpWrap && typeof window.electronAPI.YTDlpWrap.downloadFromGithub === "function") {
+			window.electronAPI.YTDlpWrap.downloadFromGithub(
+				targetPath,
+				undefined,
+				undefined,
+				(progress) => {
+					if (versionEl) {
+						versionEl.textContent = `Downloading (${channelVal}): ${(progress * 100).toFixed(0)}%`;
+					}
+				},
+				channelVal
+			).then(() => {
+				localStorage.setItem("ytdlp", targetPath);
+				checkYtdlp();
+				window.dispatchEvent(new CustomEvent("ytdownloader-reload-binaries"));
+			}).catch((err) => {
+				console.error("Failed to download yt-dlp for channel:", channelVal, err);
+				checkYtdlp();
+			});
+		} else {
+			checkYtdlp();
+		}
+	}
+
+	if (depYtdlpSource) {
+		depYtdlpSource.addEventListener("change", () => {
+			const sourceVal = depYtdlpSource.value;
+			localStorage.setItem("ytdlpSource", sourceVal);
+			if (sourceVal === "system") {
+				localStorage.removeItem("ytdlp");
+			}
+			syncSegmentedUI("depYtdlpSegmented", depYtdlpSource);
+			if (sourceVal === "bundled") {
+				if (depYtdlpChannelBox) depYtdlpChannelBox.style.display = "block";
+				let targetPath = localStorage.getItem("ytdlp");
+				if (!targetPath && homedir) {
+					const exeName = platform && platform() === "win32" ? "ytdlp.exe" : "ytdlp";
+					targetPath = join(homedir(), ".ytDownloader", exeName);
+				}
+				if (targetPath && fs && fs.existsSync && fs.existsSync(targetPath)) {
+					checkYtdlp();
+					window.dispatchEvent(new CustomEvent("ytdownloader-reload-binaries"));
+				} else {
+					// switchYtdlpChannel starts async download and dispatches ytdownloader-reload-binaries in its .then() when finished
+					switchYtdlpChannel(depYtdlpChannel ? depYtdlpChannel.value : "nightly");
+				}
+			} else {
+				if (depYtdlpChannelBox) depYtdlpChannelBox.style.display = "none";
+				checkYtdlp();
+				window.dispatchEvent(new CustomEvent("ytdownloader-reload-binaries"));
+			}
+		});
+	}
+
+	if (depYtdlpChannel) {
+		depYtdlpChannel.addEventListener("change", () => {
+			const channelVal = depYtdlpChannel.value;
+			localStorage.setItem("ytdlpChannel", channelVal);
+			syncChannelOptionUI(depYtdlpChannel);
+			switchYtdlpChannel(channelVal);
+		});
+	}
+
+	if (depFfmpegSource) {
+		depFfmpegSource.addEventListener("change", () => {
+			const sourceVal = depFfmpegSource.value;
+			localStorage.setItem("ffmpegSource", sourceVal);
+			syncSegmentedUI("depFfmpegSegmented", depFfmpegSource);
+			checkFfmpegAndFfprobe();
+			window.dispatchEvent(new CustomEvent("ytdownloader-reload-binaries"));
+		});
+	}
+
+	function syncSegmentedUI(containerId, selectEl) {
+		const container = getId(containerId);
+		if (!container || !selectEl) return;
+		const buttons = container.querySelectorAll(".dep-segment-btn");
+		buttons.forEach((btn) => {
+			if (btn.dataset.value === selectEl.value) {
+				btn.classList.add("active");
+			} else {
+				btn.classList.remove("active");
+			}
+		});
+	}
+
+	function syncChannelOptionUI(selectEl) {
+		const list = document.querySelector("#depYtdlpChannelBox .dep-option-list");
+		if (!list || !selectEl) return;
+		const items = list.querySelectorAll(".dep-option-item");
+		items.forEach((item) => {
+			if (item.dataset.channel === selectEl.value) {
+				item.classList.add("active");
+			} else {
+				item.classList.remove("active");
+			}
+		});
+	}
+
+	function setupSegmentedClick(containerId, selectEl) {
+		const container = getId(containerId);
+		if (!container || !selectEl) return;
+		const buttons = container.querySelectorAll(".dep-segment-btn");
+		buttons.forEach((btn) => {
+			btn.addEventListener("click", () => {
+				const val = btn.dataset.value;
+				if (val && selectEl.value !== val) {
+					selectEl.value = val;
+					selectEl.dispatchEvent(new Event("change"));
+				}
+			});
+		});
+	}
+
+	function setupChannelOptionsClick(selectEl) {
+		const list = document.querySelector("#depYtdlpChannelBox .dep-option-list");
+		if (!list || !selectEl) return;
+		const items = list.querySelectorAll(".dep-option-item");
+		items.forEach((item) => {
+			item.addEventListener("click", () => {
+				const channel = item.dataset.channel;
+				if (channel && selectEl.value !== channel) {
+					selectEl.value = channel;
+					selectEl.dispatchEvent(new Event("change"));
+				}
+			});
+		});
+	}
+
+	setupSegmentedClick("depYtdlpSegmented", depYtdlpSource);
+	setupSegmentedClick("depFfmpegSegmented", depFfmpegSource);
+	setupChannelOptionsClick(depYtdlpChannel);
+
+	syncSegmentedUI("depYtdlpSegmented", depYtdlpSource);
+	syncSegmentedUI("depFfmpegSegmented", depFfmpegSource);
+	syncChannelOptionUI(depYtdlpChannel);
+
+	getId("linkYtdlpGithub")?.addEventListener("click", (e) => {
+		e.preventDefault();
+		if (shell && shell.openExternal) shell.openExternal("https://github.com/yt-dlp/yt-dlp");
+	});
+	getId("linkFfmpegWebsite")?.addEventListener("click", (e) => {
+		e.preventDefault();
+		if (shell && shell.openExternal) shell.openExternal("https://ffmpeg.org");
+	});
+
+	checkYtdlp();
+	checkFfmpegAndFfprobe();
+	checkJsRuntime();
 }
 
 function startPreferences() {

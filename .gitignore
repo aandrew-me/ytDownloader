@@ -11,3 +11,4 @@ ffmpeg.patch
 deno*
 node.exe
 node
+!ffmpeg.png

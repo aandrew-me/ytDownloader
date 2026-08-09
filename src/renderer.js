@@ -29,6 +29,7 @@ const {
 	setEnv,
 	windowsStore,
 	__dirname,
+	dirname
 } = window.electronAPI;
 
 const CONSTANTS = {
@@ -202,12 +203,67 @@ class YtDownloaderApp {
 			console.log("ffmpeg path:", this.state.ffmpegPath);
 			console.log("JS runtime:", this.state.jsRuntimePath);
 
+			window.addEventListener("ytdownloader-reload-binaries", () => {
+				this.reloadBinaries();
+			});
+
 			this._addEventListeners();
 		} catch (error) {
 			console.error("Initialization failed:", error);
 			$(CONSTANTS.DOM_IDS.INCORRECT_MSG).textContent = error.message;
 			const pasteBtn = $(CONSTANTS.DOM_IDS.PASTE_URL_BTN);
 			if (pasteBtn) pasteBtn.style.display = "none";
+		}
+	}
+
+	/**
+	 * Dynamically re-resolves binary paths (yt-dlp, ffmpeg) in-memory
+	 * without requiring an application window reload.
+	 */
+	async reloadBinaries() {
+		if (this._reloadingBinariesPromise) {
+			await this._reloadingBinariesPromise;
+		}
+
+		this._reloadingBinariesPromise = (async () => {
+			try {
+				const isTestMode = Boolean(window.electronAPI && window.electronAPI.isTest);
+				const mockYtDlp = isTestMode ? window.__mockYtDlp : null;
+
+				const ytdlpSource = localStorage.getItem(CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_SOURCE) || "bundled";
+				if (ytdlpSource === CONSTANTS.YT_DLP_SOURCE.SYSTEM || ytdlpSource === "system") {
+					localStorage.removeItem(CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_PATH);
+				}
+
+				const ytDlpPath = mockYtDlp ? "mock-ytdlp" : await this._findOrDownloadYtDlp();
+				const ytDlp = mockYtDlp || YTDlpWrap.new(ytDlpPath);
+				const ffmpegPath = mockYtDlp ? "ffmpeg" : await this._findFfmpeg();
+				this._ensureFfmpegLibsLoadable(ffmpegPath);
+				const jsRuntimePath = mockYtDlp ? "" : await this._getJsRuntimePath();
+
+				// Atomic update of state once all resolvers complete
+				this.state.ytDlpPath = ytDlpPath;
+				this.state.ytDlp = ytDlp;
+				this.state.ffmpegPath = ffmpegPath;
+				this.state.jsRuntimePath = jsRuntimePath;
+
+				window.AppBinaries = {
+					ytDlpPath: this.state.ytDlpPath,
+					ytDlp: this.state.ytDlp,
+					ffmpegPath: this.state.ffmpegPath,
+					jsRuntimePath: this.state.jsRuntimePath,
+				};
+
+				console.log("Re-resolved binary paths in-memory:", window.AppBinaries);
+			} catch (error) {
+				console.error("Binary re-resolution failed:", error);
+			}
+		})();
+
+		try {
+			await this._reloadingBinariesPromise;
+		} finally {
+			this._reloadingBinariesPromise = null;
 		}
 	}
 
@@ -380,8 +436,6 @@ class YtDownloaderApp {
 
 		// PRIORITY 4: User-selected source (Windows/Linux)
 		else {
-			// Source is chosen in preferences; defaults to the nightly,
-			// app-managed binary so YouTube fixes arrive fastest.
 			const source =
 				localStorage.getItem(
 					CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_SOURCE,
@@ -389,7 +443,7 @@ class YtDownloaderApp {
 
 			// "system": use yt-dlp from PATH (apt/pip/etc.). Falls back to the
 			// managed binary if nothing is found in PATH.
-			if (source === CONSTANTS.YT_DLP_SOURCE.SYSTEM) {
+			if (source === CONSTANTS.YT_DLP_SOURCE.SYSTEM || source === "system") {
 				try {
 					let systemPath;
 					if (platform() === "win32") {
@@ -475,7 +529,7 @@ class YtDownloaderApp {
 					return;
 				}
 
-				const releaseChannel = "nightly";
+				const releaseChannel = localStorage.getItem("ytdlpChannel") || "nightly";
 
 				const updateProc = spawn(executablePath, [
 					"--update-to",
@@ -530,6 +584,7 @@ class YtDownloaderApp {
 			);
 
 			try {
+				const releaseChannel = localStorage.getItem("ytdlpChannel") || "nightly";
 				await YTDlpWrap.downloadFromGithub(
 					defaultYtDlpPath,
 					undefined,
@@ -541,7 +596,7 @@ class YtDownloaderApp {
 							i18n.__("progress") +
 							`: ${(progress * 100).toFixed(2)}%`;
 					},
-					"nightly"
+					releaseChannel
 				);
 
 				$(CONSTANTS.DOM_IDS.POPUP_BOX).style.display = "none";
@@ -599,6 +654,30 @@ class YtDownloaderApp {
 				throw new Error(
 					"No ffmpeg found in PATH on FreeBSD. App may not work correctly.",
 				);
+			}
+		}
+
+		// Priority 2.5: User-selected system ffmpeg
+		const ffmpegSource = localStorage.getItem("ffmpegSource") || "bundled";
+		if (ffmpegSource === "system") {
+			try {
+				let sysPath;
+				if (platform() === "win32") {
+					sysPath = execSync("where ffmpeg")
+						.toString()
+						.split(/\r?\n/)[0]
+						.trim();
+				} else {
+					sysPath = execSync("command -v ffmpeg || which ffmpeg")
+						.toString()
+						.split(/\r?\n/)[0]
+						.trim();
+				}
+				if (sysPath && existsSync(sysPath)) {
+					return dirname(sysPath);
+				}
+			} catch {
+				console.warn("System ffmpeg not found in PATH; falling back to bundled.");
 			}
 		}
 
