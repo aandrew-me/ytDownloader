@@ -212,5 +212,11 @@
 	"unchanged": "Unchanged",
 	"fast": "Fast",
 	"medium": "Medium",
-	"slow": "Slow"
+	"slow": "Slow",
+	"aboutLicense": "License",
+	"aboutPlatform": "Platform",
+	"aboutBuiltWith": "Built with",
+	"aboutDownloader": "Downloader",
+	"aboutGithub": "GitHub",
+	"aboutMadeBy": "Made with ❤️ by"
 }
