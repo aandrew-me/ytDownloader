@@ -2740,6 +2740,21 @@ select {
 	font-weight: 500;
 }
 
+.netscape-header-row {
+	padding: 0 4px;
+}
+
+#addCookieBlockBtn {
+	padding: 8px 16px;
+	font-size: 0.9rem;
+	font-weight: 500;
+	height: 38px;
+	border-radius: 6px;
+	box-sizing: border-box;
+	line-height: 1.2;
+	margin-right: 16px;
+}
+
 /* Interactive Sliders */
 .switch {
 	position: relative;
