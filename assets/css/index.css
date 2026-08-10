@@ -1199,6 +1199,66 @@ h2 {
 	animation-fill-mode: forwards;
 }
 
+.fade-in {
+	animation: fadeInPanel 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.fade-out {
+	animation: fadeOutPanel 0.15s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes fadeInPanel {
+	0% {
+		opacity: 0;
+		transform: translateY(-8px);
+	}
+	100% {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes fadeOutPanel {
+	0% {
+		opacity: 1;
+		transform: translateY(0);
+	}
+	100% {
+		opacity: 0;
+		transform: translateY(-6px);
+	}
+}
+
+.item-fade-in {
+	animation: itemFadeIn 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.item-fade-out {
+	animation: itemFadeOut 0.15s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes itemFadeIn {
+	0% {
+		opacity: 0;
+		transform: translateY(-10px);
+	}
+	100% {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes itemFadeOut {
+	0% {
+		opacity: 1;
+		transform: translateY(0);
+	}
+	100% {
+		opacity: 0;
+		transform: translateY(-8px);
+	}
+}
+
 body::-webkit-scrollbar {
 	width: 8px;
 }

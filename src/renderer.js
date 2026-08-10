@@ -1331,6 +1331,7 @@ class YtDownloaderApp {
 	 */
 	handleDownloadRequest(type) {
 		this._updateDownloadOptionsFromUI();
+		this._hideInfoPanel(true);
 
 		const downloadJob = {
 			type,
@@ -1357,7 +1358,6 @@ class YtDownloaderApp {
 		} else {
 			this._queueDownload(downloadJob);
 		}
-		this._hideInfoPanel();
 	}
 
 	/**
@@ -1543,7 +1543,7 @@ class YtDownloaderApp {
 		const randomId = "queue_" + Math.random().toString(36).substring(2, 12);
 		this.state.downloadQueue.push({...job, queueId: randomId});
 		const itemHTML = `
-            <div class="item" id="${randomId}">
+            <div class="item item-fade-in" id="${randomId}">
                 <div class="itemIconBox">
                     <img src="${
 						job.thumbnail || "../assets/images/thumb.png"
@@ -2165,7 +2165,8 @@ class YtDownloaderApp {
 
 		const hiddenPanel = $(CONSTANTS.DOM_IDS.HIDDEN_PANEL);
 		hiddenPanel.style.display = "inline-block";
-		hiddenPanel.classList.add("scaleUp");
+		hiddenPanel.classList.remove("scaleUp", "scale", "fade-out");
+		hiddenPanel.classList.add("fade-in");
 	}
 
 	/**
@@ -2173,7 +2174,7 @@ class YtDownloaderApp {
 	 */
 	_createDownloadUI(randomId, job) {
 		const itemHTML = `
-            <div class="item" id="${randomId}">
+            <div class="item item-fade-in" id="${randomId}">
                 <div class="itemIconBox">
                     <img src="${
 						job.thumbnail || "../assets/images/thumb.png"
@@ -2396,15 +2397,20 @@ class YtDownloaderApp {
 	/**
 	 * Hides the info panel with an animation.
 	 */
-	_hideInfoPanel() {
+	_hideInfoPanel(immediate = false) {
 		const panel = $(CONSTANTS.DOM_IDS.HIDDEN_PANEL);
-		if (panel.style.display !== "none") {
-			panel.classList.remove("scaleUp");
-			panel.classList.add("scale");
-			setTimeout(() => {
+		if (panel && panel.style.display !== "none") {
+			if (immediate) {
 				panel.style.display = "none";
-				panel.classList.remove("scale");
-			}, 400);
+				panel.classList.remove("fade-in", "fade-out", "scaleUp", "scale");
+			} else {
+				panel.classList.remove("fade-in");
+				panel.classList.add("fade-out");
+				setTimeout(() => {
+					panel.style.display = "none";
+					panel.classList.remove("fade-out", "scaleUp", "scale");
+				}, 150);
+			}
 		}
 	}
 
@@ -2454,8 +2460,9 @@ class YtDownloaderApp {
 	_fadeAndRemoveItem(id) {
 		const item = $(id);
 		if (item) {
-			item.classList.add("scale");
-			setTimeout(() => item.remove(), 500);
+			item.classList.remove("item-fade-in", "scale");
+			item.classList.add("item-fade-out");
+			setTimeout(() => item.remove(), 160);
 		}
 	}
 
