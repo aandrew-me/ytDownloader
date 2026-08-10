@@ -163,17 +163,21 @@ function initPreferences() {
 		});
 	}
 
-	// Download Path Setup
 	let downloadPath =
 		localStorage.getItem("downloadPath") || (homedir ? join(homedir(), "Downloads") : "");
-	const pathEl = getId("path");
-	if (pathEl) pathEl.textContent = downloadPath;
+	const updateAllPathDisplays = (pathVal) => {
+		document.querySelectorAll("#path, #pathPref, #pathPlaylist").forEach((el) => {
+			el.textContent = pathVal;
+		});
+	};
+	updateAllPathDisplays(downloadPath);
 
 	getId("back")?.addEventListener("click", () => {
+		flushPendingCookieSync();
 		ipcRenderer.send("close-secondary");
 	});
 
-	getId("selectLocation")?.addEventListener("click", () => {
+	(getId("selectLocationPref") || getId("selectLocation"))?.addEventListener("click", () => {
 		ipcRenderer.send("select-location-secondary", "");
 	});
 
@@ -243,6 +247,235 @@ function initPreferences() {
 	const browserSelectBox = getId("browserSelectBox");
 	const netscapeCookiesBox = getId("netscapeCookiesBox");
 
+	function extractDomainsFromNetscape(text) {
+		if (!text) return [];
+		const lines = text.split("\n");
+		const domains = new Set();
+		for (let line of lines) {
+			line = line.trim();
+			if (!line) continue;
+			if (line.startsWith("#HttpOnly_")) {
+				line = line.replace("#HttpOnly_", "");
+			} else if (line.startsWith("#")) {
+				continue;
+			}
+			const parts = line.split(/\s+/);
+			if (parts.length >= 7) {
+				let domain = parts[0].trim();
+				if (domain.startsWith(".")) domain = domain.substring(1);
+				if (domain) domains.add(domain);
+			}
+		}
+		return Array.from(domains);
+	}
+
+	let cookieBlocks = [];
+
+	function loadCookieBlocks() {
+		try {
+			const rawBlocks = localStorage.getItem("netscapeCookieBlocks");
+			if (rawBlocks) {
+				const parsed = JSON.parse(rawBlocks);
+				if (Array.isArray(parsed)) {
+					cookieBlocks = parsed.map((item) => {
+						if (typeof item === "string") {
+							return { id: Date.now().toString() + Math.random(), content: item };
+						}
+						return item;
+					});
+				}
+			}
+		} catch (e) {
+			cookieBlocks = [];
+		}
+
+		const savedNetscapeCookies = localStorage.getItem("netscapeCookies") || "";
+
+		if (!Array.isArray(cookieBlocks) || cookieBlocks.length === 0) {
+			if (savedNetscapeCookies.trim().length > 0) {
+				cookieBlocks = [
+					{ id: Date.now().toString(), content: savedNetscapeCookies },
+				];
+			} else {
+				cookieBlocks = [{ id: Date.now().toString(), content: "" }];
+			}
+		}
+	}
+
+	// ponytail: 300ms debounce prevents typing jank and out-of-order async IPC writes. Upgrade path: queue/stream if multi-MB writes occur.
+	let syncTimer = null;
+	let cachedCookiesPath = null;
+
+	async function getCookiesPathCached() {
+		if (!cachedCookiesPath && ipcRenderer && ipcRenderer.invoke) {
+			try {
+				cachedCookiesPath = await ipcRenderer.invoke("get-cookies-path");
+			} catch (err) {
+				console.error("Failed to get cookies path:", err);
+			}
+		}
+		return cachedCookiesPath;
+	}
+
+	async function syncCookiesToFile() {
+		try {
+			const cookiesPath = await getCookiesPathCached();
+			if (!cookiesPath) return;
+
+			const latestCombined = localStorage.getItem("netscapeCookies") || "";
+
+			if (!latestCombined || !latestCombined.trim()) {
+				if (fs && fs.existsSync && fs.existsSync(cookiesPath)) {
+					try {
+						fs.unlinkSync(cookiesPath);
+					} catch (e) {
+						fs.writeFileSync(cookiesPath, "", {
+							encoding: "utf8",
+							mode: 0o600,
+						});
+					}
+				}
+			} else {
+				if (fs && fs.writeFileSync) {
+					fs.writeFileSync(cookiesPath, latestCombined, {
+						encoding: "utf8",
+						mode: 0o600,
+					});
+				}
+			}
+		} catch (err) {
+			console.error("Failed to save cookies.txt:", err);
+		}
+	}
+
+	function saveAndSyncCookieBlocks(immediate = false) {
+		localStorage.setItem("netscapeCookieBlocks", JSON.stringify(cookieBlocks));
+		const combinedText = cookieBlocks
+			.map((b) => (b && b.content ? b.content.trim() : ""))
+			.filter(Boolean)
+			.join("\n\n");
+		localStorage.setItem("netscapeCookies", combinedText);
+
+		if (immediate) {
+			if (syncTimer) {
+				clearTimeout(syncTimer);
+				syncTimer = null;
+			}
+			syncCookiesToFile();
+		} else {
+			if (syncTimer) clearTimeout(syncTimer);
+			syncTimer = setTimeout(() => {
+				syncTimer = null;
+				syncCookiesToFile();
+			}, 300);
+		}
+	}
+
+	function flushPendingCookieSync() {
+		if (syncTimer) {
+			clearTimeout(syncTimer);
+			syncTimer = null;
+			syncCookiesToFile();
+		}
+	}
+
+	window.addEventListener("beforeunload", () => {
+		flushPendingCookieSync();
+	});
+
+	document.addEventListener("visibilitychange", () => {
+		if (document.visibilityState === "hidden") {
+			flushPendingCookieSync();
+		}
+	});
+
+	function renderCookieBlocks() {
+		const container = getId("cookieBlocksContainer");
+		if (!container) return;
+		container.innerHTML = "";
+
+		cookieBlocks.forEach((block, index) => {
+			const domains = extractDomainsFromNetscape(block.content);
+			const card = document.createElement("div");
+			card.className = "cookie-block-card";
+
+			const header = document.createElement("div");
+			header.className = "cookie-block-header";
+
+			const badge = document.createElement("span");
+			badge.className = "cookie-domain-badge";
+			const getNoDomainText = () =>
+				window.i18n && window.i18n.loadedLanguage && window.i18n.loadedLanguage.noDomainDetected
+					? window.i18n.__("noDomainDetected")
+					: "No domain detected";
+			if (domains.length > 0) {
+				badge.textContent = `🌐 ${domains.join(", ")}`;
+				badge.removeAttribute("data-translate");
+			} else {
+				badge.setAttribute("data-translate", "noDomainDetected");
+				badge.textContent = getNoDomainText();
+			}
+
+			const removeBtn = document.createElement("button");
+			removeBtn.className = "btn redBtn sm";
+			removeBtn.setAttribute("data-translate", "remove");
+			const removeText =
+				window.i18n && window.i18n.loadedLanguage && window.i18n.loadedLanguage.remove
+					? window.i18n.__("remove")
+					: "Remove";
+			removeBtn.textContent = removeText;
+			removeBtn.addEventListener("click", () => {
+				cookieBlocks.splice(index, 1);
+				if (cookieBlocks.length === 0) {
+					cookieBlocks.push({ id: Date.now().toString(), content: "" });
+				}
+				saveAndSyncCookieBlocks(true);
+				renderCookieBlocks();
+			});
+
+			header.appendChild(badge);
+			header.appendChild(removeBtn);
+
+			const textarea = document.createElement("textarea");
+			textarea.className = "cookie-block-textarea";
+			textarea.spellcheck = false;
+			textarea.setAttribute("data-translate-placeholder", "cookieBlockPlaceholder");
+			const placeholderText =
+				window.i18n && window.i18n.loadedLanguage && window.i18n.loadedLanguage.cookieBlockPlaceholder
+					? window.i18n.__("cookieBlockPlaceholder")
+					: "# Paste Netscape formatted cookies here";
+			textarea.placeholder = placeholderText;
+			textarea.value = block.content || "";
+
+			textarea.addEventListener("input", (e) => {
+				block.content = e.target.value;
+				saveAndSyncCookieBlocks(false);
+				const updatedDomains = extractDomainsFromNetscape(block.content);
+				if (updatedDomains.length > 0) {
+					badge.textContent = `🌐 ${updatedDomains.join(", ")}`;
+					badge.removeAttribute("data-translate");
+				} else {
+					badge.setAttribute("data-translate", "noDomainDetected");
+					badge.textContent = getNoDomainText();
+				}
+			});
+
+			card.appendChild(header);
+			card.appendChild(textarea);
+			container.appendChild(card);
+		});
+	}
+
+	getId("addCookieBlockBtn")?.addEventListener("click", () => {
+		cookieBlocks.push({ id: Date.now().toString(), content: "" });
+		saveAndSyncCookieBlocks(true);
+		renderCookieBlocks();
+	});
+
+	getId("addCookieBlockBtn")?.addEventListener("ytdownloader-refresh-blocks", () => {
+		renderCookieBlocks();
+	});
+
 	function updateCookieSourceUI(source) {
 		if (source === "browser") {
 			if (browserSelectBox) browserSelectBox.style.display = "flex";
@@ -250,6 +483,9 @@ function initPreferences() {
 		} else if (source === "file") {
 			if (browserSelectBox) browserSelectBox.style.display = "none";
 			if (netscapeCookiesBox) netscapeCookiesBox.style.display = "flex";
+			loadCookieBlocks();
+			renderCookieBlocks();
+			saveAndSyncCookieBlocks(true);
 		} else {
 			if (browserSelectBox) browserSelectBox.style.display = "none";
 			if (netscapeCookiesBox) netscapeCookiesBox.style.display = "none";
@@ -853,6 +1089,15 @@ document.addEventListener("translations-loaded", () => {
 	if (window.i18n && typeof window.i18n.translatePage === "function") {
 		window.i18n.translatePage();
 	}
+	const cookieContainer = getId("cookieBlocksContainer");
+	if (cookieContainer && cookieContainer.children.length > 0) {
+		const cookieSourceSelect = getId("cookieSource");
+		if (cookieSourceSelect && cookieSourceSelect.value === "file") {
+			// Trigger re-render of cookie blocks with translated strings
+			const addBtn = getId("addCookieBlockBtn");
+			if (addBtn) addBtn.dispatchEvent(new Event("ytdownloader-refresh-blocks"));
+		}
+	}
 
 	if (env && env.FLATPAK_ID) {
 		const flatpakEl = getId("flatpakTxt");
@@ -871,8 +1116,9 @@ ipcRenderer.on("downloadPath", (_event, pathArray) => {
 	try {
 		accessSync(pathArray[0], constants.W_OK);
 		localStorage.setItem("downloadPath", pathArray[0]);
-		const pathEl = getId("path");
-		if (pathEl) pathEl.textContent = pathArray[0];
+		document.querySelectorAll("#path, #pathPref, #pathPlaylist").forEach((el) => {
+			el.textContent = pathArray[0];
+		});
 	} catch (error) {
 		showPopup(
 			window.i18n

@@ -691,9 +691,9 @@
                             <div class="prefBox">
                                 <div class="label-group">
                                     <span id="clText" data-translate="currentDownloadLocation">Current download location</span>
-                                    <span id="path" class="path-display"></span>
+                                    <span id="pathPref" class="path-display"></span>
                                 </div>
-                                <button id="selectLocation" class="btn greenBtn" data-translate="selectDownloadLocation">Select Download Location</button>
+                                <button id="selectLocationPref" class="btn greenBtn" data-translate="selectDownloadLocation">Select Download Location</button>
                             </div>
                             <p id="msg"></p>
                         </section>
@@ -873,10 +873,10 @@
                                 </select>
                             </div>
 
-                            <div class="prefBox" id="netscapeCookiesBox" style="display: none; flex-direction: column; align-items: stretch; gap: 12px; width: 100%;">
-                                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                                    <span id="netscapeCookiesTxt" data-translate="netscapeCookiesLabel">Netscape Formatted Cookies</span>
-                                    <button id="addCookieBlockBtn" class="btn greenBtn sm" data-translate="addCookieBlock">+ Add Cookie Block</button>
+                            <div class="prefBox" id="netscapeCookiesBox" style="display: none; flex-direction: column; align-items: stretch; gap: 16px; width: 100%;">
+                                <div class="netscape-header-row" style="display: flex; justify-content: space-between; align-items: center; width: 100%; min-height: 38px;">
+                                    <span id="netscapeCookiesTxt" data-translate="netscapeCookiesLabel" style="font-weight: 600; font-size: 1.05rem;">Netscape Formatted Cookies</span>
+                                    <button id="addCookieBlockBtn" class="btn greenBtn" data-translate="addCookieBlock">+ Add Cookie Block</button>
                                 </div>
                                 <div id="cookieBlocksContainer" style="display: flex; flex-direction: column; gap: 14px; width: 100%;"></div>
                             </div>

@@ -358,14 +358,15 @@ function registerIpcHandlers() {
 		}
 	});
 
-	ipcMain.on("select-location-secondary", async () => {
-		if (!appState.secondaryWindow) return;
+	ipcMain.on("select-location-secondary", async (event) => {
+		const targetWindow = appState.secondaryWindow || appState.mainWindow || (event && event.sender && BrowserWindow.fromWebContents(event.sender));
+		if (!targetWindow) return;
 		const { canceled, filePaths } = await dialog.showOpenDialog(
-			appState.secondaryWindow,
+			targetWindow,
 			{ properties: ["openDirectory"] },
 		);
 		if (!canceled && filePaths.length > 0) {
-			appState.secondaryWindow.webContents.send(
+			targetWindow.webContents.send(
 				"downloadPath",
 				filePaths,
 			);

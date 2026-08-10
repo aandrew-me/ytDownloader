@@ -1,4 +1,5 @@
 const { test, expect } = require("@playwright/test");
+const os = require("os");
 const { launchApp } = require("./helpers/electronApp");
 
 test.describe("Preferences Page Tests", () => {
@@ -223,5 +224,55 @@ test.describe("Preferences Page Tests", () => {
 		await page.fill("#customArgsInput", customArgs);
 		const savedArgs = await page.evaluate(() => localStorage.getItem("customYtDlpArgs"));
 		expect(savedArgs).toBe(customArgs);
+	});
+
+	test("preferences select download location button opens directory dialog and updates path display", async () => {
+		const testPath = os.tmpdir();
+		await electronApp.evaluate(async ({ dialog }, p) => {
+			dialog.showOpenDialog = async () => ({
+				canceled: false,
+				filePaths: [p],
+			});
+		}, testPath);
+
+		await page.click("#selectLocationPref");
+
+		await page.waitForFunction((expected) => {
+			const el = document.getElementById("path");
+			return el && el.textContent === expected;
+		}, testPath);
+
+		const savedPath = await page.evaluate(() => localStorage.getItem("downloadPath"));
+		expect(savedPath).toBe(testPath);
+	});
+
+	test("add cookie block button creates cookie cards and updates domain badges and localStorage", async () => {
+		await page.click('button[data-tab="advanced"]');
+		await page.selectOption("#cookieSource", "file");
+		await expect(page.locator("#netscapeCookiesBox")).toBeVisible();
+
+		// Initially 1 block card should be rendered
+		let cards = page.locator(".cookie-block-card");
+		await expect(cards).toHaveCount(1);
+
+		// Click + Add Cookie Block
+		await page.click("#addCookieBlockBtn");
+		cards = page.locator(".cookie-block-card");
+		await expect(cards).toHaveCount(2);
+
+		// Type cookie content in first block
+		const sampleCookie = ".youtube.com\tTRUE\t/\tFALSE\t1767225600\tVISITOR_INFO1_LIVE\tabc123";
+		const firstTextarea = cards.nth(0).locator("textarea");
+		await firstTextarea.fill(sampleCookie);
+
+		const badgeText = await cards.nth(0).locator(".cookie-domain-badge").textContent();
+		expect(badgeText).toContain("youtube.com");
+
+		const savedCookies = await page.evaluate(() => localStorage.getItem("netscapeCookies"));
+		expect(savedCookies).toContain("VISITOR_INFO1_LIVE");
+
+		// Remove the second block
+		await cards.nth(1).locator("button").click();
+		await expect(cards).toHaveCount(1);
 	});
 });
