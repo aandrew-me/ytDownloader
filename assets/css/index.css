@@ -369,12 +369,6 @@ img {
 	display: none;
 }
 
-.btnIcon {
-	width: 15px;
-	height: 15px;
-	margin-right: 10px;
-}
-
 .speedContainer {
 	display: flex;
 }
@@ -836,7 +830,6 @@ img {
 	font-family: "JetBrains";
 }
 
-#videoAudioSeparator,
 .separator {
 	border: none;
 	height: 1px;
@@ -1057,13 +1050,6 @@ input[type="number"]::-webkit-outer-spin-button {
 	transition: all 0.3s ease;
 }
 
-#preparingBox {
-	display: none;
-	flex-direction: row;
-	justify-content: center;
-	align-items: center;
-}
-
 .modern-loading-spinner {
 	display: flex;
 	align-items: center;
@@ -1139,15 +1125,6 @@ input[type="number"]::-webkit-outer-spin-button {
 		opacity: 1;
 		box-shadow: 0 0 6px var(--blueBtn, #3b82f6);
 	}
-}
-
-.savedMsg {
-	color: rgb(52, 170, 234);
-	cursor: pointer;
-}
-
-#savedMsg {
-	cursor: pointer;
 }
 
 button {
@@ -1338,23 +1315,6 @@ h2 {
 		opacity: 0;
 		transform: translateY(-8px);
 	}
-}
-
-body::-webkit-scrollbar {
-	width: 8px;
-}
-
-body::-webkit-scrollbar-track {
-	background: transparent;
-}
-
-body::-webkit-scrollbar-thumb {
-	background: var(--box-separation);
-	border-radius: 8px;
-}
-
-body::-webkit-scrollbar-thumb:hover {
-	background: var(--item-bg);
 }
 
 /* Main content area scrollbar */
@@ -2137,20 +2097,6 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
 /* 10. Search Wrappers & Results */
 
-#searchContainer {
-	margin: 25px auto 15px auto;
-	text-align: center;
-	width: 86%;
-}
-
-#searchInfo {
-	font-size: 0.85rem;
-	color: var(--text);
-	opacity: 0.7;
-	margin-top: 8px;
-	text-align: center;
-}
-
 .searchResults {
 	display: flex;
 	flex-direction: column;
@@ -2415,10 +2361,6 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 #advancedMenu {
-	display: none;
-}
-
-#options {
 	display: none;
 }
 
@@ -2950,14 +2892,6 @@ input:checked + .slider:before {
 	display: flex;
 	flex-direction: column;
 	gap: 4px;
-}
-
-.badge {
-	background-color: var(--blueBtn);
-	color: white;
-	padding: 4px 8px;
-	border-radius: 4px;
-	font-size: 0.85rem;
 }
 
 .info-icon {
