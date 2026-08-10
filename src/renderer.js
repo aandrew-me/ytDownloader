@@ -578,7 +578,7 @@ class YtDownloaderApp {
 			console.log("yt-dlp not found, downloading...");
 
 			$(CONSTANTS.DOM_IDS.POPUP_BOX).style.display = "block";
-			$(CONSTANTS.DOM_IDS.POPUP_SVG).style.display = "inline";
+			$(CONSTANTS.DOM_IDS.POPUP_SVG).style.display = "flex";
 			document.querySelector("#popupBox p").textContent = i18n.__(
 				"downloadingNecessaryFilesWait",
 			);

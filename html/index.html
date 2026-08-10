@@ -28,19 +28,12 @@
     <div id="popupBox">
         <div id="popup">
             <p data-translate="downloadingNecessaryFilesWait">Please wait, necessary files are being downloaded</p>
-            <svg id="popupSvg" version="1.1" xmlns="http://www.w3.org/2000/svg"
-                xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 100 100"
-                enable-background="new 0 0 0 0" xml:space="preserve">
-                <circle fill="rgb(84, 171, 222)" stroke="none" cx="6" cy="50" r="6">
-                    <animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite" begin="0.1" />
-                </circle>
-                <circle fill="rgb(84, 171, 222)" stroke="none" cx="26" cy="50" r="6">
-                    <animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite" begin="0.2" />
-                </circle>
-                <circle fill="rgb(84, 171, 222)" stroke="none" cx="46" cy="50" r="6">
-                    <animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite" begin="0.3" />
-                </circle>
-            </svg>
+            <div id="popupSvg" class="modern-loading-spinner" style="margin: 12px auto;" aria-hidden="true">
+                <svg viewBox="0 0 38 38" class="spinner-svg">
+                    <circle class="spinner-track" cx="19" cy="19" r="15" fill="none" stroke-width="3.5"></circle>
+                    <circle class="spinner-head" cx="19" cy="19" r="15" fill="none" stroke-width="3.5" stroke-dasharray="70 40" stroke-linecap="round"></circle>
+                </svg>
+            </div>
             <p id="ytDlpDownloadProgress"></p>
         </div>
     </div>
@@ -138,20 +131,19 @@
                     </span>
                 </button>
 
-                <div id="loadingWrapper">
-                    <span id="processing" data-translate="processing">Loading </span>
-                    <svg version="1.1" id="L4" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
-                        y="0px" viewBox="0 0 100 100" enable-background="new 0 0 0 0" xml:space="preserve">
-                        <circle fill="rgb(84, 171, 222)" stroke="none" cx="6" cy="50" r="6">
-                            <animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite" begin="0.1" />
-                        </circle>
-                        <circle fill="rgb(84, 171, 222)" stroke="none" cx="26" cy="50" r="6">
-                            <animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite" begin="0.2" />
-                        </circle>
-                        <circle fill="rgb(84, 171, 222)" stroke="none" cx="46" cy="50" r="6">
-                            <animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite" begin="0.3" />
-                        </circle>
-                    </svg>
+                <div id="loadingWrapper" class="modern-loading-wrapper">
+                    <div class="modern-loading-spinner" aria-hidden="true">
+                        <svg viewBox="0 0 38 38" class="spinner-svg">
+                            <circle class="spinner-track" cx="19" cy="19" r="15" fill="none" stroke-width="3.5"></circle>
+                            <circle class="spinner-head" cx="19" cy="19" r="15" fill="none" stroke-width="3.5" stroke-dasharray="70 40" stroke-linecap="round"></circle>
+                        </svg>
+                    </div>
+                    <span id="processing" class="modern-loading-text" data-translate="processing">Loading</span>
+                    <div class="modern-loading-dots" aria-hidden="true">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
                 </div>
                 <p id="incorrectMsg"></p>
                 <button class="advancedToggle" id="errorBtn" data-translate="errorDetails">Error Details ▼</button>
@@ -351,20 +343,19 @@
                         placeholder="Search YouTube videos...">
                 </div>
 
-                <div id="loadingWrapperSearch" style="display: none;">
-                    <span id="processingSearch" data-translate="processing">Loading </span>
-                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
-                        y="0px" viewBox="0 0 100 100" enable-background="new 0 0 0 0" xml:space="preserve">
-                        <circle fill="rgb(84, 171, 222)" stroke="none" cx="6" cy="50" r="6">
-                            <animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite" begin="0.1" />
-                        </circle>
-                        <circle fill="rgb(84, 171, 222)" stroke="none" cx="26" cy="50" r="6">
-                            <animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite" begin="0.2" />
-                        </circle>
-                        <circle fill="rgb(84, 171, 222)" stroke="none" cx="46" cy="50" r="6">
-                            <animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite" begin="0.3" />
-                        </circle>
-                    </svg>
+                <div id="loadingWrapperSearch" class="modern-loading-wrapper" style="display: none;">
+                    <div class="modern-loading-spinner" aria-hidden="true">
+                        <svg viewBox="0 0 38 38" class="spinner-svg">
+                            <circle class="spinner-track" cx="19" cy="19" r="15" fill="none" stroke-width="3.5"></circle>
+                            <circle class="spinner-head" cx="19" cy="19" r="15" fill="none" stroke-width="3.5" stroke-dasharray="70 40" stroke-linecap="round"></circle>
+                        </svg>
+                    </div>
+                    <span id="processingSearch" class="modern-loading-text" data-translate="processing">Loading</span>
+                    <div class="modern-loading-dots" aria-hidden="true">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
                 </div>
 
                 <div id="searchResults" class="searchResults"></div>
