@@ -155,7 +155,7 @@ test.describe("Preferences Integration Tests", () => {
 		expect(downloadCmd[oIndex + 1]).toBe(customVidTemplate);
 
 		// Audio Download
-		await page.click("#audioToggle", { force: true });
+		await triggerClick(page, "audioToggle");
 		await page.evaluate(() => {
 			const sel = document.getElementById("audioFormatSelect");
 			if (!sel.value && sel.options.length > 0) {
