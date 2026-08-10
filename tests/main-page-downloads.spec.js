@@ -191,4 +191,24 @@ test.describe("Main Page Download Tests", () => {
 		expect(extractCmd).toContain("-o");
 		expect(extractCmd.some((arg) => arg.includes("dQw4w9WgXcQ"))).toBe(true);
 	});
+
+	test("info panel hides immediately when download starts", async () => {
+		const testUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+
+		await page.evaluate((url) => {
+			window.electronAPI.clipboard.writeText(url);
+		}, testUrl);
+
+		await page.click("#pasteUrl");
+		await waitForInfoPanel(page);
+
+		await triggerClick(page, "videoDownload");
+
+		const isHiddenImmediately = await page.evaluate(() => {
+			const el = document.getElementById("hidden");
+			return el && el.style.display === "none";
+		});
+
+		expect(isHiddenImmediately).toBe(true);
+	});
 });
