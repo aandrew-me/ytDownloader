@@ -238,7 +238,7 @@ test.describe("Preferences Page Tests", () => {
 		await page.click("#selectLocationPref");
 
 		await page.waitForFunction((expected) => {
-			const el = document.getElementById("path");
+			const el = document.getElementById("homePathDisplay") || document.getElementById("path");
 			return el && el.textContent === expected;
 		}, testPath);
 

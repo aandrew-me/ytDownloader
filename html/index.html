@@ -124,14 +124,97 @@
 
             <!-- View 1: Homepage Downloader -->
             <section id="view-home" class="page-view active">
-                <button id="pasteUrl">
-                    <span id="pasteText" data-translate="pasteText">Click to paste video link from clipboard</span>
-                    <span class="paste-keys">
-                        <span class="key" id="pasteCtrlKey">Ctrl</span><span class="key">V</span>
-                    </span>
-                </button>
+                <div class="home-top-bar">
+                    <div class="mode-toggle-group">
+                        <button id="modeSingleBtn" class="mode-btn active" type="button" data-translate="singleMode">Single</button>
+                        <button id="modeMultipleBtn" class="mode-btn" type="button" data-translate="multipleMode">Multiple</button>
+                    </div>
 
-                <div id="loadingWrapper" class="modern-loading-wrapper">
+                    <div class="path-picker-pill" id="homePathPicker" title="Change download location">
+                        <svg class="pill-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                        <span id="homePathDisplay" class="path-pill-text">Select location...</span>
+                    </div>
+                </div>
+
+                <!-- Single Mode Container -->
+                <div id="singleModeSection">
+                    <button id="pasteUrl">
+                        <span id="pasteText" data-translate="pasteText">Click to paste video link from clipboard</span>
+                        <span class="paste-keys">
+                            <span class="key" id="pasteCtrlKey">Ctrl</span><span class="key">V</span>
+                        </span>
+                    </button>
+                </div>
+
+                <!-- Multiple (Batch) Mode Container -->
+                <div id="multipleModeSection" style="display: none;">
+                    <div class="batch-input-card">
+                        <textarea id="batchUrlsInput" class="batch-textarea" placeholder="Paste video URLs (one per line)..." data-translate-placeholder="addUrlsPlaceholder"></textarea>
+                        <div class="batch-input-actions">
+                            <button id="pasteBatchClipboardBtn" class="batch-action-btn secondary-btn" type="button">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+                                <span data-translate="pasteClipboard">Paste Clipboard</span>
+                            </button>
+                            <button id="stopBatchBtn" class="batch-action-btn danger-btn" type="button" style="display: none;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
+                                <span data-translate="stop">Stop</span>
+                            </button>
+                            <button id="startBatchBtn" class="batch-action-btn primary-btn" type="button">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M12 17V3"/><path d="m6 11 6 6 6-6"/><path d="M19 21H5"/></svg>
+                                <span data-translate="download">Download</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Quick Preset Bar (Multiple Mode Only) -->
+                    <div class="quick-preset-bar">
+                        <div class="preset-item">
+                            <div class="preset-toggle-group">
+                                <button id="presetVideoBtn" class="preset-toggle-btn active" type="button">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; vertical-align: middle;">
+                                        <path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"/>
+                                        <rect x="2" y="6" width="14" height="12" rx="2"/>
+                                    </svg>
+                                    <span data-translate="video">Video</span>
+                                </button>
+                                <button id="presetAudioBtn" class="preset-toggle-btn" type="button">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; vertical-align: middle;">
+                                        <path d="M9 18V5l12-2v13"/>
+                                        <circle cx="6" cy="18" r="3"/>
+                                        <circle cx="18" cy="16" r="3"/>
+                                    </svg>
+                                    <span data-translate="audio">Audio</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="preset-item" id="presetQualityContainer">
+                            <span class="preset-label" data-translate="quality">Quality:</span>
+                            <select id="presetQualitySelect" class="preset-select">
+                                <option value="4320">8K (4320p)</option>
+                                <option value="2160">4K (2160p)</option>
+                                <option value="1440">1440p (2K)</option>
+                                <option value="1080">1080p</option>
+                                <option value="720">720p</option>
+                                <option value="480">480p</option>
+                                <option value="360">360p</option>
+                            </select>
+                        </div>
+
+                        <div class="preset-item" id="presetFormatContainer">
+                            <span class="preset-label" data-translate="format">Format:</span>
+                            <select id="presetFormatSelect" class="preset-select">
+                                <option value="mp4">MP4</option>
+                                <option value="mkv">MKV</option>
+                                <option value="webm">WEBM</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="loadingWrapper" class="modern-loading-wrapper" style="display: none;">
                     <div class="modern-loading-spinner" aria-hidden="true">
                         <svg viewBox="0 0 38 38" class="spinner-svg">
                             <circle class="spinner-track" cx="19" cy="19" r="15" fill="none" stroke-width="3.5"></circle>
@@ -148,9 +231,22 @@
                 <p id="incorrectMsg"></p>
                 <button class="advancedToggle" id="errorBtn" data-translate="errorDetails">Error Details ▼</button>
                 <div id="errorDetails"></div>
+
+                <!-- Empty State ("No downloads yet") -->
+                <div id="emptyStateHome" class="empty-state-card">
+                    <div class="empty-state-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="48" height="48">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                    </div>
+                    <h3 id="emptyStateTitle" data-translate="noDownloadsYet">No downloads yet</h3>
+                    <p id="emptyStateHint" data-translate="noDownloadsHint">Paste a video URL or add multiple links to start downloading.</p>
+                </div>
                 <br>
 
-                <div id="hidden">
+                <div id="hidden" style="display: none;">
                     <img src="../assets/images/close.png" alt="close" id="closeHidden">
                     <div id="btnContainer">
                         <div id="videoToggle" class="toggleBtnWrapper">
@@ -278,12 +374,6 @@
                                 </div>
                                 <input type="text" id="max-time" class="time-display" value="0:00:00">
                             </div>
-                        </div>
-
-                        <div class="advancedItem">
-                            <div><span id="clText" data-translate="currentDownloadLocation">Current download location - </span><span id="path"></span></div>
-                            <br>
-                            <button id="selectLocation" class="submitBtn" data-translate="selectDownloadLocation">Select Download Location</button>
                         </div>
 
                         <div class="advancedItem">
