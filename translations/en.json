@@ -229,5 +229,16 @@
 	"channelMaster": "Master",
 	"jsRuntime": "JS Runtime",
 	"appBundledNode": "App bundled (Node.js)",
-	"notFound": "Not found"
+	"notFound": "Not found",
+	"singleMode": "Single",
+	"multipleMode": "Multiple",
+	"noDownloadsYet": "No downloads yet",
+	"noDownloadsHint": "Paste a video URL or add multiple links to start downloading.",
+	"addUrlsPlaceholder": "Paste video URLs (one per line)...",
+	"addToBatch": "Add",
+	"pasteClipboard": "Paste Clipboard",
+	"clearQueue": "Clear Queue",
+	"downloadAll": "Download All",
+	"noVideosInQueue": "No videos in queue",
+	"stop": "Stop"
 }
