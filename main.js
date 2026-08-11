@@ -15,12 +15,23 @@ const { existsSync, readFileSync } = require("fs");
 const path = require("path");
 const DownloadHistory = require("./src/history");
 const { platform } = require("os");
+const logger = require("./src/logger");
 
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = "true";
 autoUpdater.autoDownload = false;
 
 const USER_DATA_PATH = app.getPath("userData");
 const CONFIG_FILE_PATH = path.join(USER_DATA_PATH, "ytdownloader.json");
+
+logger.init(USER_DATA_PATH);
+
+process.on("uncaughtException", (error) => {
+	logger.error(`Uncaught Exception: ${error.stack || error}`, "Main");
+});
+
+process.on("unhandledRejection", (reason) => {
+	logger.error(`Unhandled Rejection: ${reason.stack || reason}`, "Main");
+});
 
 const appState = {
 	/** @type {BrowserWindow | null} */
@@ -263,6 +274,27 @@ function createTray() {
 }
 
 function registerIpcHandlers() {
+	ipcMain.handle("logs:get-all", async (_event, sysInfo = {}) => {
+		const combinedSysInfo = {
+			version: app.getVersion(),
+			...sysInfo,
+		};
+		return logger.getCombinedLogs(combinedSysInfo);
+	});
+
+	ipcMain.handle("logs:open-folder", async () => {
+		const dir = logger.getLogDir();
+		if (dir) {
+			await shell.openPath(dir);
+			return { success: true };
+		}
+		return { success: false, error: "Log directory not available" };
+	});
+
+	ipcMain.on("logs:write", (_event, { level, msg, source = "Renderer" }) => {
+		logger.write(level || "INFO", msg, source);
+	});
+
 	ipcMain.on("autoUpdate", (_event, status) => {
 		appState.autoUpdateEnabled = status;
 

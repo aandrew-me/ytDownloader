@@ -1,4 +1,4 @@
-const { contextBridge, ipcRenderer, shell, clipboard } = require("electron");
+const { contextBridge, ipcRenderer, shell, clipboard, webFrame } = require("electron");
 const path = require("path");
 const os = require("os");
 const fs = require("fs");
@@ -367,4 +367,72 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	isTest: process.env.NODE_ENV === "test" || process.argv.includes("--is-test") || process.env.YTDOWNLOADER_TEST === "true",
 	windowsStore: process.windowsStore,
 	__dirname: path.join(__dirname, "html"),
+	logs: {
+		getCombinedLogs: (sysInfo) => ipcRenderer.invoke("logs:get-all", sysInfo),
+		openFolder: () => ipcRenderer.invoke("logs:open-folder"),
+		write: (level, msg, source = "Renderer") => ipcRenderer.send("logs:write", { level, msg, source }),
+	},
 });
+
+try {
+	webFrame.executeJavaScript(`
+		(function() {
+			if (window.__consoleHooked) return;
+			window.__consoleHooked = true;
+
+			const origLog = console.log.bind(console);
+			const origWarn = console.warn.bind(console);
+			const origError = console.error.bind(console);
+
+			function formatArgs(args) {
+				return args.map(a => {
+					if (typeof a === "object" && a !== null) {
+						if (a instanceof Error) return a.stack || a.message;
+						try { return JSON.stringify(a); } catch (_) { return String(a); }
+					}
+					return String(a);
+				}).join(" ");
+			}
+
+			console.log = function(...args) {
+				origLog.apply(console, args);
+				if (window.electronAPI && window.electronAPI.logs) {
+					window.electronAPI.logs.write("INFO", formatArgs(args), "Renderer");
+				}
+			};
+
+			console.warn = function(...args) {
+				origWarn.apply(console, args);
+				if (window.electronAPI && window.electronAPI.logs) {
+					window.electronAPI.logs.write("WARN", formatArgs(args), "Renderer");
+				}
+			};
+
+			console.error = function(...args) {
+				origError.apply(console, args);
+				if (window.electronAPI && window.electronAPI.logs) {
+					window.electronAPI.logs.write("ERROR", formatArgs(args), "Renderer");
+				}
+			};
+
+			window.addEventListener("error", function(event) {
+				const msg = event.error ? (event.error.stack || event.error.message) : event.message;
+				if (window.electronAPI && window.electronAPI.logs) {
+					window.electronAPI.logs.write("ERROR", "Uncaught UI Error: " + msg, "Renderer");
+				}
+			});
+
+			window.addEventListener("unhandledrejection", function(event) {
+				const reason = event.reason;
+				const msg = reason ? (reason.stack || reason.message || String(reason)) : "Unknown rejection";
+				if (window.electronAPI && window.electronAPI.logs) {
+					window.electronAPI.logs.write("ERROR", "Unhandled Rejection UI: " + msg, "Renderer");
+				}
+			});
+		})();
+	`);
+} catch (err) {
+	console.error("Failed to inject console hook into main world:", err);
+}
+
+

@@ -1029,6 +1029,35 @@ class YtDownloaderApp {
 			ipcRenderer.send("quit", "quit");
 		});
 
+		$("copyLogsBtn")?.addEventListener("click", async () => {
+			const btn = $("copyLogsBtn");
+			try {
+				const sysInfo = {
+					ytDlpPath: this.state?.ytDlpPath || "Unknown",
+					ffmpegPath: this.state?.ffmpegPath || "Unknown",
+				};
+				const combinedLogs = await window.electronAPI?.logs?.getCombinedLogs(sysInfo);
+				if (combinedLogs && clipboard) {
+					clipboard.writeText(combinedLogs);
+					const labelSpan = btn.querySelector("span");
+					if (labelSpan) {
+						const originalText = labelSpan.textContent;
+						const translated = (typeof i18n !== "undefined" && i18n.__) ? i18n.__("logsCopied") : "Logs copied to clipboard!";
+						labelSpan.textContent = translated;
+						setTimeout(() => {
+							labelSpan.textContent = originalText;
+						}, 2000);
+					}
+				}
+			} catch (err) {
+				console.error("Failed to copy logs:", err);
+			}
+		});
+
+		$("openLogsBtn")?.addEventListener("click", () => {
+			window.electronAPI?.logs?.openFolder();
+		});
+
 		// IPC listeners
 		ipcRenderer.on("link", (event, text) => this.getInfo(text));
 		ipcRenderer.on("downloadPath", (event, downloadPath) => {

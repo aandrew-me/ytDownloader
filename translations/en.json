@@ -229,5 +229,8 @@
 	"channelMaster": "Master",
 	"jsRuntime": "JS Runtime",
 	"appBundledNode": "App bundled (Node.js)",
-	"notFound": "Not found"
+	"notFound": "Not found",
+	"copyLogs": "Copy Logs",
+	"openLogsFolder": "Open Logs Directory",
+	"logsCopied": "Logs copied to clipboard!"
 }
