@@ -1405,8 +1405,16 @@ class YtDownloaderApp {
 			const metadata = await this._fetchVideoMetadata(safeUrl);
 			console.log(metadata);
 
+			const isLive = Boolean(
+				metadata.is_live ||
+				metadata.live_status === "is_live" ||
+				metadata.duration == null ||
+				metadata.duration === 0,
+			);
 			const durationInt =
-				metadata.duration == null ? null : Math.ceil(metadata.duration);
+				metadata.duration == null || metadata.duration <= 0
+					? null
+					: Math.ceil(metadata.duration);
 
 			this.state.videoInfo = {
 				...this.state.videoInfo,
@@ -1415,6 +1423,7 @@ class YtDownloaderApp {
 				channel: metadata.channel || "",
 				thumbnail: metadata.thumbnail,
 				duration: durationInt,
+				is_live: isLive,
 				extractor_key: metadata.extractor_key,
 			};
 			this.setVideoLength(durationInt);
@@ -2058,13 +2067,15 @@ class YtDownloaderApp {
 		const startTime = $(CONSTANTS.DOM_IDS.START_TIME).value;
 		const endTime = $(CONSTANTS.DOM_IDS.END_TIME).value;
 		const duration = this.state.videoInfo.duration;
+		const isLive = this.state.videoInfo.is_live;
 
 		const startSeconds = this.parseTime(startTime);
 		const endSeconds = this.parseTime(endTime);
 
 		if (
-			startSeconds === 0 &&
-			(endSeconds === duration || endSeconds === 0)
+			isLive ||
+			!duration ||
+			(startSeconds === 0 && (endSeconds === duration || endSeconds === 0))
 		) {
 			this.state.downloadOptions.rangeCmd = "";
 			this.state.downloadOptions.rangeOption = "";
@@ -2817,8 +2828,10 @@ class YtDownloaderApp {
 		minTimeDisplay.value = this._formatTime(minValue);
 		maxTimeDisplay.value = this._formatTime(maxValue);
 
-		const minPercent = ((minValue - minSliderVal) / sliderRange) * 100;
-		const maxPercent = ((maxValue - minSliderVal) / sliderRange) * 100;
+		const minPercent =
+			sliderRange > 0 ? ((minValue - minSliderVal) / sliderRange) * 100 : 0;
+		const maxPercent =
+			sliderRange > 0 ? ((maxValue - minSliderVal) / sliderRange) * 100 : 0;
 
 		rangeHighlight.style.left = `${minPercent}%`;
 		rangeHighlight.style.width = `${maxPercent - minPercent}%`;
@@ -2872,20 +2885,37 @@ class YtDownloaderApp {
 	setVideoLength(duration) {
 		const minSlider = $(CONSTANTS.DOM_IDS.MIN_SLIDER);
 		const maxSlider = $(CONSTANTS.DOM_IDS.MAX_SLIDER);
+		const minTimeInput = $(CONSTANTS.DOM_IDS.START_TIME);
+		const maxTimeInput = $(CONSTANTS.DOM_IDS.END_TIME);
 
 		if (typeof duration !== "number" || duration < 1) {
-			console.error(
-				"Invalid duration provided to setVideoLength. Must be a number greater than 0.",
-			);
+			if (minSlider) {
+				minSlider.max = 0;
+				minSlider.value = 0;
+				minSlider.disabled = true;
+			}
+			if (maxSlider) {
+				maxSlider.max = 0;
+				maxSlider.value = 0;
+				maxSlider.disabled = true;
+			}
+			if (minTimeInput) {
+				minTimeInput.value = "00:00";
+				minTimeInput.disabled = true;
+			}
+			if (maxTimeInput) {
+				maxTimeInput.value = "00:00";
+				maxTimeInput.disabled = true;
+			}
 
-			minSlider.max = 0;
-			maxSlider.max = 0;
-
-			minSlider.value = 0;
-			maxSlider.value = 0;
-
+			this._updateSliderUI(null);
 			return;
 		}
+
+		if (minSlider) minSlider.disabled = false;
+		if (maxSlider) maxSlider.disabled = false;
+		if (minTimeInput) minTimeInput.disabled = false;
+		if (maxTimeInput) maxTimeInput.disabled = false;
 
 		minSlider.max = duration;
 		maxSlider.max = duration;
