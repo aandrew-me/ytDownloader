@@ -937,35 +937,85 @@
                                 <a id="learnMoreOutputTemplates" class="link-info" data-translate="learnMore">Learn more</a>
                             </p>
 
-                            <div class="outputTemplateItem">
-                                <span data-translate="audioFilenameTemplate">Filename template for audios</span>
-                                <div class="input-action-group">
-                                    <input type="text" id="filenameTemplateAudio" placeholder="yt-dlp format style" value="%(title)s.%(ext)s">
-                                    <button class="btn redBtn sm" id="resetAudioFilenameTemplate" data-translate="resetToDefault">Reset</button>
+                            <div class="template-tags-helper">
+                                <div class="template-helper-group">
+                                    <span class="template-tags-label" data-translate="clickTagToInsert">Quick Insert Tags:</span>
+                                    <div class="template-tags-container">
+                                        <button type="button" class="template-tag-chip" data-tag="%(title)s" title="Video/Audio Title">%(title)s</button>
+                                        <button type="button" class="template-tag-chip" data-tag="%(ext)s" title="File Extension">%(ext)s</button>
+                                        <button type="button" class="template-tag-chip" data-tag="%(uploader)s" title="Uploader / Channel">%(uploader)s</button>
+                                        <button type="button" class="template-tag-chip" data-tag="%(creator)s" title="Creator">%(creator)s</button>
+                                        <button type="button" class="template-tag-chip" data-tag="%(upload_date)s" title="Upload Date (YYYYMMDD)">%(upload_date)s</button>
+                                        <button type="button" class="template-tag-chip" data-tag="%(id)s" title="Video ID">%(id)s</button>
+                                        <button type="button" class="template-tag-chip" data-tag="%(resolution)s" title="Resolution (e.g. 1080p)">%(resolution)s</button>
+                                        <button type="button" class="template-tag-chip" data-tag="%(channel)s" title="Channel Name">%(channel)s</button>
+                                        <button type="button" class="template-tag-chip" data-tag="%(chapter)s" title="Chapter Title">%(chapter)s</button>
+                                        <button type="button" class="template-tag-chip" data-tag="%(playlist_title)s" title="Playlist Title">%(playlist_title)s</button>
+                                        <button type="button" class="template-tag-chip" data-tag="%(playlist_index)s" title="Playlist Item Index">%(playlist_index)s</button>
+                                    </div>
+                                </div>
+
+                                <div class="template-helper-group">
+                                    <span class="template-tags-label" data-translate="presetTemplates">Common Presets:</span>
+                                    <div class="template-presets-container">
+                                        <button type="button" class="template-preset-btn" data-preset="%(title)s.%(ext)s">Default</button>
+                                        <button type="button" class="template-preset-btn" data-preset="%(title)s [%(id)s].%(ext)s">Title + ID</button>
+                                        <button type="button" class="template-preset-btn" data-preset="%(uploader)s - %(title)s.%(ext)s">Uploader - Title</button>
+                                        <button type="button" class="template-preset-btn" data-preset="%(upload_date)s - %(title)s.%(ext)s">Date - Title</button>
+                                        <button type="button" class="template-preset-btn" data-preset="%(playlist_index)s - %(title)s.%(ext)s">Index - Title</button>
+                                    </div>
                                 </div>
                             </div>
 
                             <div class="outputTemplateItem">
-                                <span data-translate="videoFilenameTemplate">Filename template for videos</span>
-                                <div class="input-action-group">
-                                    <input type="text" id="filenameTemplateVideo" placeholder="yt-dlp format style" value="%(title)s.%(ext)s">
-                                    <button class="btn redBtn sm" id="resetFilenameTemplateVideo" data-translate="resetToDefault">Reset</button>
+                                <div class="template-item-content">
+                                    <div class="template-item-header">
+                                        <span data-translate="audioFilenameTemplate">Filename template for audios</span>
+                                        <button class="btn redBtn sm" id="resetAudioFilenameTemplate" data-translate="resetToDefault">Reset</button>
+                                    </div>
+                                    <div class="highlighted-input-wrapper">
+                                        <div class="input-highlight-backdrop" id="backdropFilenameTemplateAudio" aria-hidden="true"></div>
+                                        <input type="text" id="filenameTemplateAudio" class="highlighted-template-input" placeholder="yt-dlp format style" value="%(title)s.%(ext)s" autocomplete="off" spellcheck="false">
+                                    </div>
                                 </div>
                             </div>
 
                             <div class="outputTemplateItem">
-                                <span id="fileFormatTxt" data-translate="playlistFilenameFormat">Filename format for playlists</span>
-                                <div class="input-action-group">
-                                    <input type="text" id="filenameFormat" placeholder="yt-dlp format style" value="%(playlist_index)s.%(title)s.%(ext)s">
-                                    <button class="btn redBtn sm" id="resetFilenameFormat" data-translate="resetToDefault">Reset</button>
+                                <div class="template-item-content">
+                                    <div class="template-item-header">
+                                        <span data-translate="videoFilenameTemplate">Filename template for videos</span>
+                                        <button class="btn redBtn sm" id="resetFilenameTemplateVideo" data-translate="resetToDefault">Reset</button>
+                                    </div>
+                                    <div class="highlighted-input-wrapper">
+                                        <div class="input-highlight-backdrop" id="backdropFilenameTemplateVideo" aria-hidden="true"></div>
+                                        <input type="text" id="filenameTemplateVideo" class="highlighted-template-input" placeholder="yt-dlp format style" value="%(title)s.%(ext)s" autocomplete="off" spellcheck="false">
+                                    </div>
                                 </div>
                             </div>
 
                             <div class="outputTemplateItem">
-                                <span id="dirFormatTxt" data-translate="playlistFolderNameFormat">Folder name format for playlists</span>
-                                <div class="input-action-group">
-                                    <input type="text" id="foldernameFormat" value="%(playlist_title)s" placeholder="yt-dlp format style">
-                                    <button class="btn redBtn sm" id="resetFoldernameFormat" data-translate="resetToDefault">Reset</button>
+                                <div class="template-item-content">
+                                    <div class="template-item-header">
+                                        <span id="fileFormatTxt" data-translate="playlistFilenameFormat">Filename format for playlists</span>
+                                        <button class="btn redBtn sm" id="resetFilenameFormat" data-translate="resetToDefault">Reset</button>
+                                    </div>
+                                    <div class="highlighted-input-wrapper">
+                                        <div class="input-highlight-backdrop" id="backdropFilenameFormat" aria-hidden="true"></div>
+                                        <input type="text" id="filenameFormat" class="highlighted-template-input" placeholder="yt-dlp format style" value="%(playlist_index)s.%(title)s.%(ext)s" autocomplete="off" spellcheck="false">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="outputTemplateItem">
+                                <div class="template-item-content">
+                                    <div class="template-item-header">
+                                        <span id="dirFormatTxt" data-translate="playlistFolderNameFormat">Folder name format for playlists</span>
+                                        <button class="btn redBtn sm" id="resetFoldernameFormat" data-translate="resetToDefault">Reset</button>
+                                    </div>
+                                    <div class="highlighted-input-wrapper">
+                                        <div class="input-highlight-backdrop" id="backdropFoldernameFormat" aria-hidden="true"></div>
+                                        <input type="text" id="foldernameFormat" class="highlighted-template-input" value="%(playlist_title)s" placeholder="yt-dlp format style" autocomplete="off" spellcheck="false">
+                                    </div>
                                 </div>
                             </div>
                         </section>

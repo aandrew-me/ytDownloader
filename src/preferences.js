@@ -561,8 +561,52 @@ function initPreferences() {
 		ipcRenderer.send("reload");
 	});
 
+	function escapeHtml(str) {
+		return String(str)
+			.replace(/&/g, "&amp;")
+			.replace(/</g, "&lt;")
+			.replace(/>/g, "&gt;")
+			.replace(/"/g, "&quot;")
+			.replace(/'/g, "&#039;");
+	}
+
+	function updateInputHighlight(inputId, backdropId) {
+		const inputEl = getId(inputId);
+		const backdropEl = getId(backdropId);
+		if (!inputEl || !backdropEl) return;
+
+		const val = inputEl.value || "";
+		if (!val) {
+			backdropEl.innerHTML = "";
+			return;
+		}
+
+		let html = "";
+		let lastIndex = 0;
+		const tagRegex = /%\([^)]+\)[-+0 #]*(?:\d+)?(?:\.\d+)?[a-zA-Z]?/g;
+		let match;
+
+		while ((match = tagRegex.exec(val)) !== null) {
+			if (match.index > lastIndex) {
+				html += escapeHtml(val.substring(lastIndex, match.index));
+			}
+			html += `<span class="input-tag-highlight">${escapeHtml(match[0])}</span>`;
+			lastIndex = tagRegex.lastIndex;
+		}
+		if (lastIndex < val.length) {
+			html += escapeHtml(val.substring(lastIndex));
+		}
+
+		if (val.endsWith(" ")) {
+			html += "&nbsp;";
+		}
+
+		backdropEl.innerHTML = html;
+		backdropEl.scrollLeft = inputEl.scrollLeft;
+	}
+
 	// Dynamic configuration fields abstractions helper function
-	function bindInputToStorage(inputId, storageKey, fallbackValue, resetId) {
+	function bindInputToStorage(inputId, storageKey, fallbackValue, resetId, backdropId) {
 		const inputEl = getId(inputId);
 		if (!inputEl) return;
 		const savedVal = localStorage.getItem(storageKey);
@@ -573,15 +617,33 @@ function initPreferences() {
 
 		const updateInput = () => {
 			localStorage.setItem(storageKey, inputEl.value);
+			if (backdropId) {
+				updateInputHighlight(inputId, backdropId);
+			}
 		};
 		inputEl.addEventListener("input", updateInput);
 		inputEl.addEventListener("change", updateInput);
+		if (backdropId) {
+			inputEl.addEventListener("scroll", () => {
+				const backdrop = getId(backdropId);
+				if (backdrop) backdrop.scrollLeft = inputEl.scrollLeft;
+			});
+			inputEl.addEventListener("keyup", () => updateInputHighlight(inputId, backdropId));
+			inputEl.addEventListener("focus", () => updateInputHighlight(inputId, backdropId));
+		}
 
 		if (resetId) {
 			getId(resetId)?.addEventListener("click", () => {
 				inputEl.value = fallbackValue;
 				localStorage.setItem(storageKey, fallbackValue);
+				if (backdropId) {
+					updateInputHighlight(inputId, backdropId);
+				}
 			});
+		}
+
+		if (backdropId) {
+			updateInputHighlight(inputId, backdropId);
 		}
 	}
 
@@ -590,25 +652,95 @@ function initPreferences() {
 		"filenameTemplateVideo",
 		"%(title)s.%(ext)s",
 		"resetFilenameTemplateVideo",
+		"backdropFilenameTemplateVideo",
 	);
 	bindInputToStorage(
 		"filenameTemplateAudio",
 		"filenameTemplateAudio",
 		"%(title)s.%(ext)s",
 		"resetAudioFilenameTemplate",
+		"backdropFilenameTemplateAudio",
 	);
 	bindInputToStorage(
 		"filenameFormat",
 		"filenameFormat",
 		"%(playlist_index)s.%(title)s.%(ext)s",
 		"resetFilenameFormat",
+		"backdropFilenameFormat",
 	);
 	bindInputToStorage(
 		"foldernameFormat",
 		"foldernameFormat",
 		"%(playlist_title)s",
 		"resetFoldernameFormat",
+		"backdropFoldernameFormat",
 	);
+
+	// Output template input tracker and Ctrl+Z preserving inserter
+	let lastFocusedTemplateInput = getId("filenameTemplateVideo") || getId("filenameTemplateAudio");
+	const templateInputIds = [
+		"filenameTemplateAudio",
+		"filenameTemplateVideo",
+		"filenameFormat",
+		"foldernameFormat",
+	];
+
+	templateInputIds.forEach((id) => {
+		const el = getId(id);
+		if (el) {
+			el.addEventListener("focus", () => {
+				lastFocusedTemplateInput = el;
+			});
+		}
+	});
+
+	function insertTextIntoInput(targetInput, textToInsert) {
+		if (!targetInput) return;
+		targetInput.focus();
+
+		let inserted = false;
+		try {
+			inserted = document.execCommand("insertText", false, textToInsert);
+		} catch (_) {
+			inserted = false;
+		}
+
+		if (!inserted) {
+			const start = targetInput.selectionStart ?? targetInput.value.length;
+			const end = targetInput.selectionEnd ?? targetInput.value.length;
+			targetInput.setRangeText(textToInsert, start, end, "end");
+		}
+
+		targetInput.dispatchEvent(new Event("input", { bubbles: true }));
+	}
+
+	document.querySelectorAll(".template-tag-chip").forEach((chip) => {
+		chip.addEventListener("click", () => {
+			const tag = chip.getAttribute("data-tag");
+			if (!tag) return;
+			const targetInput =
+				lastFocusedTemplateInput ||
+				getId("filenameTemplateVideo") ||
+				getId("filenameTemplateAudio");
+			insertTextIntoInput(targetInput, tag);
+		});
+	});
+
+	document.querySelectorAll(".template-preset-btn").forEach((btn) => {
+		btn.addEventListener("click", () => {
+			const preset = btn.getAttribute("data-preset");
+			if (!preset) return;
+			const targetInput =
+				lastFocusedTemplateInput ||
+				getId("filenameTemplateVideo") ||
+				getId("filenameTemplateAudio");
+			if (!targetInput) return;
+
+			targetInput.focus();
+			targetInput.select();
+			insertTextIntoInput(targetInput, preset);
+		});
+	});
 
 	// Max active downloads validation parameters
 	const maxDownloadsInput = getId("maxDownloads");
