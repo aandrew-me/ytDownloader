@@ -754,34 +754,6 @@ img {
 	box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
-.btnWrapper {
-	display: inline-flex;
-	cursor: pointer;
-	align-items: center;
-	justify-content: center;
-	transition: filter 0.2s, background-color 0.2s, transform 0.1s;
-}
-
-.btnWrapper:hover {
-	filter: brightness(1.1);
-}
-
-.btnWrapper .btn {
-	border: none;
-	color: inherit;
-	background-color: transparent;
-	font-size: inherit;
-	cursor: pointer;
-	padding: 0;
-	margin: 0;
-	pointer-events: none;
-}
-
-.btnWrapper .btnIcon,
-.btnWrapper svg {
-	pointer-events: none;
-}
-
 .toggleBtnIcon {
 	width: 30px;
 	height: 30px;
@@ -1176,6 +1148,35 @@ button {
 	filter: none;
 }
 
+.btnWrapper {
+	display: inline-flex;
+	cursor: pointer;
+	align-items: center;
+	justify-content: center;
+	transition: filter 0.2s, background-color 0.2s, transform 0.1s;
+	padding: 10px 16px;
+}
+
+.btnWrapper:hover {
+	filter: brightness(1.1);
+}
+
+.btnWrapper .btn {
+	border: none;
+	color: inherit;
+	background-color: transparent;
+	font-size: inherit;
+	cursor: pointer;
+	padding: 0;
+	margin: 0;
+	pointer-events: none;
+}
+
+.btnWrapper .btnIcon,
+.btnWrapper svg {
+	pointer-events: none;
+}
+
 .advancedToggle {
 	color: white;
 	background-color: var(--redBtn);
@@ -1201,8 +1202,112 @@ button {
 	filter: none;
 }
 
+#arrowLeftVideo,
+#arrowLeftAudio {
+	transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 #advanced {
 	display: none;
+	max-height: 0;
+	opacity: 0;
+	overflow: hidden;
+	margin-top: 0;
+	transition: max-height 0.32s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.28s ease, margin-top 0.32s ease;
+}
+
+#advanced.open {
+	max-height: 1200px;
+	opacity: 1;
+	margin-top: 16px;
+}
+
+.home-advanced-panel {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	background: var(--item-bg);
+	border: 1px solid var(--box-separation);
+	border-radius: 16px;
+	padding: 20px 22px;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.home-advanced-card {
+	background: var(--box-main);
+	border: 1px solid var(--box-separation);
+	border-radius: 12px;
+	padding: 16px 20px;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.home-advanced-header {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	color: var(--text);
+	font-size: 15px;
+	padding: 2px 0;
+}
+
+.home-advanced-icon {
+	flex-shrink: 0;
+	opacity: 0.8;
+}
+
+.home-advanced-toggles {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+	gap: 16px;
+}
+
+.home-toggle-card {
+	background: var(--box-main);
+	border: 1px solid var(--box-separation);
+	border-radius: 12px;
+	padding: 16px 20px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	cursor: pointer;
+	user-select: none;
+	transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
+}
+
+.home-toggle-card:hover {
+	border-color: var(--blueBtn);
+	transform: translateY(-1px);
+}
+
+.home-toggle-info {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.home-toggle-title {
+	font-weight: 600;
+	font-size: 15px;
+	color: var(--text);
+}
+
+.home-toggle-desc {
+	font-size: 12px;
+	opacity: 0.75;
+	color: var(--text);
+	padding: 2px;
+}
+
+.home-advanced-card .time-display {
+	height: 2.5rem;
+	width: 5.5rem;
+	font-size: 0.9rem;
+	border: 1px solid var(--box-separation);
+	background-color: var(--background);
+	border-radius: 8px;
 }
 
 .advancedItem {
@@ -1223,6 +1328,7 @@ button {
 #subHeader {
 	font-weight: bold;
 	margin-top: 0;
+	font-size: 15px;
 }
 
 h2 {

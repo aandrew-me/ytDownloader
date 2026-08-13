@@ -160,15 +160,30 @@ if (document.readyState === "loading") {
 let advancedHidden = true;
 
 export function advancedToggle() {
+	const advEl = getId("advanced");
+	const arrowVideo = getId("arrowLeftVideo");
+	const arrowAudio = getId("arrowLeftAudio");
+
 	if (advancedHidden) {
-		if (getId("advanced")) getId("advanced").style.display = "block";
-		if (getId("arrowLeftVideo")) getId("arrowLeftVideo").style.transform = "rotate(-90deg)";
-		if (getId("arrowLeftAudio")) getId("arrowLeftAudio").style.transform = "rotate(-90deg)";
+		if (advEl) {
+			advEl.style.display = "block";
+			void advEl.offsetHeight;
+			advEl.classList.add("open");
+		}
+		if (arrowVideo) arrowVideo.style.transform = "rotate(-90deg)";
+		if (arrowAudio) arrowAudio.style.transform = "rotate(-90deg)";
 		advancedHidden = false;
 	} else {
-		if (getId("advanced")) getId("advanced").style.display = "none";
-		if (getId("arrowLeftVideo")) getId("arrowLeftVideo").style.transform = "rotate(0deg)";
-		if (getId("arrowLeftAudio")) getId("arrowLeftAudio").style.transform = "rotate(0deg)";
+		if (advEl) {
+			advEl.classList.remove("open");
+			setTimeout(() => {
+				if (advancedHidden && advEl) {
+					advEl.style.display = "none";
+				}
+			}, 320);
+		}
+		if (arrowVideo) arrowVideo.style.transform = "rotate(0deg)";
+		if (arrowAudio) arrowAudio.style.transform = "rotate(0deg)";
 		advancedHidden = true;
 	}
 }
