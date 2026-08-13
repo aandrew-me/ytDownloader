@@ -107,7 +107,6 @@ const CONSTANTS = {
 		NETSCAPE_COOKIES: "netscapeCookies",
 		BROWSER_COOKIES: "browser",
 		PROXY: "proxy",
-		CONFIG_PATH: "configPath",
 		AUTO_UPDATE: "autoUpdate",
 		CLOSE_TO_TRAY: "closeToTray",
 		YT_DLP_CUSTOM_ARGS: "customYtDlpArgs",
@@ -931,9 +930,6 @@ class YtDownloaderApp {
 			localStorage.getItem(
 				CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_CUSTOM_ARGS,
 			) || "";
-		prefs.configPath =
-			localStorage.getItem(CONSTANTS.LOCAL_STORAGE_KEYS.CONFIG_PATH) ||
-			"";
 		prefs.videoOutputTemplate =
 			localStorage.getItem("filenameTemplateVideo") ||
 			"%(title)s.%(ext)s";
@@ -1211,7 +1207,7 @@ class YtDownloaderApp {
 
 		try {
 			await this._loadSettings("https://youtube.com");
-			const {proxy, configPath} = this.state.preferences;
+			const {proxy} = this.state.preferences;
 			const args = [
 				"--flat-playlist",
 				"-j",
@@ -1225,7 +1221,6 @@ class YtDownloaderApp {
 							this.state.jsRuntimePath,
 						]
 					: []),
-				...(configPath ? ["--config-location", configPath] : []),
 				"--",
 				`ytsearch12:${query}`,
 			];
@@ -1505,7 +1500,7 @@ class YtDownloaderApp {
 	 */
 	_fetchVideoMetadata(url) {
 		return new Promise((resolve, reject) => {
-			const {proxy, configPath} = this.state.preferences;
+			const {proxy} = this.state.preferences;
 			const args = [
 				"-j",
 				"--no-playlist",
@@ -1522,8 +1517,6 @@ class YtDownloaderApp {
 							this.state.jsRuntimePath,
 						]
 					: []),
-
-				...(configPath ? ["--config-location", configPath] : []),
 
 				"--",
 				url,
@@ -1765,7 +1758,6 @@ class YtDownloaderApp {
 		const {
 			proxy,
 			browserForCookies,
-			configPath,
 			videoOutputTemplate,
 			audioOutputTemplate,
 		} = this.state.preferences;
@@ -1783,8 +1775,6 @@ class YtDownloaderApp {
 			...this._getCookieArgs(),
 
 			...(proxy ? ["--proxy", proxy] : []),
-
-			...(configPath ? ["--config-location", configPath] : []),
 
 			"--ffmpeg-location",
 			this.state.ffmpegPath,

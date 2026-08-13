@@ -38,10 +38,6 @@ const playlistDownloader = {
 			arg: "",
 			val: "",
 		},
-		configFile: {
-			arg: "",
-			path: "",
-		},
 		playlistRange: {
 			start: 1,
 			end: "",
@@ -425,9 +421,6 @@ const playlistDownloader = {
 				? [this.config.cookie.arg, this.config.cookie.val]
 				: []),
 
-			this.config.configFile.arg,
-			this.config.configFile.path,
-
 			...(this.config.proxy
 				? ["--no-check-certificate", "--proxy", this.config.proxy]
 				: []),
@@ -448,8 +441,6 @@ const playlistDownloader = {
 			formatArgs = ["-f", "bv*+ba/best"];
 		} else if (quality === "worst") {
 			formatArgs = ["-f", "wv+wa/worst"];
-		} else if (quality === "useConfig") {
-			formatArgs = [];
 		} else {
 			if (videoType === "mp4") {
 				formatArgs = [
@@ -808,9 +799,6 @@ const playlistDownloader = {
 			this.config.cookie.arg = "";
 			this.config.cookie.val = "";
 		}
-		const configPath = localStorage.getItem("configPath");
-		this.config.configFile.path = configPath ? `"${configPath}"` : "";
-		this.config.configFile.arg = configPath ? "--config-location" : "";
 
 		// Playlist range from UI inputs
 		this.config.playlistRange.start =
@@ -921,7 +909,7 @@ const playlistDownloader = {
 
 	updateVideoTypeVisibility() {
 		const value = this.ui.videoQualitySelect.value;
-		const show = !["best", "worst", "useConfig"].includes(value);
+		const show = !["best", "worst"].includes(value);
 		this.ui.typeSelectBox.style.display = show ? "block" : "none";
 	},
 
