@@ -2689,7 +2689,6 @@ h1 {
 
 /* Boxes Design System */
 .prefBox,
-.outputTemplateItem,
 .ytdlpInfoItem {
 	display: flex;
 	justify-content: space-between;
@@ -2697,6 +2696,212 @@ h1 {
 	margin: 12px 0;
 	padding: 12px;
 	border-radius: 8px;
+}
+
+.outputTemplateItem {
+	display: flex;
+	flex-direction: column;
+	margin: 12px 0;
+	padding: 14px;
+	border-radius: 8px;
+}
+
+.template-item-content {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	gap: 10px;
+}
+
+.template-item-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 12px;
+}
+
+/* Highlighted Input Architecture */
+.highlighted-input-wrapper {
+	position: relative;
+	width: 100%;
+	height: 38px;
+	background: var(--select);
+	border-radius: 8px;
+	border: 1px solid var(--box-separation);
+	box-sizing: border-box;
+	overflow: hidden;
+}
+
+.input-highlight-backdrop,
+.input-highlight-backdrop * {
+	white-space: pre !important;
+	word-break: normal !important;
+	overflow-wrap: normal !important;
+}
+
+.input-highlight-backdrop {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	padding: 0 12px;
+	display: block !important;
+	font-family: Consolas, "Courier New", monospace !important;
+	font-size: 13px !important;
+	font-weight: 400 !important;
+	font-style: normal !important;
+	letter-spacing: 0px !important;
+	word-spacing: 0px !important;
+	font-kerning: none !important;
+	font-variant-ligatures: none !important;
+	-webkit-font-smoothing: antialiased !important;
+	line-height: 36px !important;
+	text-align: left !important;
+	overflow: hidden;
+	pointer-events: none;
+	color: var(--text);
+	box-sizing: border-box;
+	z-index: 1;
+}
+
+.highlighted-template-input {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	width: 100% !important;
+	height: 100% !important;
+	font-family: Consolas, "Courier New", monospace !important;
+	font-size: 13px !important;
+	font-weight: 400 !important;
+	font-style: normal !important;
+	letter-spacing: 0px !important;
+	word-spacing: 0px !important;
+	font-kerning: none !important;
+	font-variant-ligatures: none !important;
+	-webkit-font-smoothing: antialiased !important;
+	line-height: 36px !important;
+	text-align: left !important;
+	white-space: pre !important;
+	background: transparent !important;
+	color: transparent !important;
+	caret-color: var(--text) !important;
+	-webkit-text-fill-color: transparent !important;
+	border: none !important;
+	outline: none !important;
+	padding: 0 12px !important;
+	box-sizing: border-box;
+	z-index: 2;
+}
+
+body.rtl .input-highlight-backdrop,
+body.rtl .highlighted-template-input {
+	text-align: right !important;
+}
+
+.highlighted-template-input::placeholder {
+	-webkit-text-fill-color: var(--sub-text);
+	color: var(--sub-text);
+}
+
+.input-tag-highlight {
+	background: color-mix(in srgb, var(--blueBtn) 22%, transparent);
+	color: var(--blueBtn);
+	-webkit-text-fill-color: var(--blueBtn);
+	border-radius: 3px;
+	padding: 0 !important;
+	margin: 0 !important;
+	border: none !important;
+	font: inherit !important;
+	letter-spacing: inherit !important;
+	white-space: pre !important;
+	display: inline !important;
+}
+
+/* Template Helper & Presets */
+.template-tags-helper {
+	margin: 8px 0 16px 0;
+	padding: 14px;
+	background: var(--select);
+	border-radius: 10px;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.template-helper-group {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.template-tags-label {
+	font-size: 0.82rem;
+	font-weight: 600;
+	color: var(--sub-text);
+	text-transform: uppercase;
+	letter-spacing: 0.4px;
+}
+
+.template-tags-container,
+.template-presets-container {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+}
+
+.template-tag-chip {
+	background: var(--box-main, var(--bg));
+	color: var(--text);
+	border: 1px solid var(--border, var(--box-separation));
+	padding: 4px 10px;
+	border-radius: 6px;
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+	font-size: 0.8rem;
+	cursor: pointer;
+	transition: all 0.15s ease;
+	user-select: none;
+}
+
+.template-tag-chip:hover {
+	background: var(--red);
+	color: #ffffff;
+	border-color: var(--red);
+	transform: translateY(-1px);
+}
+
+.template-tag-chip:active {
+	transform: translateY(0);
+}
+
+.template-preset-btn {
+	background: var(--box-main, var(--bg));
+	color: var(--text);
+	border: 1px solid var(--border, var(--box-separation));
+	padding: 4px 12px;
+	border-radius: 16px;
+	font-size: 0.8rem;
+	font-weight: 500;
+	cursor: pointer;
+	transition: all 0.15s ease;
+	user-select: none;
+}
+
+.template-preset-btn:hover {
+	background: var(--red);
+	color: #ffffff;
+	border-color: var(--red);
+	transform: translateY(-1px);
+}
+
+.template-preset-btn:active {
+	transform: translateY(0);
+}
+
+body.rtl .template-item-header {
+	flex-direction: row-reverse;
 }
 
 .title-box {
@@ -2734,7 +2939,7 @@ h1 {
 
 /* Inputs Architecture */
 .prefBox input[type="text"],
-.outputTemplateItem input[type="text"],
+.outputTemplateItem input[type="text"]:not(.highlighted-template-input),
 .ytdlpInfoItem input[type="text"] {
 	width: 45%;
 	height: 38px;

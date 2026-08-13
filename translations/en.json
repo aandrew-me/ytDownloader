@@ -90,6 +90,8 @@
 	"videoFilenameTemplate": "Video filename template",
 	"playlistFilenameFormat": "Filename template for playlists",
 	"playlistFolderNameFormat": "Folder name template for playlists",
+	"clickTagToInsert": "Quick insert tags:",
+	"presetTemplates": "Preset templates:",
 	"resetToDefault": "Reset to default",
 	"playlistRange": "Playlist range",
 	"thumbnail": "Thumbnail",
