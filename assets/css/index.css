@@ -727,7 +727,7 @@ img {
 	flex-direction: row;
 	justify-content: center;
 	padding-top: 14px;
-	gap: 12px;
+	gap: 2px;
 }
 
 .toggleBtnWrapper {
@@ -1048,6 +1048,7 @@ input[type="number"]::-webkit-outer-spin-button {
 	backdrop-filter: blur(12px);
 	-webkit-backdrop-filter: blur(12px);
 	transition: all 0.3s ease;
+	opacity: 0.8;
 }
 
 .modern-loading-spinner {
