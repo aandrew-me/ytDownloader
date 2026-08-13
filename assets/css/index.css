@@ -2659,8 +2659,7 @@ body.rtl #top {
 	left: 20px;
 }
 body.rtl .prefBox,
-body.rtl .outputTemplateItem,
-body.rtl .configBox {
+body.rtl .outputTemplateItem {
 	flex-direction: row-reverse;
 }
 
@@ -2736,8 +2735,7 @@ h1 {
 /* Inputs Architecture */
 .prefBox input[type="text"],
 .outputTemplateItem input[type="text"],
-.ytdlpInfoItem input[type="text"],
-.configBox input[type="text"] {
+.ytdlpInfoItem input[type="text"] {
 	width: 45%;
 	height: 38px;
 }
@@ -2859,24 +2857,6 @@ select {
 	display: flex;
 	flex-direction: column;
 	padding: 16px;
-}
-
-.configBox {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	width: 100%;
-}
-
-#configOpts {
-	display: none;
-	flex-direction: column;
-	align-items: flex-start;
-	width: 100%;
-	margin-top: 15px;
-	padding-top: 15px;
-	border-top: 1px solid var(--box-separation);
-	gap: 12px;
 }
 
 /* Custom Arguments & Cookies Textarea Styles */

@@ -50,7 +50,7 @@ function initPreferencesUI() {
 						headerEl && headerEl.textContent.toLowerCase().includes(query);
 
 					const searchableItems = section.querySelectorAll(
-						".prefBox, .outputTemplateItem, .ytdlpInfoItem, #ytDlpArgBox, .configBox, #configOpts, .dep-segmented-group, .dep-options-container, .dep-sub-details, .dep-card-footer",
+						".prefBox, .outputTemplateItem, .ytdlpInfoItem, #ytDlpArgBox, .dep-segmented-group, .dep-options-container, .dep-sub-details, .dep-card-footer",
 					);
 					let visibleChildrenCount = 0;
 
@@ -106,7 +106,7 @@ function initPreferencesUI() {
 
 				document
 					.querySelectorAll(
-						".prefBox, .outputTemplateItem, .ytdlpInfoItem, #ytDlpArgBox, .configBox, #configOpts, .settings-section, .dep-card, .dep-segmented-group, .dep-options-container, .dep-sub-details, .dep-card-footer",
+						".prefBox, .outputTemplateItem, .ytdlpInfoItem, #ytDlpArgBox, .settings-section, .dep-card, .dep-segmented-group, .dep-options-container, .dep-sub-details, .dep-card-footer",
 					)
 					.forEach((item) => item.classList.remove("item-hidden"));
 			}
@@ -180,33 +180,6 @@ function initPreferences() {
 	(getId("selectLocationPref") || getId("selectLocation"))?.addEventListener("click", () => {
 		ipcRenderer.send("select-location-secondary", "");
 	});
-
-	getId("configBtn")?.addEventListener("click", () => {
-		ipcRenderer.send("select-config", "");
-	});
-
-	const configCheck = getId("configCheck");
-	if (configCheck) {
-		configCheck.addEventListener("change", () => {
-			if (configCheck.checked) {
-				const opts = getId("configOpts");
-				if (opts) opts.style.display = "flex";
-			} else {
-				const opts = getId("configOpts");
-				if (opts) opts.style.display = "none";
-				localStorage.setItem("configPath", "");
-			}
-		});
-
-		const savedConfigPath = localStorage.getItem("configPath");
-		if (savedConfigPath) {
-			const cfgPathEl = getId("configPath");
-			if (cfgPathEl) cfgPathEl.textContent = savedConfigPath;
-			configCheck.checked = true;
-			const opts = getId("configOpts");
-			if (opts) opts.style.display = "flex";
-		}
-	}
 
 	// Localization Setup
 	const langSelectEl = getId("selectLanguage") || getId("select");
@@ -1126,10 +1099,4 @@ ipcRenderer.on("downloadPath", (_event, pathArray) => {
 			true,
 		);
 	}
-});
-
-ipcRenderer.on("configPath", (event, configPath) => {
-	localStorage.setItem("configPath", configPath);
-	const cfgPathEl = getId("configPath");
-	if (cfgPathEl) cfgPathEl.textContent = configPath;
 });
