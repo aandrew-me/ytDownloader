@@ -975,7 +975,10 @@ const playlistDownloader = {
 		const storeBinDir = path.join(os.homedir(), ".ytDownloader", "ffmpeg", "bin");
 
 		if (windowsStore) {
-			return storeBinDir;
+			if (fs.existsSync(path.join(storeBinDir, ffmpegName))) {
+				return storeBinDir;
+			}
+			return "";
 		}
 
 		if (fs.existsSync(path.join(bundledBinDir, ffmpegName))) {
@@ -986,7 +989,7 @@ const playlistDownloader = {
 			return storeBinDir;
 		}
 
-		return bundledBinDir;
+		return "";
 	},
 
 	getJsRuntimePath() {

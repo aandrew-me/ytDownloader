@@ -970,7 +970,10 @@ function getFfmpegPath() {
 	const storeFfmpegFile = path.join(os.homedir(), ".ytDownloader", "ffmpeg", "bin", ffmpegName);
 
 	if (windowsStore) {
-		return storeFfmpegFile;
+		if (existsSync(storeFfmpegFile)) {
+			return storeFfmpegFile;
+		}
+		return "";
 	}
 
 	if (existsSync(bundledFfmpegFile)) {
@@ -981,7 +984,7 @@ function getFfmpegPath() {
 		return storeFfmpegFile;
 	}
 
-	return bundledFfmpegFile;
+	return "";
 }
 
 dom.outputFolderInput.addEventListener("change", (e) => {
