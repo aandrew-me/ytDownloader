@@ -68,6 +68,7 @@ const CONSTANTS = {
 		EXTRACT_QUALITY_SELECT: "extractQualitySelect",
 		// Advanced Options
 		CUSTOM_ARGS_INPUT: "customArgsInput", // Add this line
+		HOME_OUTPUT_FORMAT_SELECT: "homeOutputFormatSelect",
 		START_TIME: "min-time",
 		END_TIME: "max-time",
 		MIN_SLIDER: "min-slider",
@@ -1483,6 +1484,9 @@ class YtDownloaderApp {
 				extractFormat: extractFormatVal,
 				extractQuality:
 					$(CONSTANTS.DOM_IDS.EXTRACT_QUALITY_SELECT)?.value || "0",
+				outputFormat:
+					$(CONSTANTS.DOM_IDS.HOME_OUTPUT_FORMAT_SELECT)?.value ||
+					"auto",
 			},
 		};
 
@@ -1804,6 +1808,7 @@ class YtDownloaderApp {
 						`bestvideo[height<=${presetQuality}]+bestaudio[ext=m4a]/best[height<=${presetQuality}]/best`,
 						"--merge-output-format",
 						"mp4",
+						// TODO: Consider doing a smart selection between remux/recode in future
 						"--recode-video",
 						"mp4",
 					];
@@ -1955,13 +1960,24 @@ class YtDownloaderApp {
 			}
 		}
 
+		if (type === "video") {
+			const targetFormat = uiSnapshot?.outputFormat;
+			if (targetFormat && targetFormat !== "auto") {
+				ext = targetFormat;
+				downloadArgs.push("--recode-video", targetFormat);
+				downloadArgs.push("--merge-output-format", targetFormat);
+			}
+		}
+
 		if (subs) downloadArgs.push(...subs.split(/\s+/));
 		if (subLangs) downloadArgs.push(...subLangs.split(/\s+/));
 		if (rangeOption) downloadArgs.push(rangeOption, rangeCmd);
 
-		const customArgsString = $(
-			CONSTANTS.DOM_IDS.CUSTOM_ARGS_INPUT,
-		).value.trim();
+		const homeCustomArgs = ($("customArgsInputHome")?.value || "").trim();
+		const prefCustomArgs = (
+			$(CONSTANTS.DOM_IDS.CUSTOM_ARGS_INPUT)?.value || ""
+		).trim();
+		const customArgsString = homeCustomArgs || prefCustomArgs;
 		if (customArgsString) {
 			const customArgs = customArgsString.split(/\s+/);
 			downloadArgs.push(...customArgs);

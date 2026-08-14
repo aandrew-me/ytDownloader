@@ -236,5 +236,7 @@
 	"clearQueue": "Clear Queue",
 	"downloadAll": "Download All",
 	"noVideosInQueue": "No videos in queue",
-	"stop": "Stop"
+	"stop": "Stop",
+	"outputFormat": "Output Format",
+	"outputFormatDesc": "Set the desired output container (e.g. MP4, MKV, WebM)"
 }
