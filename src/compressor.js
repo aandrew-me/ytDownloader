@@ -1,4 +1,4 @@
-import { getId, formatBytes } from "./utils.js";
+import { getId, formatBytes, getFfmpegPath, getFfprobePath } from "./utils.js";
 
 const {
 	spawn,
@@ -940,22 +940,7 @@ function timeToSeconds(timeStr) {
 	return hh * 3600 + mm * 60 + ss;
 }
 
-function getFfmpegPath() {
-	const isTestMode = Boolean(window.electronAPI && window.electronAPI.isTest);
-	if (isTestMode && (window.__mockYtDlp || window.__mockSpawn || window.__mockFfmpeg)) return "ffmpeg";
-	if (
-		env &&
-		env.YTDOWNLOADER_FFMPEG_PATH &&
-		existsSync(env.YTDOWNLOADER_FFMPEG_PATH)
-	) {
-		return env.YTDOWNLOADER_FFMPEG_PATH;
-	}
 
-	const dir = window.AppBinaries?.ffmpegPath;
-	if (!dir) return "";
-	const ext = os.platform() === "win32" ? ".exe" : "";
-	return path.join(dir, "ffmpeg" + ext);
-}
 
 dom.outputFolderInput.addEventListener("change", (e) => {
 	const checked = e.target.checked;
@@ -1003,23 +988,6 @@ Object.entries(menuRoutes).forEach(([domKey, route]) => {
 });
 
 // Target Size / CRF Mode helper functions
-function getFfprobePath() {
-	const isTestMode = Boolean(window.electronAPI && window.electronAPI.isTest);
-	if (isTestMode && (window.__mockYtDlp || window.__mockSpawn || window.__mockFfmpeg)) return "ffprobe";
-	if (
-		env &&
-		env.YTDOWNLOADER_FFMPEG_PATH &&
-		existsSync(env.YTDOWNLOADER_FFMPEG_PATH)
-	) {
-		const dir = path.dirname(env.YTDOWNLOADER_FFMPEG_PATH);
-		const ext = os.platform() === "win32" ? ".exe" : "";
-		return path.join(dir, "ffprobe" + ext);
-	}
-	const dir = window.AppBinaries?.ffmpegPath;
-	if (!dir) return "";
-	const ext = os.platform() === "win32" ? ".exe" : "";
-	return path.join(dir, "ffprobe" + ext);
-}
 
 function getVideoDuration(filePath) {
 	const ffprobe = getFfprobePath();

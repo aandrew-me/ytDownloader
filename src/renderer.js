@@ -1,4 +1,11 @@
-import {getId as $, showPopup, formatTime} from "./utils.js";
+import {
+	getId as $,
+	showPopup,
+	formatTime,
+	findFfmpeg,
+	ensureFfmpegLibsLoadable,
+	getJsRuntimePath,
+} from "./utils.js";
 import {selectVideo, selectAudio} from "./index.js";
 
 const {
@@ -199,11 +206,11 @@ class YtDownloaderApp {
 			this.state.ytDlp = mockYtDlp || YTDlpWrap.new(this.state.ytDlpPath);
 			this.state.ffmpegPath = mockYtDlp
 				? "ffmpeg"
-				: await this._findFfmpeg();
-			this._ensureFfmpegLibsLoadable(this.state.ffmpegPath);
+				: await findFfmpeg();
+			ensureFfmpegLibsLoadable(this.state.ffmpegPath);
 			this.state.jsRuntimePath = mockYtDlp
 				? ""
-				: await this._getJsRuntimePath();
+				: await getJsRuntimePath();
 
 			window.AppBinaries = {
 				ytDlpPath: this.state.ytDlpPath,
@@ -266,11 +273,11 @@ class YtDownloaderApp {
 				const ytDlp = mockYtDlp || YTDlpWrap.new(ytDlpPath);
 				const ffmpegPath = mockYtDlp
 					? "ffmpeg"
-					: await this._findFfmpeg();
-				this._ensureFfmpegLibsLoadable(ffmpegPath);
+					: await findFfmpeg();
+				ensureFfmpegLibsLoadable(ffmpegPath);
 				const jsRuntimePath = mockYtDlp
 					? ""
-					: await this._getJsRuntimePath();
+					: await getJsRuntimePath();
 
 				// Atomic update of state once all resolvers complete
 				this.state.ytDlpPath = ytDlpPath;
@@ -668,217 +675,6 @@ class YtDownloaderApp {
 				throw new Error("Failed to download yt-dlp.");
 			}
 		}
-	}
-
-	/**
-	 * Locates the ffmpeg executable path.
-	 * @returns {Promise<string>} A promise that resolves with the path to ffmpeg.
-	 */
-	async _findFfmpeg() {
-		// Priority 1: Environment Variable
-		if (env && env.YTDOWNLOADER_FFMPEG_PATH) {
-			if (existsSync(env.YTDOWNLOADER_FFMPEG_PATH)) {
-				return env.YTDOWNLOADER_FFMPEG_PATH;
-			}
-			throw new Error(
-				"YTDOWNLOADER_FFMPEG_PATH is set, but no file exists there.",
-			);
-		}
-
-		// Priority 2: System-installed (FreeBSD)
-		if (platform() === "freebsd") {
-			try {
-				return execSync("which ffmpeg").toString().trim();
-			} catch {
-				throw new Error(
-					"No ffmpeg found in PATH on FreeBSD. App may not work correctly.",
-				);
-			}
-		}
-
-		// Priority 2.5: User-selected system ffmpeg
-		const ffmpegSource = localStorage.getItem("ffmpegSource") || "bundled";
-		if (ffmpegSource === "system") {
-			try {
-				let sysPath;
-				if (platform() === "win32") {
-					sysPath = execSync("where ffmpeg")
-						.toString()
-						.split(/\r?\n/)[0]
-						.trim();
-				} else {
-					sysPath = execSync("command -v ffmpeg || which ffmpeg")
-						.toString()
-						.split(/\r?\n/)[0]
-						.trim();
-				}
-				if (sysPath && existsSync(sysPath)) {
-					return dirname(sysPath);
-				}
-			} catch {
-				console.warn(
-					"System ffmpeg not found in PATH; falling back to bundled.",
-				);
-			}
-		}
-
-		// Priority 3: Bundled ffmpeg
-		const bundledDir = join(__dirname, "..", "ffmpeg");
-		const isWin = platform() === "win32";
-		const ffmpegName = isWin ? "ffmpeg.exe" : "ffmpeg";
-		const bundledFfmpegFile = join(bundledDir, "bin", ffmpegName);
-
-		// MS Store packages run in a restricted WindowsApps container where executing binaries fails
-		if (windowsStore) {
-			const targetDir = join(homedir(), ".ytDownloader", "ffmpeg");
-			const targetFfmpegFile = join(targetDir, "bin", ffmpegName);
-
-			if (!existsSync(targetFfmpegFile)) {
-				if (existsSync(bundledDir)) {
-					try {
-						cpSync(bundledDir, targetDir, {
-							recursive: true,
-							dereference: true,
-						});
-					} catch {
-						console.error("Failed to copy bundled ffmpeg.");
-						return "";
-					}
-				} else {
-					return "";
-				}
-			}
-
-			return join(targetDir, "bin");
-		}
-
-		if (existsSync(bundledFfmpegFile)) {
-			return join(bundledDir, "bin");
-		}
-
-		// Fallback if existing copy is present in ~/.ytDownloader
-		const fallbackDir = join(homedir(), ".ytDownloader", "ffmpeg", "bin");
-		if (existsSync(join(fallbackDir, ffmpegName))) {
-			return fallbackDir;
-		}
-
-		return "";
-	}
-
-	/**
-	 * The bundled Linux ffmpeg is dynamically linked and ships its shared
-	 * libraries in a sibling "lib" directory, but its RPATH is broken, so it
-	 * cannot find them on its own. yt-dlp spawns ffmpeg as a child process, so
-	 * we expose that lib directory via LD_LIBRARY_PATH (inherited by children).
-	 * Without this, audio extraction fails with "ffprobe and ffmpeg not found".
-	 * @param {string} ffmpegPath Path to the bundled ffmpeg "bin" directory.
-	 */
-	_ensureFfmpegLibsLoadable(ffmpegPath) {
-		if (platform() !== "linux" || !ffmpegPath) {
-			return;
-		}
-
-		const libDir = join(ffmpegPath, "..", "lib");
-		if (!existsSync(libDir)) {
-			return;
-		}
-
-		const current = env ? env.LD_LIBRARY_PATH : undefined;
-		if (current) {
-			if (!current.split(":").includes(libDir)) {
-				setEnv("LD_LIBRARY_PATH", `${libDir}:${current}`);
-			}
-		} else {
-			setEnv("LD_LIBRARY_PATH", libDir);
-		}
-	}
-
-	/**
-	 * Determines the JavaScript runtime path for yt-dlp.
-	 * @returns {Promise<string>} A promise that resolves with the JS runtime path.
-	 */
-	async _getJsRuntimePath() {
-		const exeName = "node";
-
-		// Priority 1: Environment Variable (Node)
-		if (env && env.YTDOWNLOADER_NODE_PATH) {
-			if (existsSync(env.YTDOWNLOADER_NODE_PATH)) {
-				return `$node:${env.YTDOWNLOADER_NODE_PATH}`;
-			}
-
-			return "";
-		}
-
-		// Priority 2: Environment Variable (Deno)
-		if (env && env.YTDOWNLOADER_DENO_PATH) {
-			if (existsSync(env.YTDOWNLOADER_DENO_PATH)) {
-				return `$deno:${env.YTDOWNLOADER_DENO_PATH}`;
-			}
-
-			return "";
-		}
-
-		// Priority 3: System-installed Deno (macOS Fallback)
-		if (platform() === "darwin") {
-			const possiblePaths = [
-				"/opt/homebrew/bin/deno",
-				"/usr/local/bin/deno",
-			];
-
-			for (const p of possiblePaths) {
-				if (existsSync(p)) {
-					return `deno:${p}`;
-				}
-			}
-
-			console.log("No Deno installation found");
-
-			return "";
-		}
-
-		// Priority 4: Bundled Node Runtime
-		const isWin = platform() === "win32";
-		const nodeName = isWin ? "node.exe" : "node";
-
-		const bundledNodePath = join(__dirname, "..", nodeName);
-
-		// MS Store packages run in a restricted WindowsApps container
-		if (windowsStore) {
-			const targetDir = join(homedir(), ".ytDownloader");
-			const targetNodeFile = join(targetDir, nodeName);
-
-			if (existsSync(targetNodeFile)) {
-				return `${exeName}:${targetNodeFile}`;
-			}
-
-			if (existsSync(bundledNodePath)) {
-				if (!existsSync(targetDir)) {
-					mkdirSync(targetDir, {recursive: true});
-				}
-
-				try {
-					copyFileSync(bundledNodePath, targetNodeFile);
-				} catch {
-					console.error("Failed to copy bundled Node runtime.");
-					return "";
-				}
-
-				return `${exeName}:${targetNodeFile}`;
-			}
-
-			return "";
-		}
-
-		if (existsSync(bundledNodePath)) {
-			return `${exeName}:${bundledNodePath}`;
-		}
-
-		const fallbackNodePath = join(homedir(), ".ytDownloader", nodeName);
-		if (existsSync(fallbackNodePath)) {
-			return `${exeName}:${fallbackNodePath}`;
-		}
-
-		return "";
 	}
 
 	/**
