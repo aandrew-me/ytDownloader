@@ -7,7 +7,6 @@ const {
 	path,
 	os,
 	fs,
-	execSync,
 	constants,
 	env,
 	__dirname,
@@ -185,16 +184,21 @@ const playlistDownloader = {
 		const isTestMode = Boolean(window.electronAPI && window.electronAPI.isTest);
 		const mockYtDlp = isTestMode ? window.__mockYtDlp : null;
 
-		if (window.AppBinaries && !mockYtDlp) {
+		if (mockYtDlp) {
+			this.state.ytDlpPath = "mock-ytdlp";
+			this.state.ytDlpWrap = mockYtDlp;
+			this.state.ffmpegPath = "ffmpeg";
+			this.state.jsRuntimePath = "";
+		} else if (window.AppBinaries) {
 			this.state.ytDlpPath = window.AppBinaries.ytDlpPath;
 			this.state.ytDlpWrap = window.AppBinaries.ytDlp;
 			this.state.ffmpegPath = window.AppBinaries.ffmpegPath;
 			this.state.jsRuntimePath = window.AppBinaries.jsRuntimePath;
 		} else {
-			this.state.ytDlpPath = mockYtDlp ? "mock-ytdlp" : localStorage.getItem("ytdlp");
-			this.state.ytDlpWrap = mockYtDlp || YTDlpWrap.new(this.state.ytDlpPath);
-			this.state.ffmpegPath = mockYtDlp ? "ffmpeg" : this.getFfmpegPath();
-			this.state.jsRuntimePath = mockYtDlp ? "" : this.getJsRuntimePath();
+			this.state.ytDlpPath = localStorage.getItem("ytdlp") || "";
+			this.state.ytDlpWrap = this.state.ytDlpPath ? YTDlpWrap.new(this.state.ytDlpPath) : null;
+			this.state.ffmpegPath = "";
+			this.state.jsRuntimePath = "";
 		}
 
 		const defaultDownloadsDir = path.join(os.homedir(), "Downloads");
@@ -947,89 +951,6 @@ const playlistDownloader = {
 		ipcRenderer.send(event, path.join(__dirname, page));
 	},
 
-	getFfmpegPath() {
-		if (window.electronAPI && window.electronAPI.isTest && window.__mockYtDlp) return "ffmpeg";
-		if (
-			env &&
-			env.YTDOWNLOADER_FFMPEG_PATH &&
-			fs.existsSync(env.YTDOWNLOADER_FFMPEG_PATH)
-		) {
-			console.log("Using FFMPEG from YTDOWNLOADER_FFMPEG_PATH");
-
-			return env.YTDOWNLOADER_FFMPEG_PATH;
-		}
-
-		switch (os.platform()) {
-			case "win32":
-				return path.join(
-					os.homedir(),
-					".ytDownloader",
-					"ffmpeg",
-					"bin",
-				);
-			case "freebsd":
-				try {
-					return execSync("which ffmpeg").toString("utf8").trim();
-				} catch (error) {
-					console.error("ffmpeg not found on FreeBSD:", error);
-					return "";
-				}
-			default:
-				return path.join(
-					os.homedir(),
-					".ytDownloader",
-					"ffmpeg",
-					"bin",
-				);
-		}
-	},
-
-	getJsRuntimePath() {
-		if (window.electronAPI && window.electronAPI.isTest && window.__mockYtDlp) return "";
-		{
-			const exeName = "node";
-
-			if (env && env.YTDOWNLOADER_NODE_PATH) {
-				if (fs.existsSync(env.YTDOWNLOADER_NODE_PATH)) {
-					return `$node:${env.YTDOWNLOADER_NODE_PATH}`;
-				}
-
-				return "";
-			}
-
-			if (env && env.YTDOWNLOADER_DENO_PATH) {
-				if (fs.existsSync(env.YTDOWNLOADER_DENO_PATH)) {
-					return `$deno:${env.YTDOWNLOADER_DENO_PATH}`;
-				}
-
-				return "";
-			}
-
-			if (os.platform() === "darwin") {
-				return "";
-			}
-
-			let jsRuntimePath = path.join(
-				os.homedir(),
-				".ytDownloader",
-				exeName,
-			);
-
-			if (os.platform() === "win32") {
-				jsRuntimePath = path.join(
-					os.homedir(),
-					".ytDownloader",
-					`${exeName}.exe`,
-				);
-			}
-
-			if (fs.existsSync(jsRuntimePath)) {
-				return `${exeName}:${jsRuntimePath}`;
-			} else {
-				return "";
-			}
-		}
-	},
 	validateUrl(rawUrl) {
 		const input = String(rawUrl ?? "").trim();
 

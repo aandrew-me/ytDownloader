@@ -1,8 +1,7 @@
-import { getId, formatBytes } from "./utils.js";
+import { getId, formatBytes, getFfmpegPath, getFfprobePath } from "./utils.js";
 
 const {
 	spawn,
-	execSync,
 	path,
 	ipcRenderer,
 	os,
@@ -87,9 +86,6 @@ dom.menuIcon.addEventListener("click", () => {
 		openMenu();
 	}
 });
-
-const ffmpeg = getFfmpegPath();
-console.log(ffmpeg);
 
 const vaapi_device = "/dev/dri/renderD128";
 
@@ -294,7 +290,8 @@ async function compressVideo(file, settings, itemId, outputPath) {
 		const isTestMode = Boolean(window.electronAPI && window.electronAPI.isTest);
 		const mockSpawn = isTestMode ? (window.__mockSpawn || window.__mockFfmpeg) : null;
 		const spawnFn = mockSpawn || spawn;
-		const child = spawnFn(ffmpeg, args);
+		const ffmpegPath = getFfmpegPath();
+		const child = spawnFn(ffmpegPath, args);
 
 		activeProcesses.add(child);
 		child.on("exit", () => {
@@ -943,43 +940,7 @@ function timeToSeconds(timeStr) {
 	return hh * 3600 + mm * 60 + ss;
 }
 
-function getFfmpegPath() {
-	if (window.electronAPI && window.electronAPI.isTest && (window.__mockYtDlp || window.__mockSpawn || window.__mockFfmpeg)) return "ffmpeg";
-	if (
-		env &&
-		env.YTDOWNLOADER_FFMPEG_PATH &&
-		existsSync(env.YTDOWNLOADER_FFMPEG_PATH)
-	) {
-		console.log("Using FFMPEG from YTDOWNLOADER_FFMPEG_PATH");
-		return env.YTDOWNLOADER_FFMPEG_PATH;
-	}
 
-	switch (os.platform()) {
-		case "win32":
-			return path.join(
-				os.homedir(),
-				".ytDownloader",
-				"ffmpeg",
-				"bin",
-				"ffmpeg.exe",
-			);
-		case "freebsd":
-			try {
-				return execSync("which ffmpeg").toString("utf8").trim();
-			} catch (error) {
-				console.error("ffmpeg not found on FreeBSD:", error);
-				return "";
-			}
-		default:
-			return path.join(
-				os.homedir(),
-				".ytDownloader",
-				"ffmpeg",
-				"bin",
-				"ffmpeg",
-			);
-	}
-}
 
 dom.outputFolderInput.addEventListener("change", (e) => {
 	const checked = e.target.checked;
@@ -1027,13 +988,6 @@ Object.entries(menuRoutes).forEach(([domKey, route]) => {
 });
 
 // Target Size / CRF Mode helper functions
-function getFfprobePath() {
-	const ffmpegPath = getFfmpegPath();
-	if (!ffmpegPath) return "";
-	const dir = path.dirname(ffmpegPath);
-	const ext = os.platform() === "win32" ? ".exe" : "";
-	return path.join(dir, "ffprobe" + ext);
-}
 
 function getVideoDuration(filePath) {
 	const ffprobe = getFfprobePath();
