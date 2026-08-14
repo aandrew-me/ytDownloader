@@ -398,6 +398,25 @@
                                 </label>
                             </div>
 
+                            <!-- Output Format Selection (Video only) -->
+                            <div class="home-advanced-card" id="homeOutputFormatCard">
+                                <div class="home-advanced-header">
+                                    <svg class="home-advanced-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                                        <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                                        <line x1="12" y1="22.08" x2="12" y2="12"/>
+                                    </svg>
+                                    <span class="home-toggle-title" data-translate="outputFormat">Output Format</span>
+                                </div>
+                                <select id="homeOutputFormatSelect">
+                                    <option value="auto" data-translate="auto" selected>Auto (Default)</option>
+                                    <option value="mp4">MP4 (.mp4)</option>
+                                    <option value="mkv">MKV (.mkv)</option>
+                                    <option value="webm">WebM (.webm)</option>
+                                    <option value="mov">MOV (.mov)</option>
+                                </select>
+                            </div>
+
                             <!-- Custom yt-dlp arguments -->
                             <div class="home-advanced-card">
                                 <div class="home-advanced-header">

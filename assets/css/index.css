@@ -1239,6 +1239,7 @@ button {
 	border-radius: 16px;
 	padding: 20px 22px;
 	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+	text-align: left;
 }
 
 .home-advanced-card {
@@ -1249,6 +1250,7 @@ button {
 	display: flex;
 	flex-direction: column;
 	gap: 12px;
+	text-align: left;
 }
 
 .home-advanced-header {
@@ -1258,6 +1260,7 @@ button {
 	color: var(--text);
 	font-size: 15px;
 	padding: 2px 0;
+	text-align: left;
 }
 
 .home-advanced-icon {
@@ -1316,6 +1319,28 @@ button {
 	border: 1px solid var(--box-separation);
 	background-color: var(--background);
 	border-radius: 8px;
+}
+
+#homeOutputFormatSelect {
+	width: 100%;
+	max-width: 100%;
+	margin: 0;
+	padding: 10px 14px;
+	background-color: var(--background);
+	color: var(--text);
+	border: 1px solid var(--box-separation);
+	border-radius: 8px;
+	outline: none;
+	font-family: inherit;
+	font-size: 14px;
+	box-sizing: border-box;
+	cursor: pointer;
+	transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#homeOutputFormatSelect:focus {
+	border-color: var(--blueBtn);
+	box-shadow: 0 0 0 3px color-mix(in srgb, var(--blueBtn) 22%, transparent);
 }
 
 .advancedItem {

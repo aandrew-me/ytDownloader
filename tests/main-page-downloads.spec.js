@@ -211,4 +211,70 @@ test.describe("Main Page Download Tests", () => {
 
 		expect(isHiddenImmediately).toBe(true);
 	});
+
+	test("video download with output format selected remuxes into chosen container", async () => {
+		const testUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+
+		await page.evaluate((url) => {
+			window.electronAPI.clipboard.writeText(url);
+		}, testUrl);
+
+		await page.click("#pasteUrl");
+		await waitForInfoPanel(page);
+
+		// Open "More options"
+		await triggerClick(page, "advancedVideoToggle");
+
+		// Select mp4 output format
+		await page.selectOption("#homeOutputFormatSelect", "mp4");
+
+		await clearExecutedCommands(page);
+
+		await triggerClick(page, "videoDownload");
+
+		await page.waitForFunction(() => {
+			const cmds = window.__executedCommands || [];
+			return cmds.some((cmd) => cmd.includes("-f"));
+		});
+
+		const commands = await getExecutedCommands(page);
+		const downloadCmd = commands.find((cmd) => cmd.includes("-f"));
+		expect(downloadCmd).toBeDefined();
+		expect(downloadCmd).toContain("--recode-video");
+		expect(downloadCmd).toContain("mp4");
+		expect(downloadCmd).toContain("--merge-output-format");
+	});
+
+	test("video download with mkv output format passes mkv container args", async () => {
+		const testUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+
+		await page.evaluate((url) => {
+			window.electronAPI.clipboard.writeText(url);
+		}, testUrl);
+
+		await page.click("#pasteUrl");
+		await waitForInfoPanel(page);
+
+		// Open "More options"
+		await triggerClick(page, "advancedVideoToggle");
+
+		// Select mkv output format
+		await page.selectOption("#homeOutputFormatSelect", "mkv");
+
+		await clearExecutedCommands(page);
+
+		await triggerClick(page, "videoDownload");
+
+		await page.waitForFunction(() => {
+			const cmds = window.__executedCommands || [];
+			return cmds.some((cmd) => cmd.includes("-f"));
+		});
+
+		const commands = await getExecutedCommands(page);
+		const downloadCmd = commands.find((cmd) => cmd.includes("-f"));
+		expect(downloadCmd).toBeDefined();
+		expect(downloadCmd).toContain("--recode-video");
+		expect(downloadCmd).toContain("mkv");
+		expect(downloadCmd).toContain("--merge-output-format");
+	});
 });
