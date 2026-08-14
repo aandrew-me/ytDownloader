@@ -171,9 +171,6 @@ const playlistDownloader = {
 				window.i18n.translatePage();
 			}
 		});
-
-		console.log(`yt-dlp path: ${this.state.ytDlpPath}`);
-		console.log(`ffmpeg path: ${this.state.ffmpegPath}`);
 	},
 
 	loadInitialConfig() {
