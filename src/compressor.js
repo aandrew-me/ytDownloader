@@ -2,7 +2,6 @@ import { getId, formatBytes } from "./utils.js";
 
 const {
 	spawn,
-	execSync,
 	path,
 	ipcRenderer,
 	os,
@@ -11,7 +10,6 @@ const {
 	crypto,
 	env,
 	__dirname,
-	windowsStore,
 } = window.electronAPI;
 
 document.addEventListener("translations-loaded", () => {
@@ -88,9 +86,6 @@ dom.menuIcon.addEventListener("click", () => {
 		openMenu();
 	}
 });
-
-const ffmpeg = getFfmpegPath();
-console.log(ffmpeg);
 
 const vaapi_device = "/dev/dri/renderD128";
 
@@ -295,7 +290,8 @@ async function compressVideo(file, settings, itemId, outputPath) {
 		const isTestMode = Boolean(window.electronAPI && window.electronAPI.isTest);
 		const mockSpawn = isTestMode ? (window.__mockSpawn || window.__mockFfmpeg) : null;
 		const spawnFn = mockSpawn || spawn;
-		const child = spawnFn(ffmpeg, args);
+		const ffmpegPath = getFfmpegPath();
+		const child = spawnFn(ffmpegPath, args);
 
 		activeProcesses.add(child);
 		child.on("exit", () => {
@@ -945,46 +941,20 @@ function timeToSeconds(timeStr) {
 }
 
 function getFfmpegPath() {
-	if (window.electronAPI && window.electronAPI.isTest && (window.__mockYtDlp || window.__mockSpawn || window.__mockFfmpeg)) return "ffmpeg";
+	const isTestMode = Boolean(window.electronAPI && window.electronAPI.isTest);
+	if (isTestMode && (window.__mockYtDlp || window.__mockSpawn || window.__mockFfmpeg)) return "ffmpeg";
 	if (
 		env &&
 		env.YTDOWNLOADER_FFMPEG_PATH &&
 		existsSync(env.YTDOWNLOADER_FFMPEG_PATH)
 	) {
-		console.log("Using FFMPEG from YTDOWNLOADER_FFMPEG_PATH");
 		return env.YTDOWNLOADER_FFMPEG_PATH;
 	}
 
-	if (os.platform() === "freebsd") {
-		try {
-			return execSync("which ffmpeg").toString("utf8").trim();
-		} catch (error) {
-			console.error("ffmpeg not found on FreeBSD:", error);
-			return "";
-		}
-	}
-
-	const isWin = os.platform() === "win32";
-	const ffmpegName = isWin ? "ffmpeg.exe" : "ffmpeg";
-	const bundledFfmpegFile = path.join(__dirname, "..", "ffmpeg", "bin", ffmpegName);
-	const storeFfmpegFile = path.join(os.homedir(), ".ytDownloader", "ffmpeg", "bin", ffmpegName);
-
-	if (windowsStore) {
-		if (existsSync(storeFfmpegFile)) {
-			return storeFfmpegFile;
-		}
-		return "";
-	}
-
-	if (existsSync(bundledFfmpegFile)) {
-		return bundledFfmpegFile;
-	}
-
-	if (existsSync(storeFfmpegFile)) {
-		return storeFfmpegFile;
-	}
-
-	return "";
+	const dir = window.AppBinaries?.ffmpegPath;
+	if (!dir) return "";
+	const ext = os.platform() === "win32" ? ".exe" : "";
+	return path.join(dir, "ffmpeg" + ext);
 }
 
 dom.outputFolderInput.addEventListener("change", (e) => {
@@ -1034,9 +1004,19 @@ Object.entries(menuRoutes).forEach(([domKey, route]) => {
 
 // Target Size / CRF Mode helper functions
 function getFfprobePath() {
-	const ffmpegPath = getFfmpegPath();
-	if (!ffmpegPath) return "";
-	const dir = path.dirname(ffmpegPath);
+	const isTestMode = Boolean(window.electronAPI && window.electronAPI.isTest);
+	if (isTestMode && (window.__mockYtDlp || window.__mockSpawn || window.__mockFfmpeg)) return "ffprobe";
+	if (
+		env &&
+		env.YTDOWNLOADER_FFMPEG_PATH &&
+		existsSync(env.YTDOWNLOADER_FFMPEG_PATH)
+	) {
+		const dir = path.dirname(env.YTDOWNLOADER_FFMPEG_PATH);
+		const ext = os.platform() === "win32" ? ".exe" : "";
+		return path.join(dir, "ffprobe" + ext);
+	}
+	const dir = window.AppBinaries?.ffmpegPath;
+	if (!dir) return "";
 	const ext = os.platform() === "win32" ? ".exe" : "";
 	return path.join(dir, "ffprobe" + ext);
 }
