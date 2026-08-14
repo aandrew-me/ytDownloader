@@ -1,4 +1,4 @@
-import { getId } from "./utils.js";
+import { getId, formatTime } from "./utils.js";
 
 const {
 	clipboard,
@@ -27,6 +27,25 @@ const playlistDownloader = {
 		currentAbortController: null,
 		isDownloading: false,
 		isCancelled: false,
+		currentLocalCount: 0,
+		currentMode: "batch", // "batch" or "selective"
+	},
+
+	selectiveState: {
+		url: "",
+		title: "",
+		channel: "",
+		entries: [],
+		isFetching: false,
+		isDownloading: false,
+		isCancelled: false,
+		activeControllers: [],
+		bulkPreset: {
+			type: "video",
+			quality: "1080",
+			format: "auto",
+			audioExt: "mp3",
+		},
 	},
 
 	config: {
@@ -44,58 +63,19 @@ const playlistDownloader = {
 	},
 
 	// DOM elements
-	ui: {
-		pasteLinkBtn: getId("pasteLink"),
-		linkDisplay: getId("link"),
-		optionsContainer: getId("options"),
-		downloadList: getId("list"),
-
-		downloadVideoBtn: getId("download"),
-		downloadAudioBtn: getId("audioDownload"),
-		downloadThumbnailsBtn: getId("downloadThumbnails"),
-		saveLinksBtn: getId("saveLinks"),
-
-		selectLocationBtn: getId("selectLocation"),
-		pathDisplay: getId("path"),
-		openDownloadsBtn: getId("openDownloads"),
-		stopDownloadBtn: getId("stopDownload"),
-
-		videoToggle: getId("videoToggle"),
-		audioToggle: getId("audioToggle"),
-		advancedToggle: getId("advancedToggle"),
-		videoBox: getId("videoBox"),
-		audioBox: getId("audioBox"),
-		videoQualitySelect: getId("select"),
-		videoTypeSelect: getId("videoTypeSelect"),
-		typeSelectBox: getId("typeSelectBox"),
-		audioTypeSelect: getId("audioSelect"),
-		audioQualitySelect: getId("audioQualitySelect"),
-
-		advancedMenu: getId("advancedMenu"),
-		playlistIndexInput: getId("playlistIndex"),
-		playlistEndInput: getId("playlistEnd"),
-		subtitlesCheckbox: getId("subChecked"),
-		closeHiddenBtn: getId("closeHidden"),
-
-		playlistNameDisplay: getId("playlistName"),
-		errorMsgDisplay: getId("incorrectMsgPlaylist"),
-		errorBtn: getId("errorBtn"),
-		errorDetails: getId("errorDetails"),
-
-		menuIcon: getId("menuIcon"),
-		menu: getId("menu"),
-		preferenceWinBtn: getId("preferenceWin"),
-		aboutWinBtn: getId("aboutWin"),
-		historyWinBtn: getId("historyWin"),
-		homeWinBtn: getId("homeWin"),
-		compressorWinBtn: getId("compressorWin"),
-		searchWinBtn: getId("searchWin"),
-	},
+	ui: {},
 
 	initUI() {
 		const container = getId("view-playlist") || document;
 
 		this.ui = {
+			// Mode switcher
+			playlistModeBatchBtn: container.querySelector("#playlistModeBatchBtn"),
+			playlistModeSelectiveBtn: container.querySelector("#playlistModeSelectiveBtn"),
+			playlistBatchSection: container.querySelector("#playlistBatchSection"),
+			playlistSelectiveSection: container.querySelector("#playlistSelectiveSection"),
+
+			// Batch Mode UI
 			pasteLinkBtn: container.querySelector("#pasteLink") || container.querySelector("#pasteLinkPlaylist") || getId("pasteLink"),
 			linkDisplay: container.querySelector("#link") || getId("link"),
 			optionsContainer: container.querySelector("#options") || getId("options"),
@@ -106,8 +86,8 @@ const playlistDownloader = {
 			downloadThumbnailsBtn: container.querySelector("#downloadThumbnails") || getId("downloadThumbnails"),
 			saveLinksBtn: container.querySelector("#saveLinks") || getId("saveLinks"),
 
-			selectLocationBtn: container.querySelector("#selectLocationPlaylist") || container.querySelector("#selectLocation") || getId("selectLocation"),
-			pathDisplay: container.querySelector("#pathPlaylist") || container.querySelector("#path") || getId("path"),
+			selectLocationBtn: container.querySelector("#playlistPathPicker") || container.querySelector("#selectLocationPlaylist") || container.querySelector("#selectLocation") || getId("selectLocation"),
+			pathDisplay: container.querySelector("#playlistPathDisplay") || container.querySelector("#pathPlaylist") || container.querySelector("#path") || getId("path"),
 			openDownloadsBtn: container.querySelector("#openDownloads") || getId("openDownloads"),
 			stopDownloadBtn: container.querySelector("#stopDownload") || getId("stopDownload"),
 
@@ -132,6 +112,31 @@ const playlistDownloader = {
 			errorMsgDisplay: container.querySelector("#incorrectMsgPlaylist") || container.querySelector("#incorrectMsg") || getId("incorrectMsg"),
 			errorBtn: container.querySelector("#errorBtnPlaylist") || container.querySelector("#errorBtn") || getId("errorBtn"),
 			errorDetails: container.querySelector("#errorDetailsPlaylist") || container.querySelector("#errorDetails") || getId("errorDetails"),
+
+			// Selective Mode UI
+			pasteLinkSelectiveBtn: container.querySelector("#pasteLinkSelective"),
+			selectiveLoadingWrapper: container.querySelector("#loadingWrapperPlaylistSelective"),
+			selectiveIncorrectMsg: container.querySelector("#incorrectMsgSelective"),
+			selectiveErrorBtn: container.querySelector("#errorBtnSelective"),
+			selectiveErrorDetails: container.querySelector("#errorDetailsSelective"),
+			selectiveContent: container.querySelector("#selectiveContent"),
+			selectiveTitle: container.querySelector("#selectivePlaylistTitle"),
+			selectiveChannel: container.querySelector("#selectivePlaylistChannel"),
+			selectiveStatsBadge: container.querySelector("#selectiveStatsBadge"),
+			selectiveSelectAllBtn: container.querySelector("#selectiveSelectAllBtn"),
+			selectiveBulkVideoBtn: container.querySelector("#selectiveBulkVideoBtn"),
+			selectiveBulkAudioBtn: container.querySelector("#selectiveBulkAudioBtn"),
+			selectiveBulkVideoOptions: container.querySelector("#selectiveBulkVideoOptions"),
+			selectiveBulkAudioOptions: container.querySelector("#selectiveBulkAudioOptions"),
+			selectiveBulkResSelect: container.querySelector("#selectiveBulkResSelect"),
+			selectiveBulkFormatSelect: container.querySelector("#selectiveBulkFormatSelect"),
+			selectiveBulkAudioExtSelect: container.querySelector("#selectiveBulkAudioExtSelect"),
+			selectiveApplyBulkBtn: container.querySelector("#selectiveApplyBulkBtn"),
+			selectiveDownloadBtn: container.querySelector("#selectiveDownloadBtn"),
+			selectiveDownloadCount: container.querySelector("#selectiveDownloadCount"),
+			selectiveStopBtn: container.querySelector("#selectiveStopBtn"),
+			selectiveOpenFolderBtn: container.querySelector("#selectiveOpenFolderBtn"),
+			selectiveItemsList: container.querySelector("#selectiveItemsList"),
 
 			menuIcon: getId("menuIcon"),
 			menu: getId("menu"),
@@ -234,7 +239,17 @@ const playlistDownloader = {
 	},
 
 	initEventListeners() {
-		this.ui.pasteLinkBtn.addEventListener("click", () => this.pasteLink());
+		// Mode switching
+		this.ui.playlistModeBatchBtn?.addEventListener("click", () =>
+			this.switchPlaylistMode("batch"),
+		);
+		this.ui.playlistModeSelectiveBtn?.addEventListener("click", () =>
+			this.switchPlaylistMode("selective"),
+		);
+
+		// Batch mode events
+		this.ui.pasteLinkBtn?.addEventListener("click", () => this.pasteLink());
+
 		document.addEventListener("keydown", (event) => {
 			const viewPlaylist = getId("view-playlist");
 			if (!viewPlaylist || viewPlaylist.classList.contains("hidden")) return;
@@ -250,63 +265,103 @@ const playlistDownloader = {
 					document.activeElement.isContentEditable);
 
 			if (isCtrlV && !isInput) {
-				if (!this.state.isDownloading) {
-					this.pasteLink();
+				if (this.state.currentMode === "batch") {
+					if (!this.state.isDownloading) {
+						this.pasteLink();
+					}
+				} else {
+					if (!this.selectiveState.isFetching && !this.selectiveState.isDownloading) {
+						this.pasteLinkSelective();
+					}
 				}
 			}
 		});
 
-		this.ui.downloadVideoBtn.addEventListener("click", () =>
+		this.ui.downloadVideoBtn?.addEventListener("click", () =>
 			this.startDownload("video"),
 		);
-		this.ui.downloadAudioBtn.addEventListener("click", () =>
+		this.ui.downloadAudioBtn?.addEventListener("click", () =>
 			this.startDownload("audio"),
 		);
-		this.ui.downloadThumbnailsBtn.addEventListener("click", () =>
+		this.ui.downloadThumbnailsBtn?.addEventListener("click", () =>
 			this.startDownload("thumbnails"),
 		);
-		this.ui.saveLinksBtn.addEventListener("click", () =>
+		this.ui.saveLinksBtn?.addEventListener("click", () =>
 			this.startDownload("links"),
 		);
 
-		this.ui.videoToggle.addEventListener("click", () =>
+		this.ui.videoToggle?.addEventListener("click", () =>
 			this.toggleDownloadType("video"),
 		);
-		this.ui.audioToggle.addEventListener("click", () =>
+		this.ui.audioToggle?.addEventListener("click", () =>
 			this.toggleDownloadType("audio"),
 		);
-		this.ui.advancedToggle.addEventListener("click", () =>
+		this.ui.advancedToggle?.addEventListener("click", () =>
 			this.toggleAdvancedMenu(),
 		);
-		this.ui.videoQualitySelect.addEventListener("change", () =>
+		this.ui.videoQualitySelect?.addEventListener("change", () =>
 			this.updateVideoTypeVisibility(),
 		);
-		this.ui.selectLocationBtn.addEventListener("click", () =>
+		this.ui.selectLocationBtn?.addEventListener("click", () =>
 			ipcRenderer.send("select-location-main", ""),
 		);
-		this.ui.openDownloadsBtn.addEventListener("click", () =>
+		this.ui.openDownloadsBtn?.addEventListener("click", () =>
 			this.openDownloadsFolder(),
 		);
-		this.ui.stopDownloadBtn.addEventListener("click", () =>
+		this.ui.stopDownloadBtn?.addEventListener("click", () =>
 			this.stopDownload(),
 		);
-		this.ui.closeHiddenBtn.addEventListener("click", () =>
+		this.ui.closeHiddenBtn?.addEventListener("click", () =>
 			this.hideOptions(true),
 		);
 
-		this.ui.preferenceWinBtn.addEventListener("click", () =>
+		// Selective Mode events
+		this.ui.pasteLinkSelectiveBtn?.addEventListener("click", () =>
+			this.pasteLinkSelective(),
+		);
+		this.ui.selectiveSelectAllBtn?.addEventListener("click", () =>
+			this.toggleSelectAll(),
+		);
+		this.ui.selectiveBulkVideoBtn?.addEventListener("click", () =>
+			this.setBulkType("video"),
+		);
+		this.ui.selectiveBulkAudioBtn?.addEventListener("click", () =>
+			this.setBulkType("audio"),
+		);
+		this.ui.selectiveApplyBulkBtn?.addEventListener("click", () =>
+			this.applyBulkSettings(),
+		);
+		this.ui.selectiveDownloadBtn?.addEventListener("click", () =>
+			this.startSelectiveDownloads(),
+		);
+		this.ui.selectiveStopBtn?.addEventListener("click", () =>
+			this.stopSelectiveDownloads(),
+		);
+		this.ui.selectiveOpenFolderBtn?.addEventListener("click", () =>
+			this.openDownloadsFolder(),
+		);
+
+		this.ui.selectiveErrorBtn?.addEventListener("click", () => {
+			const isHidden = this.ui.selectiveErrorDetails.style.display === "none";
+			this.ui.selectiveErrorDetails.style.display = isHidden ? "block" : "none";
+			this.ui.selectiveErrorBtn.textContent =
+				(window.i18n ? window.i18n.__("errorDetails") : "Error Details") +
+				(isHidden ? " ▼" : " ◀");
+		});
+
+		this.ui.preferenceWinBtn?.addEventListener("click", () =>
 			this.navigate("page", "/preferences.html"),
 		);
-		this.ui.aboutWinBtn.addEventListener("click", () =>
+		this.ui.aboutWinBtn?.addEventListener("click", () =>
 			this.navigate("page", "/about.html"),
 		);
-		this.ui.historyWinBtn.addEventListener("click", () =>
+		this.ui.historyWinBtn?.addEventListener("click", () =>
 			this.navigate("page", "/history.html"),
 		);
-		this.ui.homeWinBtn.addEventListener("click", () =>
+		this.ui.homeWinBtn?.addEventListener("click", () =>
 			this.navigate("win", "/index.html"),
 		);
-		this.ui.compressorWinBtn.addEventListener("click", () =>
+		this.ui.compressorWinBtn?.addEventListener("click", () =>
 			this.navigate("win", "/compressor.html"),
 		);
 		this.ui.searchWinBtn?.addEventListener("click", () =>
@@ -315,11 +370,628 @@ const playlistDownloader = {
 
 		ipcRenderer.on("downloadPath", (_event, downloadPath) => {
 			if (downloadPath && downloadPath[0]) {
-				this.ui.pathDisplay.textContent = downloadPath[0];
+				if (this.ui.pathDisplay) {
+					this.ui.pathDisplay.textContent = downloadPath[0];
+				}
 				this.state.downloadDir = downloadPath[0];
 			}
 		});
 	},
+
+	switchPlaylistMode(mode) {
+		this.state.currentMode = mode;
+		if (mode === "batch") {
+			this.ui.playlistModeBatchBtn?.classList.add("active");
+			this.ui.playlistModeSelectiveBtn?.classList.remove("active");
+			if (this.ui.playlistBatchSection) this.ui.playlistBatchSection.style.display = "block";
+			if (this.ui.playlistSelectiveSection) this.ui.playlistSelectiveSection.style.display = "none";
+		} else {
+			this.ui.playlistModeSelectiveBtn?.classList.add("active");
+			this.ui.playlistModeBatchBtn?.classList.remove("active");
+			if (this.ui.playlistBatchSection) this.ui.playlistBatchSection.style.display = "none";
+			if (this.ui.playlistSelectiveSection) this.ui.playlistSelectiveSection.style.display = "block";
+		}
+	},
+
+	// ==========================================
+	// SELECTIVE PLAYLIST MODE IMPLEMENTATION
+	// ==========================================
+
+	pasteLinkSelective() {
+		if (this.selectiveState.isFetching || this.selectiveState.isDownloading) return;
+		const rawUrl = clipboard.readText();
+		this.fetchSelectivePlaylist(rawUrl);
+	},
+
+	async fetchSelectivePlaylist(rawUrl) {
+		let url;
+		try {
+			url = this.validateUrl(rawUrl);
+		} catch (_) {
+			this.handleSelectiveError(
+				window.i18n ? window.i18n.__("errorNetworkOrUrl") : "Invalid URL",
+				rawUrl,
+			);
+			return;
+		}
+
+		await this.updateDynamicConfig();
+
+		this.selectiveState.url = url;
+		this.selectiveState.isFetching = true;
+		this.selectiveState.entries = [];
+
+		if (this.ui.selectiveLoadingWrapper) this.ui.selectiveLoadingWrapper.style.display = "flex";
+		if (this.ui.selectiveIncorrectMsg) this.ui.selectiveIncorrectMsg.textContent = "";
+		if (this.ui.selectiveErrorBtn) this.ui.selectiveErrorBtn.style.display = "none";
+		if (this.ui.selectiveErrorDetails) {
+			this.ui.selectiveErrorDetails.style.display = "none";
+			this.ui.selectiveErrorDetails.textContent = "";
+		}
+		if (this.ui.selectiveContent) this.ui.selectiveContent.style.display = "none";
+
+		const args = [
+			"--yes-playlist",
+			"--flat-playlist",
+			"-J",
+			"--no-warnings",
+			...(this.config.cookie.arg && this.config.cookie.val
+				? [this.config.cookie.arg, this.config.cookie.val]
+				: []),
+			...(this.config.proxy
+				? ["--no-check-certificate", "--proxy", this.config.proxy]
+				: []),
+			url,
+		];
+
+		const wrap = this.state.ytDlpWrap;
+
+		if (!wrap) {
+			this.selectiveState.isFetching = false;
+			if (this.ui.selectiveLoadingWrapper) this.ui.selectiveLoadingWrapper.style.display = "none";
+			this.handleSelectiveError("yt-dlp binary not configured", url);
+			return;
+		}
+
+		try {
+			const proc = wrap.exec(args, { shell: false });
+			let stdout = "";
+			let stderr = "";
+
+			proc.ytDlpProcess?.stdout?.on("data", (data) => {
+				stdout += typeof data === "string" ? data : data.toString();
+			});
+			proc.ytDlpProcess?.stderr?.on("data", (data) => {
+				stderr += typeof data === "string" ? data : data.toString();
+			});
+
+			proc.on("close", () => {
+				this.selectiveState.isFetching = false;
+				if (this.ui.selectiveLoadingWrapper) this.ui.selectiveLoadingWrapper.style.display = "none";
+
+				if (!stdout) {
+					this.handleSelectiveError(
+						stderr || "Failed to fetch playlist data",
+						url,
+					);
+					return;
+				}
+
+				try {
+					const parsed = JSON.parse(stdout);
+					if (parsed && Array.isArray(parsed.entries) && parsed.entries.length > 0) {
+						this.selectiveState.title = parsed.title || "Playlist";
+						this.selectiveState.channel = parsed.channel || parsed.uploader || "";
+
+						const prefVideo = localStorage.getItem("preferredVideoQuality") || "1080";
+						const prefAudio = localStorage.getItem("preferredAudioQuality") || "mp3";
+
+						this.selectiveState.entries = parsed.entries.map((entry, index) => {
+							const id = entry.id || `entry_${index + 1}`;
+							const videoTitle = entry.title || `Video ${index + 1}`;
+							const duration = typeof entry.duration === "number" ? entry.duration : 0;
+							const durationStr = duration > 0 ? formatTime(duration) : "";
+
+							let thumbUrl = "../assets/images/thumb.png";
+							if (Array.isArray(entry.thumbnails) && entry.thumbnails.length > 0) {
+								const bestThumb = entry.thumbnails[entry.thumbnails.length - 1]?.url || entry.thumbnails[0]?.url;
+								if (bestThumb) thumbUrl = bestThumb;
+							}
+
+							const itemUrl = entry.url
+								? (entry.url.startsWith("http") ? entry.url : `https://www.youtube.com/watch?v=${entry.url}`)
+								: (entry.id ? `https://www.youtube.com/watch?v=${entry.id}` : url);
+
+							return {
+								id: id,
+								index: index + 1,
+								title: videoTitle,
+								channel: entry.channel || entry.uploader || this.selectiveState.channel,
+								duration: duration,
+								durationStr: durationStr,
+								thumbnail: thumbUrl,
+								url: itemUrl,
+								selected: true,
+								type: "video",
+								quality: prefVideo,
+								format: "auto",
+								audioExt: prefAudio,
+								audioQuality: "auto",
+								status: "ready", // ready, downloading, completed, error, cancelled
+							};
+						});
+
+						if (this.ui.selectiveTitle) {
+							this.ui.selectiveTitle.textContent = this.selectiveState.title;
+							this.ui.selectiveTitle.title = this.selectiveState.title;
+						}
+						if (this.ui.selectiveChannel) {
+							this.ui.selectiveChannel.textContent = this.selectiveState.channel;
+						}
+
+						this.renderSelectiveItems();
+						this.updateSelectiveStats();
+
+						if (this.ui.selectiveContent) {
+							this.ui.selectiveContent.style.display = "block";
+						}
+					} else {
+						this.handleSelectiveError(
+							window.i18n ? window.i18n.__("errorNetworkOrUrl") : "No video entries found in playlist",
+							url,
+						);
+					}
+				} catch (err) {
+					this.handleSelectiveError(err.message || "Failed to parse playlist data", url);
+				}
+			});
+
+			proc.on("error", (err) => {
+				this.selectiveState.isFetching = false;
+				if (this.ui.selectiveLoadingWrapper) this.ui.selectiveLoadingWrapper.style.display = "none";
+				this.handleSelectiveError(err.message || String(err), url);
+			});
+		} catch (err) {
+			this.selectiveState.isFetching = false;
+			if (this.ui.selectiveLoadingWrapper) this.ui.selectiveLoadingWrapper.style.display = "none";
+			this.handleSelectiveError(err.message || String(err), url);
+		}
+	},
+
+	renderSelectiveItems() {
+		if (!this.ui.selectiveItemsList) return;
+		this.ui.selectiveItemsList.innerHTML = "";
+		const fragment = document.createDocumentFragment();
+
+		const escapeHtml = (str) =>
+			String(str || "")
+				.replace(/&/g, "&amp;")
+				.replace(/</g, "&lt;")
+				.replace(/>/g, "&gt;")
+				.replace(/"/g, "&quot;")
+				.replace(/'/g, "&#039;");
+
+		this.selectiveState.entries.forEach((entry, index) => {
+			const card = document.createElement("div");
+			card.className = `selective-item-card ${entry.selected ? "" : "unselected"}`;
+			card.id = `sel_card_${index}`;
+
+			const isVideo = entry.type === "video";
+			const safeTitle = escapeHtml(entry.title);
+			const safeChannel = escapeHtml(entry.channel || "");
+			const rawThumb = entry.thumbnail && /^(https?:\/\/|\/\/|\/|\.\/|\.\.\/|data:|blob:)/i.test(entry.thumbnail)
+				? entry.thumbnail
+				: "../assets/images/thumb.png";
+			const safeThumb = escapeHtml(rawThumb);
+
+			card.innerHTML = `
+				<div class="selective-item-left">
+					<input type="checkbox" class="cb selective-cb" id="sel_cb_${index}" ${entry.selected ? "checked" : ""}>
+					<div class="selective-thumb-wrap">
+						<img src="${safeThumb}" alt="thumb" class="selective-thumb" crossorigin="anonymous">
+						${entry.durationStr ? `<span class="selective-duration">${entry.durationStr}</span>` : ""}
+					</div>
+				</div>
+				<div class="selective-item-info">
+					<div class="selective-item-title" title="${safeTitle}">${entry.index}. ${safeTitle}</div>
+					<div class="selective-item-meta">${safeChannel}</div>
+					<div class="selective-item-controls">
+						<select class="select-compact selective-type-select" id="sel_type_${index}">
+							<option value="video" ${isVideo ? "selected" : ""}>Video</option>
+							<option value="audio" ${!isVideo ? "selected" : ""}>Audio</option>
+						</select>
+
+						<select class="select-compact selective-res-select" id="sel_res_${index}" style="${isVideo ? "" : "display: none;"}">
+							<option value="best" ${entry.quality === "best" ? "selected" : ""}>Best</option>
+							<option value="4320" ${entry.quality === "4320" ? "selected" : ""}>8K (4320p)</option>
+							<option value="2160" ${entry.quality === "2160" ? "selected" : ""}>4K (2160p)</option>
+							<option value="1440" ${entry.quality === "1440" ? "selected" : ""}>1440p (2K)</option>
+							<option value="1080" ${entry.quality === "1080" ? "selected" : ""}>1080p (FHD)</option>
+							<option value="720" ${entry.quality === "720" ? "selected" : ""}>720p (HD)</option>
+							<option value="480" ${entry.quality === "480" ? "selected" : ""}>480p</option>
+							<option value="360" ${entry.quality === "360" ? "selected" : ""}>360p</option>
+							<option value="240" ${entry.quality === "240" ? "selected" : ""}>240p</option>
+							<option value="144" ${entry.quality === "144" ? "selected" : ""}>144p</option>
+							<option value="worst" ${entry.quality === "worst" ? "selected" : ""}>Worst</option>
+						</select>
+
+						<select class="select-compact selective-format-select" id="sel_fmt_${index}" style="${isVideo ? "" : "display: none;"}">
+							<option value="auto" ${entry.format === "auto" ? "selected" : ""}>Auto</option>
+							<option value="mp4" ${entry.format === "mp4" ? "selected" : ""}>MP4</option>
+							<option value="mkv" ${entry.format === "mkv" ? "selected" : ""}>MKV</option>
+							<option value="webm" ${entry.format === "webm" ? "selected" : ""}>WebM</option>
+						</select>
+
+						<select class="select-compact selective-audio-ext-select" id="sel_aext_${index}" style="${!isVideo ? "" : "display: none;"}">
+							<option value="mp3" ${entry.audioExt === "mp3" ? "selected" : ""}>MP3</option>
+							<option value="m4a" ${entry.audioExt === "m4a" ? "selected" : ""}>M4A</option>
+							<option value="opus" ${entry.audioExt === "opus" ? "selected" : ""}>OPUS</option>
+							<option value="wav" ${entry.audioExt === "wav" ? "selected" : ""}>WAV</option>
+							<option value="flac" ${entry.audioExt === "flac" ? "selected" : ""}>FLAC</option>
+							<option value="alac" ${entry.audioExt === "alac" ? "selected" : ""}>ALAC</option>
+						</select>
+					</div>
+
+					<div class="selective-item-status" id="sel_status_${index}" style="display: none;">
+						<div class="selective-prog-bar"><div class="selective-prog-fill" id="sel_bar_${index}"></div></div>
+						<span class="selective-prog-text" id="sel_txt_${index}">Ready</span>
+					</div>
+				</div>
+			`;
+
+			fragment.appendChild(card);
+
+			// Checkbox change listener
+			const cb = card.querySelector(`#sel_cb_${index}`);
+			cb?.addEventListener("change", (e) => {
+				entry.selected = e.target.checked;
+				if (entry.selected) {
+					card.classList.remove("unselected");
+				} else {
+					card.classList.add("unselected");
+				}
+				this.updateSelectiveStats();
+			});
+
+			// Type change listener
+			const typeSelect = card.querySelector(`#sel_type_${index}`);
+			const resSelect = card.querySelector(`#sel_res_${index}`);
+			const fmtSelect = card.querySelector(`#sel_fmt_${index}`);
+			const aextSelect = card.querySelector(`#sel_aext_${index}`);
+
+			typeSelect?.addEventListener("change", (e) => {
+				entry.type = e.target.value;
+				const isVid = entry.type === "video";
+				if (resSelect) resSelect.style.display = isVid ? "inline-block" : "none";
+				if (fmtSelect) fmtSelect.style.display = isVid ? "inline-block" : "none";
+				if (aextSelect) aextSelect.style.display = !isVid ? "inline-block" : "none";
+			});
+
+			resSelect?.addEventListener("change", (e) => {
+				entry.quality = e.target.value;
+			});
+
+			fmtSelect?.addEventListener("change", (e) => {
+				entry.format = e.target.value;
+			});
+
+			aextSelect?.addEventListener("change", (e) => {
+				entry.audioExt = e.target.value;
+			});
+		});
+
+		this.ui.selectiveItemsList.appendChild(fragment);
+	},
+
+	toggleSelectAll() {
+		this.selectiveState.allSelected = !this.selectiveState.allSelected;
+		this.selectiveState.entries.forEach((entry, index) => {
+			entry.selected = this.selectiveState.allSelected;
+			const cb = document.getElementById(`sel_cb_${index}`);
+			if (cb) cb.checked = entry.selected;
+
+			const card = document.getElementById(`sel_card_${index}`);
+			if (card) {
+				if (entry.selected) {
+					card.classList.remove("unselected");
+				} else {
+					card.classList.add("unselected");
+				}
+			}
+		});
+
+		this.updateSelectiveStats();
+	},
+
+	updateSelectiveStats() {
+		const total = this.selectiveState.entries.length;
+		const selectedCount = this.selectiveState.entries.filter((e) => e.selected).length;
+
+		if (this.ui.selectiveStatsBadge) {
+			const vText = window.i18n ? window.i18n.__("videosCount") : "videos";
+			const sText = window.i18n ? window.i18n.__("selectedCount") : "selected";
+			this.ui.selectiveStatsBadge.textContent = `${total} ${vText} (${selectedCount} ${sText})`;
+		}
+
+		if (this.ui.selectiveDownloadCount) {
+			this.ui.selectiveDownloadCount.textContent = selectedCount;
+		}
+
+		if (this.ui.selectiveSelectAllBtn) {
+			this.selectiveState.allSelected = selectedCount === total && total > 0;
+			this.ui.selectiveSelectAllBtn.textContent = this.selectiveState.allSelected
+				? (window.i18n ? window.i18n.__("deselectAll") : "Deselect All")
+				: (window.i18n ? window.i18n.__("selectAll") : "Select All");
+		}
+	},
+
+	setBulkType(type) {
+		this.selectiveState.bulkPreset.type = type;
+		if (type === "video") {
+			this.ui.selectiveBulkVideoBtn?.classList.add("active");
+			this.ui.selectiveBulkAudioBtn?.classList.remove("active");
+			if (this.ui.selectiveBulkVideoOptions) this.ui.selectiveBulkVideoOptions.style.display = "flex";
+			if (this.ui.selectiveBulkAudioOptions) this.ui.selectiveBulkAudioOptions.style.display = "none";
+		} else {
+			this.ui.selectiveBulkAudioBtn?.classList.add("active");
+			this.ui.selectiveBulkVideoBtn?.classList.remove("active");
+			if (this.ui.selectiveBulkVideoOptions) this.ui.selectiveBulkVideoOptions.style.display = "none";
+			if (this.ui.selectiveBulkAudioOptions) this.ui.selectiveBulkAudioOptions.style.display = "flex";
+		}
+	},
+
+	applyBulkSettings() {
+		const type = this.selectiveState.bulkPreset.type;
+		const quality = this.ui.selectiveBulkResSelect?.value || "1080";
+		const format = this.ui.selectiveBulkFormatSelect?.value || "auto";
+		const audioExt = this.ui.selectiveBulkAudioExtSelect?.value || "mp3";
+
+		this.selectiveState.entries.forEach((entry, index) => {
+			if (!entry.selected) return;
+
+			entry.type = type;
+			entry.quality = quality;
+			entry.format = format;
+			entry.audioExt = audioExt;
+
+			const typeSelect = document.getElementById(`sel_type_${index}`);
+			const resSelect = document.getElementById(`sel_res_${index}`);
+			const fmtSelect = document.getElementById(`sel_fmt_${index}`);
+			const aextSelect = document.getElementById(`sel_aext_${index}`);
+
+			if (typeSelect) typeSelect.value = type;
+			if (resSelect) {
+				resSelect.value = quality;
+				resSelect.style.display = type === "video" ? "inline-block" : "none";
+			}
+			if (fmtSelect) {
+				fmtSelect.value = format;
+				fmtSelect.style.display = type === "video" ? "inline-block" : "none";
+			}
+			if (aextSelect) {
+				aextSelect.value = audioExt;
+				aextSelect.style.display = type === "audio" ? "inline-block" : "none";
+			}
+		});
+	},
+
+	async startSelectiveDownloads() {
+		const selectedEntries = this.selectiveState.entries.filter((e) => e.selected);
+		if (selectedEntries.length === 0) {
+			alert(window.i18n ? window.i18n.__("noVideosSelected") : "No videos selected");
+			return;
+		}
+
+		if (this.selectiveState.isDownloading) return;
+
+		this.selectiveState.isDownloading = true;
+		this.selectiveState.isCancelled = false;
+		this.selectiveState.activeControllers = [];
+
+		if (this.ui.selectiveDownloadBtn) this.ui.selectiveDownloadBtn.style.display = "none";
+		if (this.ui.selectiveStopBtn) this.ui.selectiveStopBtn.style.display = "inline-flex";
+		if (this.ui.selectiveOpenFolderBtn) this.ui.selectiveOpenFolderBtn.style.display = "inline-flex";
+
+		await this.updateDynamicConfig();
+
+		let safePlaylistTitle = this.selectiveState.title || "Playlist";
+		safePlaylistTitle = safePlaylistTitle
+			.replaceAll("|", "｜")
+			.replaceAll(`"`, `＂`)
+			.replaceAll("*", "＊")
+			.replaceAll("/", "⧸")
+			.replaceAll("\\", "⧹")
+			.replaceAll(":", "：")
+			.replaceAll("?", "？")
+			.replaceAll("<", "＜")
+			.replaceAll(">", "＞");
+
+		if (os.platform() === "win32" && safePlaylistTitle.endsWith(".")) {
+			safePlaylistTitle = safePlaylistTitle.slice(0, -1) + "#";
+		}
+
+		this.state.playlistName = safePlaylistTitle;
+		const targetFolder = (this.config.foldernameFormat || "%(playlist_title)s")
+			.replaceAll("%(playlist_title)s", safePlaylistTitle);
+
+		for (const [index, entry] of this.selectiveState.entries.entries()) {
+			if (!entry.selected) continue;
+			if (this.selectiveState.isCancelled) break;
+
+			const statusEl = document.getElementById(`sel_status_${index}`);
+			const barEl = document.getElementById(`sel_bar_${index}`);
+			const txtEl = document.getElementById(`sel_txt_${index}`);
+
+			if (statusEl) statusEl.style.display = "flex";
+			if (barEl) barEl.style.width = "0%";
+			if (txtEl) txtEl.textContent = window.i18n ? window.i18n.__("downloading") : "Downloading...";
+
+			const abortController = new AbortController();
+			this.selectiveState.activeControllers.push(abortController);
+
+			let formatArgs = [];
+			if (entry.type === "video") {
+				if (entry.quality === "best") {
+					formatArgs = ["-f", "bv*+ba/best"];
+				} else if (entry.quality === "worst") {
+					formatArgs = ["-f", "wv+wa/worst"];
+				} else {
+					formatArgs = [
+						"-f",
+						`bestvideo[height<=${entry.quality}]+bestaudio/best[height<=${entry.quality}]/best`,
+					];
+				}
+
+				if (entry.format !== "auto") {
+					formatArgs.push("--merge-output-format", entry.format, "--recode-video", entry.format);
+				}
+			} else {
+				formatArgs = [
+					"-x",
+					"--audio-format",
+					entry.audioExt || "mp3",
+					"--audio-quality",
+					entry.audioQuality || "auto",
+				];
+			}
+
+			const filenameTemplate = (this.config.filenameFormat || "%(playlist_index)s.%(title)s.%(ext)s")
+				.replaceAll("%(playlist_index)s", String(entry.index))
+				.replaceAll("%(playlist_title)s", safePlaylistTitle);
+
+			const outputPath = path.join(
+				this.state.downloadDir,
+				targetFolder,
+				filenameTemplate,
+			);
+
+			const args = [
+				"--no-playlist",
+				"-o",
+				outputPath,
+				"--ffmpeg-location",
+				this.state.ffmpegPath,
+				...(this.state.jsRuntimePath
+					? ["--no-js-runtimes", "--js-runtime", this.state.jsRuntimePath]
+					: []),
+				...(this.config.cookie.arg && this.config.cookie.val
+					? [this.config.cookie.arg, this.config.cookie.val]
+					: []),
+				...(this.config.proxy
+					? ["--no-check-certificate", "--proxy", this.config.proxy]
+					: []),
+				...formatArgs,
+				entry.url,
+			].filter(Boolean);
+
+			console.log(`Command: ${this.state.ytDlpPath}`, args.join(" "));
+
+			try {
+				await new Promise((resolve) => {
+					const proc = this.state.ytDlpWrap.exec(
+						args,
+						{ shell: false },
+						abortController.signal,
+					);
+
+					proc.on("progress", (prog) => {
+						if (barEl && prog.percent) {
+							barEl.style.width = `${prog.percent}%`;
+						}
+						if (txtEl) {
+							if (prog.percent === 100) {
+								txtEl.textContent = window.i18n ? window.i18n.__("processing") : "Processing...";
+							} else if (prog.percent) {
+								txtEl.textContent = `${prog.percent}% | ${prog.currentSpeed || "0"}`;
+							}
+						}
+					});
+
+					proc.on("close", () => {
+						if (!this.selectiveState.isCancelled) {
+							if (barEl) barEl.style.width = "100%";
+							if (txtEl) txtEl.textContent = window.i18n ? window.i18n.__("fileSaved") : "Completed";
+							entry.status = "completed";
+
+							// Add to history
+							try {
+								ipcRenderer.invoke("add-to-history", {
+									title: entry.title,
+									url: entry.url,
+									format: entry.type === "video" ? (entry.format || "mp4") : (entry.audioExt || "mp3"),
+									thumbnail: entry.thumbnail,
+									duration: entry.duration,
+									filePath: this.state.downloadDir,
+								});
+							} catch (_) {}
+						}
+						resolve();
+					});
+
+					proc.on("error", (err) => {
+						if (this.selectiveState.isCancelled) {
+							if (txtEl) txtEl.textContent = window.i18n ? window.i18n.__("cancel") : "Cancelled";
+						} else {
+							if (txtEl) txtEl.textContent = err.message || "Error";
+							entry.status = "error";
+						}
+						resolve();
+					});
+				});
+			} catch (_) {}
+
+			this.selectiveState.activeControllers = this.selectiveState.activeControllers.filter(
+				(c) => c !== abortController,
+			);
+		}
+
+		this.selectiveState.isDownloading = false;
+		if (this.ui.selectiveDownloadBtn) this.ui.selectiveDownloadBtn.style.display = "inline-flex";
+		if (this.ui.selectiveStopBtn) this.ui.selectiveStopBtn.style.display = "none";
+
+		const completedEntries = selectedEntries.filter((e) => e.status === "completed");
+
+		if (!this.selectiveState.isCancelled && completedEntries.length > 0) {
+			const notify = new Notification("ytDownloader", {
+				body: window.i18n ? window.i18n.__("playlistDownloaded") : "Playlist download finished",
+				icon: "../assets/images/icon.png",
+			});
+			notify.onclick = () => this.openDownloadsFolder();
+		}
+	},
+
+	stopSelectiveDownloads() {
+		this.selectiveState.isCancelled = true;
+		this.selectiveState.isDownloading = false;
+
+		this.selectiveState.activeControllers.forEach((controller) => {
+			try {
+				controller.abort();
+			} catch (_) {}
+		});
+		this.selectiveState.activeControllers = [];
+
+		if (this.ui.selectiveDownloadBtn) this.ui.selectiveDownloadBtn.style.display = "inline-flex";
+		if (this.ui.selectiveStopBtn) this.ui.selectiveStopBtn.style.display = "none";
+	},
+
+	handleSelectiveError(error, url = "") {
+		if (this.ui.selectiveIncorrectMsg) {
+			this.ui.selectiveIncorrectMsg.textContent = window.i18n
+				? window.i18n.__("errorNetworkOrUrl")
+				: "Some error has occurred. Check your network and use correct URL";
+		}
+		if (this.ui.selectiveErrorBtn) {
+			this.ui.selectiveErrorBtn.style.display = "inline-block";
+		}
+		if (this.ui.selectiveErrorDetails) {
+			this.ui.selectiveErrorDetails.innerHTML = `<strong>URL: ${url}</strong><br><br>${String(error)}`;
+		}
+	},
+
+	// ==========================================
+	// BATCH PLAYLIST MODE IMPLEMENTATION
+	// ==========================================
 
 	async startDownload(type) {
 		if (this.state.isDownloading) return;
@@ -328,7 +1000,6 @@ const playlistDownloader = {
 			this.state.url = this.validateUrl(this.state.url);
 		} catch (_) {
 			this.showError("Invalid URL");
-
 			return;
 		}
 
@@ -367,11 +1038,10 @@ const playlistDownloader = {
 			console.log(`Command: ${this.state.ytDlpPath}`, allArgs.join(" "));
 			this.state.currentDownloadProcess = this.state.ytDlpWrap.exec(
 				allArgs,
-				{shell: false},
+				{ shell: false },
 				this.state.currentAbortController.signal,
 			);
 
-			// TODO: Avoid duplication of event listeners
 			document.addEventListener("beforeunload", () => {
 				if (this.state.currentAbortController) {
 					try {
@@ -396,7 +1066,7 @@ const playlistDownloader = {
 	},
 
 	buildBaseArgs() {
-		const {start, end} = this.config.playlistRange;
+		const { start, end } = this.config.playlistRange;
 		const outputPath = path.join(
 			this.state.downloadDir,
 			this.config.foldernameFormat,
@@ -544,7 +1214,6 @@ const playlistDownloader = {
 		];
 	},
 
-	// yt-dlp event handling
 	handleDownloadEvents(process, type) {
 		let count = 0;
 
@@ -590,7 +1259,6 @@ const playlistDownloader = {
 					videoInfo.index = eventItems[1];
 					videoInfo.title = eventItems[2];
 
-					// The title from yt-dlp output usually has double quotes around
 					if (
 						typeof videoInfo.title === "string" &&
 						videoInfo.title.startsWith('"') &&
@@ -660,8 +1328,8 @@ const playlistDownloader = {
 
 	handleCancellation(count) {
 		this.state.isDownloading = false;
-		this.ui.stopDownloadBtn.style.display = "none";
-		this.ui.pasteLinkBtn.style.display = "inline-block";
+		if (this.ui.stopDownloadBtn) this.ui.stopDownloadBtn.style.display = "none";
+		if (this.ui.pasteLinkBtn) this.ui.pasteLinkBtn.style.display = "inline-block";
 		const targetCount = count !== undefined ? count : (this.state.currentLocalCount || 0);
 		const lastProgress = getId(`p${targetCount}`);
 		if (lastProgress) {
@@ -702,14 +1370,6 @@ const playlistDownloader = {
 			if (prevProgress)
 				prevProgress.textContent = window.i18n.__("fileSaved");
 		}
-
-		const itemTypeLabel = window.i18n.__(
-			type === "thumbnails"
-				? "thumbnail"
-				: type === "links"
-					? "link"
-					: type,
-		);
 
 		const thumbnailUrl =
 			typeof videoInfo.thumbnail === "string"
@@ -773,7 +1433,6 @@ const playlistDownloader = {
 		if (!this.config.proxy) {
 			const proxy = await ipcRenderer.invoke("get-system-proxy");
 			console.log("Using system proxy: " + proxy);
-
 			this.config.proxy = proxy;
 		}
 
@@ -803,8 +1462,8 @@ const playlistDownloader = {
 
 		// Playlist range from UI inputs
 		this.config.playlistRange.start =
-			Number(this.ui.playlistIndexInput.value) || 1;
-		this.config.playlistRange.end = this.ui.playlistEndInput.value || "";
+			Number(this.ui.playlistIndexInput?.value) || 1;
+		this.config.playlistRange.end = this.ui.playlistEndInput?.value || "";
 		this.state.originalCount =
 			this.config.playlistRange.start > 1
 				? this.config.playlistRange.start - 1
@@ -877,7 +1536,6 @@ const playlistDownloader = {
 		this.ui.errorDetails.innerHTML = `<strong>URL: ${
 			this.state.url
 		}</strong><br><br>${error.toString()}`;
-		// this.ui.errorDetails.title = window.i18n.__("clickToCopy");
 	},
 
 	openDownloadsFolder() {
@@ -909,9 +1567,11 @@ const playlistDownloader = {
 	},
 
 	updateVideoTypeVisibility() {
-		const value = this.ui.videoQualitySelect.value;
+		const value = this.ui.videoQualitySelect?.value;
 		const show = !["best", "worst"].includes(value);
-		this.ui.typeSelectBox.style.display = show ? "block" : "none";
+		if (this.ui.typeSelectBox) {
+			this.ui.typeSelectBox.style.display = show ? "block" : "none";
+		}
 	},
 
 	toggleAdvancedMenu() {
@@ -922,10 +1582,10 @@ const playlistDownloader = {
 	},
 
 	closeMenu() {
-		this.ui.menuIcon.style.transform = "rotate(0deg)";
-		this.ui.menu.style.opacity = "0";
+		if (this.ui.menuIcon) this.ui.menuIcon.style.transform = "rotate(0deg)";
+		if (this.ui.menu) this.ui.menu.style.opacity = "0";
 		setTimeout(() => {
-			this.ui.menu.style.display = "none";
+			if (this.ui.menu) this.ui.menu.style.display = "none";
 		}, 300);
 	},
 

@@ -501,126 +501,236 @@
 
             <!-- View 3: Download Playlist -->
             <section id="view-playlist" class="page-view hidden">
-                <button id="pasteLink">
-                    <span id="pasteTextPlaylist" data-translate="pastePlaylistLinkTooltip">Click to paste playlist link from clipboard</span>
-                    <span class="paste-keys">
-                        <span class="key" id="pasteCtrlKeyPlaylist">Ctrl</span><span class="key">V</span>
-                    </span>
-                </button>
-
-                <div id="options">
-                    <img src="../assets/images/close.png" alt="close" id="closeHiddenPlaylist" style="display: none;">
-                    <div id="btnContainerPlaylist">
-                        <div id="videoTogglePlaylist" class="toggleBtnWrapper">
-                            <button class="toggleBtn" data-translate="video">Video</button>
-                        </div>
-                        <div id="audioTogglePlaylist" class="toggleBtnWrapper">
-                            <button class="toggleBtn" data-translate="audio">Audio</button>
-                        </div>
-                    </div>
-                    <br>
-                    <strong id="linkTitle" data-translate="link">Link:</strong>
-                    <span id="link"></span>
-                    <br><br>
-                    <div id="videoBox">
-                        <label id="videoFormat" data-translate="videoQuality">Select Video Quality </label>
-                        <select id="select" class="select">
-                            <option value="best" id="bestVideoOption" data-translate="best" selected>Best</option>
-                            <option value="worst" id="worstVideoOption" data-translate="qualityWorst">Worst</option>
-                            <option value="144">144p</option>
-                            <option value="240">240p</option>
-                            <option value="360">360p</option>
-                            <option value="480">480p</option>
-                            <option value="720">720p (HD)</option>
-                            <option value="1080">1080p (FHD)</option>
-                            <option value="1440">1440p</option>
-                            <option value="2160">2160p (4k)</option>
-                        </select>
-                        <br>
-                        <div id="typeSelectBox">
-                            <label id="videoQualityTxt" data-translate="selectVideoFormat">Select video quality</label>
-                            <select id="videoTypeSelect" class="select">
-                                <option value="auto" id="autoTxt" data-translate="auto" selected>Auto</option>
-                                <option value="mp4">Mp4</option>
-                                <option value="webm">WebM</option>
-                            </select>
-                        </div>
-                        <br>
-                        <div class="flexContainer">
-                            <button class="submitBtn" id="download" data-translate="download">Download</button>
-                        </div>
+                <div class="home-top-bar playlist-top-bar">
+                    <div class="mode-toggle-group">
+                        <button id="playlistModeBatchBtn" class="mode-btn active" type="button" data-translate="batchPlaylist">Batch (All)</button>
+                        <button id="playlistModeSelectiveBtn" class="mode-btn" type="button" data-translate="selectivePlaylist">Selective (Pick Videos)</button>
                     </div>
 
-                    <div id="audioBox">
-                        <label id="audioFormat" data-translate="selectAudioFormat">Select Audio format </label>
-                        <select id="audioSelect" class="select">
-                            <option value="mp3" selected>Mp3</option>
-                            <option value="m4a">M4a</option>
-                            <option value="opus">Opus</option>
-                            <option value="wav">Wav</option>
-                            <option value="alac">Alac</option>
-                            <option value="flac">Flac</option>
-                        </select>
-                        <br>
-                        <label class="audioQualitySelect" id="audioQualitySelectTxt" data-translate="selectQuality">Select Quality</label>
-                        <select id="audioQualitySelect" class="select">
-                            <option id="audioQualityAuto" value="auto" data-translate="auto" selected>Auto</option>
-                            <option id="audioQualityNormal" value="5" data-translate="qualityNormal">Normal</option>
-                            <option id="audioQualityBest" value="0" data-translate="best">Best</option>
-                            <option id="audioQualityGood" value="2" data-translate="qualityGood">Good</option>
-                            <option id="audioQualityBad" value="8" data-translate="qualityBad">Bad</option>
-                            <option id="audioQualityWorst" value="10" data-translate="qualityWorst">Worst</option>
-                        </select>
-                        <br><br>
-                        <div class="flexContainer">
-                            <button class="submitBtn" id="audioDownloadPlaylist" data-translate="download">Download</button>
-                        </div>
+                    <div class="path-picker-pill" id="playlistPathPicker" title="Change download location">
+                        <svg class="pill-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                        <span id="playlistPathDisplay" class="path-pill-text">Select location...</span>
                     </div>
+                </div>
 
-                    <br>
-                    <div class="flexContainer">
-                        <button id="advancedToggle" class="blueBtn" data-translate="moreOptions">More options</button>
-                    </div>
-                    <br>
+                <!-- Batch Playlist Mode Container -->
+                <div id="playlistBatchSection">
+                    <button id="pasteLink">
+                        <span id="pasteTextPlaylist" data-translate="pastePlaylistLinkTooltip">Click to paste playlist link from clipboard</span>
+                        <span class="paste-keys">
+                            <span class="key" id="pasteCtrlKeyPlaylist">Ctrl</span><span class="key">V</span>
+                        </span>
+                    </button>
 
-                    <div id="advancedMenu">
-                        <div class="advancedItem">
-                            <span id="rangeTxt" data-translate="playlistRange">Playlist range</span>
-                            <input type="number" id="playlistIndex" class="input" placeholder="Start">:
-                            <input type="number" id="playlistEnd" class="input" placeholder="End">
-                            <br><br>
-                        </div>
-                        <div class="advancedItem">
-                            <div><span id="clTextPlaylist" data-translate="currentDownloadLocation">Current download location - </span><span id="pathPlaylist"></span></div>
-                            <br>
-                            <div class="flexContainer">
-                                <button id="selectLocationPlaylist" class="submitBtn" data-translate="selectDownloadLocation">Select Download Location</button>
+                    <div id="options">
+                        <img src="../assets/images/close.png" alt="close" id="closeHiddenPlaylist" style="display: none;">
+                        <div id="btnContainerPlaylist">
+                            <div id="videoTogglePlaylist" class="toggleBtnWrapper">
+                                <button class="toggleBtn" data-translate="video">Video</button>
+                            </div>
+                            <div id="audioTogglePlaylist" class="toggleBtnWrapper">
+                                <button class="toggleBtn" data-translate="audio">Audio</button>
                             </div>
                         </div>
-                        <div class="advancedItem">
-                            <p id="subHeaderPlaylist" data-translate="subtitles">Subtitles</p>
-                            <span id="subTxtPlaylist" data-translate="downloadSubtitlesAvailable">Download subtitles if available</span>
-                            <input id="subCheckedPlaylist" class="cb" type="checkbox">
+                        <br>
+                        <strong id="linkTitle" data-translate="link">Link:</strong>
+                        <span id="link"></span>
+                        <br><br>
+                        <div id="videoBox">
+                            <label id="videoFormat" data-translate="videoQuality">Select Video Quality </label>
+                            <select id="select" class="select">
+                                <option value="best" id="bestVideoOption" data-translate="best" selected>Best</option>
+                                <option value="worst" id="worstVideoOption" data-translate="qualityWorst">Worst</option>
+                                <option value="144">144p</option>
+                                <option value="240">240p</option>
+                                <option value="360">360p</option>
+                                <option value="480">480p</option>
+                                <option value="720">720p (HD)</option>
+                                <option value="1080">1080p (FHD)</option>
+                                <option value="1440">1440p</option>
+                                <option value="2160">2160p (4k)</option>
+                            </select>
+                            <br>
+                            <div id="typeSelectBox">
+                                <label id="videoQualityTxt" data-translate="selectVideoFormat">Select video quality</label>
+                                <select id="videoTypeSelect" class="select">
+                                    <option value="auto" id="autoTxt" data-translate="auto" selected>Auto</option>
+                                    <option value="mp4">Mp4</option>
+                                    <option value="webm">WebM</option>
+                                </select>
+                            </div>
+                            <br>
+                            <div class="flexContainer">
+                                <button class="submitBtn" id="download" data-translate="download">Download</button>
+                            </div>
+                        </div>
+
+                        <div id="audioBox">
+                            <label id="audioFormat" data-translate="selectAudioFormat">Select Audio format </label>
+                            <select id="audioSelect" class="select">
+                                <option value="mp3" selected>Mp3</option>
+                                <option value="m4a">M4a</option>
+                                <option value="opus">Opus</option>
+                                <option value="wav">Wav</option>
+                                <option value="alac">Alac</option>
+                                <option value="flac">Flac</option>
+                            </select>
+                            <br>
+                            <label class="audioQualitySelect" id="audioQualitySelectTxt" data-translate="selectQuality">Select Quality</label>
+                            <select id="audioQualitySelect" class="select">
+                                <option id="audioQualityAuto" value="auto" data-translate="auto" selected>Auto</option>
+                                <option id="audioQualityNormal" value="5" data-translate="qualityNormal">Normal</option>
+                                <option id="audioQualityBest" value="0" data-translate="best">Best</option>
+                                <option id="audioQualityGood" value="2" data-translate="qualityGood">Good</option>
+                                <option id="audioQualityBad" value="8" data-translate="qualityBad">Bad</option>
+                                <option id="audioQualityWorst" value="10" data-translate="qualityWorst">Worst</option>
+                            </select>
+                            <br><br>
+                            <div class="flexContainer">
+                                <button class="submitBtn" id="audioDownloadPlaylist" data-translate="download">Download</button>
+                            </div>
+                        </div>
+
+                        <br>
+                        <div class="flexContainer">
+                            <button id="advancedToggle" class="blueBtn" data-translate="moreOptions">More options</button>
                         </div>
                         <br>
-                        <div class="flexContainer" style="gap: 12px; margin-top: 10px;">
-                            <button class="submitBtn" id="downloadThumbnails" data-translate="downloadThumbnails">Download thumbnails</button>
-                            <button class="submitBtn" id="saveLinks" data-translate="saveVideoLinksToFile">Save video links</button>
+
+                        <div id="advancedMenu">
+                            <div class="advancedItem">
+                                <span id="rangeTxt" data-translate="playlistRange">Playlist range</span>
+                                <input type="number" id="playlistIndex" class="input" placeholder="Start">:
+                                <input type="number" id="playlistEnd" class="input" placeholder="End">
+                                <br><br>
+                            </div>
+                            <div class="advancedItem">
+                                <p id="subHeaderPlaylist" data-translate="subtitles">Subtitles</p>
+                                <span id="subTxtPlaylist" data-translate="downloadSubtitlesAvailable">Download subtitles if available</span>
+                                <input id="subCheckedPlaylist" class="cb" type="checkbox">
+                            </div>
+                            <br>
+                            <div class="flexContainer" style="gap: 12px; margin-top: 10px;">
+                                <button class="submitBtn" id="downloadThumbnails" data-translate="downloadThumbnails">Download thumbnails</button>
+                                <button class="submitBtn" id="saveLinks" data-translate="saveVideoLinksToFile">Save video links</button>
+                            </div>
+                        </div>
+
+                        <p id="incorrectMsgPlaylist"></p>
+                        <button class="advancedToggle" id="errorBtnPlaylist" data-translate="errorDetails">Error Details ▼</button>
+                        <div id="errorDetailsPlaylist"></div>
+                    </div>
+
+                    <h2 id="playlistName"></h2>
+                    <div class="flexContainer" style="gap: 12px; margin: 15px 0;">
+                        <button class="submitBtn" id="openDownloads" data-translate="openDownloadFolder">Open download folder</button>
+                        <button class="submitBtn danger-btn" id="stopDownload" data-translate="cancel">Cancel</button>
+                    </div>
+                    <br><br>
+                    <div id="listPlaylist"></div>
+                </div>
+
+                <!-- Selective Playlist Mode Container -->
+                <div id="playlistSelectiveSection" style="display: none;">
+                    <div id="selectivePasteWrapper">
+                        <button id="pasteLinkSelective">
+                            <span id="pasteTextPlaylistSelective" data-translate="pastePlaylistLinkTooltip">Click to paste playlist link from clipboard</span>
+                            <span class="paste-keys">
+                                <span class="key" id="pasteCtrlKeySelective">Ctrl</span><span class="key">V</span>
+                            </span>
+                        </button>
+                    </div>
+
+                    <div id="loadingWrapperPlaylistSelective" class="modern-loading-wrapper" style="display: none;">
+                        <div class="modern-loading-spinner" aria-hidden="true">
+                            <svg viewBox="0 0 38 38" class="spinner-svg">
+                                <circle class="spinner-track" cx="19" cy="19" r="15" fill="none" stroke-width="3.5"></circle>
+                                <circle class="spinner-head" cx="19" cy="19" r="15" fill="none" stroke-width="3.5" stroke-dasharray="70 40" stroke-linecap="round"></circle>
+                            </svg>
+                        </div>
+                        <span id="processingPlaylistSelective" class="modern-loading-text" data-translate="fetchingPlaylist">Fetching playlist...</span>
+                        <div class="modern-loading-dots" aria-hidden="true">
+                            <span></span>
+                            <span></span>
+                            <span></span>
                         </div>
                     </div>
 
-                    <p id="incorrectMsgPlaylist"></p>
-                    <button class="advancedToggle" id="errorBtnPlaylist" data-translate="errorDetails">Error Details ▼</button>
-                    <div id="errorDetailsPlaylist"></div>
-                </div>
+                    <p id="incorrectMsgSelective"></p>
+                    <button class="advancedToggle" id="errorBtnSelective" style="display: none;" data-translate="errorDetails">Error Details ▼</button>
+                    <div id="errorDetailsSelective" style="display: none;"></div>
 
-                <h2 id="playlistName"></h2>
-                <div class="flexContainer" style="gap: 12px; margin: 15px 0;">
-                    <button class="submitBtn" id="openDownloads" data-translate="openDownloadFolder">Open download folder</button>
-                    <button class="submitBtn danger-btn" id="stopDownload" data-translate="cancel">Cancel</button>
+                    <div id="selectiveContent" style="display: none;">
+                        <div class="selective-header-card">
+                            <div class="selective-header-info">
+                                <h2 id="selectivePlaylistTitle" class="selective-title"></h2>
+                                <span id="selectivePlaylistChannel" class="selective-channel"></span>
+                            </div>
+                            <div class="selective-stats-badge" id="selectiveStatsBadge">0 videos</div>
+                        </div>
+
+                        <!-- Bulk Action & Config Bar -->
+                        <div class="selective-bulk-bar">
+                            <div class="selective-bulk-left">
+                                <button id="selectiveSelectAllBtn" class="batch-action-btn secondary-btn compact-btn" type="button" data-translate="deselectAll">Deselect All</button>
+                                <div class="bulk-separator"></div>
+                                <span class="bulk-label" data-translate="applyToSelected">Apply to Selected:</span>
+                                
+                                <div class="preset-toggle-group">
+                                    <button id="selectiveBulkVideoBtn" class="preset-toggle-btn active" type="button" data-translate="video">Video</button>
+                                    <button id="selectiveBulkAudioBtn" class="preset-toggle-btn" type="button" data-translate="audio">Audio</button>
+                                </div>
+
+                                <div id="selectiveBulkVideoOptions" class="selective-bulk-options">
+                                    <select id="selectiveBulkResSelect" class="preset-select">
+                                        <option value="best">Best</option>
+                                        <option value="4320">8K (4320p)</option>
+                                        <option value="2160">4K (2160p)</option>
+                                        <option value="1440">1440p (2K)</option>
+                                        <option value="1080" selected>1080p</option>
+                                        <option value="720">720p</option>
+                                        <option value="480">480p</option>
+                                        <option value="360">360p</option>
+                                        <option value="worst">Worst</option>
+                                    </select>
+                                    <select id="selectiveBulkFormatSelect" class="preset-select">
+                                        <option value="auto" selected>Auto</option>
+                                        <option value="mp4">MP4</option>
+                                        <option value="mkv">MKV</option>
+                                        <option value="webm">WebM</option>
+                                    </select>
+                                </div>
+
+                                <div id="selectiveBulkAudioOptions" class="selective-bulk-options" style="display: none;">
+                                    <select id="selectiveBulkAudioExtSelect" class="preset-select">
+                                        <option value="mp3" selected>MP3</option>
+                                        <option value="m4a">M4A</option>
+                                        <option value="opus">OPUS</option>
+                                        <option value="wav">WAV</option>
+                                        <option value="flac">FLAC</option>
+                                        <option value="alac">ALAC</option>
+                                    </select>
+                                </div>
+
+                                <button id="selectiveApplyBulkBtn" class="batch-action-btn secondary-btn compact-btn" type="button" data-translate="apply">Apply</button>
+                            </div>
+
+                            <div class="selective-bulk-right">
+                                <button id="selectiveOpenFolderBtn" class="batch-action-btn secondary-btn compact-btn" type="button" data-translate="openDownloadFolder" style="display: none;">Open Folder</button>
+                                <button id="selectiveStopBtn" class="batch-action-btn danger-btn" type="button" style="display: none;" data-translate="stop">Stop</button>
+                                <button id="selectiveDownloadBtn" class="batch-action-btn primary-btn" type="button">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M12 17V3"/><path d="m6 11 6 6 6-6"/><path d="M19 21H5"/></svg>
+                                    <span data-translate="downloadSelected">Download Selected</span> (<span id="selectiveDownloadCount">0</span>)
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Videos List Container -->
+                        <div id="selectiveItemsList" class="selective-items-list"></div>
+                    </div>
                 </div>
-                <br><br>
-                <div id="listPlaylist"></div>
             </section>
 
             <!-- View 4: Video Compressor -->

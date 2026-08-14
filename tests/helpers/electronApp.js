@@ -130,10 +130,36 @@ async function launchApp(customLocalStorage = {}, customMetadata = DEFAULT_MOCK_
 			};
 
 			setTimeout(() => {
-				if (args.includes("-j")) {
-					const jsonStr = JSON.stringify(window.__mockMetadata);
-					stdoutCbs.forEach((cb) => cb(jsonStr));
-					(callbacks["close"] || []).forEach((cb) => cb(0));
+				if (args.includes("-j") || args.includes("-J")) {
+					if (args.includes("--flat-playlist")) {
+						const playlistData = {
+							title: "Test Mock Playlist",
+							channel: "Test Playlist Channel",
+							entries: [
+								{
+									id: "vid1",
+									title: "Mock Video 1",
+									duration: 180,
+									thumbnails: [{ url: "https://example.com/thumb1.jpg" }],
+									url: "https://youtube.com/watch?v=vid1",
+								},
+								{
+									id: "vid2",
+									title: "Mock Video 2",
+									duration: 240,
+									thumbnails: [{ url: "https://example.com/thumb2.jpg" }],
+									url: "https://youtube.com/watch?v=vid2",
+								},
+							],
+						};
+						const jsonStr = JSON.stringify(playlistData);
+						stdoutCbs.forEach((cb) => cb(jsonStr));
+						(callbacks["close"] || []).forEach((cb) => cb(0));
+					} else {
+						const jsonStr = JSON.stringify(window.__mockMetadata);
+						stdoutCbs.forEach((cb) => cb(jsonStr));
+						(callbacks["close"] || []).forEach((cb) => cb(0));
+					}
 				} else {
 					(callbacks["progress"] || []).forEach((cb) =>
 						cb({ percent: 100 }),

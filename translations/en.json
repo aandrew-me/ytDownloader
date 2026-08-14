@@ -240,5 +240,19 @@
 	"noVideosInQueue": "No videos in queue",
 	"stop": "Stop",
 	"outputFormat": "Output Format",
-	"outputFormatDesc": "Set the desired output container (e.g. MP4, MKV, WebM)"
+	"outputFormatDesc": "Set the desired output container (e.g. MP4, MKV, WebM)",
+	"batchPlaylist": "Batch (All)",
+	"selectivePlaylist": "Selective (Pick Videos)",
+	"selectAll": "Select All",
+	"deselectAll": "Deselect All",
+	"downloadSelected": "Download Selected",
+	"applyToSelected": "Apply to Selected",
+	"fetchingPlaylist": "Fetching playlist...",
+	"noVideosSelected": "No videos selected",
+	"videosCount": "videos",
+	"selectedCount": "selected",
+	"audioExtension": "Audio Format",
+	"resolution": "Resolution",
+	"format": "Format",
+	"apply": "Apply"
 }
