@@ -101,18 +101,7 @@ export async function findFfmpeg() {
 		);
 	}
 
-	// Priority 2: System-installed (FreeBSD)
-	if (platform() === "freebsd") {
-		try {
-			return execSync("which ffmpeg").toString().trim();
-		} catch {
-			throw new Error(
-				"No ffmpeg found in PATH on FreeBSD. App may not work correctly.",
-			);
-		}
-	}
-
-	// Priority 2.5: User-selected system ffmpeg
+	// Priority 2: User-selected system ffmpeg
 	const ffmpegSource = localStorage.getItem("ffmpegSource") || "bundled";
 	if (ffmpegSource === "system") {
 		try {

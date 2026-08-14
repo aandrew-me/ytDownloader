@@ -431,7 +431,6 @@ class YtDownloaderApp {
 		const defaultYtDlpName = platform() === "win32" ? "ytdlp.exe" : "ytdlp";
 		const defaultYtDlpPath = join(hiddenDir, defaultYtDlpName);
 		const isMacOS = platform() === "darwin";
-		const isFreeBSD = platform() === "freebsd";
 
 		let executablePath = null;
 
@@ -464,18 +463,7 @@ class YtDownloaderApp {
 			}
 		}
 
-		// PRIORITY 3: FreeBSD
-		else if (isFreeBSD) {
-			try {
-				executablePath = execSync("which yt-dlp").toString().trim();
-			} catch {
-				throw new Error(
-					"No yt-dlp found in PATH on FreeBSD. Please install it.",
-				);
-			}
-		}
-
-		// PRIORITY 4: User-selected source (Windows/Linux)
+		// PRIORITY 3: User-selected source (Windows/Linux)
 		else {
 			const source =
 				localStorage.getItem(
