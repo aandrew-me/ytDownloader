@@ -215,4 +215,86 @@ test.describe("Playlist Page Download Tests", () => {
 		expect(downloadCmd).toContain("--sub-langs");
 		expect(downloadCmd).toContain("all");
 	});
+
+	test("selective playlist mode fetches entries and downloads selected video with custom format", async () => {
+		const playlistUrl = "https://www.youtube.com/playlist?list=PLselective123";
+
+		// Switch to Selective mode
+		await page.click("#playlistModeSelectiveBtn");
+		await expect(page.locator("#playlistSelectiveSection")).toBeVisible();
+
+		await page.evaluate((url) => {
+			window.electronAPI.clipboard.writeText(url);
+		}, playlistUrl);
+
+		await page.click("#pasteLinkSelective");
+
+		// Wait for entries list to render
+		await page.waitForSelector("#selectiveContent", { state: "visible" });
+		await expect(page.locator("#selectivePlaylistTitle")).toHaveText("Test Mock Playlist");
+		await expect(page.locator(".selective-item-card")).toHaveCount(2);
+
+		// Customize first video to 720p mp4
+		await page.selectOption("#sel_res_0", "720");
+		await page.selectOption("#sel_fmt_0", "mp4");
+
+		// Customize second video to audio mp3
+		await page.selectOption("#sel_type_1", "audio");
+		await page.selectOption("#sel_aext_1", "mp3");
+
+		await clearExecutedCommands(page);
+
+		// Click download selected
+		await page.click("#selectiveDownloadBtn");
+
+		// Wait for commands to execute
+		await page.waitForFunction(() => {
+			const cmds = window.__executedCommands;
+			return cmds && cmds.length >= 2;
+		});
+
+		const commands = await getExecutedCommands(page);
+		expect(commands.length).toBeGreaterThanOrEqual(2);
+
+		// Find the video and audio commands
+		const vid1Cmd = commands.find((cmd) => cmd.some((arg) => typeof arg === "string" && arg.includes("vid1")));
+		const vid2Cmd = commands.find((cmd) => cmd.some((arg) => typeof arg === "string" && arg.includes("vid2")));
+
+		expect(vid1Cmd).toBeDefined();
+		expect(vid1Cmd).toContain("--no-playlist");
+		expect(vid1Cmd.join(" ")).toContain("height<=720");
+		expect(vid1Cmd).toContain("mp4");
+		expect(vid1Cmd.join(" ")).toContain("Test Mock Playlist");
+		expect(vid1Cmd.join(" ")).not.toContain("\\NA\\");
+		expect(vid1Cmd.join(" ")).not.toContain("/NA/");
+
+		expect(vid2Cmd).toBeDefined();
+		expect(vid2Cmd).toContain("-x");
+		expect(vid2Cmd).toContain("--audio-format");
+		expect(vid2Cmd).toContain("mp3");
+		expect(vid2Cmd.join(" ")).toContain("Test Mock Playlist");
+	});
+
+	test("selective playlist mode select all / deselect all toggles all items", async () => {
+		const playlistUrl = "https://www.youtube.com/playlist?list=PLselective123";
+
+		await page.click("#playlistModeSelectiveBtn");
+		await page.evaluate((url) => {
+			window.electronAPI.clipboard.writeText(url);
+		}, playlistUrl);
+
+		await page.click("#pasteLinkSelective");
+		await page.waitForSelector("#selectiveContent", { state: "visible" });
+
+		// Click Deselect All
+		await page.click("#selectiveSelectAllBtn");
+		await expect(page.locator("#selectiveDownloadCount")).toHaveText("0");
+		expect(await page.locator(".selective-cb:checked").count()).toBe(0);
+
+		// Click Select All
+		await page.click("#selectiveSelectAllBtn");
+		await expect(page.locator("#selectiveDownloadCount")).toHaveText("2");
+		expect(await page.locator(".selective-cb:checked").count()).toBe(2);
+	});
 });
+
