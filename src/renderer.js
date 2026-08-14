@@ -724,31 +724,45 @@ class YtDownloaderApp {
 
 		// Priority 3: Bundled ffmpeg
 		const bundledDir = join(__dirname, "..", "ffmpeg");
-		const targetDir = join(homedir(), ".ytDownloader", "ffmpeg");
-
 		const isWin = platform() === "win32";
 		const ffmpegName = isWin ? "ffmpeg.exe" : "ffmpeg";
-		const targetFfmpegFile = join(targetDir, "bin", ffmpegName);
+		const bundledFfmpegFile = join(bundledDir, "bin", ffmpegName);
 
-		// Check if the folder has already been copied
-		if (!existsSync(targetFfmpegFile)) {
-			if (existsSync(bundledDir)) {
-				try {
-					cpSync(bundledDir, targetDir, {
-						recursive: true,
-						dereference: true,
-					});
-				} catch {
-					console.error("Failed to copy bundled ffmpeg.");
+		// MS Store packages run in a restricted WindowsApps container where executing binaries fails
+		if (windowsStore) {
+			const targetDir = join(homedir(), ".ytDownloader", "ffmpeg");
+			const targetFfmpegFile = join(targetDir, "bin", ffmpegName);
 
+			if (!existsSync(targetFfmpegFile)) {
+				if (existsSync(bundledDir)) {
+					try {
+						cpSync(bundledDir, targetDir, {
+							recursive: true,
+							dereference: true,
+						});
+					} catch {
+						console.error("Failed to copy bundled ffmpeg.");
+						return "";
+					}
+				} else {
 					return "";
 				}
-			} else {
-				return "";
 			}
+
+			return join(targetDir, "bin");
 		}
 
-		return join(targetDir, "bin");
+		if (existsSync(bundledFfmpegFile)) {
+			return join(bundledDir, "bin");
+		}
+
+		// Fallback if existing copy is present in ~/.ytDownloader
+		const fallbackDir = join(homedir(), ".ytDownloader", "ffmpeg", "bin");
+		if (existsSync(join(fallbackDir, ffmpegName))) {
+			return fallbackDir;
+		}
+
+		return "";
 	}
 
 	/**
@@ -827,29 +841,41 @@ class YtDownloaderApp {
 		const nodeName = isWin ? "node.exe" : "node";
 
 		const bundledNodePath = join(__dirname, "..", nodeName);
-		const targetDir = join(homedir(), ".ytDownloader");
-		const targetNodeFile = join(targetDir, nodeName);
 
-		// Check if folder has already been copied
-		if (existsSync(targetNodeFile)) {
-			return `${exeName}:${targetNodeFile}`;
+		// MS Store packages run in a restricted WindowsApps container
+		if (windowsStore) {
+			const targetDir = join(homedir(), ".ytDownloader");
+			const targetNodeFile = join(targetDir, nodeName);
+
+			if (existsSync(targetNodeFile)) {
+				return `${exeName}:${targetNodeFile}`;
+			}
+
+			if (existsSync(bundledNodePath)) {
+				if (!existsSync(targetDir)) {
+					mkdirSync(targetDir, {recursive: true});
+				}
+
+				try {
+					copyFileSync(bundledNodePath, targetNodeFile);
+				} catch {
+					console.error("Failed to copy bundled Node runtime.");
+					return "";
+				}
+
+				return `${exeName}:${targetNodeFile}`;
+			}
+
+			return "";
 		}
 
-		// Copy to .ytDownloader
 		if (existsSync(bundledNodePath)) {
-			if (!existsSync(targetDir)) {
-				mkdirSync(targetDir, {recursive: true});
-			}
+			return `${exeName}:${bundledNodePath}`;
+		}
 
-			try {
-				copyFileSync(bundledNodePath, targetNodeFile);
-			} catch {
-				console.error("Failed to copy bundled Node runtime.");
-
-				return "";
-			}
-
-			return `${exeName}:${targetNodeFile}`;
+		const fallbackNodePath = join(homedir(), ".ytDownloader", nodeName);
+		if (existsSync(fallbackNodePath)) {
+			return `${exeName}:${fallbackNodePath}`;
 		}
 
 		return "";

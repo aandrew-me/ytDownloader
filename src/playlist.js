@@ -11,6 +11,7 @@ const {
 	constants,
 	env,
 	__dirname,
+	windowsStore,
 } = window.electronAPI;
 
 const playlistDownloader = {
@@ -959,76 +960,80 @@ const playlistDownloader = {
 			return env.YTDOWNLOADER_FFMPEG_PATH;
 		}
 
-		switch (os.platform()) {
-			case "win32":
-				return path.join(
-					os.homedir(),
-					".ytDownloader",
-					"ffmpeg",
-					"bin",
-				);
-			case "freebsd":
-				try {
-					return execSync("which ffmpeg").toString("utf8").trim();
-				} catch (error) {
-					console.error("ffmpeg not found on FreeBSD:", error);
-					return "";
-				}
-			default:
-				return path.join(
-					os.homedir(),
-					".ytDownloader",
-					"ffmpeg",
-					"bin",
-				);
+		if (os.platform() === "freebsd") {
+			try {
+				return execSync("which ffmpeg").toString("utf8").trim();
+			} catch (error) {
+				console.error("ffmpeg not found on FreeBSD:", error);
+				return "";
+			}
 		}
+
+		const isWin = os.platform() === "win32";
+		const ffmpegName = isWin ? "ffmpeg.exe" : "ffmpeg";
+		const bundledBinDir = path.join(__dirname, "..", "ffmpeg", "bin");
+		const storeBinDir = path.join(os.homedir(), ".ytDownloader", "ffmpeg", "bin");
+
+		if (windowsStore) {
+			return storeBinDir;
+		}
+
+		if (fs.existsSync(path.join(bundledBinDir, ffmpegName))) {
+			return bundledBinDir;
+		}
+
+		if (fs.existsSync(path.join(storeBinDir, ffmpegName))) {
+			return storeBinDir;
+		}
+
+		return bundledBinDir;
 	},
 
 	getJsRuntimePath() {
 		if (window.electronAPI && window.electronAPI.isTest && window.__mockYtDlp) return "";
-		{
-			const exeName = "node";
 
-			if (env && env.YTDOWNLOADER_NODE_PATH) {
-				if (fs.existsSync(env.YTDOWNLOADER_NODE_PATH)) {
-					return `$node:${env.YTDOWNLOADER_NODE_PATH}`;
-				}
+		const exeName = "node";
 
-				return "";
+		if (env && env.YTDOWNLOADER_NODE_PATH) {
+			if (fs.existsSync(env.YTDOWNLOADER_NODE_PATH)) {
+				return `$node:${env.YTDOWNLOADER_NODE_PATH}`;
 			}
 
-			if (env && env.YTDOWNLOADER_DENO_PATH) {
-				if (fs.existsSync(env.YTDOWNLOADER_DENO_PATH)) {
-					return `$deno:${env.YTDOWNLOADER_DENO_PATH}`;
-				}
-
-				return "";
-			}
-
-			if (os.platform() === "darwin") {
-				return "";
-			}
-
-			let jsRuntimePath = path.join(
-				os.homedir(),
-				".ytDownloader",
-				exeName,
-			);
-
-			if (os.platform() === "win32") {
-				jsRuntimePath = path.join(
-					os.homedir(),
-					".ytDownloader",
-					`${exeName}.exe`,
-				);
-			}
-
-			if (fs.existsSync(jsRuntimePath)) {
-				return `${exeName}:${jsRuntimePath}`;
-			} else {
-				return "";
-			}
+			return "";
 		}
+
+		if (env && env.YTDOWNLOADER_DENO_PATH) {
+			if (fs.existsSync(env.YTDOWNLOADER_DENO_PATH)) {
+				return `$deno:${env.YTDOWNLOADER_DENO_PATH}`;
+			}
+
+			return "";
+		}
+
+		if (os.platform() === "darwin") {
+			return "";
+		}
+
+		const nodeName = os.platform() === "win32" ? `${exeName}.exe` : exeName;
+		const bundledNode = path.join(__dirname, "..", nodeName);
+		const storeNode = path.join(os.homedir(), ".ytDownloader", nodeName);
+
+		if (windowsStore) {
+			if (fs.existsSync(storeNode)) {
+				return `${exeName}:${storeNode}`;
+			}
+			return "";
+		}
+
+		if (fs.existsSync(bundledNode)) {
+			return `${exeName}:${bundledNode}`;
+		}
+
+		if (fs.existsSync(storeNode)) {
+			return `${exeName}:${storeNode}`;
+		}
+
+		return "";
 	},
 	validateUrl(rawUrl) {
 		const input = String(rawUrl ?? "").trim();

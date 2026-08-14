@@ -11,6 +11,7 @@ const {
 	crypto,
 	env,
 	__dirname,
+	windowsStore,
 } = window.electronAPI;
 
 document.addEventListener("translations-loaded", () => {
@@ -954,31 +955,33 @@ function getFfmpegPath() {
 		return env.YTDOWNLOADER_FFMPEG_PATH;
 	}
 
-	switch (os.platform()) {
-		case "win32":
-			return path.join(
-				os.homedir(),
-				".ytDownloader",
-				"ffmpeg",
-				"bin",
-				"ffmpeg.exe",
-			);
-		case "freebsd":
-			try {
-				return execSync("which ffmpeg").toString("utf8").trim();
-			} catch (error) {
-				console.error("ffmpeg not found on FreeBSD:", error);
-				return "";
-			}
-		default:
-			return path.join(
-				os.homedir(),
-				".ytDownloader",
-				"ffmpeg",
-				"bin",
-				"ffmpeg",
-			);
+	if (os.platform() === "freebsd") {
+		try {
+			return execSync("which ffmpeg").toString("utf8").trim();
+		} catch (error) {
+			console.error("ffmpeg not found on FreeBSD:", error);
+			return "";
+		}
 	}
+
+	const isWin = os.platform() === "win32";
+	const ffmpegName = isWin ? "ffmpeg.exe" : "ffmpeg";
+	const bundledFfmpegFile = path.join(__dirname, "..", "ffmpeg", "bin", ffmpegName);
+	const storeFfmpegFile = path.join(os.homedir(), ".ytDownloader", "ffmpeg", "bin", ffmpegName);
+
+	if (windowsStore) {
+		return storeFfmpegFile;
+	}
+
+	if (existsSync(bundledFfmpegFile)) {
+		return bundledFfmpegFile;
+	}
+
+	if (existsSync(storeFfmpegFile)) {
+		return storeFfmpegFile;
+	}
+
+	return bundledFfmpegFile;
 }
 
 dom.outputFolderInput.addEventListener("change", (e) => {

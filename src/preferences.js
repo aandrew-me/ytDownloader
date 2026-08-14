@@ -11,6 +11,8 @@ const {
 	platform,
 	exec,
 	env,
+	__dirname,
+	windowsStore,
 } = window.electronAPI;
 
 function initPreferencesUI() {
@@ -826,8 +828,15 @@ function initDependenciesTab() {
 			});
 		} else {
 			let bundledFfmpegBin = "";
-			if (homedir) {
-				const exeName = platform && platform() === "win32" ? "ffmpeg.exe" : "ffmpeg";
+			const exeName = platform && platform() === "win32" ? "ffmpeg.exe" : "ffmpeg";
+			if (windowsStore && homedir) {
+				bundledFfmpegBin = join(homedir(), ".ytDownloader", "ffmpeg", "bin", exeName);
+			} else if (__dirname) {
+				bundledFfmpegBin = join(__dirname, "..", "ffmpeg", "bin", exeName);
+				if (!fs.existsSync(bundledFfmpegBin) && homedir) {
+					bundledFfmpegBin = join(homedir(), ".ytDownloader", "ffmpeg", "bin", exeName);
+				}
+			} else if (homedir) {
 				bundledFfmpegBin = join(homedir(), ".ytDownloader", "ffmpeg", "bin", exeName);
 			}
 			if (bundledFfmpegBin && fs && fs.existsSync && fs.existsSync(bundledFfmpegBin)) {
