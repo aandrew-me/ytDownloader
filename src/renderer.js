@@ -266,15 +266,16 @@ class YtDownloaderApp {
 						CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_PATH,
 					);
 				}
-
 				const ytDlpPath = mockYtDlp
 					? "mock-ytdlp"
 					: await this._findOrDownloadYtDlp();
 				const ytDlp = mockYtDlp || YTDlpWrap.new(ytDlpPath);
+
 				const ffmpegPath = mockYtDlp
 					? "ffmpeg"
 					: await findFfmpeg();
 				ensureFfmpegLibsLoadable(ffmpegPath);
+
 				const jsRuntimePath = mockYtDlp
 					? ""
 					: await getJsRuntimePath();

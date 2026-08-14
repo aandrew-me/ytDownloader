@@ -349,7 +349,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	spawn: spawnWrapper,
 	spawnSync: (command, args, options) => spawnSync(command, args, options),
 	exec: (command, options, callback) => exec(command, options, callback),
-	execSync: (command, options) => execSync(command, options),
+	execSync: (command, options) => execSync(command, { encoding: "utf-8", ...options }),
 	si: {
 		graphics: () => si.graphics(),
 	},
