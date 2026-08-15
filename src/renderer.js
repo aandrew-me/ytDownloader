@@ -2452,7 +2452,13 @@ class YtDownloaderApp {
 			i18n.__("errorNetworkOrUrl");
 		$(CONSTANTS.DOM_IDS.ERROR_BTN).style.display = "inline-block";
 		const errorDetails = $(CONSTANTS.DOM_IDS.ERROR_DETAILS);
-		errorDetails.innerHTML = `<strong>URL: ${url}</strong><br><br>${errorMessage}`;
+		errorDetails.textContent = "";
+		const strong = document.createElement("strong");
+		strong.textContent = `URL: ${url}`;
+		errorDetails.appendChild(strong);
+		errorDetails.appendChild(document.createElement("br"));
+		errorDetails.appendChild(document.createElement("br"));
+		errorDetails.appendChild(document.createTextNode(errorMessage));
 		errorDetails.title = i18n.__("clickToCopy");
 	}
 
