@@ -193,6 +193,7 @@ class YtDownloaderApp {
 
 		this._setupDirectories();
 		this._configureTray();
+		this._configureGlobalHotkey();
 		this._configureAutoUpdate();
 
 		try {
@@ -378,6 +379,17 @@ class YtDownloaderApp {
 		) {
 			console.log("Tray is enabled.");
 			ipcRenderer.send("useTray", true);
+		}
+	}
+
+	/**
+	 * Restores the global hotkey setting from localStorage on startup.
+	 */
+	_configureGlobalHotkey() {
+		if (localStorage.getItem("globalHotkeyEnabled") === "true") {
+			const defaultAccel = platform() === "darwin" ? "Cmd+Shift+D" : "Ctrl+Shift+D";
+			const accelerator = localStorage.getItem("globalHotkeyAccelerator") || defaultAccel;
+			ipcRenderer.send("useGlobalHotkey", { enabled: true, accelerator });
 		}
 	}
 

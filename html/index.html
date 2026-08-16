@@ -981,6 +981,23 @@
                         </section>
 
                         <section class="settings-section">
+                            <div class="prefBox">
+                                <div class="pref-label-group">
+                                    <span data-translate="globalHotkeyEnabled">Enable global hotkey</span>
+                                    <p class="pref-subtitle" data-translate="globalHotkeyDesc">Brings the app to focus and pastes your clipboard URL</p>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" id="globalHotkeyEnabled">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="prefBox" id="hotkeyInputBox">
+                                <span data-translate="customizeHotkey">Shortcut</span>
+                                <div id="hotkeyRecorder" class="hotkey-recorder" tabindex="0" role="button" title="Click to record shortcut"></div>
+                            </div>
+                        </section>
+
+                        <section class="settings-section">
                             <div class="prefBox" id="autoUpdatesBox">
                                 <span id="autoUpdateTxt" data-translate="disableAutoUpdates">Disable auto updates</span>
                                 <label class="switch">

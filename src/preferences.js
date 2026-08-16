@@ -792,6 +792,121 @@ function initPreferences() {
 		ipcRenderer.send("useTray", true);
 	}
 
+	const defaultAccel = platform() === "darwin" ? "Cmd+Shift+D" : "Ctrl+Shift+D";
+
+	function sendHotkeyConfig() {
+		const enabled = localStorage.getItem("globalHotkeyEnabled") === "true";
+		const accelerator = localStorage.getItem("globalHotkeyAccelerator") || defaultAccel;
+		ipcRenderer.send("useGlobalHotkey", { enabled, accelerator });
+	}
+
+	bindCheckboxToStorage(
+		"globalHotkeyEnabled",
+		"globalHotkeyEnabled",
+		"true",
+		"false",
+		() => sendHotkeyConfig(),
+	);
+
+	if (localStorage.getItem("globalHotkeyEnabled") === "true") {
+		sendHotkeyConfig();
+	}
+
+	// Key recorder — renders kbd chips
+	const hotkeyRecorder = getId("hotkeyRecorder");
+	if (hotkeyRecorder) {
+		function renderHotkey(accelerator) {
+			if (!accelerator) {
+				const hint = window.i18n ? window.i18n.__("hotkeyClickToRecord") : "Click to record";
+				hotkeyRecorder.innerHTML = `<span class="hotkey-hint">${hint}</span>`;
+				return;
+			}
+			const displayMap = { Cmd: "⌘", Super: "⊞" };
+			const parts = accelerator.split("+");
+			hotkeyRecorder.innerHTML = parts
+				.map((p, i) =>
+					`<kbd>${displayMap[p] ?? p}</kbd>${i < parts.length - 1 ? '<span class="hotkey-plus">+</span>' : ""}`,
+				)
+				.join("");
+		}
+
+		renderHotkey(localStorage.getItem("globalHotkeyAccelerator") || defaultAccel);
+
+		let cleanupActiveRecording = null;
+
+		hotkeyRecorder.addEventListener("click", () => {
+			if (cleanupActiveRecording) {
+				cleanupActiveRecording();
+			}
+
+			// Unregister while recording so the current combo isn't swallowed by the OS
+			ipcRenderer.send("useGlobalHotkey", { enabled: false });
+
+			const recordingText = window.i18n ? window.i18n.__("hotkeyRecording") : "Press keys...";
+			hotkeyRecorder.innerHTML = `<span class="hotkey-hint">${recordingText}</span>`;
+			hotkeyRecorder.classList.add("recording");
+
+			function stopRecording() {
+				hotkeyRecorder.classList.remove("recording");
+				document.removeEventListener("keydown", onKeyDown, true);
+				hotkeyRecorder.removeEventListener("blur", onBlur);
+				cleanupActiveRecording = null;
+			}
+
+			function onKeyDown(e) {
+				e.preventDefault();
+				e.stopPropagation();
+
+				const modKeys = ["Control", "Alt", "Shift", "Meta"];
+				if (modKeys.includes(e.key)) return; // wait for a non-modifier
+
+				const parts = [];
+				if (e.ctrlKey) parts.push("Ctrl");
+				if (e.altKey) parts.push("Alt");
+				if (e.shiftKey) parts.push("Shift");
+				if (e.metaKey) parts.push(platform() === "darwin" ? "Cmd" : "Super");
+
+				const keyMap = {
+					" ": "Space", ArrowUp: "Up", ArrowDown: "Down",
+					ArrowLeft: "Left", ArrowRight: "Right",
+					Enter: "Return", Escape: "Escape", Delete: "Delete",
+					Backspace: "Backspace", Tab: "Tab",
+					Home: "Home", End: "End", PageUp: "PageUp", PageDown: "PageDown",
+					Insert: "Insert",
+				};
+				const mapped = keyMap[e.key] ?? (e.key.length === 1 ? e.key.toUpperCase() : e.key);
+				const isFKey = /^F\d+$/.test(mapped);
+
+				// Require at least one modifier unless it's an F-key
+				if (!isFKey && parts.length === 0) return;
+
+				parts.push(mapped);
+				const accelerator = parts.join("+");
+
+				localStorage.setItem("globalHotkeyAccelerator", accelerator);
+				stopRecording();
+				renderHotkey(accelerator);
+				sendHotkeyConfig();
+			}
+
+			function onBlur() {
+				// Cancelled — restore chips and re-register the old hotkey
+				stopRecording();
+				renderHotkey(localStorage.getItem("globalHotkeyAccelerator") || defaultAccel);
+				sendHotkeyConfig();
+			}
+
+			cleanupActiveRecording = () => {
+				document.removeEventListener("keydown", onKeyDown, true);
+				hotkeyRecorder.removeEventListener("blur", onBlur);
+				cleanupActiveRecording = null;
+			};
+
+			document.addEventListener("keydown", onKeyDown, true);
+			hotkeyRecorder.addEventListener("blur", onBlur);
+		});
+	}
+
 	bindCheckboxToStorage("autoUpdateDisabled", "autoUpdate", "false", "true");
 	bindCheckboxToStorage("showMoreFormats", "showMoreFormats", "true", "false");
 
