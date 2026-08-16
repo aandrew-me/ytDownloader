@@ -37,8 +37,8 @@ export function switchView(targetViewId) {
 }
 window.switchView = switchView;
 
-if (window.electronAPI && typeof window.electronAPI.on === "function") {
-	window.electronAPI.on("navigate-view", (targetViewId) => {
+if (window.electronAPI?.ipcRenderer) {
+	window.electronAPI.ipcRenderer.on("navigate-view", (_event, targetViewId) => {
 		switchView(targetViewId);
 	});
 }

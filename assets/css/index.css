@@ -4502,4 +4502,88 @@ body.rtl .header-core {
 	display: block;
 	line-height: 1.4;
 	font-weight: 500;
-}
+}
+
+/* ── Settings: label with subtitle ───────────────────────────── */
+.pref-label-group {
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
+	align-items: flex-start;
+}
+
+.pref-subtitle {
+	margin: 0;
+	font-size: 0.78rem;
+	opacity: 0.55;
+	font-weight: 400;
+	line-height: 1.4;
+}
+
+/* ── Hotkey recorder ──────────────────────────────────────────── */
+.hotkey-recorder {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	min-width: 140px;
+	min-height: 36px;
+	padding: 4px 10px;
+	border-radius: 8px;
+	border: 1px solid var(--box-separation);
+	background: var(--select);
+	cursor: pointer;
+	user-select: none;
+	transition: border-color 0.15s, box-shadow 0.15s;
+	justify-content: center;
+	flex-wrap: wrap;
+}
+
+.hotkey-recorder:hover {
+	border-color: var(--blueBtn);
+}
+
+.hotkey-recorder:focus {
+	outline: none;
+	border-color: var(--blueBtn);
+	box-shadow: 0 0 0 3px color-mix(in srgb, var(--blueBtn) 22%, transparent);
+}
+
+.hotkey-recorder.recording {
+	border-color: var(--blueBtn);
+	box-shadow: 0 0 0 3px color-mix(in srgb, var(--blueBtn) 22%, transparent);
+	animation: hotkey-pulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes hotkey-pulse {
+	from { box-shadow: 0 0 0 3px color-mix(in srgb, var(--blueBtn) 15%, transparent); }
+	to   { box-shadow: 0 0 0 5px color-mix(in srgb, var(--blueBtn) 30%, transparent); }
+}
+
+.hotkey-recorder kbd {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 2px 8px;
+	border-radius: 5px;
+	font-family: "JetBrains", monospace;
+	font-size: 0.8rem;
+	font-weight: 600;
+	background: var(--box-main);
+	color: var(--text);
+	border: 1px solid var(--box-separation);
+	box-shadow: 0 3px 0 var(--box-separation);
+	line-height: 1.6;
+	white-space: nowrap;
+}
+
+.hotkey-recorder .hotkey-plus {
+	font-size: 0.7rem;
+	opacity: 0.45;
+	padding: 0 1px;
+}
+
+.hotkey-recorder .hotkey-hint {
+	font-size: 0.78rem;
+	opacity: 0.45;
+	font-style: italic;
+}

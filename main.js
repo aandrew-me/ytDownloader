@@ -8,6 +8,7 @@ const {
 	Menu,
 	clipboard,
 	session,
+	globalShortcut,
 } = require("electron");
 const { autoUpdater } = require("electron-updater");
 const fs = require("fs").promises;
@@ -36,6 +37,8 @@ const appState = {
 	config: {},
 	downloadHistory: new DownloadHistory(),
 	autoUpdateEnabled: false,
+	/** @type {string | null} Currently registered global hotkey accelerator */
+	registeredHotkeyAccelerator: null,
 };
 
 const isTestEnv = process.env.NODE_ENV === "test" || process.argv.includes("--is-test") || process.env.YTDOWNLOADER_TEST === "true";
@@ -66,6 +69,7 @@ app.whenReady().then(async () => {
 
 app.on("before-quit", async () => {
 	appState.isQuitting = true;
+	globalShortcut.unregisterAll();
 	try {
 		// Save the final config state before exiting.
 		await saveConfiguration();
@@ -226,11 +230,13 @@ function createTray() {
 				if (!appState.indexPageIsOpen) {
 					wc.once("did-finish-load", () => {
 						appState.indexPageIsOpen = true;
+						wc.send("navigate-view", "view-home");
 						wc.send("link", text);
 					});
 
 					await appState.mainWindow.loadFile("html/index.html");
 				} else {
+					wc.send("navigate-view", "view-home");
 					wc.send("link", text);
 				}
 			},
@@ -394,6 +400,52 @@ function registerIpcHandlers() {
 		else {
 			appState.tray?.destroy();
 			appState.tray = null;
+		}
+	});
+
+	ipcMain.on("useGlobalHotkey", (_event, config) => {
+		// Unregister whatever was previously registered
+		if (appState.registeredHotkeyAccelerator) {
+			globalShortcut.unregister(appState.registeredHotkeyAccelerator);
+			appState.registeredHotkeyAccelerator = null;
+		}
+		if (!config.enabled) return;
+
+		const defaultAccel = process.platform === "darwin" ? "Cmd+Shift+D" : "Ctrl+Shift+D";
+		const accelerator = config.accelerator || defaultAccel;
+
+		try {
+			globalShortcut.register(accelerator, async () => {
+				const text = clipboard.readText().trim();
+				if (!appState.mainWindow) return;
+
+				if (appState.mainWindow.isMinimized()) appState.mainWindow.restore();
+				appState.mainWindow.show();
+				appState.mainWindow.focus();
+				if (app.dock) app.dock.show();
+
+				const bounds = appState.config.bounds;
+				if (bounds && bounds.width && bounds.height) {
+					appState.mainWindow.setBounds(bounds);
+				}
+				if (appState.config.isMaximized) appState.mainWindow.maximize();
+
+				const wc = appState.mainWindow.webContents;
+				if (!appState.indexPageIsOpen) {
+					wc.once("did-finish-load", () => {
+						appState.indexPageIsOpen = true;
+						wc.send("navigate-view", "view-home");
+						if (text) wc.send("link", text);
+					});
+					await appState.mainWindow.loadFile("html/index.html");
+				} else {
+					wc.send("navigate-view", "view-home");
+					if (text) wc.send("link", text);
+				}
+			});
+			appState.registeredHotkeyAccelerator = accelerator;
+		} catch (e) {
+			console.error("Failed to register hotkey:", accelerator, e.message);
 		}
 	});
 
