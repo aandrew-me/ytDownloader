@@ -160,6 +160,12 @@ async function launchApp(customLocalStorage = {}, customMetadata = DEFAULT_MOCK_
 						stdoutCbs.forEach((cb) => cb(jsonStr));
 						(callbacks["close"] || []).forEach((cb) => cb(0));
 					}
+				} else if (
+					args.includes("--load-info-json") &&
+					window.__mockFailOnLoadInfoJson
+				) {
+					window.__mockFailOnLoadInfoJson = false;
+					(callbacks["close"] || []).forEach((cb) => cb(1));
 				} else {
 					(callbacks["progress"] || []).forEach((cb) =>
 						cb({ percent: 100 }),

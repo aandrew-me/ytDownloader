@@ -181,6 +181,7 @@ class YtDownloaderApp {
 				quality: "1080",
 				format: "mp4",
 			},
+			activeInfoJsonPaths: new Map(),
 		};
 	}
 
@@ -226,6 +227,22 @@ class YtDownloaderApp {
 
 			window.addEventListener("ytdownloader-reload-binaries", () => {
 				this.reloadBinaries();
+			});
+
+			// Defer background cleanup of orphaned temp files so it doesn't block startup
+			setTimeout(() => {
+				this._cleanupTempFiles();
+			}, 1000);
+
+			// Synchronously clean up the active session's info JSON on exit
+			window.addEventListener("beforeunload", () => {
+				if (this.state.videoInfo?.infoJsonPath) {
+					try {
+						if (existsSync(this.state.videoInfo.infoJsonPath)) {
+							unlinkSync(this.state.videoInfo.infoJsonPath);
+						}
+					} catch (_) {}
+				}
 			});
 
 			this._addEventListeners();
@@ -1244,6 +1261,8 @@ class YtDownloaderApp {
 				duration: durationInt,
 				is_live: isLive,
 				extractor_key: metadata.extractor_key,
+				infoJsonPath: metadata._infoJsonPath || null,
+				infoJsonFetchedAt: metadata._infoJsonFetchedAt || null,
 			};
 			this.setVideoLength(durationInt);
 			this._populateFormatSelectors(metadata.formats || []);
@@ -1296,6 +1315,8 @@ class YtDownloaderApp {
 			title: this.state.videoInfo.title,
 			channel: this.state.videoInfo.channel,
 			thumbnail: this.state.videoInfo.thumbnail,
+			infoJsonPath: this.state.videoInfo.infoJsonPath,
+			infoJsonFetchedAt: this.state.videoInfo.infoJsonFetchedAt,
 			options: {...this.state.downloadOptions},
 			// Capture UI values at the moment of click
 			uiSnapshot: {
@@ -1373,7 +1394,28 @@ class YtDownloaderApp {
 			process.on("close", () => {
 				if (stdout) {
 					try {
-						resolve(JSON.parse(stdout));
+						const metadata = JSON.parse(stdout);
+						const randomId =
+							"meta_" + Math.random().toString(36).substring(2, 10);
+						const safeId = (metadata.id || "video").replace(
+							/[^a-zA-Z0-9_-]/g,
+							"",
+						);
+						const infoJsonPath = join(
+							tmpdir(),
+							`ytdlp_info_${safeId}_${randomId}.info.json`,
+						);
+						try {
+							writeFileSync(infoJsonPath, stdout, "utf8");
+							metadata._infoJsonPath = infoJsonPath;
+							metadata._infoJsonFetchedAt = Date.now();
+						} catch (writeErr) {
+							console.warn(
+								"Failed to write temporary info.json:",
+								writeErr,
+							);
+						}
+						resolve(metadata);
 					} catch (e) {
 						reject(
 							new Error(
@@ -1403,14 +1445,30 @@ class YtDownloaderApp {
 		this.state.currentDownloads++;
 		const randomId = "item_" + Math.random().toString(36).substring(2, 12);
 
-		const {downloadArgs, tempFilePath} = this._prepareDownloadArgs(job);
-
 		this._createDownloadUI(randomId, job);
 		this._updateEmptyStateUI();
 
 		const controller = new AbortController();
 		controller.isBatch = !!job.isBatch;
 		this.state.downloadControllers.set(randomId, controller);
+
+		this._runDownloadProcess(randomId, job, controller);
+	}
+
+	/**
+	 * Executes the yt-dlp download process with automatic fallback to live URL if --load-info-json fails.
+	 * @param {string} randomId The unique identifier for the download UI item.
+	 * @param {object} job The download job configuration and snapshot.
+	 * @param {AbortController} controller Abort controller for cancelling the download process.
+	 */
+	_runDownloadProcess(randomId, job, controller) {
+		const {downloadArgs, tempFilePath} = this._prepareDownloadArgs(job);
+
+		let didRetain = false;
+		if (job.usingInfoJson && !job._forceLiveUrl) {
+			this._retainInfoJson(job.infoJsonPath);
+			didRetain = true;
+		}
 
 		const downloadProcess = this.state.ytDlp.exec(downloadArgs, {
 			shell: false,
@@ -1477,6 +1535,28 @@ class YtDownloaderApp {
 					}
 				}
 
+				if (
+					code !== 0 &&
+					didRetain &&
+					!job._forceLiveUrl &&
+					!controller.signal.aborted
+				) {
+					console.warn(
+						`Download with --load-info-json failed (exit code ${code}). Retrying with live URL...`,
+					);
+					this._releaseInfoJson(job.infoJsonPath);
+					didRetain = false;
+					job._forceLiveUrl = true;
+					const el = $(`${randomId}_prog`);
+					if (el) el.textContent = i18n.__("downloading");
+					this._runDownloadProcess(randomId, job, controller);
+					return;
+				}
+
+				if (didRetain) {
+					this._releaseInfoJson(job.infoJsonPath);
+					didRetain = false;
+				}
 				this._handleDownloadCompletion(
 					code,
 					randomId,
@@ -1489,6 +1569,29 @@ class YtDownloaderApp {
 					try {
 						unlinkSync(tempFilePath);
 					} catch (e) {}
+				}
+
+				if (
+					didRetain &&
+					!job._forceLiveUrl &&
+					!controller.signal.aborted
+				) {
+					console.warn(
+						"Download with --load-info-json encountered error. Retrying with live URL:",
+						error,
+					);
+					this._releaseInfoJson(job.infoJsonPath);
+					didRetain = false;
+					job._forceLiveUrl = true;
+					const el = $(`${randomId}_prog`);
+					if (el) el.textContent = i18n.__("downloading");
+					this._runDownloadProcess(randomId, job, controller);
+					return;
+				}
+
+				if (didRetain) {
+					this._releaseInfoJson(job.infoJsonPath);
+					didRetain = false;
 				}
 				this.state.downloadedItems.add(randomId);
 				this._updateClearAllButton();
@@ -1830,7 +1933,22 @@ class YtDownloaderApp {
 			tempFilePath,
 		);
 
-		downloadArgs.push(url);
+		const MAX_INFO_JSON_AGE_MS = 1 * 60 * 60 * 1000; // 1 hour
+		const hasValidInfoJson =
+			!job.isBatch &&
+			!job._forceLiveUrl &&
+			job.infoJsonPath &&
+			existsSync(job.infoJsonPath) &&
+			job.infoJsonFetchedAt &&
+			Date.now() - job.infoJsonFetchedAt < MAX_INFO_JSON_AGE_MS;
+
+		job.usingInfoJson = Boolean(hasValidInfoJson);
+
+		if (hasValidInfoJson) {
+			downloadArgs.push("--load-info-json", job.infoJsonPath);
+		} else {
+			downloadArgs.push(url);
+		}
 
 		return {downloadArgs, tempFilePath};
 	}
@@ -1926,9 +2044,78 @@ class YtDownloaderApp {
 	}
 
 	/**
+	 * Increments the reference count for an active info.json temporary file.
+	 * Prevents premature deletion while in-flight downloads are using it.
+	 * @param {string} infoJsonPath The absolute path to the info.json file.
+	 */
+	_retainInfoJson(infoJsonPath) {
+		if (!infoJsonPath) return;
+		const current = this.state.activeInfoJsonPaths.get(infoJsonPath) || 0;
+		this.state.activeInfoJsonPaths.set(infoJsonPath, current + 1);
+	}
+
+	/**
+	 * Decrements the reference count for an active info.json temporary file.
+	 * Deletes the file if no active downloads reference it and it is not currently loaded in the UI.
+	 * @param {string} infoJsonPath The absolute path to the info.json file.
+	 */
+	_releaseInfoJson(infoJsonPath) {
+		if (!infoJsonPath) return;
+		const current = this.state.activeInfoJsonPaths.get(infoJsonPath) || 0;
+		if (current <= 1) {
+			this.state.activeInfoJsonPaths.delete(infoJsonPath);
+			if (this.state.videoInfo?.infoJsonPath !== infoJsonPath) {
+				try {
+					if (existsSync(infoJsonPath)) unlinkSync(infoJsonPath);
+				} catch (_) {}
+			}
+		} else {
+			this.state.activeInfoJsonPaths.set(infoJsonPath, current - 1);
+		}
+	}
+
+	/**
+	 * Sweeps and removes orphan temporary files (ytdlp_info_*.info.json and ytdlp_path_*.txt)
+	 * from the system temp directory on startup.
+	 */
+	_cleanupTempFiles() {
+		try {
+			const tmpDir = tmpdir();
+			const active = this.state.activeInfoJsonPaths;
+			const current = this.state.videoInfo?.infoJsonPath;
+			const files = readdirSync(tmpDir);
+			for (const file of files) {
+				if (
+					(file.startsWith("ytdlp_info_") &&
+						file.endsWith(".info.json")) ||
+					(file.startsWith("ytdlp_path_") && file.endsWith(".txt"))
+				) {
+					const full = join(tmpDir, file);
+					if (full === current || active?.has(full)) continue;
+					try {
+						unlinkSync(full);
+					} catch (_) {}
+				}
+			}
+		} catch (e) {
+			console.warn("Failed cleaning up temp files:", e);
+		}
+	}
+
+	/**
 	 * Resets the UI state for a new link.
 	 */
 	_resetUIForNewLink() {
+		if (this.state.videoInfo?.infoJsonPath) {
+			const oldPath = this.state.videoInfo.infoJsonPath;
+			this.state.videoInfo.infoJsonPath = null;
+			this.state.videoInfo.infoJsonFetchedAt = null;
+			if (!this.state.activeInfoJsonPaths.has(oldPath)) {
+				try {
+					if (existsSync(oldPath)) unlinkSync(oldPath);
+				} catch (_) {}
+			}
+		}
 		this._hideInfoPanel();
 		$(CONSTANTS.DOM_IDS.LOADING_WRAPPER).style.display = "flex";
 		$(CONSTANTS.DOM_IDS.INCORRECT_MSG).textContent = "";

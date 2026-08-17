@@ -277,4 +277,51 @@ test.describe("Main Page Download Tests", () => {
 		expect(downloadCmd).toContain("mkv");
 		expect(downloadCmd).toContain("--merge-output-format");
 	});
+
+	test("download automatically retries with live URL if --load-info-json fails", async () => {
+		const testUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+
+		await page.evaluate((url) => {
+			window.electronAPI.clipboard.writeText(url);
+		}, testUrl);
+
+		await page.click("#pasteUrl");
+		await waitForInfoPanel(page);
+
+		// Arm mock to fail on the first --load-info-json execution
+		await page.evaluate(() => {
+			window.__mockFailOnLoadInfoJson = true;
+		});
+
+		await clearExecutedCommands(page);
+
+		// Trigger download
+		await triggerClick(page, "videoDownload");
+
+		// Wait until second command (fallback with direct URL) is executed
+		await page.waitForFunction(() => {
+			const cmds = window.__executedCommands || [];
+			return (
+				cmds.length >= 2 &&
+				cmds.some(
+					(cmd) =>
+						cmd.includes("-f") &&
+						cmd.includes("https://www.youtube.com/watch?v=dQw4w9WgXcQ"),
+				)
+			);
+		});
+
+		const commands = await getExecutedCommands(page);
+		expect(commands.length).toBeGreaterThanOrEqual(2);
+
+		const firstCmd = commands[0];
+		const retryCmd = commands[commands.length - 1];
+
+		// First command should have used --load-info-json
+		expect(firstCmd).toContain("--load-info-json");
+
+		// Retry command should have fallen back to URL without --load-info-json
+		expect(retryCmd).not.toContain("--load-info-json");
+		expect(retryCmd).toContain(testUrl);
+	});
 });
