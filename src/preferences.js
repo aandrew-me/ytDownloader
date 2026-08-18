@@ -191,27 +191,55 @@ function initPreferences() {
 	}
 
 	if (langSelectEl) {
+		let currentLocale = localStorage.getItem("locale");
 		const updateLang = async (e) => {
-			const chosenLang = e.target.value;
-			if (
+			const chosenLang = e?.target?.value || langSelectEl.value;
+			if (!chosenLang || chosenLang === currentLocale) return;
+			currentLocale = chosenLang;
+
+			const isRTL =
 				chosenLang === "fa" ||
 				chosenLang === "ar" ||
 				chosenLang === "fa-IR" ||
-				chosenLang === "ar-SA"
-			) {
-				localStorage.setItem("rightToLeft", "true");
-			} else {
-				localStorage.setItem("rightToLeft", "false");
-			}
+				chosenLang === "ar-SA";
+			localStorage.setItem("rightToLeft", isRTL ? "true" : "false");
+			localStorage.setItem("locale", chosenLang);
+
 			if (window.i18n && typeof window.i18n.setLocale === "function") {
 				await window.i18n.setLocale(chosenLang);
-			} else {
-				localStorage.setItem("locale", chosenLang);
 			}
 			updateDirectionality();
 		};
 		langSelectEl.addEventListener("change", updateLang);
 		langSelectEl.addEventListener("input", updateLang);
+
+		if (typeof SlimSelect !== "undefined" && !langSelectEl.slim) {
+			Array.from(langSelectEl.options).forEach((opt) => {
+				if (!opt.id) opt.id = opt.value;
+			});
+			langSelectEl.slim = new SlimSelect({
+				select: langSelectEl,
+				settings: {
+					showSearch: true,
+					contentLocation: document.body,
+				},
+				events: {
+					afterOpen: () => {
+						document
+							.querySelectorAll(".ss-option.ss-selected")
+							.forEach((el) => {
+								el.addEventListener(
+									"click",
+									() => {
+										langSelectEl.slim.close();
+									},
+									{once: true},
+								);
+							});
+					},
+				},
+			});
+		}
 	}
 
 	// Cookie Source & Netscape Cookies Setup
