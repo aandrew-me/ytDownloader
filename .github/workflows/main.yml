@@ -32,13 +32,17 @@ jobs:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         strategy:
             matrix:
-                os:
-                    [
-                        macos-latest,
-                        macos-26-intel,
-                        ubuntu-latest,
-                        windows-latest,
-                    ]
+                include:
+                    - target: macos-arm64
+                      os: macos-latest
+                    - target: macos-intel
+                      os: macos-26-intel
+                    - target: linux-x64
+                      os: ubuntu-latest
+                    - target: windows-x64
+                      os: windows-latest
+                    - target: windows-arm64
+                      os: windows-latest
 
         steps:
             - name: Checkout code
@@ -50,11 +54,12 @@ jobs:
                   node-version: 24
 
             - name: Linux Build
-              if: matrix.os == 'ubuntu-latest'
+              if: matrix.target == 'linux-x64'
               run: |
                   sudo snap install snapcraft --classic
                   wget "https://github.com/aandrew-me/ffmpeg-builds/releases/download/v8/ffmpeg_linux_amd64.tar.xz"
-                  wget "https://github.com/aandrew-me/ffmpeg-builds/releases/download/v8/node_linux_amd64" -O node
+                  NODE_ARCHIVE=$(curl -fsSL https://nodejs.org/dist/latest-v22.x/SHASUMS256.txt | grep 'linux-x64\.tar\.xz$' | awk '{print $2}')
+                  curl -fsSL "https://nodejs.org/dist/latest-v22.x/${NODE_ARCHIVE}" | tar -xJ --strip-components=2 --wildcards '*/bin/node'
                   chmod +x node
                   tar -xf ffmpeg_linux_amd64.tar.xz
                   mv ffmpeg_linux_amd64 ffmpeg
@@ -64,11 +69,10 @@ jobs:
                   patchelf --set-rpath '$ORIGIN/../lib' ffmpeg/bin/ffprobe
                   rm ffmpeg_linux_amd64.tar.xz
                   npm i
-                  npx electron-builder -l --publish=always
                   npm run gh-linux
 
             - name: Macos Intel Build
-              if: matrix.os == 'macos-26-intel'
+              if: matrix.target == 'macos-intel'
               run: |
                   mkdir -p ffmpeg/bin
                   curl -L https://github.com/aandrew-me/ffmpeg-builds/releases/download/v8/ffmpeg_macos_amd64 -o ffmpeg/bin/ffmpeg
@@ -79,7 +83,7 @@ jobs:
                   npm run gh-mac
 
             - name: Macos Arm Build
-              if: matrix.os == 'macos-latest'
+              if: matrix.target == 'macos-arm64'
               run: |
                   mkdir -p ffmpeg/bin
                   curl -L https://github.com/aandrew-me/ffmpeg-builds/releases/download/v8/ffmpeg_macos_amd64 -o ffmpeg/bin/ffmpeg
@@ -89,14 +93,26 @@ jobs:
                   npm i
                   npm run gh-mac
 
-            - name: Windows Build
-              if: matrix.os == 'windows-latest'
+            - name: Windows x64 Build
+              if: matrix.target == 'windows-x64'
               shell: powershell
               run: |
-                  Invoke-WebRequest -Uri "https://github.com/aandrew-me/ffmpeg-builds/releases/download/v8/node.exe" -OutFile node.exe
-                  Invoke-WebRequest -Uri "https://github.com/aandrew-me/ffmpeg-builds/releases/download/v8/ffmpeg_win64.zip" -OutFile ffmpeg_win64.zip
+                  curl.exe -fsSL "https://nodejs.org/dist/latest-v22.x/win-x64/node.exe" -o node.exe
+                  curl.exe -fsSL "https://github.com/aandrew-me/ffmpeg-builds/releases/download/v8/ffmpeg_win64.zip" -o ffmpeg_win64.zip
                   Expand-Archive -Path ffmpeg_win64.zip -DestinationPath .
                   Move-Item -Path .\ffmpeg_win64 -Destination .\ffmpeg
                   Remove-Item -Path ffmpeg_win64.zip
                   npm i
                   npm run gh-windows
+
+            - name: Windows Arm64 Build
+              if: matrix.target == 'windows-arm64'
+              shell: powershell
+              run: |
+                  curl.exe -fsSL "https://nodejs.org/dist/latest-v22.x/win-arm64/node.exe" -o node.exe
+                  curl.exe -fsSL "https://github.com/aandrew-me/ffmpeg-builds/releases/download/v8/ffmpeg_win_arm64.zip" -o ffmpeg_win_arm64.zip
+                  Expand-Archive -Path ffmpeg_win_arm64.zip -DestinationPath .
+                  Get-ChildItem -Directory -Filter "ffmpeg*" | ForEach-Object { Move-Item $_.FullName .\ffmpeg }
+                  Remove-Item -Path ffmpeg_win_arm64.zip
+                  npm i
+                  npm run gh-windows-arm64
