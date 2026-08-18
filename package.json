@@ -16,6 +16,7 @@
 		"linux": "electron-builder -l",
 		"mac": "electron-builder -m",
 		"gh-windows": "electron-builder -w --publish=always",
+		"gh-windows-arm64": "electron-builder -w --arm64 -c.win.artifactName=\"${productName}_Win_arm64.${ext}\" --publish=always",
 		"gh-linux": "electron-builder -l --publish=always",
 		"gh-mac": "electron-builder -m --publish=always"
 	},
