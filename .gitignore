@@ -1,5 +1,7 @@
 node_modules
 release
+out
+dist
 test.js
 .*
 !/.gitignore

@@ -1,0 +1,238 @@
+import { getId } from "./utils.js";
+
+export function switchView(targetViewId: string): void {
+	const views = document.querySelectorAll(".page-view");
+	const navItems = document.querySelectorAll(".nav-item");
+
+	views.forEach((view) => {
+		if (view.id === targetViewId) {
+			view.classList.remove("hidden");
+			view.classList.add("active");
+		} else {
+			view.classList.remove("active");
+			view.classList.add("hidden");
+		}
+	});
+
+	navItems.forEach((item) => {
+		if ((item as HTMLElement).dataset.target === targetViewId) {
+			item.classList.add("active");
+		} else {
+			item.classList.remove("active");
+		}
+	});
+
+	if (targetViewId === "view-history" && typeof window.loadHistory === "function") {
+		window.loadHistory();
+	}
+
+	if (targetViewId === "view-compressor" && typeof window.initCompressorGPU === "function") {
+		window.initCompressorGPU();
+	}
+
+	if (targetViewId === "view-playlist" && window.playlistDownloader) {
+		window.playlistDownloader.initUI();
+		window.playlistDownloader.loadInitialConfig();
+	}
+}
+window.switchView = switchView;
+
+if (window.electronAPI?.ipcRenderer) {
+	window.electronAPI.ipcRenderer.on("navigate-view", (_event: any, targetViewId: string) => {
+		switchView(targetViewId);
+	});
+}
+
+export function toggleSidebar(collapse?: boolean): void {
+	const sidebar = getId("sidebar");
+	const mainContent = document.querySelector(".main-content-wrapper");
+
+	const isCurrentlyCollapsed = sidebar?.classList.contains("collapsed");
+	const shouldCollapse = collapse !== undefined ? collapse : !isCurrentlyCollapsed;
+
+	if (shouldCollapse) {
+		sidebar?.classList.add("collapsed");
+		mainContent?.classList.add("sidebar-collapsed");
+		localStorage.setItem("sidebarCollapsed", "true");
+	} else {
+		sidebar?.classList.remove("collapsed");
+		mainContent?.classList.remove("sidebar-collapsed");
+		localStorage.setItem("sidebarCollapsed", "false");
+	}
+}
+window.toggleSidebar = toggleSidebar;
+
+document.addEventListener("DOMContentLoaded", () => {
+	getId("sidebarCollapseBtn")?.addEventListener("click", () => toggleSidebar());
+
+	if (localStorage.getItem("sidebarCollapsed") === "false") {
+		toggleSidebar(false);
+	} else {
+		toggleSidebar(true);
+	}
+
+	document.querySelectorAll(".nav-item").forEach((btn) => {
+		btn.addEventListener("click", (e) => {
+			e.preventDefault();
+			const target = btn.getAttribute("data-target");
+			if (target) {
+				switchView(target);
+			}
+		});
+	});
+});
+
+getId("menuIcon")?.addEventListener("click", () => {
+	const menuEl = getId("menu");
+	const menuIconEl = getId("menuIcon");
+	const menuDisplay = menuEl?.style.display;
+	if (menuDisplay != "none" && menuDisplay != "" && menuDisplay != undefined) {
+		if (menuIconEl) menuIconEl.style.transform = "rotate(0deg)";
+		let count = 0;
+		let opacity = 1;
+		const fade = setInterval(() => {
+			if (count >= 10) {
+				if (menuEl) menuEl.style.display = "none";
+				clearInterval(fade);
+			} else {
+				opacity -= 0.1;
+				if (menuEl) menuEl.style.opacity = opacity.toFixed(3).toString();
+				count++;
+			}
+		}, 50);
+	} else if (menuEl) {
+		if (menuIconEl) menuIconEl.style.transform = "rotate(90deg)";
+
+		setTimeout(() => {
+			menuEl.style.display = "flex";
+			menuEl.style.opacity = "1";
+		}, 150);
+	}
+});
+
+getId("themeToggle")?.addEventListener("change", () => {
+	const themeToggleEl = getId("themeToggle") as HTMLSelectElement | null;
+	const val = themeToggleEl?.value || "frappe";
+	localStorage.setItem("theme", val);
+
+	const x = window.innerWidth;
+	const y = 0;
+	const maxRadius = Math.hypot(window.innerWidth, window.innerHeight);
+
+	if ((document as any).startViewTransition) {
+		const transition = (document as any).startViewTransition(() => {
+			document.documentElement.setAttribute("theme", val);
+		});
+
+		transition.ready.then(() => {
+			document.documentElement.animate(
+				{
+					clipPath: [
+						`circle(0px at ${x}px ${y}px)`,
+						`circle(${maxRadius}px at ${x}px ${y}px)`
+					]
+				},
+				{
+					duration: 1100,
+					easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+					pseudoElement: '::view-transition-new(root)'
+				}
+			);
+		});
+	} else {
+		document.documentElement.setAttribute("theme", val);
+	}
+});
+
+function initTheme(): void {
+	const storageTheme = localStorage.getItem("theme") || "frappe";
+	document.documentElement.setAttribute("theme", storageTheme);
+	const themeToggleEl = getId("themeToggle") as HTMLSelectElement | null;
+	if (themeToggleEl) {
+		themeToggleEl.value = storageTheme;
+	}
+}
+
+if (document.readyState === "loading") {
+	document.addEventListener("DOMContentLoaded", initTheme);
+} else {
+	initTheme();
+}
+
+////
+let advancedHidden = true;
+
+export function advancedToggle(): void {
+	const advEl = getId("advanced");
+	const arrowVideo = getId("arrowLeftVideo");
+	const arrowAudio = getId("arrowLeftAudio");
+
+	if (advancedHidden) {
+		if (advEl) {
+			advEl.style.display = "block";
+			void advEl.offsetHeight;
+			advEl.classList.add("open");
+		}
+		if (arrowVideo) arrowVideo.style.transform = "rotate(-90deg)";
+		if (arrowAudio) arrowAudio.style.transform = "rotate(-90deg)";
+		advancedHidden = false;
+	} else {
+		if (advEl) {
+			advEl.classList.remove("open");
+			setTimeout(() => {
+				if (advancedHidden && advEl) {
+					advEl.style.display = "none";
+				}
+			}, 320);
+		}
+		if (arrowVideo) arrowVideo.style.transform = "rotate(0deg)";
+		if (arrowAudio) arrowAudio.style.transform = "rotate(0deg)";
+		advancedHidden = true;
+	}
+}
+window.advancedToggle = advancedToggle;
+
+// Check scroll go to top
+
+window.onscroll = function () {
+	scrollFunction();
+};
+
+function scrollFunction(): void {
+	const goToTop = getId("goToTop");
+	if (
+		document.body.scrollTop > 50 ||
+		document.documentElement.scrollTop > 50
+	) {
+		if (goToTop) goToTop.style.display = "block";
+	} else {
+		if (goToTop) goToTop.style.display = "none";
+	}
+}
+
+// Function to scroll go to top
+
+getId("goToTop")?.addEventListener("click", () => {
+	window.scrollTo({top: 0, behavior: "smooth"});
+});
+
+// Showing and hiding error details
+export function toggleErrorDetails(): void {
+	const errorDetails = getId("errorDetails");
+	if (!errorDetails) return;
+	const display = getComputedStyle(errorDetails).display;
+	const errorBtn = getId("errorBtn");
+
+	if (display === "none") {
+		errorDetails.style.display = "block";
+		if (errorBtn) errorBtn.textContent = (window.i18n?.__("errorDetails") || "Error Details") + " ▼";
+	} else {
+		errorDetails.style.display = "none";
+		if (errorBtn) errorBtn.textContent = (window.i18n?.__("errorDetails") || "Error Details") + " ◀";
+	}
+}
+window.toggleErrorDetails = toggleErrorDetails;
+
+getId("errorBtn")?.addEventListener("click", toggleErrorDetails);
+getId("advancedVideoToggle")?.addEventListener("click", advancedToggle);
+getId("advancedAudioToggle")?.addEventListener("click", advancedToggle);

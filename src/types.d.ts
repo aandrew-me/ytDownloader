@@ -81,9 +81,9 @@ interface ElectronAPI {
         writeText(text: string): void;
     };
     YTDlpWrap: YTDlpWrapBridge;
-    homedir: string;
-    platform: string;
-    tmpdir: string;
+    homedir: () => string;
+    platform: () => string;
+    tmpdir: () => string;
     join(...paths: string[]): string;
     mkdirSync(path: string, options?: { recursive?: boolean }): string | undefined;
     accessSync(path: string, mode?: number): void;
@@ -120,7 +120,32 @@ declare global {
     interface Window {
         electronAPI: ElectronAPI;
         __mockYtDlp?: YTDlpWrapInstance;
+        __mockSpawn?: any;
+        __mockFfmpeg?: any;
+        __executedCommands?: any[];
+        __mockMetadata?: any;
+        i18n?: {
+            __(key: string): string;
+            setLocale(locale: string): void;
+            getLocale(): string;
+        };
+        switchView?: (targetViewId: string) => void;
+        toggleSidebar?: (collapse?: boolean) => void;
+        loadHistory?: () => void;
+        initCompressorGPU?: () => void;
+        playlistDownloader?: any;
+        selectVideo?: () => void;
+        selectAudio?: () => void;
+        advancedToggle?: () => void;
+        toggleErrorDetails?: () => void;
+        AppBinaries?: {
+            ffmpegPath?: string;
+            jsRuntimePath?: string;
+            [key: string]: any;
+        };
+        SlimSelect?: any;
     }
 }
 
-export { format, info };
+export { format, info, ElectronAPI, FsPromises, SpawnChildWrapper, YTDlpWrapBridge };
+
