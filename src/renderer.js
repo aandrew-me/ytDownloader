@@ -1626,7 +1626,7 @@ class YtDownloaderApp {
                 <div class="itemIconBox">
                     <img src="${
 						job.thumbnail || "../assets/images/thumb.png"
-					}" alt="thumbnail" class="itemIcon" crossorigin="anonymous">
+					}" alt="thumbnail" class="itemIcon" crossorigin="anonymous" onload="this.parentElement.classList.add('loaded')" onerror="this.onerror=null;this.src='../assets/images/thumb.png';this.parentElement.classList.add('loaded');">
                     ${
 						this._isSafeWebUrl(job.thumbnail)
 							? `<button id="${randomId}_thumbOpen" class="openThumbBtn" title="${i18n.__(
@@ -2473,7 +2473,7 @@ class YtDownloaderApp {
                 <div class="itemIconBox">
                     <img src="${
 						job.thumbnail || "../assets/images/thumb.png"
-					}" alt="thumbnail" class="itemIcon" crossorigin="anonymous">
+					}" alt="thumbnail" class="itemIcon" crossorigin="anonymous" onload="this.parentElement.classList.add('loaded')" onerror="this.onerror=null;this.src='../assets/images/thumb.png';this.parentElement.classList.add('loaded');">
                     ${
 						this._isSafeWebUrl(job.thumbnail)
 							? `<button id="${randomId}_thumbOpen" class="openThumbBtn" title="${i18n.__(
