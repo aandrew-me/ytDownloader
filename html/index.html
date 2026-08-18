@@ -524,111 +524,284 @@
                         </span>
                     </button>
 
-                    <div id="options">
-                        <img src="../assets/images/close.png" alt="close" id="closeHiddenPlaylist" style="display: none;">
-                        <div id="btnContainerPlaylist">
-                            <div id="videoTogglePlaylist" class="toggleBtnWrapper">
+                    <div id="options" class="playlist-hidden-menu">
+                        <!-- Top Header Bar with Close Button -->
+                        <div class="playlist-menu-header">
+                            <div class="playlist-menu-title-group">
+                                <svg class="playlist-menu-header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="8" y1="6" x2="21" y2="6"/>
+                                    <line x1="8" y1="12" x2="21" y2="12"/>
+                                    <line x1="8" y1="18" x2="21" y2="18"/>
+                                    <line x1="3" y1="6" x2="3.01" y2="6"/>
+                                    <line x1="3" y1="12" x2="3.01" y2="12"/>
+                                    <line x1="3" y1="18" x2="3.01" y2="18"/>
+                                </svg>
+                                <span class="playlist-menu-header-title" data-translate="batchPlaylist">Batch (All)</span>
+                            </div>
+                            <button id="closeHiddenPlaylist" class="playlist-close-btn" title="Close" aria-label="Close" type="button">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- Detected URL Pill / Banner -->
+                        <div class="playlist-url-card">
+                            <div class="playlist-url-left">
+                                <svg class="playlist-url-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                                </svg>
+                                <strong id="linkTitle" class="playlist-url-label" data-translate="link">Link:</strong>
+                            </div>
+                            <span id="link" class="playlist-url-text" title="Detected URL"></span>
+                        </div>
+
+                        <!-- Mode Switcher (Video vs Audio) -->
+                        <div id="btnContainerPlaylist" class="playlist-type-switcher">
+                            <div id="videoTogglePlaylist" class="toggleBtnWrapper active">
+                                <svg class="toggleBtnIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"/>
+                                    <rect x="2" y="6" width="14" height="12" rx="2"/>
+                                </svg>
                                 <button class="toggleBtn" data-translate="video">Video</button>
                             </div>
                             <div id="audioTogglePlaylist" class="toggleBtnWrapper">
+                                <svg class="toggleBtnIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M9 18V5l12-2v13"/>
+                                    <circle cx="6" cy="18" r="3"/>
+                                    <circle cx="18" cy="16" r="3"/>
+                                </svg>
                                 <button class="toggleBtn" data-translate="audio">Audio</button>
                             </div>
                         </div>
-                        <br>
-                        <strong id="linkTitle" data-translate="link">Link:</strong>
-                        <span id="link"></span>
-                        <br><br>
-                        <div id="videoBox">
-                            <label id="videoFormat" data-translate="videoQuality">Select Video Quality </label>
-                            <select id="select" class="select">
-                                <option value="best" id="bestVideoOption" data-translate="best" selected>Best</option>
-                                <option value="worst" id="worstVideoOption" data-translate="qualityWorst">Worst</option>
-                                <option value="144">144p</option>
-                                <option value="240">240p</option>
-                                <option value="360">360p</option>
-                                <option value="480">480p</option>
-                                <option value="720">720p (HD)</option>
-                                <option value="1080">1080p (FHD)</option>
-                                <option value="1440">1440p</option>
-                                <option value="2160">2160p (4k)</option>
-                            </select>
-                            <br>
-                            <div id="typeSelectBox">
-                                <label id="videoQualityTxt" data-translate="selectVideoFormat">Select video quality</label>
-                                <select id="videoTypeSelect" class="select">
-                                    <option value="auto" id="autoTxt" data-translate="auto" selected>Auto</option>
-                                    <option value="mp4">Mp4</option>
-                                    <option value="webm">WebM</option>
-                                </select>
+
+                        <!-- Video Configuration Box -->
+                        <div id="videoBox" class="playlist-config-box">
+                            <div class="playlist-options-grid">
+                                <div class="playlist-option-card">
+                                    <div class="playlist-option-header">
+                                        <svg class="playlist-option-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                                            <line x1="8" y1="21" x2="16" y2="21"/>
+                                            <line x1="12" y1="17" x2="12" y2="21"/>
+                                        </svg>
+                                        <label id="videoFormat" class="playlist-option-label" data-translate="videoQuality">Select Video Quality </label>
+                                    </div>
+                                    <div class="playlist-select-wrapper">
+                                        <select id="select" class="select playlist-select">
+                                            <option value="best" id="bestVideoOption" data-translate="best" selected>Best</option>
+                                            <option value="worst" id="worstVideoOption" data-translate="qualityWorst">Worst</option>
+                                            <option value="144">144p</option>
+                                            <option value="240">240p</option>
+                                            <option value="360">360p</option>
+                                            <option value="480">480p</option>
+                                            <option value="720">720p (HD)</option>
+                                            <option value="1080">1080p (FHD)</option>
+                                            <option value="1440">1440p</option>
+                                            <option value="2160">2160p (4k)</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div id="typeSelectBox" class="playlist-option-card">
+                                    <div class="playlist-option-header">
+                                        <svg class="playlist-option-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                            <polyline points="14 2 14 8 20 8"/>
+                                            <line x1="16" y1="13" x2="8" y2="13"/>
+                                            <line x1="16" y1="17" x2="8" y2="17"/>
+                                            <polyline points="10 9 9 9 8 9"/>
+                                        </svg>
+                                        <label id="videoQualityTxt" class="playlist-option-label" data-translate="selectVideoFormat">Select video quality</label>
+                                    </div>
+                                    <div class="playlist-select-wrapper">
+                                        <select id="videoTypeSelect" class="select playlist-select">
+                                            <option value="auto" id="autoTxt" data-translate="auto" selected>Auto</option>
+                                            <option value="mp4">Mp4</option>
+                                            <option value="webm">WebM</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
-                            <br>
-                            <div class="flexContainer">
-                                <button class="submitBtn" id="download" data-translate="download">Download</button>
+
+                            <div class="playlist-actions-row">
+                                <button class="submitBtn playlist-download-btn" id="download">
+                                    <svg class="btnIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M12 17V3"/>
+                                        <path d="m6 11 6 6 6-6"/>
+                                        <path d="M19 21H5"/>
+                                    </svg>
+                                    <span data-translate="download">Download</span>
+                                </button>
                             </div>
                         </div>
 
-                        <div id="audioBox">
-                            <label id="audioFormat" data-translate="selectAudioFormat">Select Audio format </label>
-                            <select id="audioSelect" class="select">
-                                <option value="mp3" selected>Mp3</option>
-                                <option value="m4a">M4a</option>
-                                <option value="opus">Opus</option>
-                                <option value="wav">Wav</option>
-                                <option value="alac">Alac</option>
-                                <option value="flac">Flac</option>
-                            </select>
-                            <br>
-                            <label class="audioQualitySelect" id="audioQualitySelectTxt" data-translate="selectQuality">Select Quality</label>
-                            <select id="audioQualitySelect" class="select">
-                                <option id="audioQualityAuto" value="auto" data-translate="auto" selected>Auto</option>
-                                <option id="audioQualityNormal" value="5" data-translate="qualityNormal">Normal</option>
-                                <option id="audioQualityBest" value="0" data-translate="best">Best</option>
-                                <option id="audioQualityGood" value="2" data-translate="qualityGood">Good</option>
-                                <option id="audioQualityBad" value="8" data-translate="qualityBad">Bad</option>
-                                <option id="audioQualityWorst" value="10" data-translate="qualityWorst">Worst</option>
-                            </select>
-                            <br><br>
-                            <div class="flexContainer">
-                                <button class="submitBtn" id="audioDownloadPlaylist" data-translate="download">Download</button>
+                        <!-- Audio Configuration Box -->
+                        <div id="audioBox" class="playlist-config-box" style="display: none;">
+                            <div class="playlist-options-grid">
+                                <div class="playlist-option-card">
+                                    <div class="playlist-option-header">
+                                        <svg class="playlist-option-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M9 18V5l12-2v13"/>
+                                            <circle cx="6" cy="18" r="3"/>
+                                            <circle cx="18" cy="16" r="3"/>
+                                        </svg>
+                                        <label id="audioFormat" class="playlist-option-label" data-translate="selectAudioFormat">Select Audio format </label>
+                                    </div>
+                                    <div class="playlist-select-wrapper">
+                                        <select id="audioSelect" class="select playlist-select">
+                                            <option value="mp3" selected>Mp3</option>
+                                            <option value="m4a">M4a</option>
+                                            <option value="opus">Opus</option>
+                                            <option value="wav">Wav</option>
+                                            <option value="alac">Alac</option>
+                                            <option value="flac">Flac</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="playlist-option-card">
+                                    <div class="playlist-option-header">
+                                        <svg class="playlist-option-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <line x1="4" y1="21" x2="4" y2="14"/>
+                                            <line x1="4" y1="10" x2="4" y2="3"/>
+                                            <line x1="12" y1="21" x2="12" y2="12"/>
+                                            <line x1="12" y1="8" x2="12" y2="3"/>
+                                            <line x1="20" y1="21" x2="20" y2="16"/>
+                                            <line x1="20" y1="12" x2="20" y2="3"/>
+                                            <line x1="1" y1="14" x2="7" y2="14"/>
+                                            <line x1="9" y1="8" x2="15" y2="8"/>
+                                            <line x1="17" y1="16" x2="23" y2="16"/>
+                                        </svg>
+                                        <label class="audioQualitySelect playlist-option-label" id="audioQualitySelectTxt" data-translate="selectQuality">Select Quality</label>
+                                    </div>
+                                    <div class="playlist-select-wrapper">
+                                        <select id="audioQualitySelect" class="select playlist-select">
+                                            <option id="audioQualityAuto" value="auto" data-translate="auto" selected>Auto</option>
+                                            <option id="audioQualityNormal" value="5" data-translate="qualityNormal">Normal</option>
+                                            <option id="audioQualityBest" value="0" data-translate="best">Best</option>
+                                            <option id="audioQualityGood" value="2" data-translate="qualityGood">Good</option>
+                                            <option id="audioQualityBad" value="8" data-translate="qualityBad">Bad</option>
+                                            <option id="audioQualityWorst" value="10" data-translate="qualityWorst">Worst</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="playlist-actions-row">
+                                <button class="submitBtn playlist-download-btn" id="audioDownloadPlaylist">
+                                    <svg class="btnIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M12 17V3"/>
+                                        <path d="m6 11 6 6 6-6"/>
+                                        <path d="M19 21H5"/>
+                                    </svg>
+                                    <span data-translate="download">Download</span>
+                                </button>
                             </div>
                         </div>
 
-                        <br>
-                        <div class="flexContainer">
-                            <button id="advancedToggle" class="blueBtn" data-translate="moreOptions">More options</button>
-                        </div>
-                        <br>
-
-                        <div id="advancedMenu">
-                            <div class="advancedItem">
-                                <span id="rangeTxt" data-translate="playlistRange">Playlist range</span>
-                                <input type="number" id="playlistIndex" class="input" placeholder="Start">:
-                                <input type="number" id="playlistEnd" class="input" placeholder="End">
-                                <br><br>
-                            </div>
-                            <div class="advancedItem">
-                                <p id="subHeaderPlaylist" data-translate="subtitles">Subtitles</p>
-                                <span id="subTxtPlaylist" data-translate="downloadSubtitlesAvailable">Download subtitles if available</span>
-                                <input id="subCheckedPlaylist" class="cb" type="checkbox">
-                            </div>
-                            <br>
-                            <div class="flexContainer" style="gap: 12px; margin-top: 10px;">
-                                <button class="submitBtn" id="downloadThumbnails" data-translate="downloadThumbnails">Download thumbnails</button>
-                                <button class="submitBtn" id="saveLinks" data-translate="saveVideoLinksToFile">Save video links</button>
-                            </div>
+                        <!-- More Options (Advanced Toggle) -->
+                        <div class="playlist-advanced-toggle-wrapper">
+                            <button id="advancedToggle" class="playlist-advanced-toggle-btn" type="button">
+                                <svg class="btnIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="3"/>
+                                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                                </svg>
+                                <span data-translate="moreOptions">More options</span>
+                                <svg id="arrowLeftPlaylist" class="btnIcon playlist-arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="m6 9 6 6 6-6"/>
+                                </svg>
+                            </button>
                         </div>
 
-                        <p id="incorrectMsgPlaylist"></p>
-                        <button class="advancedToggle" id="errorBtnPlaylist" data-translate="errorDetails">Error Details ▼</button>
-                        <div id="errorDetailsPlaylist"></div>
+                        <!-- Advanced Options Accordion Panel -->
+                        <div id="advancedMenu" class="playlist-advanced-panel">
+                            <div class="playlist-advanced-cards-grid">
+                                <!-- Playlist Range Card -->
+                                <div class="playlist-advanced-card">
+                                    <div class="playlist-advanced-card-header">
+                                        <svg class="playlist-advanced-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <line x1="10" y1="6" x2="21" y2="6"/>
+                                            <line x1="10" y1="12" x2="21" y2="12"/>
+                                            <line x1="10" y1="18" x2="21" y2="18"/>
+                                            <path d="M4 6h1v4"/>
+                                            <path d="M4 10h2"/>
+                                            <path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/>
+                                        </svg>
+                                        <div class="playlist-advanced-card-text">
+                                            <span id="rangeTxt" class="playlist-advanced-card-title" data-translate="playlistRange">Playlist range</span>
+                                            <span class="playlist-advanced-card-desc">Download a specific range of videos</span>
+                                        </div>
+                                    </div>
+                                    <div class="playlist-range-inputs">
+                                        <div class="playlist-range-input-group">
+                                            <span class="playlist-range-badge">Start</span>
+                                            <input type="number" id="playlistIndex" class="input playlist-number-input" placeholder="1" min="1">
+                                        </div>
+                                        <span class="playlist-range-separator">→</span>
+                                        <div class="playlist-range-input-group">
+                                            <span class="playlist-range-badge">End</span>
+                                            <input type="number" id="playlistEnd" class="input playlist-number-input" placeholder="Max" min="1">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Subtitles Toggle Card -->
+                                <label class="playlist-advanced-card playlist-toggle-card" for="subCheckedPlaylist">
+                                    <div class="playlist-advanced-card-header">
+                                        <svg class="playlist-advanced-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <rect x="2" y="4" width="20" height="16" rx="2"/>
+                                            <path d="M7 15h4M15 15h2M7 11h2M13 11h4"/>
+                                        </svg>
+                                        <div class="playlist-advanced-card-text">
+                                            <span id="subHeaderPlaylist" class="playlist-advanced-card-title" data-translate="subtitles">Subtitles</span>
+                                            <span id="subTxtPlaylist" class="playlist-advanced-card-desc" data-translate="downloadSubtitlesAvailable">Download subtitles if available</span>
+                                        </div>
+                                    </div>
+                                    <div class="switch">
+                                        <input id="subCheckedPlaylist" class="cb" type="checkbox">
+                                        <span class="slider"></span>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <!-- Additional Actions (Thumbnails & Links) -->
+                            <div class="playlist-extra-actions">
+                                <button class="playlist-action-btn secondary-btn" id="downloadThumbnails" type="button">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                        <circle cx="8.5" cy="8.5" r="1.5"/>
+                                        <polyline points="21 15 16 10 5 21"/>
+                                    </svg>
+                                    <span data-translate="downloadThumbnails">Download thumbnails</span>
+                                </button>
+                                <button class="playlist-action-btn secondary-btn" id="saveLinks" type="button">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                                    </svg>
+                                    <span data-translate="saveVideoLinksToFile">Save video links</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Error Message & Details Container -->
+                        <div class="playlist-error-container">
+                            <p id="incorrectMsgPlaylist" class="playlist-error-msg"></p>
+                            <button class="advancedToggle playlist-error-btn" id="errorBtnPlaylist" style="display: none;" data-translate="errorDetails">Error Details ▼</button>
+                            <div id="errorDetailsPlaylist" class="playlist-error-details" style="display: none;"></div>
+                        </div>
                     </div>
 
-                    <h2 id="playlistName"></h2>
-                    <div class="flexContainer" style="gap: 12px; margin: 15px 0;">
-                        <button class="submitBtn" id="openDownloads" data-translate="openDownloadFolder">Open download folder</button>
-                        <button class="submitBtn danger-btn" id="stopDownload" data-translate="cancel">Cancel</button>
+                    <div id="playlistStatusSection" class="playlist-status-section">
+                        <h2 id="playlistName" class="playlist-status-title"></h2>
+                        <div id="playlistStatusActions" class="playlist-status-actions">
+                            <button class="playlist-btn-status" id="openDownloads" data-translate="openDownloadFolder" style="display: none;">Open download folder</button>
+                            <button class="playlist-btn-status danger-btn" id="stopDownload" data-translate="cancel" style="display: none;">Cancel</button>
+                        </div>
                     </div>
-                    <br><br>
                     <div id="listPlaylist"></div>
                 </div>
 

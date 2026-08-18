@@ -314,6 +314,15 @@ const playlistDownloader = {
 		this.ui.closeHiddenBtn?.addEventListener("click", () =>
 			this.hideOptions(true),
 		);
+		this.ui.errorBtn?.addEventListener("click", () => {
+			const isHidden =
+				this.ui.errorDetails.style.display === "none" ||
+				this.ui.errorDetails.style.display === "";
+			this.ui.errorDetails.style.display = isHidden ? "block" : "none";
+			this.ui.errorBtn.textContent =
+				(window.i18n ? window.i18n.__("errorDetails") : "Error Details") +
+				(isHidden ? " ▼" : " ◀");
+		});
 
 		// Selective Mode events
 		this.ui.pasteLinkSelectiveBtn?.addEventListener("click", () =>
@@ -1280,6 +1289,12 @@ const playlistDownloader = {
 
 		process.on("progress", (progress) => {
 			const progressElement = getId(`p${count}`);
+			const barElement = getId(`bar${count}`);
+
+			if (barElement && progress.percent) {
+				barElement.style.width = `${progress.percent}%`;
+			}
+
 			if (!progressElement) return;
 
 			if (progress.percent === 100) {
@@ -1332,8 +1347,12 @@ const playlistDownloader = {
 		if (this.ui.pasteLinkBtn) this.ui.pasteLinkBtn.style.display = "inline-block";
 		const targetCount = count !== undefined ? count : (this.state.currentLocalCount || 0);
 		const lastProgress = getId(`p${targetCount}`);
+		const lastBar = getId(`bar${targetCount}`);
 		if (lastProgress) {
 			lastProgress.textContent = window.i18n ? window.i18n.__("cancel") : "Cancelled";
+		}
+		if (lastBar) {
+			lastBar.classList.add("cancelled");
 		}
 	},
 
@@ -1342,33 +1361,39 @@ const playlistDownloader = {
 		this.state.url = clipboard.readText();
 		this.ui.linkDisplay.textContent = ` ${this.state.url}`;
 		this.ui.optionsContainer.style.display = "block";
+		this.ui.optionsContainer.classList.remove("fade-out");
+		this.ui.optionsContainer.classList.add("fade-in");
 		this.ui.errorMsgDisplay.textContent = "";
 		this.ui.errorBtn.style.display = "none";
 	},
 
 	updatePlaylistUI(videoInfo, count, type) {
-		let itemTitle = "";
+		let itemTypeLabel = "";
 		switch (type) {
 			case "thumbnails":
-				itemTitle = `${window.i18n.__("thumbnail")} ${
-					this.state.originalCount
-				}`;
+				itemTypeLabel = window.i18n ? window.i18n.__("thumbnail") : "Thumbnail";
 				break;
 			case "links":
-				itemTitle = `${window.i18n.__("link")} ${
-					this.state.originalCount
-				}`;
+				itemTypeLabel = window.i18n ? window.i18n.__("link") : "Link";
+				break;
+			case "audio":
+				itemTypeLabel = window.i18n ? window.i18n.__("audio") : "Audio";
 				break;
 			default:
-				itemTitle = `${window.i18n.__(type)} ${
-					this.state.originalCount
-				}`;
+				itemTypeLabel = window.i18n ? window.i18n.__("video") : "Video";
 		}
+
+		const itemTitle = `${itemTypeLabel} ${this.state.originalCount}`;
 
 		if (count > 1) {
 			const prevProgress = getId(`p${count - 1}`);
+			const prevBar = getId(`bar${count - 1}`);
 			if (prevProgress)
-				prevProgress.textContent = window.i18n.__("fileSaved");
+				prevProgress.textContent = window.i18n ? window.i18n.__("fileSaved") : "Completed";
+			if (prevBar) {
+				prevBar.style.width = "100%";
+				prevBar.classList.add("completed");
+			}
 		}
 
 		const thumbnailUrl =
@@ -1381,40 +1406,36 @@ const playlistDownloader = {
 				? thumbnailUrl
 				: "../assets/images/thumb.png";
 		const safeAlt = videoInfo.title || "thumbnail";
+		const itemIndex = videoInfo.index ?? this.state.originalCount;
 		const itemTitleText = videoInfo.title
-			? `${videoInfo.index ?? this.state.originalCount}. ${videoInfo.title}`
+			? `${itemIndex}. ${videoInfo.title}`
 			: itemTitle;
 
 		const itemElement = document.createElement("div");
-		itemElement.className = "item";
+		itemElement.className = "item playlist-item-card";
 		itemElement.id = `item-${count}`;
 
-		const iconBox = document.createElement("div");
-		iconBox.className = "itemIconBox";
+		itemElement.innerHTML = `
+			<div class="itemIconBox playlist-thumb-container">
+				<img src="${safeThumbnail}" alt="${safeAlt}" class="itemIcon playlist-item-thumb" crossorigin="anonymous">
+				<span class="playlist-type-badge">${itemTypeLabel}</span>
+			</div>
+			<div class="itemBody playlist-item-body">
+				<div class="playlist-item-top-row">
+					<div class="itemTitle playlist-item-title" title="${itemTitleText}">${itemTitleText}</div>
+					<span class="playlist-index-pill">#${itemIndex}</span>
+				</div>
+				<div class="playlist-progress-wrapper">
+					<div class="custom-progress playlist-progress-track">
+						<div class="custom-progress-fill playlist-progress-fill" id="bar${count}"></div>
+					</div>
+					<div class="playlist-progress-meta">
+						<p class="itemProgress playlist-progress-text" id="p${count}">${window.i18n ? window.i18n.__("downloading") : "Downloading..."}</p>
+					</div>
+				</div>
+			</div>
+		`;
 
-		const img = document.createElement("img");
-		img.src = safeThumbnail;
-		img.alt = safeAlt;
-		img.className = "itemIcon";
-		img.crossOrigin = "anonymous";
-		iconBox.appendChild(img);
-
-		const body = document.createElement("div");
-		body.className = "itemBody";
-
-		const titleElement = document.createElement("div");
-		titleElement.className = "itemTitle";
-		titleElement.textContent = itemTitleText;
-
-		const progressElement = document.createElement("p");
-		progressElement.className = "itemProgress";
-		progressElement.id = `p${count}`;
-		progressElement.textContent = window.i18n.__("downloading");
-
-		body.appendChild(titleElement);
-		body.appendChild(progressElement);
-		itemElement.appendChild(iconBox);
-		itemElement.appendChild(body);
 		this.ui.downloadList.appendChild(itemElement);
 		window.scrollTo(0, document.body.scrollHeight);
 	},
@@ -1475,6 +1496,7 @@ const playlistDownloader = {
 
 	hideOptions(justHide = false) {
 		this.ui.optionsContainer.style.display = "none";
+		this.ui.optionsContainer.classList.remove("fade-in");
 		this.ui.downloadList.innerHTML = "";
 		this.ui.errorBtn.style.display = "none";
 		this.ui.errorDetails.style.display = "none";
@@ -1556,29 +1578,56 @@ const playlistDownloader = {
 
 	toggleDownloadType(type) {
 		const isVideo = type === "video";
-		this.ui.videoToggle.style.backgroundColor = isVideo
-			? "var(--box-toggleOn)"
-			: "var(--box-toggle)";
-		this.ui.audioToggle.style.backgroundColor = isVideo
-			? "var(--box-toggle)"
-			: "var(--box-toggleOn)";
-		this.ui.videoBox.style.display = isVideo ? "block" : "none";
-		this.ui.audioBox.style.display = isVideo ? "none" : "block";
+		this.ui.videoToggle?.classList.toggle("active", isVideo);
+		this.ui.audioToggle?.classList.toggle("active", !isVideo);
+		if (this.ui.videoToggle) {
+			this.ui.videoToggle.style.backgroundColor = isVideo
+				? "var(--box-toggleOn)"
+				: "var(--box-toggle)";
+		}
+		if (this.ui.audioToggle) {
+			this.ui.audioToggle.style.backgroundColor = isVideo
+				? "var(--box-toggle)"
+				: "var(--box-toggleOn)";
+		}
+		if (this.ui.videoBox) {
+			this.ui.videoBox.style.display = isVideo ? "block" : "none";
+			if (isVideo) this.ui.videoBox.classList.add("fade-in");
+		}
+		if (this.ui.audioBox) {
+			this.ui.audioBox.style.display = isVideo ? "none" : "block";
+			if (!isVideo) this.ui.audioBox.classList.add("fade-in");
+		}
 	},
 
 	updateVideoTypeVisibility() {
 		const value = this.ui.videoQualitySelect?.value;
 		const show = !["best", "worst"].includes(value);
 		if (this.ui.typeSelectBox) {
-			this.ui.typeSelectBox.style.display = show ? "block" : "none";
+			this.ui.typeSelectBox.style.display = show ? "flex" : "none";
 		}
 	},
 
 	toggleAdvancedMenu() {
 		const isHidden =
 			this.ui.advancedMenu.style.display === "none" ||
-			this.ui.advancedMenu.style.display === "";
-		this.ui.advancedMenu.style.display = isHidden ? "block" : "none";
+			this.ui.advancedMenu.style.display === "" ||
+			!this.ui.advancedMenu.classList.contains("open");
+
+		if (isHidden) {
+			this.ui.advancedMenu.style.display = "block";
+			void this.ui.advancedMenu.offsetHeight;
+			this.ui.advancedMenu.classList.add("open");
+			this.ui.advancedToggle?.classList.add("open");
+		} else {
+			this.ui.advancedMenu.classList.remove("open");
+			this.ui.advancedToggle?.classList.remove("open");
+			setTimeout(() => {
+				if (!this.ui.advancedMenu.classList.contains("open")) {
+					this.ui.advancedMenu.style.display = "none";
+				}
+			}, 250);
+		}
 	},
 
 	closeMenu() {
