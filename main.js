@@ -12,7 +12,7 @@ const {
 } = require("electron");
 const { autoUpdater } = require("electron-updater");
 const fs = require("fs").promises;
-const { existsSync, readFileSync } = require("fs");
+const { existsSync, readFileSync, writeFileSync } = require("fs");
 const path = require("path");
 const DownloadHistory = require("./src/history");
 const { platform } = require("os");
@@ -53,6 +53,7 @@ if (!gotTheLock) {
 				appState.mainWindow.restore();
 			appState.mainWindow.show();
 			appState.mainWindow.focus();
+			if (app.dock) app.dock.show();
 		}
 	});
 }
@@ -67,15 +68,10 @@ app.whenReady().then(async () => {
 	});
 });
 
-app.on("before-quit", async () => {
+app.on("before-quit", () => {
 	appState.isQuitting = true;
 	globalShortcut.unregisterAll();
-	try {
-		// Save the final config state before exiting.
-		await saveConfiguration();
-	} catch (error) {
-		console.error("Failed to save configuration during quit:", error);
-	}
+	saveConfiguration();
 });
 
 app.on("window-all-closed", () => {
@@ -262,7 +258,11 @@ function createTray() {
 	appState.tray.setToolTip("ytDownloader");
 	appState.tray.setContextMenu(contextMenu);
 	appState.tray.on("click", () => {
-		appState.mainWindow?.show();
+		if (appState.mainWindow && !appState.mainWindow.isDestroyed()) {
+			if (appState.mainWindow.isMinimized()) appState.mainWindow.restore();
+			appState.mainWindow.show();
+			appState.mainWindow.focus();
+		}
 
 		if (app.dock) app.dock.show();
 	});
@@ -366,12 +366,12 @@ function registerIpcHandlers() {
 
 	ipcMain.on("select-location-secondary", async (event) => {
 		const targetWindow = appState.secondaryWindow || appState.mainWindow || (event && event.sender && BrowserWindow.fromWebContents(event.sender));
-		if (!targetWindow) return;
+		if (!targetWindow || targetWindow.isDestroyed()) return;
 		const { canceled, filePaths } = await dialog.showOpenDialog(
 			targetWindow,
 			{ properties: ["openDirectory"] },
 		);
-		if (!canceled && filePaths.length > 0) {
+		if (!canceled && filePaths.length > 0 && !targetWindow.isDestroyed()) {
 			targetWindow.webContents.send(
 				"downloadPath",
 				filePaths,
@@ -417,18 +417,12 @@ function registerIpcHandlers() {
 		try {
 			globalShortcut.register(accelerator, async () => {
 				const text = clipboard.readText().trim();
-				if (!appState.mainWindow) return;
+				if (!appState.mainWindow || appState.mainWindow.isDestroyed()) return;
 
 				if (appState.mainWindow.isMinimized()) appState.mainWindow.restore();
 				appState.mainWindow.show();
 				appState.mainWindow.focus();
 				if (app.dock) app.dock.show();
-
-				const bounds = appState.config.bounds;
-				if (bounds && bounds.width && bounds.height) {
-					appState.mainWindow.setBounds(bounds);
-				}
-				if (appState.config.isMaximized) appState.mainWindow.maximize();
 
 				const wc = appState.mainWindow.webContents;
 				if (!appState.indexPageIsOpen) {
@@ -454,7 +448,8 @@ function registerIpcHandlers() {
 	});
 
 	ipcMain.on("error_dialog", async (_event, message) => {
-		const { response } = await dialog.showMessageBox(appState.mainWindow, {
+		const win = appState.mainWindow && !appState.mainWindow.isDestroyed() ? appState.mainWindow : null;
+		const { response } = await dialog.showMessageBox(win, {
 			type: "error",
 			title: "Error",
 			message: message,
@@ -574,7 +569,7 @@ function isZipBuild() {
 
 function registerAutoUpdaterEvents() {
 	autoUpdater.on("update-available", async (info) => {
-		if (isZipBuild() || platform() === "darwin") {
+		if (isZipBuild() || platform() === "darwin" || platform() === "linux") {
 			const dialogOpts = {
 				type: "info",
 				buttons: [i18n("download"), i18n("no")],
@@ -601,7 +596,7 @@ function registerAutoUpdaterEvents() {
 							);
 						}
 					} else {
-						shell.openExternal("https://github.com/aandrew-me/ytDownloader/releases/latest")
+						shell.openExternal("https://github.com/aandrew-me/ytDownloader/releases/latest");
 					}
 				}
 			});
@@ -615,8 +610,9 @@ function registerAutoUpdaterEvents() {
 					info.releaseNotes?.toString().replace(/<[^>]*>?/gm, "") ||
 					"No details available.",
 			};
+			const parentWin = appState.mainWindow && !appState.mainWindow.isDestroyed() ? appState.mainWindow : null;
 			const { response } = await dialog.showMessageBox(
-				appState.mainWindow,
+				parentWin,
 				dialogOpts,
 			);
 			if (response === 0) {
@@ -626,32 +622,33 @@ function registerAutoUpdaterEvents() {
 	});
 
 	autoUpdater.on("update-downloaded", async () => {
-		appState.mainWindow.webContents.send("update-downloaded", "");
+		if (appState.mainWindow && !appState.mainWindow.isDestroyed()) {
+			appState.mainWindow.webContents.send("update-downloaded", "");
+		}
 		const dialogOpts = {
 			type: "info",
 			buttons: [i18n("restart"), i18n("later")],
 			title: "Update Ready",
 			message: i18n("installAndRestartPrompt"),
 		};
+		const parentWin = appState.mainWindow && !appState.mainWindow.isDestroyed() ? appState.mainWindow : null;
 		const { response } = await dialog.showMessageBox(
-			appState.mainWindow,
+			parentWin,
 			dialogOpts,
 		);
 		if (response === 0) {
 			autoUpdater.quitAndInstall(true, true);
-		} else {
-			// TODO: Consider if its worth enabling
-			// autoUpdater.autoInstallOnAppQuit = true;
 		}
 	});
 
-	autoUpdater.on("download-progress", async (info) => {
-		appState.mainWindow.webContents.send("download-progress", info.percent);
+	autoUpdater.on("download-progress", (info) => {
+		if (appState.mainWindow && !appState.mainWindow.isDestroyed()) {
+			appState.mainWindow.webContents.send("download-progress", info.percent);
+		}
 	});
 
 	autoUpdater.on("error", (error) => {
 		console.error("Auto-update error:", error);
-		// dialog.showErrorBox("Update Error", i18n("updateError"));
 	});
 }
 
@@ -682,9 +679,9 @@ async function loadConfiguration() {
 	}
 }
 
-async function saveConfiguration() {
+function saveConfiguration() {
 	try {
-		await fs.writeFile(CONFIG_FILE_PATH, JSON.stringify(appState.config));
+		writeFileSync(CONFIG_FILE_PATH, JSON.stringify(appState.config, null, 2));
 	} catch (error) {
 		console.error("Failed to save configuration:", error);
 	}
@@ -692,21 +689,31 @@ async function saveConfiguration() {
 
 async function loadTranslations() {
 	const locale = app.getSystemLocale();
-	console.log({ locale });
 	const defaultLangPath = path.join(__dirname, "translations", "en.json");
+	let fallbackData = {};
+	try {
+		const defaultContent = await fs.readFile(defaultLangPath, "utf8");
+		fallbackData = JSON.parse(defaultContent);
+	} catch (e) {
+		console.error("Failed to load default translations:", e);
+	}
+
 	let langPath = path.join(__dirname, "translations", `${locale}.json`);
-
-	try {
-		await fs.access(langPath);
-	} catch {
-		langPath = defaultLangPath;
+	let localeData = {};
+	if (locale !== "en") {
+		try {
+			await fs.access(langPath);
+			const fileContent = await fs.readFile(langPath, "utf8");
+			localeData = JSON.parse(fileContent);
+		} catch {
+			const baseCode = locale.split("-")[0];
+			const altPath = path.join(__dirname, "translations", `${baseCode}.json`);
+			try {
+				const altContent = await fs.readFile(altPath, "utf8");
+				localeData = JSON.parse(altContent);
+			} catch (_) {}
+		}
 	}
 
-	try {
-		const fileContent = await fs.readFile(langPath, "utf8");
-		appState.loadedLanguage = JSON.parse(fileContent);
-	} catch (error) {
-		console.error("Failed to load translation file:", error);
-		appState.loadedLanguage = {};
-	}
+	appState.loadedLanguage = { ...fallbackData, ...localeData };
 }

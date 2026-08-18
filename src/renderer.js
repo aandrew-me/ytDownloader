@@ -925,7 +925,7 @@ class YtDownloaderApp {
 					document.activeElement.tagName === "TEXTAREA" ||
 					document.activeElement.isContentEditable);
 			
-			const isNotBatchView = $(CONSTANTS.DOM_IDS.MULTIPLE_MODE_SECTION).style.display === "none";
+			const isNotBatchView = this.state.mode === "single";
 
 			if (isCtrlV && !isInput && isNotBatchView) {
 				const pasteBtnInner = $(CONSTANTS.DOM_IDS.PASTE_URL_BTN);
@@ -994,14 +994,14 @@ class YtDownloaderApp {
 		});
 
 		ipcRenderer.on("download-progress", (_event, percent) => {
-			if (percent) {
+			if (typeof percent === "number") {
 				const popup = $(CONSTANTS.DOM_IDS.UPDATE_POPUP);
 				const textEl = $(CONSTANTS.DOM_IDS.UPDATE_POPUP_PROGRESS);
 				const barEl = $(CONSTANTS.DOM_IDS.UPDATE_POPUP_BAR);
 
-				popup.style.display = "flex";
-				textEl.textContent = `${percent.toFixed(1)}%`;
-				barEl.style.width = `${percent}%`;
+				if (popup) popup.style.display = "flex";
+				if (textEl) textEl.textContent = `${percent.toFixed(1)}%`;
+				if (barEl) barEl.style.width = `${percent}%`;
 			}
 		});
 
@@ -1071,11 +1071,12 @@ class YtDownloaderApp {
 				let stdout = "";
 				let stderr = "";
 
-				window.addEventListener("beforeunload", () => {
+				const onBeforeUnload = () => {
 					if (process && !process.killed) {
 						process.kill();
 					}
-				});
+				};
+				window.addEventListener("beforeunload", onBeforeUnload);
 
 				process.ytDlpProcess.stdout.on("data", (data) => {
 					stdout += data;
@@ -1085,6 +1086,7 @@ class YtDownloaderApp {
 				});
 
 				process.on("close", () => {
+					window.removeEventListener("beforeunload", onBeforeUnload);
 					const items = [];
 					if (stdout) {
 						const lines = stdout.split(/\r?\n/);
@@ -1104,7 +1106,10 @@ class YtDownloaderApp {
 					resolve(items);
 				});
 
-				process.on("error", (err) => reject(err));
+				process.on("error", (err) => {
+					window.removeEventListener("beforeunload", onBeforeUnload);
+					reject(err);
+				});
 			});
 
 			this._renderSearchResults(results);
@@ -1315,6 +1320,7 @@ class YtDownloaderApp {
 			title: this.state.videoInfo.title,
 			channel: this.state.videoInfo.channel,
 			thumbnail: this.state.videoInfo.thumbnail,
+			duration: this.state.videoInfo.duration,
 			infoJsonPath: this.state.videoInfo.infoJsonPath,
 			infoJsonFetchedAt: this.state.videoInfo.infoJsonFetchedAt,
 			options: {...this.state.downloadOptions},
@@ -1372,11 +1378,12 @@ class YtDownloaderApp {
 
 			const process = this.state.ytDlp.exec(args, {shell: false});
 
-			window.addEventListener("beforeunload", () => {
+			const onBeforeUnload = () => {
 				if (process && !process.killed) {
 					process.kill();
 				}
-			});
+			};
+			window.addEventListener("beforeunload", onBeforeUnload);
 
 			console.log(
 				"Spawned yt-dlp with args:",
@@ -1392,6 +1399,7 @@ class YtDownloaderApp {
 			process.ytDlpProcess.stderr.on("data", (data) => (stderr += data));
 
 			process.on("close", () => {
+				window.removeEventListener("beforeunload", onBeforeUnload);
 				if (stdout) {
 					try {
 						const metadata = JSON.parse(stdout);
@@ -1433,7 +1441,10 @@ class YtDownloaderApp {
 				}
 			});
 
-			process.on("error", (err) => reject(err));
+			process.on("error", (err) => {
+				window.removeEventListener("beforeunload", onBeforeUnload);
+				reject(err);
+			});
 		});
 	}
 
@@ -1475,11 +1486,12 @@ class YtDownloaderApp {
 			signal: controller.signal,
 		});
 
-		window.addEventListener("beforeunload", () => {
+		const onBeforeUnload = () => {
 			if (downloadProcess && !downloadProcess.killed) {
 				downloadProcess.kill();
 			}
-		});
+		};
+		window.addEventListener("beforeunload", onBeforeUnload);
 
 		console.log(
 			"Spawned yt-dlp with args:",
@@ -1520,6 +1532,7 @@ class YtDownloaderApp {
 				if (el) el.textContent = i18n.__("downloading");
 			})
 			.once("close", (code) => {
+				window.removeEventListener("beforeunload", onBeforeUnload);
 				if (existsSync(tempFilePath)) {
 					try {
 						const fileContent = readFileSync(
@@ -1561,10 +1574,12 @@ class YtDownloaderApp {
 					code,
 					randomId,
 					actualFilePath,
-					job.thumbnail,
+					job,
+					controller,
 				);
 			})
 			.once("error", (error) => {
+				window.removeEventListener("beforeunload", onBeforeUnload);
 				if (existsSync(tempFilePath)) {
 					try {
 						unlinkSync(tempFilePath);
@@ -1639,6 +1654,10 @@ class YtDownloaderApp {
 		$(CONSTANTS.DOM_IDS.DOWNLOAD_LIST).insertAdjacentHTML(
 			"beforeend",
 			itemHTML,
+		);
+
+		$(`${randomId}_close`)?.addEventListener("click", () =>
+			this._cancelDownload(randomId),
 		);
 
 		if (this._isSafeWebUrl(job.thumbnail)) {
@@ -1807,8 +1826,8 @@ class YtDownloaderApp {
 				const finalAudioExt = audioExt === "webm" ? "opus" : audioExt;
 				ext = videoExt;
 				if (videoExt === "mp4" && finalAudioExt === "opus") {
-					if (videoCodec.includes("avc")) ext = "mkv";
-					else if (videoCodec.includes("av01")) ext = "webm";
+					if (videoCodec?.includes("avc")) ext = "mkv";
+					else if (videoCodec?.includes("av01")) ext = "webm";
 				} else if (
 					videoExt === "webm" &&
 					["m4a", "mp4"].includes(finalAudioExt)
@@ -1956,12 +1975,22 @@ class YtDownloaderApp {
 	/**
 	 * Handles the completion of a download process.
 	 */
-	_handleDownloadCompletion(code, randomId, actualFilePath, thumbnail) {
-		this.state.currentDownloads--;
-		this.state.downloadControllers.delete(randomId);
+	_handleDownloadCompletion(code, randomId, actualFilePath, job, controller) {
+		const wasActive = this.state.downloadControllers.delete(randomId);
+		if (wasActive) {
+			this.state.currentDownloads = Math.max(
+				0,
+				this.state.currentDownloads - 1,
+			);
+		}
+
+		if (controller?.signal?.aborted) {
+			if (wasActive) this._processQueue();
+			return;
+		}
 
 		if (code === 0) {
-			this._showDownloadSuccessUI(randomId, actualFilePath, thumbnail);
+			this._showDownloadSuccessUI(randomId, actualFilePath, job);
 			this.state.downloadedItems.add(randomId);
 			this._updateClearAllButton();
 		} else if (code !== null) {
@@ -1969,11 +1998,14 @@ class YtDownloaderApp {
 				new Error(`Download process exited with code ${code}.`),
 				randomId,
 			);
+			return;
 		}
 
-		this._processQueue();
+		if (wasActive) {
+			this._processQueue();
+		}
 
-		if ($(CONSTANTS.DOM_IDS.QUIT_CHECKED).checked) {
+		if ($(CONSTANTS.DOM_IDS.QUIT_CHECKED)?.checked) {
 			ipcRenderer.send("quit", "quit");
 		}
 	}
@@ -1982,29 +2014,34 @@ class YtDownloaderApp {
 	 * Handles an error during the download process.
 	 */
 	_handleDownloadError(error, randomId) {
-		if (
-			error.name === "AbortError" ||
-			error.message.includes("AbortError")
-		) {
-			console.log(`Download ${randomId} was aborted.`);
+		const wasActive = this.state.downloadControllers.delete(randomId);
+		if (wasActive) {
 			this.state.currentDownloads = Math.max(
 				0,
 				this.state.currentDownloads - 1,
 			);
-			this.state.downloadControllers.delete(randomId);
-			this._processQueue();
+		}
 
+		if (
+			error.name === "AbortError" ||
+			error.message?.includes("AbortError")
+		) {
+			console.log(`Download ${randomId} was aborted.`);
+			if (wasActive) {
+				this._processQueue();
+			}
 			return; // Don't treat user cancellation as an error
 		}
-		this.state.currentDownloads--;
-		this.state.downloadControllers.delete(randomId);
+
 		console.error("Download Error:", error);
 		const progressEl = $(`${randomId}_prog`);
 		if (progressEl) {
 			progressEl.textContent = i18n.__("errorHoverForDetails");
 			progressEl.title = error.message;
 		}
-		this._processQueue();
+		if (wasActive) {
+			this._processQueue();
+		}
 	}
 
 	/**
@@ -2375,11 +2412,6 @@ class YtDownloaderApp {
 
 		if (audioOptions.length > 0) {
 			mountSlimSelect(audioSelectEl, audioOptions);
-
-			mountSlimSelect(
-				audioForVideoSelectEl,
-				JSON.parse(JSON.stringify(audioOptions)),
-			);
 		}
 
 		const audioForVideoOptions = JSON.parse(JSON.stringify(audioOptions));
@@ -2533,9 +2565,13 @@ class YtDownloaderApp {
 	/**
 	 * Updates a download item's UI to show it has completed successfully.
 	 */
-	_showDownloadSuccessUI(randomId, actualFilePath, thumbnail) {
+	_showDownloadSuccessUI(randomId, actualFilePath, job) {
 		const progressEl = $(`${randomId}_prog`);
 		const openBtn = $(`${randomId}_openBtn`);
+		const itemTitle = job?.title || this.state.videoInfo?.title;
+		const itemUrl = job?.url || this.state.videoInfo?.url;
+		const itemDuration = job?.duration ?? this.state.videoInfo?.duration;
+		const thumbnail = job?.thumbnail;
 
 		if (!progressEl) return;
 
@@ -2562,11 +2598,10 @@ class YtDownloaderApp {
 		// If file doesn't exist at the expected path, attempt to find it with a loose matching strategy
 		if (
 			!existsSync(fullPath) &&
-			this.state.videoInfo &&
-			this.state.videoInfo.title
+			itemTitle
 		) {
 			try {
-				const originalTitle = this.state.videoInfo.title;
+				const originalTitle = itemTitle;
 				const dirFiles = readdirSync(this.state.downloadDir);
 				const looseTitle = originalTitle
 					.replace(/[^a-zA-Z0-9]/g, "")
@@ -2627,14 +2662,14 @@ class YtDownloaderApp {
 				const fileSize = stat.size || 0;
 				ipcRenderer
 					.invoke("add-to-history", {
-						title: this.state.videoInfo.title,
-						url: this.state.videoInfo.url,
+						title: itemTitle,
+						url: itemUrl,
 						filename: baseFilename,
 						filePath: fullPath,
 						fileSize: fileSize,
 						format: ext,
 						thumbnail: thumbnail,
-						duration: this.state.videoInfo.duration,
+						duration: itemDuration,
 					})
 					.catch((err) =>
 						console.error("Error adding to history:", err),
@@ -2876,7 +2911,7 @@ class YtDownloaderApp {
 		}
 
 		const minSliderVal = parseInt(minSlider.min);
-		const maxSliderVal = parseInt(minSlider.max);
+		const maxSliderVal = parseInt(maxSlider.max);
 		newSeconds = Math.max(minSliderVal, Math.min(maxSliderVal, newSeconds));
 
 		if (input.id === "min-time") {
@@ -2990,7 +3025,7 @@ class YtDownloaderApp {
 		const emptyCard = document.getElementById("emptyStateHome");
 		const hiddenPanel = $(CONSTANTS.DOM_IDS.HIDDEN_PANEL);
 		const hiddenPanelVisible =
-			$(CONSTANTS.DOM_IDS.HIDDEN_PANEL).style.display !== "none";
+			hiddenPanel && hiddenPanel.style.display !== "none";
 		const downloadList = $(CONSTANTS.DOM_IDS.DOWNLOAD_LIST);
 		const hasDownloadsInList =
 			downloadList && downloadList.children.length > 0;
@@ -3216,8 +3251,14 @@ class YtDownloaderApp {
 					title: title,
 					channel: channel,
 					thumbnail: thumbnail,
+					duration: meta?.duration ? Math.ceil(meta.duration) : null,
 					isBatch: true,
-					options: {...this.state.downloadOptions},
+					options: {
+						rangeCmd: "",
+						rangeOption: "",
+						subs: "",
+						subLangs: "",
+					},
 					uiSnapshot: {
 						videoFormat: preset.quality,
 						audioForVideoFormat: "best",
@@ -3260,12 +3301,11 @@ class YtDownloaderApp {
 		this.state.isBatchCancelled = true;
 		this.state.isBatchRunning = false;
 
-		this.state.downloadControllers.forEach((controller, id) => {
+		this.state.downloadControllers.forEach((controller) => {
 			if (controller.isBatch) {
 				try {
 					controller.abort();
 				} catch (e) {}
-				this.state.downloadControllers.delete(id);
 			}
 		});
 
