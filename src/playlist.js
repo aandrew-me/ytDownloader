@@ -315,13 +315,16 @@ const playlistDownloader = {
 			this.hideOptions(true),
 		);
 		this.ui.errorBtn?.addEventListener("click", () => {
+			if (!this.ui.errorDetails) return;
 			const isHidden =
 				this.ui.errorDetails.style.display === "none" ||
 				this.ui.errorDetails.style.display === "";
 			this.ui.errorDetails.style.display = isHidden ? "block" : "none";
-			this.ui.errorBtn.textContent =
-				(window.i18n ? window.i18n.__("errorDetails") : "Error Details") +
-				(isHidden ? " ▼" : " ◀");
+			if (this.ui.errorBtn) {
+				this.ui.errorBtn.textContent =
+					(window.i18n ? window.i18n.__("errorDetails") : "Error Details") +
+					(isHidden ? " ▼" : " ◀");
+			}
 		});
 
 		// Selective Mode events
@@ -384,6 +387,27 @@ const playlistDownloader = {
 				}
 				this.state.downloadDir = downloadPath[0];
 			}
+		});
+
+		window.addEventListener("beforeunload", () => {
+			if (this.state.currentAbortController) {
+				try {
+					this.state.currentAbortController.abort();
+				} catch (_) { }
+			}
+			if (
+				this.state.currentDownloadProcess?.ytDlpProcess &&
+				!this.state.currentDownloadProcess.ytDlpProcess.killed
+			) {
+				try {
+					this.state.currentDownloadProcess.ytDlpProcess.kill();
+				} catch (_) { }
+			}
+			this.selectiveState.activeControllers.forEach((c) => {
+				try {
+					c.abort();
+				} catch (_) { }
+			});
 		});
 	},
 
@@ -935,7 +959,7 @@ const playlistDownloader = {
 									duration: entry.duration,
 									filePath: this.state.downloadDir,
 								});
-							} catch (_) {}
+							} catch (_) { }
 						}
 						resolve();
 					});
@@ -950,7 +974,7 @@ const playlistDownloader = {
 						resolve();
 					});
 				});
-			} catch (_) {}
+			} catch (_) { }
 
 			this.selectiveState.activeControllers = this.selectiveState.activeControllers.filter(
 				(c) => c !== abortController,
@@ -979,7 +1003,7 @@ const playlistDownloader = {
 		this.selectiveState.activeControllers.forEach((controller) => {
 			try {
 				controller.abort();
-			} catch (_) {}
+			} catch (_) { }
 		});
 		this.selectiveState.activeControllers = [];
 
@@ -1053,23 +1077,6 @@ const playlistDownloader = {
 				{ shell: false },
 				this.state.currentAbortController.signal,
 			);
-
-			document.addEventListener("beforeunload", () => {
-				if (this.state.currentAbortController) {
-					try {
-						this.state.currentAbortController.abort();
-					} catch (e) {}
-				}
-				if (
-					this.state.currentDownloadProcess &&
-					this.state.currentDownloadProcess.ytDlpProcess &&
-					!this.state.currentDownloadProcess.ytDlpProcess.killed
-				) {
-					try {
-						this.state.currentDownloadProcess.ytDlpProcess.kill();
-					} catch (e) {}
-				}
-			});
 
 			this.handleDownloadEvents(this.state.currentDownloadProcess, type);
 		} catch (error) {
@@ -1197,7 +1204,7 @@ const playlistDownloader = {
 			quality,
 			"--embed-metadata",
 			(format === "mp3" || (format === "m4a" && isYouTube)) &&
-			canEmbedThumb
+				canEmbedThumb
 				? "--embed-thumbnail"
 				: "",
 		];
@@ -1253,9 +1260,12 @@ const playlistDownloader = {
 						this.state.playlistName.slice(0, -1) + "#";
 				}
 
-				this.ui.playlistNameDisplay.textContent = `${window.i18n.__(
-					"downloadingPlaylist",
-				)} ${this.state.playlistName}`;
+				if (this.ui.playlistNameDisplay) {
+					const dlText = window.i18n
+						? window.i18n.__("downloadingPlaylist")
+						: "Downloading playlist:";
+					this.ui.playlistNameDisplay.textContent = `${dlText} ${this.state.playlistName}`;
+				}
 			}
 
 			if (eventData.includes("[Item info]")) {
@@ -1273,15 +1283,15 @@ const playlistDownloader = {
 
 					if (
 						typeof videoInfo.title === "string" &&
-						videoInfo.title.startsWith('"') &&
-						videoInfo.title.endsWith('"') &&
+						((videoInfo.title.startsWith('"') && videoInfo.title.endsWith('"')) ||
+							(videoInfo.title.startsWith("'") && videoInfo.title.endsWith("'"))) &&
 						videoInfo.title.length >= 2
 					) {
 						videoInfo.title = videoInfo.title.slice(1, -1);
 					}
 
 					videoInfo.thumbnail = eventItems[3];
-				} catch (error) {}
+				} catch (error) { }
 
 				count++;
 				this.state.originalCount++;
@@ -1301,15 +1311,20 @@ const playlistDownloader = {
 			if (!progressElement) return;
 
 			if (progress.percent === 100) {
-				progressElement.textContent = `${window.i18n.__(
-					"processing",
-				)}...`;
+				const procText = window.i18n
+					? window.i18n.__("processing")
+					: "Processing";
+				progressElement.textContent = `${procText}...`;
 			} else if (progress.percent) {
-				progressElement.textContent = `${window.i18n.__("progress")} ${
-					progress.percent
-				}% | ${window.i18n.__("speed")} ${
-					progress.currentSpeed || "0"
-				}`;
+				const progText = window.i18n
+					? window.i18n.__("progress")
+					: "Progress";
+				const speedText = window.i18n
+					? window.i18n.__("speed")
+					: "Speed";
+				progressElement.textContent = `${progText} ${progress.percent
+					}% | ${speedText} ${progress.currentSpeed || "0"
+					}`;
 			}
 		});
 
@@ -1331,14 +1346,14 @@ const playlistDownloader = {
 				if (typeof this.state.currentDownloadProcess.kill === "function") {
 					this.state.currentDownloadProcess.kill();
 				}
-			} catch (e) {}
+			} catch (e) { }
 			if (
 				this.state.currentDownloadProcess.ytDlpProcess &&
 				typeof this.state.currentDownloadProcess.ytDlpProcess.kill === "function"
 			) {
 				try {
 					this.state.currentDownloadProcess.ytDlpProcess.kill();
-				} catch (e) {}
+				} catch (e) { }
 			}
 		}
 		this.handleCancellation(this.state.currentLocalCount || 0);
@@ -1405,7 +1420,7 @@ const playlistDownloader = {
 				: "";
 		const safeThumbnail =
 			thumbnailUrl &&
-			/^(https?:\/\/|\/\/|\/|\.\/|\.\.\/|data:|blob:)/i.test(thumbnailUrl)
+				/^(https?:\/\/|\/\/|\/|\.\/|\.\.\/|data:|blob:)/i.test(thumbnailUrl)
 				? this.escapeHtml(thumbnailUrl)
 				: "../assets/images/thumb.png";
 		const safeAlt = this.escapeHtml(videoInfo.title || "thumbnail");
@@ -1500,22 +1515,29 @@ const playlistDownloader = {
 	},
 
 	hideOptions(justHide = false) {
-		this.ui.optionsContainer.style.display = "none";
-		this.ui.optionsContainer.classList.remove("fade-in");
-		this.ui.downloadList.innerHTML = "";
-		this.ui.errorBtn.style.display = "none";
-		this.ui.errorDetails.style.display = "none";
-		this.ui.errorDetails.textContent = "";
-		this.ui.errorMsgDisplay.style.display = "none";
-		this.ui.stopDownloadBtn.style.display = "none";
+		if (this.ui.optionsContainer) {
+			this.ui.optionsContainer.style.display = "none";
+			this.ui.optionsContainer.classList.remove("fade-in");
+		}
+		if (this.ui.downloadList) this.ui.downloadList.innerHTML = "";
+		if (this.ui.errorBtn) this.ui.errorBtn.style.display = "none";
+		if (this.ui.errorDetails) {
+			this.ui.errorDetails.style.display = "none";
+			this.ui.errorDetails.textContent = "";
+		}
+		if (this.ui.errorMsgDisplay) this.ui.errorMsgDisplay.style.display = "none";
+		if (this.ui.stopDownloadBtn) this.ui.stopDownloadBtn.style.display = "none";
 
 		if (!justHide) {
-			this.ui.playlistNameDisplay.textContent = `${window.i18n.__(
-				"processing",
-			)}...`;
-			this.ui.pasteLinkBtn.style.display = "none";
-			this.ui.openDownloadsBtn.style.display = "inline-block";
-			this.ui.stopDownloadBtn.style.display = "inline-block";
+			if (this.ui.playlistNameDisplay) {
+				const procText = window.i18n
+					? window.i18n.__("processing")
+					: "Processing";
+				this.ui.playlistNameDisplay.textContent = `${procText}...`;
+			}
+			if (this.ui.pasteLinkBtn) this.ui.pasteLinkBtn.style.display = "none";
+			if (this.ui.openDownloadsBtn) this.ui.openDownloadsBtn.style.display = "inline-block";
+			if (this.ui.stopDownloadBtn) this.ui.stopDownloadBtn.style.display = "inline-block";
 		}
 	},
 
@@ -1526,16 +1548,21 @@ const playlistDownloader = {
 		}
 		if (!this.state.isDownloading) return;
 		this.state.isDownloading = false;
-		this.ui.stopDownloadBtn.style.display = "none";
+		if (this.ui.stopDownloadBtn) this.ui.stopDownloadBtn.style.display = "none";
 
 		const lastProgress = getId(`p${count}`);
-		if (lastProgress)
-			lastProgress.textContent = window.i18n.__("fileSaved");
-		this.ui.pasteLinkBtn.style.display = "inline-block";
-		this.ui.openDownloadsBtn.style.display = "inline-block";
+		if (lastProgress) {
+			lastProgress.textContent = window.i18n
+				? window.i18n.__("fileSaved")
+				: "Completed";
+		}
+		if (this.ui.pasteLinkBtn) this.ui.pasteLinkBtn.style.display = "inline-block";
+		if (this.ui.openDownloadsBtn) this.ui.openDownloadsBtn.style.display = "inline-block";
 
 		const notify = new Notification("ytDownloader", {
-			body: window.i18n.__("playlistDownloaded"),
+			body: window.i18n
+				? window.i18n.__("playlistDownloaded")
+				: "Playlist download finished",
 			icon: "../assets/images/icon.png",
 		});
 
@@ -1543,39 +1570,48 @@ const playlistDownloader = {
 	},
 
 	showError(error) {
-		if (this.state.isCancelled) {
+		if (
+			this.state.isCancelled ||
+			error?.name === "AbortError" ||
+			error?.message?.includes("AbortError")
+		) {
 			this.handleCancellation(this.state.currentLocalCount || 0);
 			return;
 		}
 		this.state.isDownloading = false;
-		this.ui.stopDownloadBtn.style.display = "none";
+		if (this.ui.stopDownloadBtn) this.ui.stopDownloadBtn.style.display = "none";
 
-		console.error("Download Error:", error.toString());
-		this.ui.pasteLinkBtn.style.display = "inline-block";
-		this.ui.openDownloadsBtn.style.display = "none";
-		this.ui.optionsContainer.style.display = "block";
-		this.ui.playlistNameDisplay.textContent = "";
-		this.ui.errorMsgDisplay.textContent =
-			window.i18n.__("errorNetworkOrUrl");
-		this.ui.errorMsgDisplay.style.display = "block";
-		this.ui.errorMsgDisplay.title = error.toString();
-		this.ui.errorBtn.style.display = "inline-block";
-		this.ui.errorDetails.innerHTML = `<strong>URL: ${
-			this.state.url
-		}</strong><br><br>${error.toString()}`;
+		console.error("Download Error:", error?.toString?.() || error);
+		if (this.ui.pasteLinkBtn) this.ui.pasteLinkBtn.style.display = "inline-block";
+		if (this.ui.openDownloadsBtn) this.ui.openDownloadsBtn.style.display = "none";
+		if (this.ui.optionsContainer) this.ui.optionsContainer.style.display = "block";
+		if (this.ui.playlistNameDisplay) this.ui.playlistNameDisplay.textContent = "";
+		if (this.ui.errorMsgDisplay) {
+			this.ui.errorMsgDisplay.textContent = window.i18n
+				? window.i18n.__("errorNetworkOrUrl")
+				: "Some error has occurred. Check your network and use correct URL";
+			this.ui.errorMsgDisplay.style.display = "block";
+			this.ui.errorMsgDisplay.title = error?.toString?.() || String(error);
+		}
+		if (this.ui.errorBtn) this.ui.errorBtn.style.display = "inline-block";
+		if (this.ui.errorDetails) {
+			this.ui.errorDetails.innerHTML = `<strong>URL: ${this.escapeHtml(
+				this.state.url
+			)}</strong><br><br>${this.escapeHtml(error?.toString?.() || String(error))}`;
+		}
 	},
 
 	openDownloadsFolder() {
 		const openPath =
 			this.state.playlistName &&
-			fs.existsSync(
-				path.join(this.state.downloadDir, this.state.playlistName),
-			)
+				fs.existsSync(
+					path.join(this.state.downloadDir, this.state.playlistName),
+				)
 				? path.join(this.state.downloadDir, this.state.playlistName)
 				: this.state.downloadDir;
 
 		ipcRenderer.invoke("open-folder", openPath).then((result) => {
-			if (!result.success) {
+			if (result && !result.success) {
 				ipcRenderer.invoke("open-folder", this.state.downloadDir);
 			}
 		});
@@ -1614,6 +1650,7 @@ const playlistDownloader = {
 	},
 
 	toggleAdvancedMenu() {
+		if (!this.ui.advancedMenu) return;
 		const isHidden =
 			this.ui.advancedMenu.style.display === "none" ||
 			this.ui.advancedMenu.style.display === "" ||
