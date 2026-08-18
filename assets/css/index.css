@@ -286,6 +286,12 @@ body {
 	text-align: center;
 }
 
+#playlistBatchSection,
+#playlistSelectiveSection {
+	width: 100%;
+	box-sizing: border-box;
+}
+
 .page-view.hidden {
 	display: none;
 }
