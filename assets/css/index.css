@@ -2657,8 +2657,50 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
 .ss-content {
 	background-color: var(--select) !important;
-	border: transparent !important;
+	border: 1px solid var(--box-separation) !important;
 	border-radius: 8px !important;
+	box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35) !important;
+}
+
+.prefBox .ss-main {
+	width: min(240px, 100%);
+	min-width: 180px;
+	height: 38px;
+	min-height: 38px;
+	padding: 4px 10px;
+	background-color: var(--select);
+	color: var(--text);
+	border: 1px solid var(--box-separation);
+	border-radius: 6px;
+	font-size: 0.95rem;
+	box-sizing: border-box;
+	transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.prefBox .ss-main:focus,
+.prefBox .ss-main.ss-open {
+	border-color: var(--blueBtn);
+	box-shadow: 0 0 0 3px color-mix(in srgb, var(--blueBtn) 22%, transparent);
+}
+
+.prefBox .ss-main .ss-values .ss-single {
+	margin: 0;
+	padding: 0 4px;
+	font-size: 0.95rem;
+	color: var(--text);
+}
+
+body.rtl .ss-main .ss-values {
+	text-align: right;
+	justify-content: flex-end;
+}
+
+body.rtl .ss-content .ss-search input {
+	text-align: right;
+}
+
+body.rtl .ss-content .ss-list .ss-option {
+	text-align: right;
 }
 
 .ss-list {
