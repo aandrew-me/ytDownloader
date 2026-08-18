@@ -119,6 +119,7 @@ const CONSTANTS = {
 		CLOSE_TO_TRAY: "closeToTray",
 		YT_DLP_CUSTOM_ARGS: "customYtDlpArgs",
 		YT_DLP_SOURCE: "ytdlpSource",
+		AUTO_DOWNLOAD_ON_PASTE: "autoDownloadOnPaste",
 	},
 	// yt-dlp source selectable in preferences.
 	// "nightly": app-managed standalone binary kept on the nightly channel.
@@ -181,6 +182,8 @@ class YtDownloaderApp {
 				quality: "1080",
 				format: "mp4",
 			},
+			isAutoMode:
+				localStorage.getItem("autoDownloadOnPaste") === "true",
 			activeInfoJsonPaths: new Map(),
 		};
 	}
@@ -247,6 +250,7 @@ class YtDownloaderApp {
 
 			this._addEventListeners();
 			this._syncPresetDefaultsFromPreferences();
+			this._updateAutoModeUI();
 			this._updateEmptyStateUI();
 		} catch (error) {
 			console.error("Initialization failed:", error);
@@ -852,6 +856,16 @@ class YtDownloaderApp {
 			.getElementById("modeMultipleBtn")
 			?.addEventListener("click", () => this._switchHomeMode("multiple"));
 		document
+			.getElementById("autoDownloadToggleBtn")
+			?.addEventListener("click", () => {
+				this.state.isAutoMode = !this.state.isAutoMode;
+				localStorage.setItem(
+					CONSTANTS.LOCAL_STORAGE_KEYS.AUTO_DOWNLOAD_ON_PASTE,
+					this.state.isAutoMode ? "true" : "false",
+				);
+				this._updateAutoModeUI();
+			});
+		document
 			.getElementById("homePathPicker")
 			?.addEventListener("click", () =>
 				ipcRenderer.send("select-location-main", ""),
@@ -1271,7 +1285,12 @@ class YtDownloaderApp {
 			};
 			this.setVideoLength(durationInt);
 			this._populateFormatSelectors(metadata.formats || []);
-			this._displayInfoPanel();
+
+			if (this.state.mode === "single" && this.state.isAutoMode) {
+				this.handleDownloadRequest(this.state.batchPreset.type);
+			} else {
+				this._displayInfoPanel();
+			}
 		} catch (error) {
 			console.log(error);
 			if (
@@ -1314,6 +1333,11 @@ class YtDownloaderApp {
 			presetFormat ||
 			"mp3";
 
+		const isAuto = Boolean(
+			this.state.isAutoMode && this.state.mode === "single",
+		);
+		const isBatch = Boolean(this.state.mode === "multiple");
+
 		const downloadJob = {
 			type: type || this.state.batchPreset.type,
 			url: this.state.videoInfo.url,
@@ -1324,6 +1348,14 @@ class YtDownloaderApp {
 			infoJsonPath: this.state.videoInfo.infoJsonPath,
 			infoJsonFetchedAt: this.state.videoInfo.infoJsonFetchedAt,
 			options: {...this.state.downloadOptions},
+			isAuto,
+			isBatch,
+			presetQuality:
+				presetQuality || this.state.batchPreset.quality || "1080",
+			presetFormat:
+				presetFormat ||
+				this.state.batchPreset.format ||
+				(type === "video" ? "mp4" : "mp3"),
 			// Capture UI values at the moment of click
 			uiSnapshot: {
 				videoFormat: videoFormatVal,
@@ -1735,10 +1767,13 @@ class YtDownloaderApp {
 
 		let downloadArgs = [];
 
-		if (job.isBatch) {
-			const presetQuality = uiSnapshot.videoFormat || "1080";
+		if (job.isBatch || job.isAuto) {
+			const presetQuality =
+				job.presetQuality || uiSnapshot.videoFormat || "1080";
 			const presetFormat =
-				uiSnapshot.audioFormat || (type === "video" ? "mp4" : "mp3");
+				job.presetFormat ||
+				uiSnapshot.audioFormat ||
+				(type === "video" ? "mp4" : "mp3");
 			const isYouTube =
 				url &&
 				(url.includes("youtube.com/") || url.includes("youtu.be/"));
@@ -3069,9 +3104,31 @@ class YtDownloaderApp {
 			if (multipleSec) multipleSec.style.display = "block";
 			if (pathPicker) pathPicker.style.display = "inline-flex";
 			if (hiddenPanel) hiddenPanel.style.display = "none";
-			this._syncPresetDefaultsFromPreferences();
 		}
+		this._updateAutoModeUI();
 		this._updateEmptyStateUI();
+	}
+
+	/**
+	 * Updates the Auto Mode button and Quick Preset Bar visibility on the homepage.
+	 */
+	_updateAutoModeUI() {
+		const autoBtn = document.getElementById("autoDownloadToggleBtn");
+		const presetBar = document.getElementById("quickPresetBar");
+		if (autoBtn) {
+			autoBtn.classList.toggle("active", Boolean(this.state.isAutoMode));
+		}
+		if (presetBar) {
+			if (
+				this.state.mode === "multiple" ||
+				(this.state.mode === "single" && this.state.isAutoMode)
+			) {
+				presetBar.style.display = "flex";
+				this._syncPresetDefaultsFromPreferences();
+			} else {
+				presetBar.style.display = "none";
+			}
+		}
 	}
 
 	/**

@@ -1750,7 +1750,7 @@ input[type="number"]::-webkit-outer-spin-button {
 	position: relative;
 	transition: all 0.25s ease;
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-	margin-top: 15px;
+	margin: 15px;
 	font-weight: bold;
 }
 
@@ -1827,6 +1827,11 @@ input[type="number"]::-webkit-outer-spin-button {
 #incorrectMsg,
 #incorrectMsgPlaylist {
 	color: var(--redBtn);
+}
+
+#incorrectMsg:empty,
+#incorrectMsgPlaylist:empty {
+	display: none;
 }
 
 #incorrectMsgPlaylist {
@@ -4879,6 +4884,50 @@ body.rtl .header-core {
 	flex-wrap: wrap;
 }
 
+.home-top-left {
+	display: inline-flex;
+	align-items: center;
+	gap: 12px;
+	flex-wrap: wrap;
+}
+
+.auto-mode-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	background: var(--box-main, #2a2a2a);
+	border: 1px solid var(--box-toggle, #3a3a3a);
+	color: var(--text-secondary, #94a3b8);
+	padding: 7px 14px;
+	font-size: 13px;
+	font-weight: 600;
+	border-radius: 10px;
+	cursor: pointer;
+	transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.auto-mode-btn:hover {
+	color: var(--text, #ffffff);
+	border-color: var(--blueBtn, #54abde);
+}
+
+.auto-mode-btn .auto-bolt-icon {
+	width: 14px;
+	height: 14px;
+	transition: transform 0.2s ease, fill 0.2s ease;
+}
+
+.auto-mode-btn.active {
+	background: rgba(84, 171, 222, 0.15);
+	border-color: var(--blueBtn, #54abde);
+	color: var(--blueBtn, #54abde);
+}
+
+.auto-mode-btn.active .auto-bolt-icon {
+	fill: var(--blueBtn, #54abde);
+	transform: scale(1.1);
+}
+
 .mode-toggle-group {
 	display: inline-flex;
 	background: var(--box-main, #2a2a2a);
@@ -5026,7 +5075,7 @@ body.rtl .header-core {
 .quick-preset-bar {
 	width: 100%;
 	max-width: 800px;
-	margin: 0 auto 20px auto;
+	margin: 20px auto 10px auto;
 	box-sizing: border-box;
 	display: flex;
 	flex-wrap: wrap;
