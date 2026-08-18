@@ -4444,12 +4444,12 @@ body.rtl .header-core {
 	text-align: left;
 	transition: all 0.25s ease;
 	backdrop-filter: blur(12px);
-	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+	box-shadow: var(--box-shadow, 0 4px 20px rgba(0, 0, 0, 0.15));
 }
 
 .dep-card:hover {
-	border-color: rgba(255, 255, 255, 0.15);
-	box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+	border-color: var(--blueBtn, rgba(255, 255, 255, 0.15));
+	box-shadow: var(--box-shadow, 0 8px 30px rgba(0, 0, 0, 0.25));
 }
 
 .dep-card-header {
@@ -4521,23 +4521,25 @@ body.rtl .header-core {
 	font-weight: 600;
 	padding: 3px 10px;
 	border-radius: 20px;
-	background: rgba(255, 255, 255, 0.08);
-	color: var(--text-secondary, #cbd5e1);
-	border: 1px solid rgba(255, 255, 255, 0.1);
+	background: var(--box-toggle, rgba(255, 255, 255, 0.08));
+	color: var(--text);
+	border: 1px solid var(--box-separation, rgba(255, 255, 255, 0.1));
 	letter-spacing: 0.3px;
 }
 
 .dep-subtitle {
 	display: block;
 	font-size: 0.85rem;
-	color: var(--text-secondary, #94a3b8);
+	color: var(--text);
+	opacity: 0.7;
 	margin-top: 3px;
 }
 
 .dep-refresh-btn {
-	background: rgba(255, 255, 255, 0.05);
+	background: var(--box-toggle, rgba(255, 255, 255, 0.05));
 	border: 1px solid var(--box-separation, rgba(255, 255, 255, 0.1));
-	color: var(--text-secondary, #94a3b8);
+	color: var(--text);
+	opacity: 0.8;
 	width: 36px;
 	height: 36px;
 	border-radius: 10px;
@@ -4549,8 +4551,9 @@ body.rtl .header-core {
 }
 
 .dep-refresh-btn:hover {
-	background: rgba(255, 255, 255, 0.12);
-	color: var(--text, #ffffff);
+	background: var(--select, rgba(255, 255, 255, 0.12));
+	color: var(--text);
+	opacity: 1;
 	transform: rotate(45deg);
 }
 
@@ -4570,7 +4573,8 @@ body.rtl .header-core {
 	font-weight: 600;
 	text-transform: uppercase;
 	letter-spacing: 0.05em;
-	color: var(--text-secondary, #94a3b8);
+	color: var(--text);
+	opacity: 0.65;
 	margin-bottom: 8px;
 }
 
@@ -4580,7 +4584,7 @@ body.rtl .header-core {
 
 .dep-segmented-control {
 	display: flex;
-	background: rgba(0, 0, 0, 0.25);
+	background: var(--box-toggle, rgba(0, 0, 0, 0.25));
 	border: 1px solid var(--box-separation, rgba(255, 255, 255, 0.08));
 	border-radius: 12px;
 	padding: 4px;
@@ -4591,7 +4595,8 @@ body.rtl .header-core {
 	flex: 1;
 	background: transparent;
 	border: 1px solid transparent;
-	color: var(--text-secondary, #94a3b8);
+	color: var(--text);
+	opacity: 0.75;
 	padding: 10px 16px;
 	border-radius: 8px;
 	font-size: 0.9rem;
@@ -4602,16 +4607,18 @@ body.rtl .header-core {
 }
 
 .dep-segment-btn.active {
-	background: rgba(59, 130, 246, 0.12);
-	color: #60a5fa;
-	border-color: rgba(59, 130, 246, 0.4);
+	background: var(--box-toggleOn, rgba(59, 130, 246, 0.12));
+	color: var(--blueBtn, #3b82f6);
+	border-color: var(--blueBtn, rgba(59, 130, 246, 0.4));
 	font-weight: 600;
+	opacity: 1;
 	box-shadow: 0 2px 10px rgba(59, 130, 246, 0.15);
 }
 
 .dep-segment-btn:hover:not(.active) {
-	color: var(--text, #f8fafc);
-	background: rgba(255, 255, 255, 0.04);
+	color: var(--text);
+	opacity: 1;
+	background: var(--box-main, rgba(255, 255, 255, 0.04));
 }
 
 .dep-hidden-select {
@@ -4639,7 +4646,7 @@ body.rtl .header-core {
 	align-items: center;
 	gap: 14px;
 	padding: 14px 18px;
-	background: rgba(255, 255, 255, 0.02);
+	background: var(--item-bg, rgba(255, 255, 255, 0.02));
 	border: 1px solid var(--box-separation, rgba(255, 255, 255, 0.06));
 	border-radius: 12px;
 	cursor: pointer;
@@ -4647,20 +4654,20 @@ body.rtl .header-core {
 }
 
 .dep-option-item:hover:not(.disabled-item) {
-	background: rgba(255, 255, 255, 0.05);
-	border-color: rgba(255, 255, 255, 0.12);
+	background: var(--box-toggle, rgba(255, 255, 255, 0.05));
+	border-color: var(--blueBtn, rgba(255, 255, 255, 0.12));
 }
 
 .dep-option-item.active {
-	background: rgba(59, 130, 246, 0.08);
-	border-color: rgba(59, 130, 246, 0.4);
+	background: var(--box-toggleOn, rgba(59, 130, 246, 0.08));
+	border-color: var(--blueBtn, rgba(59, 130, 246, 0.4));
 }
 
 .dep-radio-circle {
 	width: 20px;
 	height: 20px;
 	border-radius: 50%;
-	border: 2px solid var(--text-secondary, #64748b);
+	border: 2px solid var(--box-separation, #64748b);
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -4669,8 +4676,8 @@ body.rtl .header-core {
 }
 
 .dep-option-item.active .dep-radio-circle {
-	border-color: #3b82f6;
-	background: #3b82f6;
+	border-color: var(--blueBtn, #3b82f6);
+	background: var(--blueBtn, #3b82f6);
 }
 
 .dep-option-item.active .dep-radio-circle::after {
@@ -4696,7 +4703,8 @@ body.rtl .header-core {
 
 .dep-option-desc {
 	font-size: 0.8rem;
-	color: var(--text-secondary, #94a3b8);
+	color: var(--text);
+	opacity: 0.7;
 }
 
 .dep-active-tag {
@@ -4704,9 +4712,9 @@ body.rtl .header-core {
 	font-weight: 600;
 	padding: 3px 10px;
 	border-radius: 12px;
-	background: rgba(59, 130, 246, 0.2);
-	color: #60a5fa;
-	border: 1px solid rgba(59, 130, 246, 0.3);
+	background: var(--box-toggleOn, rgba(59, 130, 246, 0.2));
+	color: var(--blueBtn, #3b82f6);
+	border: 1px solid var(--blueBtn, rgba(59, 130, 246, 0.3));
 	display: none;
 }
 
@@ -4719,7 +4727,7 @@ body.rtl .header-core {
 	flex-direction: column;
 	gap: 8px;
 	margin-bottom: 18px;
-	background: rgba(0, 0, 0, 0.2);
+	background: var(--item-bg, rgba(0, 0, 0, 0.2));
 	padding: 14px 18px;
 	border-radius: 12px;
 	border: 1px solid var(--box-separation, rgba(255, 255, 255, 0.06));
@@ -4733,7 +4741,8 @@ body.rtl .header-core {
 
 .dep-detail-label {
 	font-size: 0.88rem;
-	color: var(--text-secondary, #94a3b8);
+	color: var(--text);
+	opacity: 0.75;
 	font-weight: 500;
 }
 
@@ -4747,7 +4756,8 @@ body.rtl .header-core {
 }
 
 .dep-path-info {
-	color: var(--text-secondary, #94a3b8);
+	color: var(--text);
+	opacity: 0.7;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
@@ -4758,14 +4768,16 @@ body.rtl .header-core {
 	display: flex;
 	align-items: center;
 	gap: 6px;
-	color: var(--text-secondary, #94a3b8);
+	color: var(--text);
+	opacity: 0.75;
 	text-decoration: none;
 	font-weight: 500;
-	transition: color 0.2s ease;
+	transition: all 0.2s ease;
 }
 
 .dep-github-link:hover {
 	color: var(--blueBtn, #60a5fa);
+	opacity: 1;
 }
 
 .dep-github-link svg {
