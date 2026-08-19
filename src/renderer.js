@@ -119,6 +119,7 @@ const CONSTANTS = {
 		CLOSE_TO_TRAY: "closeToTray",
 		YT_DLP_CUSTOM_ARGS: "customYtDlpArgs",
 		YT_DLP_SOURCE: "ytdlpSource",
+		AUTO_DOWNLOAD_ON_PASTE: "autoDownloadOnPaste",
 	},
 	// yt-dlp source selectable in preferences.
 	// "nightly": app-managed standalone binary kept on the nightly channel.
@@ -181,6 +182,8 @@ class YtDownloaderApp {
 				quality: "1080",
 				format: "mp4",
 			},
+			isAutoMode:
+				localStorage.getItem("autoDownloadOnPaste") === "true",
 			activeInfoJsonPaths: new Map(),
 		};
 	}
@@ -247,6 +250,7 @@ class YtDownloaderApp {
 
 			this._addEventListeners();
 			this._syncPresetDefaultsFromPreferences();
+			this._updateAutoModeUI();
 			this._updateEmptyStateUI();
 		} catch (error) {
 			console.error("Initialization failed:", error);
@@ -852,6 +856,16 @@ class YtDownloaderApp {
 			.getElementById("modeMultipleBtn")
 			?.addEventListener("click", () => this._switchHomeMode("multiple"));
 		document
+			.getElementById("autoDownloadToggleBtn")
+			?.addEventListener("click", () => {
+				this.state.isAutoMode = !this.state.isAutoMode;
+				localStorage.setItem(
+					CONSTANTS.LOCAL_STORAGE_KEYS.AUTO_DOWNLOAD_ON_PASTE,
+					this.state.isAutoMode ? "true" : "false",
+				);
+				this._updateAutoModeUI();
+			});
+		document
 			.getElementById("homePathPicker")
 			?.addEventListener("click", () =>
 				ipcRenderer.send("select-location-main", ""),
@@ -1271,7 +1285,12 @@ class YtDownloaderApp {
 			};
 			this.setVideoLength(durationInt);
 			this._populateFormatSelectors(metadata.formats || []);
-			this._displayInfoPanel();
+
+			if (this.state.mode === "single" && this.state.isAutoMode) {
+				this.handleDownloadRequest(this.state.batchPreset.type);
+			} else {
+				this._displayInfoPanel();
+			}
 		} catch (error) {
 			console.log(error);
 			if (
@@ -1314,6 +1333,11 @@ class YtDownloaderApp {
 			presetFormat ||
 			"mp3";
 
+		const isAuto = Boolean(
+			this.state.isAutoMode && this.state.mode === "single",
+		);
+		const isBatch = Boolean(this.state.mode === "multiple");
+
 		const downloadJob = {
 			type: type || this.state.batchPreset.type,
 			url: this.state.videoInfo.url,
@@ -1324,6 +1348,14 @@ class YtDownloaderApp {
 			infoJsonPath: this.state.videoInfo.infoJsonPath,
 			infoJsonFetchedAt: this.state.videoInfo.infoJsonFetchedAt,
 			options: {...this.state.downloadOptions},
+			isAuto,
+			isBatch,
+			presetQuality:
+				presetQuality || this.state.batchPreset.quality || "1080",
+			presetFormat:
+				presetFormat ||
+				this.state.batchPreset.format ||
+				(type === "video" ? "mp4" : "mp3"),
 			// Capture UI values at the moment of click
 			uiSnapshot: {
 				videoFormat: videoFormatVal,
@@ -1735,10 +1767,13 @@ class YtDownloaderApp {
 
 		let downloadArgs = [];
 
-		if (job.isBatch) {
-			const presetQuality = uiSnapshot.videoFormat || "1080";
+		if (job.isBatch || job.isAuto) {
+			const presetQuality =
+				job.presetQuality || uiSnapshot.videoFormat || "1080";
 			const presetFormat =
-				uiSnapshot.audioFormat || (type === "video" ? "mp4" : "mp3");
+				job.presetFormat ||
+				uiSnapshot.audioFormat ||
+				(type === "video" ? "mp4" : "mp3");
 			const isYouTube =
 				url &&
 				(url.includes("youtube.com/") || url.includes("youtu.be/"));
@@ -1817,7 +1852,7 @@ class YtDownloaderApp {
 			}
 		} else {
 			if (type === "video") {
-				const [videoFid, videoExt, _, videoCodec] =
+				const [videoFid, videoExt, _, videoCodec, videoAudioFlag] =
 					uiSnapshot.videoFormat.split("|");
 				const [audioFid, audioExt] =
 					uiSnapshot.audioForVideoFormat.split("|");
@@ -1834,8 +1869,9 @@ class YtDownloaderApp {
 				) {
 					ext = "mkv";
 				}
+				const hasIntegratedAudio = videoAudioFlag === "hasAudio";
 				audioFormat =
-					audioForVideoFormat_id === "none"
+					hasIntegratedAudio || audioForVideoFormat_id === "none"
 						? ""
 						: `+${audioForVideoFormat_id}`;
 			} else if (type === "audio") {
@@ -2228,7 +2264,95 @@ class YtDownloaderApp {
 			? videoCodec
 			: [...availableCodecs].pop();
 
+		// Separate audio formats
+		const audioOnlyFormats = formats.filter(
+			(f) => f.acodec !== "none" && f.video_ext === "none",
+		);
+
+		// Helper to score audio formats for ranking & selection
+		const scoreAudio = (format, preferredExt = "") => {
+			let score = 0;
+			const note = (format.format_note || "").toLowerCase();
+			const lang = (format.language || "").toLowerCase();
+			const ext = (format.ext === "webm" ? "opus" : format.ext || "").toLowerCase();
+
+			// 1. Original vs Dubbed Language Priority
+			const isOriginal =
+				note.includes("original") ||
+				note.includes("(default)") ||
+				lang === "orig" ||
+				lang === "default" ||
+				(typeof format.language_preference === "number" && format.language_preference > 0);
+			const isDubbed =
+				note.includes("dubbed") ||
+				(typeof format.language_preference === "number" && format.language_preference < 0);
+
+			if (isOriginal) {
+				score += 100000;
+			} else if (!isDubbed) {
+				score += 50000;
+			} else {
+				score += 0;
+			}
+
+			// 2. Audio Codec / Extension preference
+			if (preferredExt) {
+				const cleanPref = preferredExt.toLowerCase();
+				if (ext === cleanPref || (format.ext || "").toLowerCase() === cleanPref) {
+					score += 5000;
+				}
+			}
+
+			// 3. Audio Bitrate / Quality
+			const bitrate = format.abr || format.tbr || 0;
+			score += bitrate * 10;
+
+			if (note.includes("medium")) score += 300;
+			else if (note.includes("high")) score += 500;
+			else if (note.includes("low")) score += 100;
+			else if (note.includes("ultralow")) score += 50;
+
+			if (format.asr) {
+				score += Math.round(format.asr / 1000);
+			}
+
+			return score;
+		};
+
+		const prefAudioQuality =
+			localStorage.getItem("preferredAudioQuality") ||
+			localStorage.getItem("preferredAudioFormat") ||
+			"";
+		const standaloneAudioPref =
+			prefAudioQuality.toLowerCase().includes("opus") ||
+			prefAudioQuality.toLowerCase().includes("webm")
+				? "opus"
+				: "m4a";
+
+		let bestStandaloneAudio = null;
+		let bestStandaloneScore = -Infinity;
+		let bestAudioForVideo = null;
+		let bestVideoScore = -Infinity;
+
+		const videoIsWebm = finalCodec === "vp9" || finalCodec === "av01";
+		const videoAudioPref = videoIsWebm ? "opus" : "m4a";
+
+		audioOnlyFormats.forEach((f) => {
+			const sScore = scoreAudio(f, standaloneAudioPref);
+			if (sScore > bestStandaloneScore) {
+				bestStandaloneScore = sScore;
+				bestStandaloneAudio = f;
+			}
+
+			const vScore = scoreAudio(f, videoAudioPref);
+			if (vScore > bestVideoScore) {
+				bestVideoScore = vScore;
+				bestAudioForVideo = f;
+			}
+		});
+
 		let isAVideoSelected = false;
+		let selectedVideoHasAudio = false;
 
 		const videoOptions = [];
 		const audioOptions = [];
@@ -2260,6 +2384,8 @@ class YtDownloaderApp {
 				}
 
 				let isSelected = false;
+				const hasAudio =
+					format.acodec !== "none" && format.acodec !== undefined;
 
 				if (
 					!isAVideoSelected &&
@@ -2268,13 +2394,14 @@ class YtDownloaderApp {
 				) {
 					isSelected = true;
 					isAVideoSelected = true;
+					selectedVideoHasAudio = hasAudio;
 				}
 
 				const quality = `${format.height || "???"}p${format.fps === 60 ? "60" : ""}`;
 				const vcodecText = format.vcodec?.split(".")[0] || "";
 
 				let audioMarkup = `<div class="audio-placeholder"></div>`;
-				if (format.acodec !== "none") {
+				if (hasAudio) {
 					const langName = getLanguageName(format.language);
 					const langSpan = langName
 						? `<span class="lang-text">${langName}</span>`
@@ -2321,7 +2448,7 @@ class YtDownloaderApp {
 
 				videoOptions.push({
 					text: optionTextFallback,
-					value: `${format.format_id}|${format.ext}|${format.height}|${format.vcodec}`,
+					value: `${format.format_id}|${format.ext}|${format.height}|${format.vcodec}|${hasAudio ? "hasAudio" : "noAudio"}`,
 					selected: isSelected,
 					html: htmlContent,
 				});
@@ -2335,9 +2462,13 @@ class YtDownloaderApp {
 
 				const audioExt = format.ext === "webm" ? "opus" : format.ext;
 
-				const formatNote = i18n.__(
-					format.format_note || "unknownQuality",
-				);
+				const formatNote = format.format_note
+					? format.format_note
+					: i18n.__("unknownQuality");
+
+				const isStandaloneSelected =
+					bestStandaloneAudio &&
+					format.format_id === bestStandaloneAudio.format_id;
 
 				// HTML for Audio Grid
 				const htmlContent = `
@@ -2351,6 +2482,7 @@ class YtDownloaderApp {
 				audioOptions.push({
 					text: `${formatNote} ${audioExt} ${displaySize}`,
 					value: `${format.format_id}|${audioExt}`,
+					selected: Boolean(isStandaloneSelected),
 					html: htmlContent,
 				});
 			}
@@ -2414,12 +2546,22 @@ class YtDownloaderApp {
 			mountSlimSelect(audioSelectEl, audioOptions);
 		}
 
-		const audioForVideoOptions = JSON.parse(JSON.stringify(audioOptions));
+		const audioForVideoOptions = audioOptions.map((opt) => {
+			const isMatch =
+				bestAudioForVideo &&
+				opt.value.startsWith(`${bestAudioForVideo.format_id}|`);
+			return {
+				...opt,
+				selected: !selectedVideoHasAudio && Boolean(isMatch),
+			};
+		});
+
 		const noAudioTxt = i18n.__("noAudio") || "No Audio";
 
 		audioForVideoOptions.push({
 			text: noAudioTxt,
 			value: "none|none",
+			selected: Boolean(selectedVideoHasAudio || !bestAudioForVideo),
 			html: `
         <div class="modern-option-row audio-grid">
             <span class="main-text">${noAudioTxt}</span>
@@ -3069,9 +3211,30 @@ class YtDownloaderApp {
 			if (multipleSec) multipleSec.style.display = "block";
 			if (pathPicker) pathPicker.style.display = "inline-flex";
 			if (hiddenPanel) hiddenPanel.style.display = "none";
-			this._syncPresetDefaultsFromPreferences();
 		}
+		this._updateAutoModeUI();
 		this._updateEmptyStateUI();
+	}
+
+	/**
+	 * Updates the Auto Mode button and Quick Preset Bar visibility on the homepage.
+	 */
+	_updateAutoModeUI() {
+		const autoBtn = document.getElementById("autoDownloadToggleBtn");
+		const presetBar = document.getElementById("quickPresetBar");
+		if (autoBtn) {
+			autoBtn.classList.toggle("active", Boolean(this.state.isAutoMode));
+		}
+		if (presetBar) {
+			if (
+				this.state.mode === "multiple" ||
+				(this.state.mode === "single" && this.state.isAutoMode)
+			) {
+				presetBar.style.display = "flex";
+			} else {
+				presetBar.style.display = "none";
+			}
+		}
 	}
 
 	/**
