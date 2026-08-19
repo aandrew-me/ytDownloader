@@ -2,6 +2,7 @@ import {
 	getId as $,
 	showPopup,
 	formatTime,
+	formatVideoCodec,
 	findFfmpeg,
 	ensureFfmpegLibsLoadable,
 	getJsRuntimePath,
@@ -2398,7 +2399,7 @@ class YtDownloaderApp {
 				}
 
 				const quality = `${format.height || "???"}p${format.fps === 60 ? "60" : ""}`;
-				const vcodecText = format.vcodec?.split(".")[0] || "";
+				const vcodecText = formatVideoCodec(format.vcodec);
 
 				let audioMarkup = `<div class="audio-placeholder"></div>`;
 				if (hasAudio) {
