@@ -335,3 +335,21 @@ export async function getJsRuntimePath() {
 	return "";
 }
 
+/**
+ * Maps raw video codec strings (e.g. avc1, av01, vp9) into user-friendly display names (e.g. H.264, AV1, VP9)
+ * @param {string | null | undefined} codec
+ * @returns {string}
+ */
+export function formatVideoCodec(codec) {
+	if (!codec || codec === "none") return "";
+	const lower = codec.toLowerCase();
+	if (lower.startsWith("avc1") || lower.startsWith("avc") || lower.startsWith("h264")) return "H.264";
+	if (lower.startsWith("av01") || lower.startsWith("av1")) return "AV1";
+	if (lower.startsWith("vp9") || lower.startsWith("vp09")) return "VP9";
+	if (lower.startsWith("vp8") || lower.startsWith("vp08")) return "VP8";
+	if (lower.startsWith("hev1") || lower.startsWith("hvc1") || lower.startsWith("hevc") || lower.startsWith("h265")) return "H.265";
+	if (lower.startsWith("mp4v")) return "MPEG-4";
+	if (lower.startsWith("prores")) return "ProRes";
+	if (lower.startsWith("theora")) return "Theora";
+	return codec.split(".")[0];
+}
