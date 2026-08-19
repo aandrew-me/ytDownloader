@@ -1,5 +1,6 @@
 import {
 	getId as $,
+	escapeHtml,
 	showPopup,
 	formatTime,
 	formatVideoCodec,
@@ -1371,6 +1372,10 @@ class YtDownloaderApp {
 					$(CONSTANTS.DOM_IDS.HOME_OUTPUT_FORMAT_SELECT)?.value ||
 					"auto",
 			},
+			customArgs:
+				$("customArgsInputHome")?.value?.trim() ||
+				$(CONSTANTS.DOM_IDS.CUSTOM_ARGS_INPUT)?.value?.trim() ||
+				"",
 		};
 
 		if (this.state.currentDownloads < this.state.maxActiveDownloads) {
@@ -1486,6 +1491,7 @@ class YtDownloaderApp {
 	 * @param {object} job The download job object.
 	 */
 	_startDownload(job) {
+		this._ensureJobCommand(job);
 		this.state.currentDownloads++;
 		const randomId = "item_" + Math.random().toString(36).substring(2, 12);
 
@@ -1506,7 +1512,18 @@ class YtDownloaderApp {
 	 * @param {AbortController} controller Abort controller for cancelling the download process.
 	 */
 	_runDownloadProcess(randomId, job, controller) {
-		const {downloadArgs, tempFilePath} = this._prepareDownloadArgs(job);
+		this._ensureJobCommand(job);
+		let downloadArgs = job.downloadArgs;
+		let tempFilePath = job.tempFilePath;
+
+		if (job._forceLiveUrl || !downloadArgs) {
+			const prep = this._prepareDownloadArgs(job);
+			downloadArgs = prep.downloadArgs;
+			tempFilePath = prep.tempFilePath;
+			job.downloadArgs = downloadArgs;
+			job.tempFilePath = tempFilePath;
+			job.command = this._formatYtDlpCommand(downloadArgs, job.url);
+		}
 
 		let didRetain = false;
 		if (job.usingInfoJson && !job._forceLiveUrl) {
@@ -1561,7 +1578,7 @@ class YtDownloaderApp {
 				this._updateProgressUI(randomId, progress);
 			})
 			.once("ytDlpEvent", () => {
-				const el = $(`${randomId}_prog`);
+				const el = $(`${randomId}_status`) || $(`${randomId}_prog`);
 				if (el) el.textContent = i18n.__("downloading");
 			})
 			.once("close", (code) => {
@@ -1593,7 +1610,7 @@ class YtDownloaderApp {
 					this._releaseInfoJson(job.infoJsonPath);
 					didRetain = false;
 					job._forceLiveUrl = true;
-					const el = $(`${randomId}_prog`);
+					const el = $(`${randomId}_status`) || $(`${randomId}_prog`);
 					if (el) el.textContent = i18n.__("downloading");
 					this._runDownloadProcess(randomId, job, controller);
 					return;
@@ -1631,7 +1648,7 @@ class YtDownloaderApp {
 					this._releaseInfoJson(job.infoJsonPath);
 					didRetain = false;
 					job._forceLiveUrl = true;
-					const el = $(`${randomId}_prog`);
+					const el = $(`${randomId}_status`) || $(`${randomId}_prog`);
 					if (el) el.textContent = i18n.__("downloading");
 					this._runDownloadProcess(randomId, job, controller);
 					return;
@@ -1648,64 +1665,34 @@ class YtDownloaderApp {
 	}
 
 	/**
+	 * Ensures that a job has its arguments and formatted command computed and frozen.
+	 * @param {object} job The download job object.
+	 * @returns {object} The job with downloadArgs, tempFilePath, and command populated.
+	 */
+	_ensureJobCommand(job) {
+		if (!job.command || !job.downloadArgs) {
+			try {
+				const {downloadArgs, tempFilePath} = this._prepareDownloadArgs(job);
+				job.downloadArgs = downloadArgs;
+				job.tempFilePath = tempFilePath;
+				job.command = this._formatYtDlpCommand(downloadArgs, job.url);
+			} catch (err) {
+				console.error("Error preparing job command:", err);
+				job.command = "yt-dlp " + (job.url ? `"${job.url}"` : "");
+			}
+		}
+		return job;
+	}
+
+	/**
 	 * Queues a download job if the maximum number of active downloads is reached.
 	 * @param {object} job The download job object.
 	 */
 	_queueDownload(job) {
+		this._ensureJobCommand(job);
 		const randomId = "queue_" + Math.random().toString(36).substring(2, 12);
 		this.state.downloadQueue.push({...job, queueId: randomId});
-		const itemHTML = `
-            <div class="item item-fade-in" id="${randomId}">
-                <div class="itemIconBox">
-                    <img src="${
-						job.thumbnail || "../assets/images/thumb.png"
-					}" alt="thumbnail" class="itemIcon" crossorigin="anonymous" onload="this.parentElement.classList.add('loaded')" onerror="this.onerror=null;this.src='../assets/images/thumb.png';this.parentElement.classList.add('loaded');">
-                    ${
-						this._isSafeWebUrl(job.thumbnail)
-							? `<button id="${randomId}_thumbOpen" class="openThumbBtn" title="${i18n.__(
-									"thumbnail",
-								)}"><img src="../assets/images/external-link.png" alt="Open Thumbnail"/></button>`
-							: ""
-					}
-                    <span class="itemType">${i18n.__(
-						job.type === "video" ? "video" : "audio",
-					)}</span>
-                </div>
-                <img src="../assets/images/close.png" class="itemClose" id="${randomId}_close">
-                <div class="itemBody">
-                    <div class="itemTitle">${job.title}</div>
-					<div class="itemChannel">${job.channel}</div>
-					<div class="speedContainer">
-						<span class="itemSpeed" id="${randomId}_speed"></span>
-					</div>
-                    <div id="${randomId}_prog" class="itemProgress">${i18n.__(
-						"preparing",
-					)}</div>
-					<button id="${randomId}_openBtn" class="openFileBtn"><img class="btnIcon" src="../assets/images/external-link.png"/>${i18n.__("openFile")}</button>
-                </div>
-            </div>`;
-		$(CONSTANTS.DOM_IDS.DOWNLOAD_LIST).insertAdjacentHTML(
-			"beforeend",
-			itemHTML,
-		);
-
-		$(`${randomId}_close`)?.addEventListener("click", () =>
-			this._cancelDownload(randomId),
-		);
-
-		if (this._isSafeWebUrl(job.thumbnail)) {
-			$(`${randomId}_thumbOpen`)?.addEventListener("click", (e) => {
-				e.stopPropagation();
-				try {
-					const u = new URL(job.thumbnail);
-					if (u.protocol === "http:" || u.protocol === "https:") {
-						shell.openExternal(job.thumbnail);
-					}
-				} catch (err) {
-					console.error("Invalid thumbnail URL:", err);
-				}
-			});
-		}
+		this._createDownloadUI(randomId, job, true);
 	}
 
 	/**
@@ -1735,14 +1722,17 @@ class YtDownloaderApp {
 	 * @returns {{downloadArgs: string[], tempFilePath: string}}
 	 */
 	_prepareDownloadArgs(job) {
-		const {type, url, title, options, uiSnapshot} = job;
-		const {rangeOption, rangeCmd, subs, subLangs} = options;
+		const type = job.type || "video";
+		const url = job.url || "";
+		const options = job.options || {};
+		const uiSnapshot = job.uiSnapshot || {};
+		const {rangeOption = "", rangeCmd = "", subs = "", subLangs = ""} = options;
 		const {
-			proxy,
+			proxy = "",
 			browserForCookies,
-			videoOutputTemplate,
-			audioOutputTemplate,
-		} = this.state.preferences;
+			videoOutputTemplate = "%(title)s.%(ext)s",
+			audioOutputTemplate = "%(title)s.%(ext)s",
+		} = this.state.preferences || {};
 
 		let format_id, ext, audioForVideoFormat_id, audioFormat;
 
@@ -1955,11 +1945,12 @@ class YtDownloaderApp {
 		if (subLangs) downloadArgs.push(...subLangs.split(/\s+/));
 		if (rangeOption) downloadArgs.push(rangeOption, rangeCmd);
 
-		const homeCustomArgs = ($("customArgsInputHome")?.value || "").trim();
-		const prefCustomArgs = (
-			$(CONSTANTS.DOM_IDS.CUSTOM_ARGS_INPUT)?.value || ""
-		).trim();
-		const customArgsString = homeCustomArgs || prefCustomArgs;
+		const customArgsString =
+			job.customArgs !== undefined
+				? job.customArgs
+				: $("customArgsInputHome")?.value?.trim() ||
+					$(CONSTANTS.DOM_IDS.CUSTOM_ARGS_INPUT)?.value?.trim() ||
+					"";
 		if (customArgsString) {
 			const customArgs = customArgsString.split(/\s+/);
 			downloadArgs.push(...customArgs);
@@ -2071,11 +2062,16 @@ class YtDownloaderApp {
 		}
 
 		console.error("Download Error:", error);
-		const progressEl = $(`${randomId}_prog`);
-		if (progressEl) {
-			progressEl.textContent = i18n.__("errorHoverForDetails");
-			progressEl.title = error.message;
+		const statusEl = $(`${randomId}_status`) || $(`${randomId}_prog`);
+		const fillEl = $(`${randomId}_fill`);
+		const speedEl = $(`${randomId}_speed`);
+		if (statusEl) {
+			statusEl.textContent = i18n.__("errorHoverForDetails");
+			statusEl.title = error.message;
+			statusEl.classList.add("status-error");
 		}
+		if (speedEl) speedEl.textContent = "";
+		if (fillEl) fillEl.style.background = "var(--redBtn, #ef4444)";
 		if (wasActive) {
 			this._processQueue();
 		}
@@ -2608,9 +2604,148 @@ class YtDownloaderApp {
 	}
 
 	/**
-	 * Creates the initial UI element for a new download.
+	 * Formats command arguments into a terminal/shell-friendly command string with proper quoting.
+	 * @param {string[]} args Command arguments
+	 * @param {string} [url] Source video URL
+	 * @returns {string}
 	 */
-	_createDownloadUI(randomId, job) {
+	_formatYtDlpCommand(args = [], url = "") {
+		const bin = this.state.ytDlpPath || "yt-dlp";
+		const binFormatted = bin.includes(" ") ? `"${bin}"` : bin;
+
+		const cleanArgs = [];
+		for (let i = 0; i < args.length; i++) {
+			const arg = args[i];
+			if (arg === "--print-to-file") {
+				i += 2; // skip after_move:filepath and tempFilePath
+				continue;
+			}
+			if (arg === "--load-info-json") {
+				i += 1; // skip json path
+				if (url && !cleanArgs.includes(url)) cleanArgs.push(url);
+				continue;
+			}
+			cleanArgs.push(arg);
+		}
+
+		if (url && !cleanArgs.includes(url)) {
+			cleanArgs.push(url);
+		}
+
+		// Simple CLI flags like -f, -o, -P, -x, --no-playlist, --no-mtime don't need quotes
+		const isSafeFlag = /^--?[a-zA-Z0-9_-]+$/;
+
+		const formattedArgs = cleanArgs.map((arg) => {
+			if (typeof arg !== "string") return `"${String(arg)}"`;
+			if (isSafeFlag.test(arg)) {
+				return arg;
+			}
+			// Wrap URLs, paths, format strings, templates, and arguments in quotes for terminal compatibility
+			const escaped = arg.replace(/"/g, '\\"');
+			return `"${escaped}"`;
+		});
+
+		return [binFormatted, ...formattedArgs].join(" ");
+	}
+
+	/**
+	 * Shows a modal dialog displaying the full yt-dlp command with a one-click copy option.
+	 * @param {string} commandStr The formatted command string.
+	 */
+	_showCommandModal(commandStr) {
+		const existingModal = document.getElementById("cmdModalBackdrop");
+		if (existingModal) existingModal.remove();
+
+		const safeCmd = escapeHtml(commandStr || "yt-dlp");
+		const modalHTML = `
+            <div id="cmdModalBackdrop" class="cmd-modal-backdrop">
+                <div class="cmd-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="cmdModalTitle">
+                    <div class="cmd-modal-header">
+                        <div class="cmd-modal-title" id="cmdModalTitle">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="4 17 10 11 4 5"></polyline>
+                                <line x1="12" y1="19" x2="20" y2="19"></line>
+                            </svg>
+                            <span>yt-dlp Command</span>
+                        </div>
+                        <button class="cmd-modal-close" id="cmdModalCloseBtn" aria-label="Close" title="${i18n.__("close") || "Close"}">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="cmd-modal-body">
+                        <pre class="cmd-code-box" id="cmdCodeText"><code>${safeCmd}</code></pre>
+                    </div>
+                    <div class="cmd-modal-footer">
+                        <button class="cmd-modal-btn cmd-modal-btn-close" id="cmdModalCancelBtn" type="button">${i18n.__("close") || "Close"}</button>
+                        <button class="cmd-modal-btn cmd-modal-btn-copy" id="cmdModalCopyBtn" type="button">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                            </svg>
+                            <span id="cmdModalCopyText">${i18n.__("clickToCopy") || "Copy Command"}</span>
+                        </button>
+                    </div>
+                </div>
+            </div>`;
+
+		document.body.insertAdjacentHTML("beforeend", modalHTML);
+		const backdrop = document.getElementById("cmdModalBackdrop");
+
+		// Trigger entrance animation
+		requestAnimationFrame(() => {
+			backdrop?.classList.add("active");
+		});
+
+		const closeModal = () => {
+			backdrop?.classList.remove("active");
+			document.removeEventListener("keydown", onKeyDown);
+			setTimeout(() => backdrop?.remove(), 200);
+		};
+
+		const onKeyDown = (e) => {
+			if (e.key === "Escape") {
+				closeModal();
+			}
+		};
+		document.addEventListener("keydown", onKeyDown);
+
+		document.getElementById("cmdModalCloseBtn")?.addEventListener("click", closeModal);
+		document.getElementById("cmdModalCancelBtn")?.addEventListener("click", closeModal);
+		backdrop?.addEventListener("click", (e) => {
+			if (e.target === backdrop) closeModal();
+		});
+
+		document.getElementById("cmdModalCopyBtn")?.addEventListener("click", () => {
+			const clipApi = window.electronAPI?.clipboard || clipboard;
+			if (clipApi) {
+				clipApi.writeText(commandStr);
+				const copyTextEl = document.getElementById("cmdModalCopyText");
+				if (copyTextEl) copyTextEl.textContent = i18n.__("copiedText") || "Copied!";
+				this._showPopup(i18n.__("copiedText") || "Command copied to clipboard!");
+				setTimeout(() => {
+					if (copyTextEl) copyTextEl.textContent = i18n.__("clickToCopy") || "Copy Command";
+				}, 2000);
+			}
+		});
+	}
+
+	/**
+	 * Creates the initial UI element for a new download.
+	 * @param {string} randomId The unique ID of the download item element.
+	 * @param {object} job The download job data.
+	 * @param {boolean} [isQueued=false] Whether this item is initially queued.
+	 */
+	_createDownloadUI(randomId, job, isQueued = false) {
+		const safeTitle = escapeHtml(job.title || "Video");
+		const safeChannel = escapeHtml(job.channel || "");
+		const isSafeUrl = this._isSafeWebUrl(job.url);
+		const initialStatus = isQueued
+			? (i18n.__("queued") || "Queued")
+			: (i18n.__("preparing") || "Preparing...");
+
 		const itemHTML = `
             <div class="item item-fade-in" id="${randomId}">
                 <div class="itemIconBox">
@@ -2621,24 +2756,50 @@ class YtDownloaderApp {
 						this._isSafeWebUrl(job.thumbnail)
 							? `<button id="${randomId}_thumbOpen" class="openThumbBtn" title="${i18n.__(
 									"thumbnail",
-								)}"><img src="../assets/images/external-link.png" alt="Open Thumbnail"/></button>`
+								) || "Thumbnail"}" aria-label="Open Thumbnail"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></button>`
 							: ""
 					}
                     <span class="itemType">${i18n.__(
 						job.type === "video" ? "video" : "audio",
 					)}</span>
                 </div>
-                <img src="../assets/images/close.png" class="itemClose" id="${randomId}_close">
+                <button class="itemClose" id="${randomId}_close" title="${i18n.__("cancel") || "Cancel"}" aria-label="Cancel download">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
                 <div class="itemBody">
-                    <div class="itemTitle">${job.title}</div>
-					<div class="itemChannel">${job.channel}</div>
-					<div class="speedContainer">
-						<span class="itemSpeed" id="${randomId}_speed"></span>
+                    <div class="itemTitle" id="${randomId}_title" title="${safeTitle}" ${isSafeUrl ? 'tabindex="0" role="link"' : ""}>${safeTitle}</div>
+					${safeChannel ? `<div class="itemChannel"><svg class="channelIcon" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><span>${safeChannel}</span></div>` : ""}
+					<div class="itemProgressSection" id="${randomId}_progressSection">
+						<div class="itemProgressMeta">
+							<span class="itemProgStatus" id="${randomId}_status">${initialStatus}</span>
+							<div class="itemMetaRight">
+								<span class="itemSpeed" id="${randomId}_speed"></span>
+								<button id="${randomId}_cmdMetaBtn" class="cmdMetaBtn" type="button" title="View yt-dlp Command" aria-label="View yt-dlp command">
+									<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+										<polyline points="4 17 10 11 4 5"></polyline>
+										<line x1="12" y1="19" x2="20" y2="19"></line>
+									</svg>
+								</button>
+							</div>
+						</div>
+						<div id="${randomId}_prog" class="custom-progress">
+							<div class="custom-progress-fill" id="${randomId}_fill" style="width: 0%;"></div>
+						</div>
 					</div>
-                    <div id="${randomId}_prog" class="itemProgress">${i18n.__(
-						"preparing",
-					)}</div>
-					<button id="${randomId}_openBtn" class="openFileBtn"><img class="btnIcon" src="../assets/images/external-link.png"/>${i18n.__("openFile")}</button>
+					<div class="itemActions" id="${randomId}_actions" style="display: none;">
+						<button id="${randomId}_openBtn" class="openFileBtn" type="button">
+							<svg class="btnIcon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+								<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+							</svg>
+							<span>${i18n.__("openFile") || "Open file"}</span>
+						</button>
+						<button id="${randomId}_cmdBtn" class="cmdActionBtn" type="button" title="View yt-dlp Command" aria-label="View yt-dlp command">
+							<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+								<polyline points="4 17 10 11 4 5"></polyline>
+								<line x1="12" y1="19" x2="20" y2="19"></line>
+							</svg>
+						</button>
+					</div>
                 </div>
             </div>`;
 		$(CONSTANTS.DOM_IDS.DOWNLOAD_LIST).insertAdjacentHTML(
@@ -2646,9 +2807,38 @@ class YtDownloaderApp {
 			itemHTML,
 		);
 
-		$(`${randomId}_close`).addEventListener("click", () =>
+		$(`${randomId}_close`)?.addEventListener("click", () =>
 			this._cancelDownload(randomId),
 		);
+
+		const handleShowCommand = () => {
+			this._ensureJobCommand(job);
+			this._showCommandModal(job.command || ("yt-dlp " + (job.url ? `"${job.url}"` : "")));
+		};
+
+		$(`${randomId}_cmdMetaBtn`)?.addEventListener("click", handleShowCommand);
+		$(`${randomId}_cmdBtn`)?.addEventListener("click", handleShowCommand);
+
+		if (isSafeUrl) {
+			const titleEl = $(`${randomId}_title`);
+			if (titleEl) {
+				const openTitleUrl = () => {
+					try {
+						const shellApi = window.electronAPI?.shell || shell;
+						shellApi.openExternal(job.url);
+					} catch (err) {
+						console.error("Error opening URL:", err);
+					}
+				};
+				titleEl.addEventListener("click", openTitleUrl);
+				titleEl.addEventListener("keydown", (e) => {
+					if (e.key === "Enter" || e.key === " ") {
+						e.preventDefault();
+						openTitleUrl();
+					}
+				});
+			}
+		}
 
 		if (this._isSafeWebUrl(job.thumbnail)) {
 			$(`${randomId}_thumbOpen`)?.addEventListener("click", (e) => {
@@ -2656,7 +2846,8 @@ class YtDownloaderApp {
 				try {
 					const u = new URL(job.thumbnail);
 					if (u.protocol === "http:" || u.protocol === "https:") {
-						shell.openExternal(job.thumbnail);
+						const shellApi = window.electronAPI?.shell || shell;
+						shellApi.openExternal(job.thumbnail);
 					}
 				} catch (err) {
 					console.error("Invalid thumbnail URL:", err);
@@ -2670,37 +2861,27 @@ class YtDownloaderApp {
 	 */
 	_updateProgressUI(randomId, progress) {
 		const speedEl = $(`${randomId}_speed`);
-		const progEl = $(`${randomId}_prog`);
-		if (!speedEl || !progEl) return;
-
-		let fillEl = progEl.querySelector(".custom-progress-fill");
-
-		if (!fillEl) {
-			progEl.innerHTML = "";
-
-			const bar = document.createElement("div");
-			bar.className = "custom-progress";
-
-			fillEl = document.createElement("div");
-			fillEl.className = "custom-progress-fill";
-
-			bar.appendChild(fillEl);
-			progEl.appendChild(bar);
-		}
+		const statusEl = $(`${randomId}_status`);
+		const fillEl = $(`${randomId}_fill`);
+		if (!fillEl) return;
 
 		if (progress.percent === 100) {
-			fillEl.style.width = progress.percent + "%";
-			speedEl.textContent = "";
-			progEl.textContent = i18n.__("processing");
+			fillEl.style.width = "100%";
+			if (speedEl) speedEl.textContent = "";
+			if (statusEl) statusEl.textContent = i18n.__("processing") || "Processing...";
 			ipcRenderer.send("progress", 0);
 
 			return;
 		}
 
-		speedEl.textContent = `${i18n.__("speed")}: ${
-			progress.currentSpeed || "0 B/s"
-		}`;
-		fillEl.style.width = progress.percent + "%";
+		const percentNum = typeof progress.percent === "number" ? Math.round(progress.percent) : 0;
+		if (statusEl) {
+			statusEl.textContent = `${i18n.__("downloading") || "Downloading..."} ${percentNum}%`;
+		}
+		if (speedEl) {
+			speedEl.textContent = progress.currentSpeed ? `${progress.currentSpeed}` : "";
+		}
+		fillEl.style.width = `${progress.percent}%`;
 
 		ipcRenderer.send("progress", progress.percent / 100);
 	}
@@ -2709,14 +2890,15 @@ class YtDownloaderApp {
 	 * Updates a download item's UI to show it has completed successfully.
 	 */
 	_showDownloadSuccessUI(randomId, actualFilePath, job) {
-		const progressEl = $(`${randomId}_prog`);
+		const progressSection = $(`${randomId}_progressSection`);
+		const actionsEl = $(`${randomId}_actions`);
 		const openBtn = $(`${randomId}_openBtn`);
+		const speedEl = $(`${randomId}_speed`);
+		const closeBtn = $(`${randomId}_close`);
 		const itemTitle = job?.title || this.state.videoInfo?.title;
 		const itemUrl = job?.url || this.state.videoInfo?.url;
 		const itemDuration = job?.duration ?? this.state.videoInfo?.duration;
 		const thumbnail = job?.thumbnail;
-
-		if (!progressEl) return;
 
 		let fullPath;
 		if (actualFilePath) {
@@ -2778,17 +2960,23 @@ class YtDownloaderApp {
 
 		const ext = fullFilename.split(".").pop();
 
-		progressEl.innerHTML = ""; // Clear progress bar
+		if (progressSection) progressSection.style.display = "none";
+		if (speedEl) speedEl.textContent = "";
+
+		if (actionsEl) {
+			actionsEl.style.display = "flex";
+		}
 
 		if (openBtn) {
-			openBtn.style.display = "flex";
+			openBtn.style.display = "inline-flex";
 			openBtn.onclick = () => {
 				ipcRenderer.send("show-file", fullPath);
 			};
 		}
 
-		progressEl.style.display = "none";
-		$(`${randomId}_speed`).textContent = "";
+		if (closeBtn) {
+			closeBtn.title = i18n.__("close") || "Dismiss";
+		}
 
 		// Send desktop notification
 		new Notification("ytDownloader", {
@@ -3430,6 +3618,10 @@ class YtDownloaderApp {
 						extractFormat: preset.format,
 						extractQuality: "0",
 					},
+					customArgs:
+						$("customArgsInputHome")?.value?.trim() ||
+						$(CONSTANTS.DOM_IDS.CUSTOM_ARGS_INPUT)?.value?.trim() ||
+						"",
 				};
 
 				if (

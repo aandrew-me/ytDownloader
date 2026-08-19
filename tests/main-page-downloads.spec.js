@@ -324,4 +324,85 @@ test.describe("Main Page Download Tests", () => {
 		expect(retryCmd).not.toContain("--load-info-json");
 		expect(retryCmd).toContain(testUrl);
 	});
+
+	test("clicking video title in download item opens video URL in default browser", async () => {
+		const testUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+
+		await page.evaluate((url) => {
+			window.electronAPI.clipboard.writeText(url);
+		}, testUrl);
+
+		await page.click("#pasteUrl");
+		await waitForInfoPanel(page);
+
+		await triggerClick(page, "videoDownload");
+
+		// Wait for download item to appear in download list
+		await page.waitForSelector("#list .item");
+
+		// Verify title element exists and has proper title attribute
+		const titleEl = await page.$("#list .item .itemTitle");
+		expect(titleEl).not.toBeNull();
+		const titleText = await titleEl.innerText();
+		expect(titleText).toContain("Test YouTube Video Title");
+
+		// Verify role and tabindex
+		const role = await titleEl.getAttribute("role");
+		const tabindex = await titleEl.getAttribute("tabindex");
+		expect(role).toBe("link");
+		expect(tabindex).toBe("0");
+
+		// Click the title
+		await titleEl.click();
+
+		// Verify shell.openExternal was called with testUrl
+		await page.waitForFunction(() => (window.electronAPI.shell.getOpenedExternalUrls() || []).length > 0);
+		const openedUrls = await page.evaluate(() => window.electronAPI.shell.getOpenedExternalUrls() || []);
+		expect(openedUrls).toContain(testUrl);
+	});
+
+	test("clicking Command button opens modal showing yt-dlp command with copy button", async () => {
+		const testUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+
+		await page.evaluate((url) => {
+			window.electronAPI.clipboard.writeText(url);
+		}, testUrl);
+
+		await page.click("#pasteUrl");
+		await waitForInfoPanel(page);
+
+		await triggerClick(page, "videoDownload");
+
+		// Wait for download item to appear
+		await page.waitForSelector("#list .item");
+
+		// Find command button (either action button or meta button)
+		const cmdBtn = await page.waitForSelector("#list .item .cmdActionBtn, #list .item .cmdMetaBtn");
+		expect(cmdBtn).not.toBeNull();
+
+		// Click command button
+		await cmdBtn.click();
+
+		// Modal should appear
+		await page.waitForSelector("#cmdModalBackdrop");
+		const codeTextEl = await page.$("#cmdCodeText");
+		expect(codeTextEl).not.toBeNull();
+		const codeText = await codeTextEl.innerText();
+		expect(codeText).toMatch(/yt-dlp|mock-ytdlp/);
+		expect(codeText).toContain("-f");
+		expect(codeText).toContain("dQw4w9WgXcQ");
+
+		// Click copy command button
+		await page.click("#cmdModalCopyBtn");
+
+		// Clipboard should contain the command
+		const copiedClipboardText = await page.evaluate(() => window.electronAPI.clipboard.readText());
+		expect(copiedClipboardText).toMatch(/yt-dlp|mock-ytdlp/);
+		expect(copiedClipboardText).toContain("-f");
+		expect(copiedClipboardText).toContain("dQw4w9WgXcQ");
+
+		// Close modal
+		await page.click("#cmdModalCloseBtn");
+		await page.waitForSelector("#cmdModalBackdrop", { state: "detached" });
+	});
 });

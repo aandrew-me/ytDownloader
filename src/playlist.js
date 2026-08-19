@@ -1,4 +1,4 @@
-import { getId, formatTime } from "./utils.js";
+import { getId, formatTime, escapeHtml } from "./utils.js";
 
 const {
 	clipboard,
@@ -591,21 +591,10 @@ const playlistDownloader = {
 		}
 	},
 
-	escapeHtml(str) {
-		return String(str || "")
-			.replace(/&/g, "&amp;")
-			.replace(/</g, "&lt;")
-			.replace(/>/g, "&gt;")
-			.replace(/"/g, "&quot;")
-			.replace(/'/g, "&#039;");
-	},
-
 	renderSelectiveItems() {
 		if (!this.ui.selectiveItemsList) return;
 		this.ui.selectiveItemsList.innerHTML = "";
 		const fragment = document.createDocumentFragment();
-
-		const escapeHtml = (str) => this.escapeHtml(str);
 
 		this.selectiveState.entries.forEach((entry, index) => {
 			const card = document.createElement("div");
@@ -1421,15 +1410,15 @@ const playlistDownloader = {
 		const safeThumbnail =
 			thumbnailUrl &&
 				/^(https?:\/\/|\/\/|\/|\.\/|\.\.\/|data:|blob:)/i.test(thumbnailUrl)
-				? this.escapeHtml(thumbnailUrl)
+				? escapeHtml(thumbnailUrl)
 				: "../assets/images/thumb.png";
-		const safeAlt = this.escapeHtml(videoInfo.title || "thumbnail");
-		const itemIndex = this.escapeHtml(videoInfo.index ?? this.state.originalCount);
+		const safeAlt = escapeHtml(videoInfo.title || "thumbnail");
+		const itemIndex = escapeHtml(videoInfo.index ?? this.state.originalCount);
 		const rawTitle = videoInfo.title
 			? `${videoInfo.index ?? this.state.originalCount}. ${videoInfo.title}`
 			: itemTitle;
-		const safeTitleText = this.escapeHtml(rawTitle);
-		const safeTypeLabel = this.escapeHtml(itemTypeLabel);
+		const safeTitleText = escapeHtml(rawTitle);
+		const safeTypeLabel = escapeHtml(itemTypeLabel);
 
 		const itemElement = document.createElement("div");
 		itemElement.className = "item playlist-item-card";
@@ -1450,7 +1439,7 @@ const playlistDownloader = {
 						<div class="custom-progress-fill playlist-progress-fill" id="bar${count}"></div>
 					</div>
 					<div class="playlist-progress-meta">
-						<p class="itemProgress playlist-progress-text" id="p${count}">${window.i18n ? this.escapeHtml(window.i18n.__("downloading")) : "Downloading..."}</p>
+						<p class="itemProgress playlist-progress-text" id="p${count}">${window.i18n ? escapeHtml(window.i18n.__("downloading")) : "Downloading..."}</p>
 					</div>
 				</div>
 			</div>
@@ -1595,9 +1584,9 @@ const playlistDownloader = {
 		}
 		if (this.ui.errorBtn) this.ui.errorBtn.style.display = "inline-block";
 		if (this.ui.errorDetails) {
-			this.ui.errorDetails.innerHTML = `<strong>URL: ${this.escapeHtml(
+			this.ui.errorDetails.innerHTML = `<strong>URL: ${escapeHtml(
 				this.state.url
-			)}</strong><br><br>${this.escapeHtml(error?.toString?.() || String(error))}`;
+			)}</strong><br><br>${escapeHtml(error?.toString?.() || String(error))}`;
 		}
 	},
 

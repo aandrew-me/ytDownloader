@@ -222,7 +222,15 @@ contextBridge.exposeInMainWorld("electronAPI", {
 		invoke: (channel, ...args) => ipcRenderer.invoke(channel, ...args),
 	},
 	shell: {
-		openExternal: (url) => shell.openExternal(url),
+		openExternal: (url) => {
+			if (isTest) {
+				if (!global.__openedExternalUrls) global.__openedExternalUrls = [];
+				global.__openedExternalUrls.push(url);
+				return Promise.resolve();
+			}
+			return shell.openExternal(url);
+		},
+		getOpenedExternalUrls: () => (global.__openedExternalUrls ? [...global.__openedExternalUrls] : []),
 		showItemInFolder: (p) => shell.showItemInFolder(p),
 		openPath: (p) => shell.openPath(p),
 	},

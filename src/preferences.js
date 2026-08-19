@@ -1,4 +1,4 @@
-import { getId, showPopup } from "./utils.js";
+import { getId, showPopup, escapeHtml } from "./utils.js";
 
 const {
 	ipcRenderer,
@@ -591,14 +591,6 @@ function initPreferences() {
 		ipcRenderer.send("reload");
 	});
 
-	function escapeHtml(str) {
-		return String(str)
-			.replace(/&/g, "&amp;")
-			.replace(/</g, "&lt;")
-			.replace(/>/g, "&gt;")
-			.replace(/"/g, "&quot;")
-			.replace(/'/g, "&#039;");
-	}
 
 	function updateInputHighlight(inputId, backdropId) {
 		const inputEl = getId(inputId);

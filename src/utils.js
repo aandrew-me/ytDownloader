@@ -12,6 +12,20 @@ export function getId(id) {
 }
 
 /**
+ * Escapes unsafe HTML characters in a string
+ * @param {string} str
+ * @returns {string}
+ */
+export function escapeHtml(str) {
+	return String(str || "")
+		.replace(/&/g, "&amp;")
+		.replace(/</g, "&lt;")
+		.replace(/>/g, "&gt;")
+		.replace(/"/g, "&quot;")
+		.replace(/'/g, "&#039;");
+}
+
+/**
  * Displays a temporary popup toast notification
  * @param {string} text
  * @param {boolean} [isError=false]
