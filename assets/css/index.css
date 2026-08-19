@@ -3745,10 +3745,22 @@ input[type="text"].modernSearchInput {
 }
 
 /* History Page System */
+#view-history.active {
+	display: flex;
+	flex-direction: column;
+	min-height: calc(100vh - 48px);
+	box-sizing: border-box;
+}
+
 .history-container {
 	padding: 20px;
 	max-width: 1200px;
 	margin: 0 auto;
+	width: 100%;
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: column;
+	flex: 1;
 }
 
 .history-controls {
@@ -3815,6 +3827,7 @@ button.danger-btn:active {
 	display: flex;
 	flex-direction: column;
 	gap: 10px;
+	flex: 1;
 }
 
 .history-item {

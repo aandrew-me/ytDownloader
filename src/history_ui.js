@@ -58,22 +58,22 @@ export function renderHistory(historyItems) {
 
 	if (!historyItems || historyItems.length === 0) {
 		const emptyState = document.createElement("div");
-		emptyState.className = "empty-state";
-		emptyState.style.textAlign = "center";
-		emptyState.style.padding = "40px";
-		emptyState.style.opacity = "0.7";
+		emptyState.className = "empty-state-card";
 
 		const icon = document.createElement("div");
-		icon.style.fontSize = "48px";
-		icon.style.marginBottom = "10px";
-		icon.textContent = "📭";
+		icon.className = "empty-state-icon";
+		icon.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="48" height="48">
+			<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+			<polyline points="7 10 12 15 17 10"></polyline>
+			<line x1="12" y1="15" x2="12" y2="3"></line>
+		</svg>`;
 
-		const heading = document.createElement("h2");
-		heading.textContent = t("noDownloadsYet", "No Downloads Yet");
+		const heading = document.createElement("h3");
+		heading.textContent = t("noDownloadsYet", "No downloads yet");
 
 		const text = document.createElement("p");
 		text.textContent = t(
-			"yourDownloadHistoryWillAppearHere",
+			"downloadHistoryPlaceholder",
 			"Your download history will appear here",
 		);
 
