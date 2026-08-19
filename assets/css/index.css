@@ -3,7 +3,10 @@
 /* 1. Base Layout & Body Defaults */
 
 body {
-	font-family: "Inter", "Ubuntu", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	text-rendering: optimizeLegibility;
 	text-align: center;
 	margin: 0;
 	padding: 0;
@@ -32,16 +35,19 @@ body {
 	left: 0;
 	top: 0;
 	bottom: 0;
-	width: 250px;
-	min-width: 250px;
+	width: 280px;
+	min-width: 280px;
 	height: 100vh;
+	font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 	background: var(--box-main, rgba(15, 23, 42, 0.95));
 	backdrop-filter: blur(20px);
 	-webkit-backdrop-filter: blur(20px);
 	border-right: 1px solid var(--box-separation, rgba(255, 255, 255, 0.08));
 	display: flex;
 	flex-direction: column;
-	padding: 16px 8px;
+	padding: 20px 14px 16px 14px;
 	box-sizing: border-box;
 	z-index: 100;
 	user-select: none;
@@ -52,8 +58,8 @@ body {
 }
 
 .sidebar.collapsed {
-	width: 64px;
-	min-width: 64px;
+	width: 68px;
+	min-width: 68px;
 	padding: 16px 0;
 }
 
@@ -64,30 +70,54 @@ body {
 .sidebar-brand {
 	display: flex;
 	align-items: center;
-	gap: 10px;
-	padding: 0 8px 14px 8px;
-	border-bottom: 1px solid var(--box-separation, rgba(255, 255, 255, 0.08));
-	margin-bottom: 15px;
+	justify-content: space-between;
+	gap: 8px;
+	padding: 2px 6px;
+	margin-bottom: 30px;
 	overflow-x: hidden;
 }
 
+.sidebar-brand-left {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	min-width: 0;
+}
+
+.sidebar-brand-icon {
+	width: 32px;
+	height: 32px;
+	border-radius: 8px;
+	flex-shrink: 0;
+	object-fit: contain;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
 .sidebar-brand-title {
-	font-size: 1.1rem;
+	font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 1.15rem;
 	font-weight: 700;
-	letter-spacing: 0.5px;
+	letter-spacing: -0.03em;
 	color: var(--text, #f8fafc);
-	flex: 1;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
+	display: flex;
+	align-items: center;
+}
+
+.sidebar-brand-title .brand-accent {
+	color: var(--blueBtn, #38bdf8);
+	margin-right: 0.5px;
 }
 
 .sidebar-toggle-btn {
-	background: transparent;
-	border: none;
+	background: rgba(255, 255, 255, 0.04);
+	border: 1px solid var(--box-separation, rgba(255, 255, 255, 0.08));
 	color: var(--text-secondary, #94a3b8);
 	cursor: pointer;
-	padding: 6px;
+	width: 34px;
+	height: 34px;
 	border-radius: 8px;
 	display: flex;
 	align-items: center;
@@ -97,13 +127,14 @@ body {
 }
 
 .sidebar-toggle-btn:hover {
-	background: var(--box-separation, rgba(255, 255, 255, 0.08));
+	background: rgba(255, 255, 255, 0.1);
 	color: var(--text, #f8fafc);
+	border-color: rgba(255, 255, 255, 0.18);
 }
 
 .sidebar-toggle-btn svg {
-	width: 18px;
-	height: 18px;
+	width: 17px;
+	height: 17px;
 	stroke: currentColor;
 	fill: none;
 	stroke-width: 2;
@@ -111,55 +142,71 @@ body {
 	stroke-linejoin: round;
 }
 
+.sidebar .sidebar-toggle-btn .sidebar-icon-close {
+	display: block;
+}
+
+.sidebar .sidebar-toggle-btn .sidebar-icon-open {
+	display: none;
+}
+
 .sidebar.collapsed .sidebar-brand {
 	justify-content: center;
 	align-items: center;
-	padding: 0 0 14px 0;
+	padding: 0 0 16px 0;
+	margin-bottom: 12px;
 	gap: 0;
 	width: 100%;
 }
 
-.sidebar.collapsed .sidebar-brand-title {
+.sidebar.collapsed .sidebar-brand-left {
 	display: none;
 }
 
 .sidebar.collapsed .sidebar-toggle-btn {
+	display: flex;
 	width: 44px;
 	height: 44px;
-	padding: 0;
 	margin: 0 auto;
-	border-radius: 12px;
-	justify-content: center;
-	align-items: center;
+	border-radius: 10px;
 }
 
 .sidebar.collapsed .sidebar-toggle-btn svg {
 	width: 20px;
 	height: 20px;
-	margin: 0;
+}
+
+.sidebar.collapsed .sidebar-toggle-btn .sidebar-icon-close {
+	display: none;
+}
+
+.sidebar.collapsed .sidebar-toggle-btn .sidebar-icon-open {
+	display: block;
 }
 
 .sidebar-nav {
 	display: flex;
 	flex-direction: column;
-	gap: 4px;
+	gap: 6px;
 	flex: 1;
 	overflow-x: hidden;
 	overflow-y: auto;
 }
 
 .sidebar-nav .nav-item {
+	font-family: inherit;
+	letter-spacing: -0.01em;
 	display: flex;
 	align-items: center;
-	gap: 10px;
-	padding: 10px;
+	gap: 12px;
+	padding: 10px 14px;
 	border-radius: 10px;
 	color: var(--text-secondary, #94a3b8);
 	text-decoration: none;
 	cursor: pointer;
-	font-size: 0.95rem;
+	font-size: 0.94rem;
 	font-weight: 500;
-	transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+	transition: all 0.15s ease;
 	background: transparent;
 	border: none;
 	width: 100%;
@@ -178,7 +225,7 @@ body {
 	padding: 0;
 	margin: 0 auto;
 	border-left: none;
-	border-radius: 12px;
+	border-radius: 10px;
 	gap: 0;
 }
 
@@ -188,33 +235,33 @@ body {
 
 .sidebar.collapsed .nav-item svg {
 	margin: 0;
-	width: 22px;
-	height: 22px;
+	width: 20px;
+	height: 20px;
 }
 
 .sidebar-nav .nav-item:hover {
-	background: var(--box-separation, rgba(255, 255, 255, 0.06));
-	color: var(--text, #e2e8f0);
-	transform: translateX(3px);
+	background: rgba(255, 255, 255, 0.05);
+	color: var(--text, #f8fafc);
 }
 
 .sidebar.collapsed .nav-item:hover {
-	transform: none;
-	background: var(--box-separation, rgba(255, 255, 255, 0.12));
+	background: rgba(255, 255, 255, 0.08);
 }
 
 .sidebar-nav .nav-item.active {
-	background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(56, 189, 248, 0.05));
-	color: var(--blueBtn, #38bdf8);
-	border-left: 3px solid var(--blueBtn, #38bdf8);
+	background: rgba(255, 255, 255, 0.08);
+	color: var(--text, #ffffff);
 	font-weight: 600;
 }
 
+.sidebar-nav .nav-item.active svg {
+	color: var(--blueBtn, #38bdf8);
+}
+
 .sidebar.collapsed .nav-item.active {
-	border-left: none;
-	background: rgba(56, 189, 248, 0.22);
-	border: 1px solid rgba(56, 189, 248, 0.4);
-	box-shadow: 0 0 12px rgba(56, 189, 248, 0.2);
+	background: rgba(255, 255, 255, 0.12);
+	border: none;
+	box-shadow: none;
 }
 
 .sidebar-nav .nav-item svg {
@@ -226,6 +273,7 @@ body {
 	stroke-linecap: round;
 	stroke-linejoin: round;
 	flex-shrink: 0;
+	transition: color 0.15s ease;
 }
 
 .sidebar-footer {
@@ -253,7 +301,7 @@ body {
 
 .main-content-wrapper {
 	flex: 1;
-	margin-left: 250px;
+	margin-left: 280px;
 	height: 100vh;
 	overflow-y: auto;
 	padding: 24px 32px;
@@ -263,7 +311,7 @@ body {
 }
 
 .main-content-wrapper.sidebar-collapsed {
-	margin-left: 64px;
+	margin-left: 68px;
 }
 
 .page-view {
