@@ -5039,12 +5039,12 @@ body.rtl .header-core {
 }
 
 .dep-segment-btn.active {
-	background: var(--box-toggleOn, rgba(59, 130, 246, 0.12));
+	background: color-mix(in srgb, var(--blueBtn) 18%, transparent);
 	color: var(--blueBtn, #3b82f6);
-	border-color: var(--blueBtn, rgba(59, 130, 246, 0.4));
+	border-color: color-mix(in srgb, var(--blueBtn) 50%, transparent);
 	font-weight: 600;
 	opacity: 1;
-	box-shadow: 0 2px 10px rgba(59, 130, 246, 0.15);
+	box-shadow: 0 2px 10px color-mix(in srgb, var(--blueBtn) 15%, transparent);
 }
 
 .dep-segment-btn:hover:not(.active) {
@@ -5091,8 +5091,8 @@ body.rtl .header-core {
 }
 
 .dep-option-item.active {
-	background: var(--box-toggleOn, rgba(59, 130, 246, 0.08));
-	border-color: var(--blueBtn, rgba(59, 130, 246, 0.4));
+	background: color-mix(in srgb, var(--blueBtn) 10%, transparent);
+	border-color: color-mix(in srgb, var(--blueBtn) 45%, transparent);
 }
 
 .dep-radio-circle {
@@ -5144,9 +5144,9 @@ body.rtl .header-core {
 	font-weight: 600;
 	padding: 3px 10px;
 	border-radius: 12px;
-	background: var(--box-toggleOn, rgba(59, 130, 246, 0.2));
+	background: color-mix(in srgb, var(--blueBtn) 18%, transparent);
 	color: var(--blueBtn, #3b82f6);
-	border: 1px solid var(--blueBtn, rgba(59, 130, 246, 0.3));
+	border: 1px solid color-mix(in srgb, var(--blueBtn) 40%, transparent);
 	display: none;
 }
 
