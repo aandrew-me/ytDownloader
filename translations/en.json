@@ -259,5 +259,13 @@
 	"audioExtension": "Audio Format",
 	"resolution": "Resolution",
 	"format": "Format",
-	"apply": "Apply"
+	"apply": "Apply",
+	"locateBinary": "Browse for yt-dlp...",
+	"useSystemBinary": "Use System yt-dlp",
+	"openAppFolder": "Open Destination Folder",
+	"openGithubReleases": "Download from GitHub",
+	"downloadFailedHint": "Could not download yt-dlp automatically. You can retry, select an existing binary, or download manually.",
+	"quitApp": "Quit",
+	"validatingBinary": "Validating binary...",
+	"invalidBinarySelected": "The selected file is not a valid yt-dlp binary. Please choose a valid yt-dlp executable."
 }

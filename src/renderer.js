@@ -24,6 +24,7 @@ const {
 	accessSync,
 	promises,
 	existsSync,
+	chmodSync,
 	cpSync,
 	copyFileSync,
 	writeFileSync,
@@ -32,6 +33,7 @@ const {
 	readdirSync,
 	statSync,
 	execSync,
+	execFileSync,
 	spawn,
 	env,
 	setEnv,
@@ -89,7 +91,15 @@ const CONSTANTS = {
 		POPUP_BOX: "popupBox",
 		POPUP_BOX_MAC: "popupBoxMac",
 		POPUP_TEXT: "popupText",
+		POPUP_MESSAGE: "popupMessage",
 		POPUP_SVG: "popupSvg",
+		POPUP_HINT: "popupHint",
+		POPUP_ACTIONS: "popupActions",
+		POPUP_RETRY_BTN: "popupRetryBtn",
+		POPUP_BROWSE_BTN: "popupBrowseBtn",
+		POPUP_SYSTEM_BTN: "popupSystemBtn",
+		POPUP_GITHUB_BTN: "popupGithubBtn",
+		POPUP_QUIT_BTN: "popupQuitBtn",
 		YTDLP_DOWNLOAD_PROGRESS: "ytDlpDownloadProgress",
 		UPDATE_POPUP: "updatePopup",
 		UPDATE_POPUP_PROGRESS: "updateProgress",
@@ -632,72 +642,280 @@ class YtDownloaderApp {
 
 	/**
 	 * Checks for the presence of the yt-dlp binary at the default path.
-	 * If not found, it attempts to download it from GitHub.
+	 * If not found, it attempts to download it from GitHub with channel fallbacks.
+	 * If download fails, presents interactive recovery options (retry, browse, system PATH, manual download, quit).
 	 *
 	 * @param {string} defaultYtDlpPath The expected path to the yt-dlp binary.
 	 * @returns {Promise<string>} A promise that resolves with the path to the yt-dlp binary.
-	 * @throws {Error} Throws an error if the download fails.
 	 */
 	async ensureYtDlpBinary(defaultYtDlpPath) {
 		try {
 			await promises.access(defaultYtDlpPath);
-
 			return defaultYtDlpPath;
 		} catch {
-			console.log("yt-dlp not found, downloading...");
+			// File not found, proceed to download attempt
+		}
 
-			$(CONSTANTS.DOM_IDS.POPUP_BOX).style.display = "block";
-			$(CONSTANTS.DOM_IDS.POPUP_SVG).style.display = "inline";
-			document.querySelector("#popupBox p").textContent = i18n.__(
-				"downloadingNecessaryFilesWait",
-			);
+		console.log("yt-dlp not found, downloading...");
 
-			try {
-				const releaseChannel =
-					localStorage.getItem("ytdlpChannel") || "nightly";
-				await YTDlpWrap.downloadFromGithub(
-					defaultYtDlpPath,
-					undefined,
-					undefined,
-					(progress, _d, _t) => {
-						$(
-							CONSTANTS.DOM_IDS.YTDLP_DOWNLOAD_PROGRESS,
-						).textContent =
-							i18n.__("progress") +
-							`: ${(progress * 100).toFixed(2)}%`;
-					},
-					releaseChannel,
-				);
-
-				$(CONSTANTS.DOM_IDS.POPUP_BOX).style.display = "none";
-
-				localStorage.setItem(
-					CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_PATH,
-					defaultYtDlpPath,
-				);
-
-				return defaultYtDlpPath;
-			} catch (downloadError) {
-				$(CONSTANTS.DOM_IDS.YTDLP_DOWNLOAD_PROGRESS).textContent = "";
-
-				console.error("Failed to download yt-dlp:", downloadError);
-
-				document.querySelector("#popupBox p").textContent = i18n.__(
-					"errorFailedFileDownload",
-				);
-				$(CONSTANTS.DOM_IDS.POPUP_SVG).style.display = "none";
-
-				const tryAgainBtn = document.createElement("button");
-				tryAgainBtn.id = "tryBtn";
-				tryAgainBtn.textContent = i18n.__("tryAgain");
-				tryAgainBtn.addEventListener("click", () => {
-					// TODO: Improve it
-					ipcRenderer.send("reload");
-				});
-				$("popup").appendChild(tryAgainBtn);
-
-				throw new Error("Failed to download yt-dlp.");
+		const hiddenDir = join(homedir(), ".ytDownloader");
+		try {
+			if (!existsSync(hiddenDir)) {
+				mkdirSync(hiddenDir, { recursive: true });
 			}
+		} catch (_) {}
+
+		const popupBox = $(CONSTANTS.DOM_IDS.POPUP_BOX);
+		const popupSvg = $(CONSTANTS.DOM_IDS.POPUP_SVG);
+		const popupMsg = $(CONSTANTS.DOM_IDS.POPUP_MESSAGE) || document.querySelector("#popupBox p");
+		const progressEl = $(CONSTANTS.DOM_IDS.YTDLP_DOWNLOAD_PROGRESS);
+		const popupHint = $(CONSTANTS.DOM_IDS.POPUP_HINT);
+		const popupActions = $(CONSTANTS.DOM_IDS.POPUP_ACTIONS);
+		const retryBtn = $(CONSTANTS.DOM_IDS.POPUP_RETRY_BTN);
+		const browseBtn = $(CONSTANTS.DOM_IDS.POPUP_BROWSE_BTN);
+		const systemBtn = $(CONSTANTS.DOM_IDS.POPUP_SYSTEM_BTN);
+		const githubBtn = $(CONSTANTS.DOM_IDS.POPUP_GITHUB_BTN);
+		const quitBtn = $(CONSTANTS.DOM_IDS.POPUP_QUIT_BTN);
+
+		const isValidYtDlpBinary = (filePath) => {
+			try {
+				if (!filePath || !existsSync(filePath)) return false;
+				if (platform() !== "win32") {
+					try {
+						chmodSync(filePath, 0o755);
+					} catch (_) {}
+				}
+				const output = execFileSync(filePath, ["--version"], {
+					timeout: 3500,
+					stdio: ["ignore", "pipe", "pipe"],
+					encoding: "utf-8",
+					windowsHide: true,
+				});
+				const version = output ? output.trim() : "";
+				return /^\d{4}\.\d{2}\.\d{2}/.test(version);
+			} catch (err) {
+				console.warn("Validation of yt-dlp binary failed:", err);
+				return false;
+			}
+		};
+
+		const showDownloadingState = () => {
+			if (popupBox) popupBox.style.display = "block";
+			if (popupSvg) popupSvg.style.display = "flex";
+			if (popupActions) popupActions.style.display = "none";
+			if (popupHint) popupHint.style.display = "none";
+			if (popupMsg) {
+				popupMsg.textContent = i18n.__("downloadingNecessaryFilesWait");
+			}
+			if (progressEl) progressEl.textContent = "";
+		};
+
+		const tryDownload = async () => {
+			const preferredChannel =
+				localStorage.getItem("ytdlpChannel") || "nightly";
+			const channelsToTry = [
+				preferredChannel,
+				"stable",
+				"master",
+			].filter((val, idx, arr) => arr.indexOf(val) === idx);
+
+			let lastError = null;
+			for (const channel of channelsToTry) {
+				try {
+					console.log(`Attempting yt-dlp download from channel: ${channel}`);
+					showDownloadingState();
+					await YTDlpWrap.downloadFromGithub(
+						defaultYtDlpPath,
+						undefined,
+						undefined,
+						(progress) => {
+							if (progressEl) {
+								progressEl.textContent =
+									i18n.__("progress") +
+									`: ${(progress * 100).toFixed(2)}%`;
+							}
+						},
+						channel,
+					);
+
+					if (!isValidYtDlpBinary(defaultYtDlpPath)) {
+						try {
+							if (existsSync(defaultYtDlpPath)) {
+								unlinkSync(defaultYtDlpPath);
+							}
+						} catch (_) {}
+						throw new Error(
+							`Downloaded binary from channel ${channel} failed integrity check.`,
+						);
+					}
+
+					if (popupBox) popupBox.style.display = "none";
+					localStorage.setItem(
+						CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_PATH,
+						defaultYtDlpPath,
+					);
+					return defaultYtDlpPath;
+				} catch (err) {
+					console.warn(`yt-dlp download failed on channel ${channel}:`, err);
+					lastError = err;
+				}
+			}
+			throw lastError || new Error("Failed to download yt-dlp.");
+		};
+
+		try {
+			return await tryDownload();
+		} catch (initialError) {
+			console.error("All download channels failed:", initialError);
+
+			return new Promise((resolve) => {
+				const showRecoveryUI = () => {
+					if (popupBox) popupBox.style.display = "block";
+					if (popupSvg) popupSvg.style.display = "none";
+					if (progressEl) progressEl.textContent = "";
+					if (popupMsg) {
+						popupMsg.textContent = i18n.__("errorFailedFileDownload");
+					}
+					if (popupHint) {
+						popupHint.textContent = i18n.__("downloadFailedHint");
+						popupHint.style.color = "";
+						popupHint.style.display = "block";
+					}
+
+					let detectedSystemPath = null;
+					try {
+						if (platform() === "win32") {
+							detectedSystemPath = execSync("where yt-dlp")
+								.toString()
+								.split(/\r?\n/)[0]
+								.trim();
+						} else {
+							detectedSystemPath = execSync("command -v yt-dlp")
+								.toString()
+								.trim();
+						}
+						if (detectedSystemPath && !isValidYtDlpBinary(detectedSystemPath)) {
+							detectedSystemPath = null;
+						}
+					} catch (_) {
+						detectedSystemPath = null;
+					}
+
+					if (systemBtn) {
+						if (detectedSystemPath) {
+							systemBtn.style.display = "flex";
+							systemBtn.onclick = () => {
+								localStorage.setItem(
+									CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_SOURCE,
+									CONSTANTS.YT_DLP_SOURCE.SYSTEM,
+								);
+								localStorage.setItem(
+									CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_PATH,
+									detectedSystemPath,
+								);
+
+								const depYtdlpSource = $("depYtdlpSource");
+								if (depYtdlpSource) {
+									depYtdlpSource.value = "system";
+									depYtdlpSource.dispatchEvent(new Event("change"));
+								}
+
+								if (popupBox) popupBox.style.display = "none";
+								cleanupListeners();
+								resolve(detectedSystemPath);
+							};
+						} else {
+							systemBtn.style.display = "none";
+						}
+					}
+
+					if (popupActions) popupActions.style.display = "flex";
+				};
+
+				const cleanupListeners = () => {
+					if (retryBtn) retryBtn.onclick = null;
+					if (browseBtn) browseBtn.onclick = null;
+					if (githubBtn) githubBtn.onclick = null;
+					if (quitBtn) quitBtn.onclick = null;
+					if (systemBtn) systemBtn.onclick = null;
+				};
+
+				if (retryBtn) {
+					retryBtn.onclick = async () => {
+						try {
+							const downloadedPath = await tryDownload();
+							cleanupListeners();
+							resolve(downloadedPath);
+						} catch (retryErr) {
+							console.error("Retry failed:", retryErr);
+							showRecoveryUI();
+						}
+					};
+				}
+
+				if (browseBtn) {
+					browseBtn.onclick = async () => {
+						try {
+							const chosenPath = await ipcRenderer.invoke("select-ytdlp-file");
+							if (!chosenPath) return;
+
+							if (!isValidYtDlpBinary(chosenPath)) {
+								if (popupHint) {
+									popupHint.textContent = i18n.__("invalidBinarySelected");
+									popupHint.style.color = "var(--redBtn, #ef4444)";
+									popupHint.style.display = "block";
+								}
+								return;
+							}
+
+							// Copy verified binary to where yt-dlp is usually placed
+							if (chosenPath !== defaultYtDlpPath) {
+								copyFileSync(chosenPath, defaultYtDlpPath);
+								if (platform() !== "win32") {
+									try {
+										chmodSync(defaultYtDlpPath, 0o755);
+									} catch (_) {}
+								}
+							}
+
+							localStorage.setItem(
+								CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_PATH,
+								defaultYtDlpPath,
+							);
+							localStorage.setItem(
+								CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_SOURCE,
+								"bundled",
+							);
+
+							const depYtdlpSource = $("depYtdlpSource");
+							if (depYtdlpSource) {
+								depYtdlpSource.value = "bundled";
+								depYtdlpSource.dispatchEvent(new Event("change"));
+							}
+
+							if (popupBox) popupBox.style.display = "none";
+							cleanupListeners();
+							resolve(defaultYtDlpPath);
+						} catch (dialogErr) {
+							console.error("Browse failed:", dialogErr);
+						}
+					};
+				}
+
+				if (githubBtn) {
+					githubBtn.onclick = () => {
+						shell.openExternal("https://github.com/yt-dlp/yt-dlp/releases");
+					};
+				}
+
+				if (quitBtn) {
+					quitBtn.onclick = () => {
+						ipcRenderer.send("quit");
+					};
+				}
+
+				showRecoveryUI();
+			});
 		}
 	}
 
