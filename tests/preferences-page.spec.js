@@ -213,6 +213,25 @@ test.describe("Preferences Page Tests", () => {
 	test("proxy and custom yt-dlp arguments update localStorage", async () => {
 		await page.click('button[data-tab="advanced"]');
 
+		// Test proxy mode selection
+		await page.selectOption("#proxyMode", "none");
+		await expect(page.locator("#customProxyBox")).toBeHidden();
+		await expect(page.locator("#systemProxyBox")).toBeHidden();
+		let savedProxyMode = await page.evaluate(() => localStorage.getItem("proxyMode"));
+		expect(savedProxyMode).toBe("none");
+
+		await page.selectOption("#proxyMode", "system");
+		await expect(page.locator("#customProxyBox")).toBeHidden();
+		await expect(page.locator("#systemProxyBox")).toBeVisible();
+		savedProxyMode = await page.evaluate(() => localStorage.getItem("proxyMode"));
+		expect(savedProxyMode).toBe("system");
+
+		await page.selectOption("#proxyMode", "custom");
+		await expect(page.locator("#customProxyBox")).toBeVisible();
+		await expect(page.locator("#systemProxyBox")).toBeHidden();
+		savedProxyMode = await page.evaluate(() => localStorage.getItem("proxyMode"));
+		expect(savedProxyMode).toBe("custom");
+
 		const proxyUrl = "http://127.0.0.1:8080";
 		await page.fill("#proxyTxt", proxyUrl);
 		// Dispatch change event for input

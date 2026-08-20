@@ -233,6 +233,37 @@ test.describe("Preferences Integration Tests", () => {
 		expect(downloadCmd).toContain(proxyUrl);
 	});
 
+	test("proxy is not included when proxyMode is none", async () => {
+		const proxyUrl = "http://127.0.0.1:8080";
+		const res = await launchApp({
+			proxyMode: "none",
+			proxy: proxyUrl,
+		});
+		electronApp = res.app;
+		page = res.page;
+
+		const testUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+		await page.evaluate((url) => window.electronAPI.clipboard.writeText(url), testUrl);
+
+		await page.click("#pasteUrl");
+		await waitForInfoPanel(page);
+
+		await clearExecutedCommands(page);
+
+		await triggerClick(page, "videoDownload");
+
+		await page.waitForFunction(() => {
+			const cmds = window.__executedCommands || [];
+			return cmds.some((cmd) => cmd.includes("-f"));
+		});
+
+		const commands = await getExecutedCommands(page);
+		const downloadCmd = commands.find((cmd) => cmd.includes("-f"));
+
+		expect(downloadCmd).toBeDefined();
+		expect(downloadCmd).not.toContain("--proxy");
+	});
+
 	test("custom yt-dlp options preference is appended to yt-dlp command", async () => {
 		const customArgs = "--no-check-certificates --geo-bypass";
 		const res = await launchApp({

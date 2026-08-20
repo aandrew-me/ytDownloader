@@ -126,6 +126,7 @@ const CONSTANTS = {
 		COOKIE_SOURCE: "cookieSource",
 		NETSCAPE_COOKIES: "netscapeCookies",
 		BROWSER_COOKIES: "browser",
+		PROXY_MODE: "proxyMode",
 		PROXY: "proxy",
 		AUTO_UPDATE: "autoUpdate",
 		CLOSE_TO_TRAY: "closeToTray",
@@ -175,6 +176,7 @@ class YtDownloaderApp {
 				audioQuality: "",
 				videoCodec: "avc1",
 				showMoreFormats: false,
+				proxyMode: "system",
 				proxy: "",
 				cookieSource: "none",
 				cookiesPath: "",
@@ -942,10 +944,17 @@ class YtDownloaderApp {
 			localStorage.getItem(
 				CONSTANTS.LOCAL_STORAGE_KEYS.SHOW_MORE_FORMATS,
 			) === "true";
-		prefs.proxy =
-			localStorage.getItem(CONSTANTS.LOCAL_STORAGE_KEYS.PROXY) || "";
+		prefs.proxyMode =
+			localStorage.getItem(CONSTANTS.LOCAL_STORAGE_KEYS.PROXY_MODE) ||
+			(localStorage.getItem(CONSTANTS.LOCAL_STORAGE_KEYS.PROXY)
+				? "custom"
+				: "system");
 
-		if (!prefs.proxy) {
+		if (prefs.proxyMode === "custom") {
+			prefs.proxy =
+				localStorage.getItem(CONSTANTS.LOCAL_STORAGE_KEYS.PROXY) || "";
+		} else if (prefs.proxyMode === "system") {
+			prefs.proxy = "";
 			try {
 				const systemProxy = await ipcRenderer.invoke(
 					"get-system-proxy",
@@ -959,6 +968,8 @@ class YtDownloaderApp {
 			} catch (err) {
 				console.error("Failed to get system proxy:", err);
 			}
+		} else {
+			prefs.proxy = "";
 		}
 
 		prefs.cookieSource =
