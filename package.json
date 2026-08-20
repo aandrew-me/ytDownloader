@@ -35,7 +35,7 @@
 	"devDependencies": {
 		"@playwright/test": "^1.45.0",
 		"electron": "^30.5.1",
-		"electron-builder": "^26.0.12",
+		"electron-builder": "^26.15.3",
 		"typescript": "^5.3.3"
 	},
 	"build": {
@@ -87,6 +87,9 @@
 		"directories": {
 			"buildResources": "resources",
 			"output": "release"
+		},
+		"toolsets": {
+			"appimage": "1.0.3"
 		},
 		"linux": {
 			"target": [
