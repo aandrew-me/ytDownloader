@@ -3200,7 +3200,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
 .prefBox .ss-main .ss-values .ss-single {
 	margin: 0;
-	padding: 0 4px;
+	padding: 4px;
 	font-size: 0.95rem;
 	color: var(--text);
 }
@@ -4313,15 +4313,14 @@ body.rtl .template-item-header {
 	border-radius: 0;
 }
 
-.outputTemplateItem,
-.ytdlpInfoItem,
-#ytDlpArgBox {
+.ytdlpInfoItem {
 	background-color: var(--box-separation);
 }
 
 #ytDlpArgBox {
 	padding: 8px;
 	border-radius: 8px;
+	text-align: left;
 }
 
 #outputTemplateBox {
@@ -4599,10 +4598,17 @@ input:checked+.slider:before {
 	opacity: 0.7;
 }
 
+.pref-label-inline {
+	display: inline-flex;
+	align-items: baseline;
+	gap: 8px;
+}
+
 .link-info {
 	color: var(--blueBtn);
 	text-decoration: none;
 	cursor: pointer;
+	font-size: 0.85rem;
 }
 
 .link-info:hover {
