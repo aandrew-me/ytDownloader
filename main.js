@@ -390,6 +390,28 @@ function registerIpcHandlers() {
 		}
 	});
 
+	ipcMain.handle("select-ytdlp-file", async () => {
+		if (!appState.mainWindow) return null;
+		const isWin = process.platform === "win32";
+		const { canceled, filePaths } = await dialog.showOpenDialog(
+			appState.mainWindow,
+			{
+				properties: ["openFile"],
+				filters: [
+					{
+						name: isWin ? "Executable (yt-dlp.exe)" : "Executable (yt-dlp)",
+						extensions: isWin ? ["exe", "*"] : ["*"],
+					},
+					{ name: "All Files", extensions: ["*"] },
+				],
+			},
+		);
+		if (!canceled && filePaths.length > 0) {
+			return filePaths[0];
+		}
+		return null;
+	});
+
 	ipcMain.handle("get-cookies-path", () => {
 		return path.join(USER_DATA_PATH, "cookies.txt");
 	});

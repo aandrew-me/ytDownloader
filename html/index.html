@@ -27,7 +27,7 @@
 <body>
     <div id="popupBox">
         <div id="popup">
-            <p data-translate="downloadingNecessaryFilesWait">Please wait, necessary files are being downloaded</p>
+            <p id="popupMessage" data-translate="downloadingNecessaryFilesWait">Please wait, necessary files are being downloaded</p>
             <div id="popupSvg" class="modern-loading-spinner" style="margin: 12px auto;" aria-hidden="true">
                 <svg viewBox="0 0 38 38" class="spinner-svg">
                     <circle class="spinner-track" cx="19" cy="19" r="15" fill="none" stroke-width="3.5"></circle>
@@ -35,6 +35,16 @@
                 </svg>
             </div>
             <p id="ytDlpDownloadProgress"></p>
+            <p id="popupHint" class="popup-hint" style="display: none;"></p>
+            <div id="popupActions" class="popup-actions-grid" style="display: none;">
+                <button type="button" id="popupRetryBtn" class="popup-btn popup-btn-primary" data-translate="tryAgain">Try again</button>
+                <button type="button" id="popupBrowseBtn" class="popup-btn popup-btn-secondary" data-translate="locateBinary">Browse for yt-dlp...</button>
+                <button type="button" id="popupSystemBtn" class="popup-btn popup-btn-secondary" style="display: none;" data-translate="useSystemBinary">Use System yt-dlp</button>
+                <div class="popup-links-row">
+                    <button type="button" id="popupGithubBtn" class="popup-link-btn" data-translate="openGithubReleases">Download from GitHub</button>
+                    <button type="button" id="popupQuitBtn" class="popup-link-btn quit-link" data-translate="quitApp">Quit</button>
+                </div>
+            </div>
         </div>
     </div>
 

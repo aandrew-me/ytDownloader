@@ -3,10 +3,60 @@ const path = require("path");
 const os = require("os");
 const fs = require("fs");
 const originalFs = require("original-fs");
-const { exec, execSync, spawn, spawnSync } = require("child_process");
+const { exec, execSync, spawn, spawnSync, execFileSync } = require("child_process");
+const https = require("https");
+const http = require("http");
 const crypto = require("crypto");
 const si = require("systeminformation");
 const { default: YTDlpWrap } = require("yt-dlp-wrap-plus");
+
+// Fix unhandled request-level network error (e.g. getaddrinfo ENOTFOUND), follow redirects, and ensure User-Agent header in yt-dlp-wrap-plus
+if (YTDlpWrap && typeof YTDlpWrap.createGetMessage === "function") {
+	const fetchWithRedirects = (url, redirectCount = 0) => {
+		if (redirectCount > 10) {
+			return Promise.reject(new Error("Too many redirects"));
+		}
+		return new Promise((resolve, reject) => {
+			try {
+				const client = url.startsWith("https") ? https : http;
+				const options = {
+					headers: {
+						"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 ytDownloader",
+						"Accept": "*/*",
+					},
+				};
+				const req = client.get(url, options, (httpResponse) => {
+					const { statusCode, headers } = httpResponse;
+					httpResponse.on("error", (e) => reject(e));
+
+					// Follow 3xx redirects
+					if (statusCode >= 300 && statusCode < 400 && headers.location) {
+						const nextUrl = new URL(headers.location, url).toString();
+						httpResponse.resume(); // drain intermediate stream
+						return resolve(fetchWithRedirects(nextUrl, redirectCount + 1));
+					}
+
+					// Reject on HTTP errors
+					if (statusCode < 200 || statusCode >= 300) {
+						httpResponse.resume();
+						return reject(
+							new Error(`HTTP ${statusCode}: ${httpResponse.statusMessage || "Download failed"}`),
+						);
+					}
+
+					resolve(httpResponse);
+				});
+				req.on("error", (e) => reject(e));
+			} catch (err) {
+				reject(err);
+			}
+		});
+	};
+
+	YTDlpWrap.createGetMessage = function (url) {
+		return fetchWithRedirects(url, 0);
+	};
+}
 
 const isTest = process.env.NODE_ENV === "test" || process.env.YTDOWNLOADER_TEST === "true" || (process.argv && process.argv.includes("--is-test"));
 
@@ -324,6 +374,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	writeFileSync: (p, data, options) => fs.writeFileSync(p, data, options),
 	mkdirSync: (p, options) => fs.mkdirSync(p, options),
 	unlinkSync: (p) => fs.unlinkSync(p),
+	chmodSync: (p, mode) => fs.chmodSync(p, mode),
 	copyFileSync: (src, dest, flags) => fs.copyFileSync(src, dest, flags),
 	cpSync: (src, dest, options) => fs.cpSync ? fs.cpSync(src, dest, options) : null,
 	accessSync: (p, mode) => {
@@ -358,6 +409,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	spawnSync: (command, args, options) => spawnSync(command, args, options),
 	exec: (command, options, callback) => exec(command, options, callback),
 	execSync: (command, options) => execSync(command, { encoding: "utf-8", ...options }),
+	execFileSync: (file, args, options) => execFileSync(file, args, { encoding: "utf-8", ...options }),
 	si: {
 		graphics: () => si.graphics(),
 	},
