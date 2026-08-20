@@ -1385,6 +1385,20 @@
                         <section class="settings-section">
                             <div class="prefBox">
                                 <span id="proxyTitle" data-translate="proxy">Proxy</span>
+                                <select id="proxyMode">
+                                    <option value="none" data-translate="none">None</option>
+                                    <option value="system" data-translate="proxySystem">System</option>
+                                    <option value="custom" data-translate="proxyCustom">Custom</option>
+                                </select>
+                            </div>
+
+                            <div class="prefBox" id="systemProxyBox" style="display: none;">
+                                <span id="systemProxyTxt" data-translate="systemProxy">System Proxy</span>
+                                <span id="systemProxyVal" data-translate="checking" style="color: var(--color-subtext, #888); font-family: monospace; font-size: 0.95rem; user-select: text;">Checking...</span>
+                            </div>
+
+                            <div class="prefBox" id="customProxyBox" style="display: none;">
+                                <span id="customProxyTxt" data-translate="customProxy">Custom Proxy URL</span>
                                 <input type="text" id="proxyTxt" placeholder="http://localhost:8080"
                                     pattern="^(https?:\/\/|socks5:\/\/)?[a-zA-Z0-9.\-]+:\d+$"
                                     title="Examples: localhost:8080, http://localhost:8080, https://example.com:443, socks5://127.0.0.1:9050">

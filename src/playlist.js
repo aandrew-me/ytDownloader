@@ -1458,12 +1458,25 @@ const playlistDownloader = {
 			"%(playlist_index)s.%(title)s.%(ext)s";
 
 		// Proxy, cookies, config file
-		this.config.proxy = localStorage.getItem("proxy") || "";
+		const proxyMode =
+			localStorage.getItem("proxyMode") ||
+			(localStorage.getItem("proxy") ? "custom" : "system");
 
-		if (!this.config.proxy) {
-			const proxy = await ipcRenderer.invoke("get-system-proxy");
-			console.log("Using system proxy: " + proxy);
-			this.config.proxy = proxy;
+		if (proxyMode === "custom") {
+			this.config.proxy = localStorage.getItem("proxy") || "";
+		} else if (proxyMode === "system") {
+			this.config.proxy = "";
+			try {
+				const proxy = await ipcRenderer.invoke("get-system-proxy");
+				if (proxy) {
+					console.log("Using system proxy: " + proxy);
+					this.config.proxy = proxy;
+				}
+			} catch (err) {
+				console.error("Failed to get system proxy:", err);
+			}
+		} else {
+			this.config.proxy = "";
 		}
 
 		const cookieSource =

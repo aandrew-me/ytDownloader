@@ -547,7 +547,61 @@ function initPreferences() {
 	bindSelectToStorage("preferredVideoCodec", "preferredVideoCodec");
 
 	// Proxy Setting Updates
+	const proxyModeSelect = getId("proxyMode");
+	const systemProxyBox = getId("systemProxyBox");
+	const systemProxyVal = getId("systemProxyVal");
+	const customProxyBox = getId("customProxyBox");
 	const proxyEl = getId("proxyTxt");
+
+	const savedProxyMode =
+		localStorage.getItem("proxyMode") ||
+		(localStorage.getItem("proxy") ? "custom" : "system");
+
+	async function updateSystemProxyDisplay() {
+		if (!systemProxyVal) return;
+		try {
+			systemProxyVal.textContent =
+				window.i18n?.__("checking") || "Checking...";
+			const sysProxy = await ipcRenderer.invoke("get-system-proxy");
+			if (sysProxy) {
+				systemProxyVal.textContent = sysProxy;
+			} else {
+				const directTxt =
+					window.i18n?.__("noSystemProxyDetected") ||
+					"None (Direct connection)";
+				systemProxyVal.textContent = directTxt;
+			}
+		} catch (e) {
+			systemProxyVal.textContent =
+				window.i18n?.__("noSystemProxyDetected") ||
+				"None (Direct connection)";
+		}
+	}
+
+	function updateProxyModeUI(mode) {
+		if (customProxyBox) {
+			customProxyBox.style.display = mode === "custom" ? "flex" : "none";
+		}
+		if (systemProxyBox) {
+			systemProxyBox.style.display = mode === "system" ? "flex" : "none";
+			if (mode === "system") {
+				updateSystemProxyDisplay();
+			}
+		}
+	}
+
+	if (proxyModeSelect) {
+		proxyModeSelect.value = savedProxyMode;
+		updateProxyModeUI(savedProxyMode);
+
+		const updateProxyMode = (e) => {
+			const newMode = e.target.value;
+			localStorage.setItem("proxyMode", newMode);
+			updateProxyModeUI(newMode);
+		};
+		proxyModeSelect.addEventListener("change", updateProxyMode);
+	}
+
 	if (proxyEl) {
 		const savedProxy = localStorage.getItem("proxy");
 		if (savedProxy) proxyEl.value = savedProxy;
