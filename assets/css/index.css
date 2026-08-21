@@ -1151,10 +1151,19 @@ img {
 	background: color-mix(in srgb, var(--box-separation) 70%, var(--text) 30%);
 }
 
-.itemClose {
+.itemTopActions {
 	position: absolute;
 	top: 10px;
 	right: 10px;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	z-index: 2;
+}
+
+.itemPause,
+.itemClose {
+	position: static;
 	cursor: pointer;
 	width: 28px;
 	height: 28px;
@@ -1168,7 +1177,13 @@ img {
 	padding: 0;
 	transition: background-color 0.2s ease, transform 0.2s ease, color 0.2s ease;
 	opacity: 0.75;
-	z-index: 2;
+}
+
+.itemPause:hover {
+	background: var(--blueBtn, #3b82f6);
+	color: #ffffff;
+	opacity: 1;
+	transform: scale(1.05);
 }
 
 .itemClose:hover {

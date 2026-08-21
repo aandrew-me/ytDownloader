@@ -92,11 +92,12 @@ async function launchApp(customLocalStorage = {}, customMetadata = DEFAULT_MOCK_
 		window.__executedCommands = [];
 		window.__mockMetadata = meta;
 
-		const createMockProcess = (args) => {
+		const createMockProcess = (args, options = {}, abortSignal = null) => {
 			window.__executedCommands.push(args);
 			const callbacks = {};
 			const stdoutCbs = [];
 			const stderrCbs = [];
+			let isClosed = false;
 
 			const procWrapper = {
 				ytDlpProcess: {
@@ -129,7 +130,26 @@ async function launchApp(customLocalStorage = {}, customMetadata = DEFAULT_MOCK_
 				killed: false,
 			};
 
+			const sig = abortSignal || options?.signal;
+			if (sig) {
+				sig.addEventListener("abort", () => {
+					if (isClosed) return;
+					isClosed = true;
+					procWrapper.killed = true;
+					procWrapper.ytDlpProcess.killed = true;
+					(callbacks["close"] || []).forEach((cb) => cb(null));
+				});
+			}
+
+			const delay =
+				!args.includes("-j") &&
+				!args.includes("-J") &&
+				window.__mockDownloadDelay
+					? window.__mockDownloadDelay
+					: 10;
+
 			setTimeout(() => {
+				if (isClosed) return;
 				if (args.includes("-j") || args.includes("-J")) {
 					if (args.includes("--flat-playlist")) {
 						const playlistData = {
@@ -167,19 +187,28 @@ async function launchApp(customLocalStorage = {}, customMetadata = DEFAULT_MOCK_
 					window.__mockFailOnLoadInfoJson = false;
 					(callbacks["close"] || []).forEach((cb) => cb(1));
 				} else {
+					stdoutCbs.forEach((cb) =>
+						cb("[download] Destination: mock_download_file.mp4\n"),
+					);
 					(callbacks["progress"] || []).forEach((cb) =>
-						cb({ percent: 100 }),
+						cb({ percent: 50, currentSpeed: "2.5MiB/s" }),
 					);
 					(callbacks["ytDlpEvent"] || []).forEach((cb) => cb());
-					(callbacks["close"] || []).forEach((cb) => cb(0));
+					if (!window.__mockStayInProgress) {
+						(callbacks["progress"] || []).forEach((cb) =>
+							cb({ percent: 100 }),
+						);
+						(callbacks["close"] || []).forEach((cb) => cb(0));
+					}
 				}
-			}, 10);
+			}, delay);
 
 			return procWrapper;
 		};
 
 		window.__mockYtDlp = {
-			exec: (args) => createMockProcess(args),
+			exec: (args, options, abortSignal) =>
+				createMockProcess(args, options, abortSignal),
 			execPromise: async () => JSON.stringify(window.__mockMetadata),
 		};
 

@@ -376,9 +376,9 @@ test.describe("Main Page Download Tests", () => {
 		// Wait for download item to appear
 		await page.waitForSelector("#list .item");
 
-		// Find command button (either action button or meta button)
-		const cmdBtn = await page.waitForSelector("#list .item .cmdActionBtn, #list .item .cmdMetaBtn");
-		expect(cmdBtn).not.toBeNull();
+		// Find visible command button (either action button or meta button)
+		const cmdBtn = page.locator("#list .item .cmdActionBtn:visible, #list .item .cmdMetaBtn:visible").first();
+		await cmdBtn.waitFor({ state: "visible" });
 
 		// Click command button
 		await cmdBtn.click();
@@ -405,4 +405,58 @@ test.describe("Main Page Download Tests", () => {
 		await page.click("#cmdModalCloseBtn");
 		await page.waitForSelector("#cmdModalBackdrop", { state: "detached" });
 	});
+
+	test("download item has pause/resume button which pauses and resumes download", async () => {
+		const testUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+
+		// Instruct mock to stay in progress so download doesn't immediately close
+		await page.evaluate(() => {
+			window.__mockStayInProgress = true;
+		});
+
+		await page.evaluate((url) => {
+			window.electronAPI.clipboard.writeText(url);
+		}, testUrl);
+
+		await page.click("#pasteUrl");
+		await waitForInfoPanel(page);
+
+		await triggerClick(page, "videoDownload");
+
+		// Wait for download item and pause button to appear
+		const pauseBtn = await page.waitForSelector("#list .item .itemPause");
+		expect(pauseBtn).not.toBeNull();
+
+		// Initially, title should be "Pause"
+		const initialTitle = await pauseBtn.getAttribute("title");
+		expect(initialTitle).toMatch(/Pause/i);
+
+		// Click pause
+		await pauseBtn.click();
+
+		// Status should update to "Paused"
+		await page.waitForFunction(() => {
+			const statusEl = document.querySelector("#list .item .itemProgStatus");
+			return statusEl && statusEl.textContent.includes("Paused");
+		});
+
+		// Pause button title should now be "Resume"
+		const pausedTitle = await pauseBtn.getAttribute("title");
+		expect(pausedTitle).toMatch(/Resume/i);
+
+		// Clear mock stay in progress flag so resuming can complete
+		await page.evaluate(() => {
+			window.__mockStayInProgress = false;
+		});
+
+		// Click resume
+		await pauseBtn.click();
+
+		// Download should resume and complete
+		await page.waitForSelector("#list .item .itemActions", {
+			state: "visible",
+			timeout: 5000,
+		});
+	});
 });
+
