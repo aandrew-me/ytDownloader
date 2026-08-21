@@ -189,6 +189,8 @@ class YtDownloaderApp {
 			downloadControllers: new Map(),
 			downloadedItems: new Set(),
 			downloadQueue: [],
+			pausedJobs: new Map(),
+			activeJobs: new Map(),
 			mode: "single",
 			batchQueue: [],
 			batchPreset: {
@@ -1718,14 +1720,33 @@ class YtDownloaderApp {
 	/**
 	 * Starts the download process for a given job.
 	 * @param {object} job The download job object.
+	 * @param {string|null} existingId Optional existing ID if resuming a download.
 	 */
-	_startDownload(job) {
+	_startDownload(job, existingId = null) {
 		this._ensureJobCommand(job);
 		this.state.currentDownloads++;
-		const randomId = "item_" + Math.random().toString(36).substring(2, 12);
+		const randomId =
+			existingId || "item_" + Math.random().toString(36).substring(2, 12);
 
-		this._createDownloadUI(randomId, job);
-		this._updateEmptyStateUI();
+		if (!existingId) {
+			this._createDownloadUI(randomId, job);
+			this._updateEmptyStateUI();
+		} else {
+			const statusEl = $(`${randomId}_status`);
+			if (statusEl) {
+				statusEl.textContent = i18n.__("downloading") || "Downloading...";
+				statusEl.classList.remove("status-error");
+			}
+			const pauseBtn = $(`${randomId}_pause`);
+			if (pauseBtn) {
+				pauseBtn.title = i18n.__("pause") || "Pause";
+				pauseBtn.setAttribute("aria-label", "Pause download");
+				pauseBtn.innerHTML = `<svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"></rect><rect x="14" y="4" width="4" height="16" rx="1"></rect></svg>`;
+			}
+		}
+
+		this.state.activeJobs.set(randomId, job);
+		this.state.pausedJobs.delete(randomId);
 
 		const controller = new AbortController();
 		controller.isBatch = !!job.isBatch;
@@ -1760,14 +1781,27 @@ class YtDownloaderApp {
 			didRetain = true;
 		}
 
-		const downloadProcess = this.state.ytDlp.exec(downloadArgs, {
-			shell: false,
-			signal: controller.signal,
-		});
+		const downloadProcess = this.state.ytDlp.exec(
+			downloadArgs,
+			{shell: false},
+			controller.signal,
+		);
+		controller.downloadProcess = downloadProcess;
 
 		const onBeforeUnload = () => {
 			if (downloadProcess && !downloadProcess.killed) {
-				downloadProcess.kill();
+				if (
+					platform() === "win32" &&
+					downloadProcess.ytDlpProcess?.pid
+				) {
+					try {
+						execSync(
+							`taskkill /pid ${downloadProcess.ytDlpProcess.pid} /T /F`,
+						);
+					} catch (e) {}
+				} else {
+					downloadProcess.kill();
+				}
 			}
 		};
 		window.addEventListener("beforeunload", onBeforeUnload);
@@ -1827,6 +1861,20 @@ class YtDownloaderApp {
 					}
 				}
 
+				if (controller.isPaused) {
+					if (didRetain) {
+						this._releaseInfoJson(job.infoJsonPath);
+					}
+					this._handleDownloadCompletion(
+						code,
+						randomId,
+						actualFilePath,
+						job,
+						controller,
+					);
+					return;
+				}
+
 				if (
 					code !== 0 &&
 					didRetain &&
@@ -1865,6 +1913,22 @@ class YtDownloaderApp {
 					} catch (e) {}
 				}
 
+				if (controller.isPaused) {
+					if (didRetain) {
+						this._releaseInfoJson(job.infoJsonPath);
+					}
+					const wasActive =
+						this.state.downloadControllers.delete(randomId);
+					if (wasActive) {
+						this.state.currentDownloads = Math.max(
+							0,
+							this.state.currentDownloads - 1,
+						);
+						this._processQueue();
+					}
+					return;
+				}
+
 				if (
 					didRetain &&
 					!job._forceLiveUrl &&
@@ -1889,8 +1953,125 @@ class YtDownloaderApp {
 				}
 				this.state.downloadedItems.add(randomId);
 				this._updateClearAllButton();
-				this._handleDownloadError(error, randomId);
+				this._handleDownloadError(error, randomId, controller);
 			});
+	}
+
+	/**
+	 * Pauses an active download.
+	 * @param {string} randomId The ID of the download item.
+	 */
+	_pauseDownload(randomId) {
+		const controller = this.state.downloadControllers.get(randomId);
+		const job = this.state.activeJobs.get(randomId);
+		if (!job && !controller) return;
+
+		if (job) {
+			this.state.pausedJobs.set(randomId, job);
+			this.state.activeJobs.delete(randomId);
+		}
+
+		if (controller) {
+			controller.isPaused = true;
+			controller.abort();
+			if (
+				controller.downloadProcess?.ytDlpProcess &&
+				!controller.downloadProcess.ytDlpProcess.killed
+			) {
+				try {
+					if (
+						platform() === "win32" &&
+						controller.downloadProcess.ytDlpProcess.pid
+					) {
+						execSync(
+							`taskkill /pid ${controller.downloadProcess.ytDlpProcess.pid} /T /F`,
+						);
+					} else {
+						controller.downloadProcess.ytDlpProcess.kill();
+					}
+				} catch (e) {}
+			}
+		}
+
+		const statusEl = $(`${randomId}_status`);
+		if (statusEl) {
+			statusEl.textContent = i18n.__("paused") || "Paused";
+			statusEl.classList.remove("status-error");
+		}
+		const speedEl = $(`${randomId}_speed`);
+		if (speedEl) speedEl.textContent = "";
+
+		const pauseBtn = $(`${randomId}_pause`);
+		if (pauseBtn) {
+			pauseBtn.title = i18n.__("resume") || "Resume";
+			pauseBtn.setAttribute("aria-label", "Resume download");
+			pauseBtn.innerHTML = `<svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><polygon points="6,4 20,12 6,20"></polygon></svg>`;
+		}
+	}
+
+	/**
+	 * Resumes a paused download.
+	 * @param {string} randomId The ID of the download item.
+	 */
+	_resumeDownload(randomId) {
+		const job =
+			this.state.pausedJobs.get(randomId) ||
+			this.state.activeJobs.get(randomId);
+		if (!job) return;
+
+		// Bail if the paused process hasn't finished tearing down yet.
+		if (this.state.downloadControllers.has(randomId)) return;
+
+		this.state.pausedJobs.delete(randomId);
+
+		const pauseBtn = $(`${randomId}_pause`);
+		if (pauseBtn) {
+			pauseBtn.title = i18n.__("pause") || "Pause";
+			pauseBtn.setAttribute("aria-label", "Pause download");
+			pauseBtn.innerHTML = `<svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"></rect><rect x="14" y="4" width="4" height="16" rx="1"></rect></svg>`;
+		}
+
+		if (this.state.currentDownloads < this.state.maxActiveDownloads) {
+			this._startDownload(job, randomId);
+		} else {
+			const statusEl = $(`${randomId}_status`);
+			if (statusEl) {
+				statusEl.textContent = i18n.__("queued") || "Queued";
+			}
+			this.state.downloadQueue.push({...job, queueId: randomId});
+		}
+	}
+
+	/**
+	 * Toggles between pause and resume for a download item.
+	 * @param {string} randomId The ID of the download item.
+	 */
+	_togglePauseResume(randomId) {
+		// If currently queued from a resume, pause it back
+		const queuedIndex = this.state.downloadQueue.findIndex(
+			(j) => j.queueId === randomId,
+		);
+		if (queuedIndex !== -1) {
+			const [queuedJob] = this.state.downloadQueue.splice(queuedIndex, 1);
+			this.state.pausedJobs.set(randomId, queuedJob);
+			const statusEl = $(`${randomId}_status`);
+			if (statusEl) {
+				statusEl.textContent = i18n.__("paused") || "Paused";
+			}
+			const pauseBtn = $(`${randomId}_pause`);
+			if (pauseBtn) {
+				pauseBtn.title = i18n.__("resume") || "Resume";
+				pauseBtn.setAttribute("aria-label", "Resume download");
+				pauseBtn.innerHTML = `<svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><polygon points="6,4 20,12 6,20"></polygon></svg>`;
+			}
+			return;
+		}
+
+		if (this.state.pausedJobs.has(randomId)) {
+			this._resumeDownload(randomId);
+		} else {
+			this._pauseDownload(randomId);
+		}
 	}
 
 	/**
@@ -1933,15 +2114,21 @@ class YtDownloaderApp {
 			this.state.currentDownloads < this.state.maxActiveDownloads
 		) {
 			const nextJob = this.state.downloadQueue.shift();
-			// Remove the pending UI element
-			$(nextJob.queueId)?.remove();
 
 			if (nextJob.isBatch && this.state.isBatchCancelled) {
+				if (nextJob.queueId && nextJob.queueId.startsWith("queue_")) {
+					$(nextJob.queueId)?.remove();
+				}
 				this._processQueue();
 				return;
 			}
 
-			this._startDownload(nextJob);
+			if (nextJob.queueId && nextJob.queueId.startsWith("queue_")) {
+				$(nextJob.queueId)?.remove();
+				this._startDownload(nextJob);
+			} else {
+				this._startDownload(nextJob, nextJob.queueId);
+			}
 		}
 	}
 
@@ -2241,12 +2428,21 @@ class YtDownloaderApp {
 			);
 		}
 
+		if (controller?.isPaused) {
+			if (wasActive) this._processQueue();
+			return;
+		}
+
 		if (controller?.signal?.aborted) {
+			this.state.activeJobs.delete(randomId);
+			this.state.pausedJobs.delete(randomId);
 			if (wasActive) this._processQueue();
 			return;
 		}
 
 		if (code === 0) {
+			this.state.activeJobs.delete(randomId);
+			this.state.pausedJobs.delete(randomId);
 			this._showDownloadSuccessUI(randomId, actualFilePath, job);
 			this.state.downloadedItems.add(randomId);
 			this._updateClearAllButton();
@@ -2254,6 +2450,7 @@ class YtDownloaderApp {
 			this._handleDownloadError(
 				new Error(`Download process exited with code ${code}.`),
 				randomId,
+				controller,
 			);
 			return;
 		}
@@ -2270,7 +2467,7 @@ class YtDownloaderApp {
 	/**
 	 * Handles an error during the download process.
 	 */
-	_handleDownloadError(error, randomId) {
+	_handleDownloadError(error, randomId, controller = null) {
 		const wasActive = this.state.downloadControllers.delete(randomId);
 		if (wasActive) {
 			this.state.currentDownloads = Math.max(
@@ -2279,16 +2476,28 @@ class YtDownloaderApp {
 			);
 		}
 
+		if (controller?.isPaused) {
+			if (wasActive) this._processQueue();
+			return;
+		}
+
 		if (
 			error.name === "AbortError" ||
-			error.message?.includes("AbortError")
+			error.message?.includes("AbortError") ||
+			controller?.signal?.aborted
 		) {
 			console.log(`Download ${randomId} was aborted.`);
+			this.state.activeJobs.delete(randomId);
+			this.state.pausedJobs.delete(randomId);
 			if (wasActive) {
 				this._processQueue();
 			}
 			return; // Don't treat user cancellation as an error
 		}
+
+		this.state.activeJobs.delete(randomId);
+		this.state.pausedJobs.delete(randomId);
+		$(`${randomId}_pause`)?.remove();
 
 		console.error("Download Error:", error);
 		const statusEl = $(`${randomId}_status`) || $(`${randomId}_prog`);
@@ -2992,9 +3201,20 @@ class YtDownloaderApp {
 						job.type === "video" ? "video" : "audio",
 					)}</span>
                 </div>
-                <button class="itemClose" id="${randomId}_close" title="${i18n.__("cancel") || "Cancel"}" aria-label="Cancel download">
-                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                </button>
+                <div class="itemTopActions">
+                    ${
+						!isQueued
+							? `<button class="itemPause" id="${randomId}_pause" title="${i18n.__(
+									"pause",
+								) || "Pause"}" aria-label="Pause download">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"></rect><rect x="14" y="4" width="4" height="16" rx="1"></rect></svg>
+                    </button>`
+							: ""
+					}
+                    <button class="itemClose" id="${randomId}_close" title="${i18n.__("cancel") || "Cancel"}" aria-label="Cancel download">
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
                 <div class="itemBody">
                     <div class="itemTitle" id="${randomId}_title" title="${safeTitle}" ${isSafeUrl ? 'tabindex="0" role="link"' : ""}>${safeTitle}</div>
 					${safeChannel ? `<div class="itemChannel"><svg class="channelIcon" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><span>${safeChannel}</span></div>` : ""}
@@ -3038,6 +3258,10 @@ class YtDownloaderApp {
 
 		$(`${randomId}_close`)?.addEventListener("click", () =>
 			this._cancelDownload(randomId),
+		);
+
+		$(`${randomId}_pause`)?.addEventListener("click", () =>
+			this._togglePauseResume(randomId),
 		);
 
 		const handleShowCommand = () => {
@@ -3191,6 +3415,7 @@ class YtDownloaderApp {
 
 		if (progressSection) progressSection.style.display = "none";
 		if (speedEl) speedEl.textContent = "";
+		$(`${randomId}_pause`)?.remove();
 
 		if (actionsEl) {
 			actionsEl.style.display = "flex";
@@ -3309,8 +3534,29 @@ class YtDownloaderApp {
 	_cancelDownload(id) {
 		// If it's an active download
 		if (this.state.downloadControllers.has(id)) {
-			this.state.downloadControllers.get(id).abort();
+			const controller = this.state.downloadControllers.get(id);
+			controller.abort();
+			if (
+				controller?.downloadProcess?.ytDlpProcess &&
+				!controller.downloadProcess.ytDlpProcess.killed
+			) {
+				try {
+					if (
+						platform() === "win32" &&
+						controller.downloadProcess.ytDlpProcess.pid
+					) {
+						execSync(
+							`taskkill /pid ${controller.downloadProcess.ytDlpProcess.pid} /T /F`,
+						);
+					} else {
+						controller.downloadProcess.ytDlpProcess.kill();
+					}
+				} catch (e) {}
+			}
 		}
+		this.state.activeJobs.delete(id);
+		this.state.pausedJobs.delete(id);
+
 		// If it's in the queue
 		this.state.downloadQueue = this.state.downloadQueue.filter(
 			(job) => job.queueId !== id,
