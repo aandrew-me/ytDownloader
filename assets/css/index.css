@@ -4982,6 +4982,7 @@ body.rtl .header-core {
 .about-link-primary {
 	background: var(--blueBtn, #3b82f6);
 	color: #fff;
+	border: none;
 }
 
 .about-link-primary:hover {
