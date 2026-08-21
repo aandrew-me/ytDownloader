@@ -2483,8 +2483,57 @@ button {
 	width: 140px;
 }
 
+.clear-downloads-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin: 16px auto 24px auto;
+	width: 100%;
+}
+
 #clearBtn {
 	display: none;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	padding: 8px 18px;
+	border-radius: 8px;
+	font-family: inherit;
+	font-size: 13px;
+	font-weight: 600;
+	cursor: pointer;
+	color: var(--text-secondary, #94a3b8);
+	background: var(--box-main, rgba(255, 255, 255, 0.05));
+	border: 1px solid var(--box-separation, rgba(255, 255, 255, 0.12));
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+	transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+	outline: none;
+	user-select: none;
+}
+
+#clearBtn:hover {
+	color: #ef4444;
+	background: rgba(239, 68, 68, 0.1);
+	border-color: rgba(239, 68, 68, 0.3);
+	transform: translateY(-1px);
+	box-shadow: 0 4px 12px rgba(239, 68, 68, 0.12);
+}
+
+#clearBtn:active {
+	transform: translateY(0) scale(0.98);
+	background: rgba(239, 68, 68, 0.18);
+}
+
+#clearBtn .clear-btn-icon {
+	width: 15px;
+	height: 15px;
+	flex-shrink: 0;
+	pointer-events: none;
+	transition: transform 0.2s ease;
+}
+
+#clearBtn:hover .clear-btn-icon {
+	transform: rotate(-8deg);
 }
 
 #extractBtn:active,
