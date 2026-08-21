@@ -3775,18 +3775,18 @@ body.rtl .ss-content .ss-list .ss-option {
 	height: 60px;
 	margin: 40px auto;
 
-	background: rgba(14, 23, 45, 0.45);
+	background: var(--box-main, rgba(14, 23, 45, 0.45));
 
 	backdrop-filter: blur(12px);
 	-webkit-backdrop-filter: blur(12px);
 
 	border-radius: 999px;
 
-	border: 2px solid rgba(0, 255, 180, 0.15);
+	border: 2px solid color-mix(in srgb, var(--blueBtn, #38bdf8) 20%, var(--box-separation, transparent));
 
 	box-shadow:
-		inset 0 0 15px rgba(0, 255, 180, 0.04),
-		0 0 20px rgba(0, 255, 180, 0.08);
+		inset 0 0 15px color-mix(in srgb, var(--blueBtn, #38bdf8) 5%, transparent),
+		0 0 20px color-mix(in srgb, var(--blueBtn, #38bdf8) 8%, transparent);
 
 	position: relative;
 	overflow: visible;
@@ -3795,11 +3795,11 @@ body.rtl .ss-content .ss-list .ss-option {
 }
 
 .modernSearchWrapper:focus-within {
-	border-color: rgba(0, 255, 180, 0.35);
+	border-color: var(--blueBtn, #38bdf8);
 
 	box-shadow:
-		inset 0 0 20px rgba(0, 255, 180, 0.06),
-		0 0 30px rgba(0, 255, 180, 0.12);
+		inset 0 0 20px color-mix(in srgb, var(--blueBtn, #38bdf8) 8%, transparent),
+		0 0 30px color-mix(in srgb, var(--blueBtn, #38bdf8) 18%, transparent);
 }
 
 .modernSearchWrapper::before {
@@ -3814,7 +3814,7 @@ body.rtl .ss-content .ss-list .ss-option {
 	height: 180px;
 
 	background: radial-gradient(circle,
-			rgba(0, 255, 180, 0.18),
+			color-mix(in srgb, var(--blueBtn, #38bdf8) 18%, transparent),
 			transparent 70%);
 
 	filter: blur(35px);
@@ -3840,22 +3840,28 @@ body.rtl .ss-content .ss-list .ss-option {
 	color: white;
 
 	background: radial-gradient(circle at 30% 30%,
-			rgba(0, 255, 180, 0.45),
-			rgba(20, 80, 130, 0.95));
+			var(--blueBtn, #3b82f6),
+			var(--blueBtn-bottom, #1d4ed8));
 
 	box-shadow:
-		0 0 20px rgba(0, 255, 180, 0.3),
+		0 0 20px color-mix(in srgb, var(--blueBtn, #3b82f6) 40%, transparent),
 		inset 0 0 12px rgba(255, 255, 255, 0.15);
 
 	flex-shrink: 0;
 
 	position: relative;
 
-	transition: transform 0.2s ease;
+	transition: transform 0.2s ease, filter 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .modernSearchButton:hover {
-	transform: scale(1.03);
+	transform: scale(1.04);
+	filter: brightness(1.1);
+}
+
+.modernSearchButton:active {
+	transform: scale(0.97);
+	filter: brightness(0.95);
 }
 
 .modernSearchButton::before {
@@ -3867,7 +3873,7 @@ body.rtl .ss-content .ss-list .ss-option {
 	border-radius: inherit;
 
 	background: radial-gradient(circle,
-			rgba(0, 255, 180, 0.25),
+			color-mix(in srgb, var(--blueBtn, #3b82f6) 25%, transparent),
 			transparent 75%);
 
 	filter: blur(12px);
@@ -3904,7 +3910,7 @@ input[type="text"].modernSearchInput {
 }
 
 .modernSearchInput::placeholder {
-	color: rgba(255, 255, 255, 0.45);
+	color: color-mix(in srgb, var(--text, #fff) 45%, transparent);
 }
 
 /* Playlist Hidden Elements */
