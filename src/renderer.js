@@ -2631,9 +2631,7 @@ class YtDownloaderApp {
 		}
 		this._hideInfoPanel();
 		$(CONSTANTS.DOM_IDS.LOADING_WRAPPER).style.display = "flex";
-		$(CONSTANTS.DOM_IDS.INCORRECT_MSG).textContent = "";
-		$(CONSTANTS.DOM_IDS.ERROR_BTN).style.display = "none";
-		$(CONSTANTS.DOM_IDS.ERROR_DETAILS).style.display = "none";
+		this._clearError();
 		$(CONSTANTS.DOM_IDS.VIDEO_FORMAT_SELECT).innerHTML = "";
 		$(CONSTANTS.DOM_IDS.AUDIO_FORMAT_SELECT).innerHTML = "";
 		const noAudioTxt = i18n.__("noAudio");
@@ -3487,6 +3485,19 @@ class YtDownloaderApp {
 	}
 
 	/**
+	 * Clears error messages and hides error details in the main UI.
+	 */
+	_clearError() {
+		$(CONSTANTS.DOM_IDS.INCORRECT_MSG).textContent = "";
+		$(CONSTANTS.DOM_IDS.ERROR_BTN).style.display = "none";
+		const errorDetails = $(CONSTANTS.DOM_IDS.ERROR_DETAILS);
+		if (errorDetails) {
+			errorDetails.style.display = "none";
+			errorDetails.textContent = "";
+		}
+	}
+
+	/**
 	 * Hides the info panel with an animation.
 	 */
 	_hideInfoPanel(immediate = false) {
@@ -3867,6 +3878,7 @@ class YtDownloaderApp {
 			if (pathPicker) pathPicker.style.display = "inline-flex";
 			if (hiddenPanel) hiddenPanel.style.display = "none";
 		}
+		this._clearError();
 		this._updateAutoModeUI();
 		this._updateEmptyStateUI();
 	}
@@ -4011,6 +4023,8 @@ class YtDownloaderApp {
 	 */
 	async _startBatchDownloads() {
 		if (this.state.isBatchRunning) return;
+
+		this._clearError();
 
 		const textarea = document.getElementById("batchUrlsInput");
 		const text = textarea ? textarea.value : "";
