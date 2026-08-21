@@ -1790,18 +1790,7 @@ class YtDownloaderApp {
 
 		const onBeforeUnload = () => {
 			if (downloadProcess && !downloadProcess.killed) {
-				if (
-					platform() === "win32" &&
-					downloadProcess.ytDlpProcess?.pid
-				) {
-					try {
-						execSync(
-							`taskkill /pid ${downloadProcess.ytDlpProcess.pid} /T /F`,
-						);
-					} catch (e) {}
-				} else {
-					downloadProcess.kill();
-				}
+				this._killDownloadProcess(downloadProcess);
 			}
 		};
 		window.addEventListener("beforeunload", onBeforeUnload);
@@ -1974,22 +1963,8 @@ class YtDownloaderApp {
 		if (controller) {
 			controller.isPaused = true;
 			controller.abort();
-			if (
-				controller.downloadProcess?.ytDlpProcess &&
-				!controller.downloadProcess.ytDlpProcess.killed
-			) {
-				try {
-					if (
-						platform() === "win32" &&
-						controller.downloadProcess.ytDlpProcess.pid
-					) {
-						execSync(
-							`taskkill /pid ${controller.downloadProcess.ytDlpProcess.pid} /T /F`,
-						);
-					} else {
-						controller.downloadProcess.ytDlpProcess.kill();
-					}
-				} catch (e) {}
+			if (controller.downloadProcess) {
+				this._killDownloadProcess(controller.downloadProcess);
 			}
 		}
 
@@ -2071,6 +2046,36 @@ class YtDownloaderApp {
 			this._resumeDownload(randomId);
 		} else {
 			this._pauseDownload(randomId);
+		}
+	}
+
+	/**
+	 * Forcefully terminates a download process and all child processes across platforms.
+	 * @param {object} processWrapper The yt-dlp process wrapper or child process object.
+	 */
+	_killDownloadProcess(processWrapper) {
+		const proc = processWrapper?.ytDlpProcess || processWrapper;
+		const pid = proc?.pid;
+		if (!pid || proc.killed) return;
+
+		try {
+			if (platform() === "win32") {
+				execSync(`taskkill /pid ${pid} /T /F`);
+			} else {
+				try {
+					execSync(`pkill -9 -P ${pid}`);
+				} catch (e) {}
+				try {
+					execSync(`kill -9 ${pid}`);
+				} catch (e) {}
+				try {
+					proc.kill("SIGKILL");
+				} catch (e) {}
+			}
+		} catch (err) {
+			try {
+				proc.kill("SIGKILL");
+			} catch (e) {}
 		}
 	}
 
@@ -3536,22 +3541,8 @@ class YtDownloaderApp {
 		if (this.state.downloadControllers.has(id)) {
 			const controller = this.state.downloadControllers.get(id);
 			controller.abort();
-			if (
-				controller?.downloadProcess?.ytDlpProcess &&
-				!controller.downloadProcess.ytDlpProcess.killed
-			) {
-				try {
-					if (
-						platform() === "win32" &&
-						controller.downloadProcess.ytDlpProcess.pid
-					) {
-						execSync(
-							`taskkill /pid ${controller.downloadProcess.ytDlpProcess.pid} /T /F`,
-						);
-					} else {
-						controller.downloadProcess.ytDlpProcess.kill();
-					}
-				} catch (e) {}
+			if (controller?.downloadProcess) {
+				this._killDownloadProcess(controller.downloadProcess);
 			}
 		}
 		this.state.activeJobs.delete(id);
