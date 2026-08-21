@@ -4046,12 +4046,15 @@ class YtDownloaderApp {
 				let title = url;
 				let thumbnail = "";
 				let channel = "";
+				let duration = null;
 
 				try {
 					const meta = await this._fetchVideoMetadata(url);
 					if (meta && meta.title) title = meta.title;
 					if (meta && meta.thumbnail) thumbnail = meta.thumbnail;
 					if (meta && meta.channel) channel = meta.channel;
+					if (meta?.duration && meta.duration > 0)
+						duration = Math.ceil(meta.duration);
 				} catch (e) {
 					console.warn(
 						"Failed fetching meta for batch item:",
@@ -4069,7 +4072,7 @@ class YtDownloaderApp {
 					title: title,
 					channel: channel,
 					thumbnail: thumbnail,
-					duration: meta?.duration ? Math.ceil(meta.duration) : null,
+					duration: duration,
 					isBatch: true,
 					options: {
 						rangeCmd: "",
