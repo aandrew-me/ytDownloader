@@ -1940,8 +1940,6 @@ class YtDownloaderApp {
 					this._releaseInfoJson(job.infoJsonPath);
 					didRetain = false;
 				}
-				this.state.downloadedItems.add(randomId);
-				this._updateClearAllButton();
 				this._handleDownloadError(error, randomId, controller);
 			});
 	}
@@ -2515,6 +2513,8 @@ class YtDownloaderApp {
 		}
 		if (speedEl) speedEl.textContent = "";
 		if (fillEl) fillEl.style.background = "var(--redBtn, #ef4444)";
+		this.state.downloadedItems.add(randomId);
+		this._updateClearAllButton();
 		if (wasActive) {
 			this._processQueue();
 		}
@@ -3600,8 +3600,9 @@ class YtDownloaderApp {
 	 */
 	_updateClearAllButton() {
 		const btn = $(CONSTANTS.DOM_IDS.CLEAR_BTN);
+		if (!btn) return;
 		btn.style.display =
-			this.state.downloadedItems.size > 1 ? "inline-block" : "none";
+			this.state.downloadedItems.size > 0 ? "inline-flex" : "none";
 	}
 
 	/**

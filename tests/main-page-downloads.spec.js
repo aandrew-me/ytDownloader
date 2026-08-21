@@ -458,5 +458,46 @@ test.describe("Main Page Download Tests", () => {
 			timeout: 5000,
 		});
 	});
+
+	test("clear downloads button appears on download completion and removes completed downloads", async () => {
+		const testUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+
+		await page.evaluate((url) => {
+			window.electronAPI.clipboard.writeText(url);
+		}, testUrl);
+
+		await page.click("#pasteUrl");
+		await waitForInfoPanel(page);
+
+		await triggerClick(page, "videoDownload");
+
+		// Wait for download item to complete
+		await page.waitForSelector("#list .item .itemActions", {
+			state: "visible",
+			timeout: 5000,
+		});
+
+		// Verify clear button becomes visible
+		const clearBtn = await page.waitForSelector("#clearBtn", {
+			state: "visible",
+			timeout: 5000,
+		});
+		expect(clearBtn).not.toBeNull();
+
+		// Click Clear Downloads
+		await page.click("#clearBtn");
+
+		// Verify download items are removed from list
+		await page.waitForFunction(() => {
+			const list = document.getElementById("list");
+			return list && list.children.length === 0;
+		});
+
+		// Verify clear button hides after clearing
+		await page.waitForFunction(() => {
+			const btn = document.getElementById("clearBtn");
+			return btn && btn.style.display === "none";
+		});
+	});
 });
 
