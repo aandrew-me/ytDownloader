@@ -4,6 +4,7 @@ import {
 	showPopup,
 	formatTime,
 	formatVideoCodec,
+	formatBitrate,
 	findFfmpeg,
 	ensureFfmpegLibsLoadable,
 	getJsRuntimePath,
@@ -67,6 +68,7 @@ const CONSTANTS = {
 		AUDIO_PRESENT_SECTION: "audioPresent",
 		QUIT_APP_BTN: "quitAppBtn",
 		// Format Selectors
+		VIDEO_FORMAT_SELECT_CONTAINER: "videoFormatSelectContainer",
 		VIDEO_FORMAT_SELECT: "videoFormatSelect",
 		AUDIO_FORMAT_SELECT: "audioFormatSelect",
 		AUDIO_FOR_VIDEO_FORMAT_SELECT: "audioForVideoFormatSelect",
@@ -2653,6 +2655,15 @@ class YtDownloaderApp {
 
 		const {videoQuality, videoCodec, showMoreFormats} =
 			this.state.preferences;
+
+		const videoContainer = $(CONSTANTS.DOM_IDS.VIDEO_FORMAT_SELECT_CONTAINER);
+		if (videoContainer) {
+			videoContainer.classList.toggle(
+				"extended-format-select",
+				Boolean(showMoreFormats),
+			);
+		}
+
 		let bestMatchHeight = 0;
 
 		const speakerIconSvg = `<svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>`;
@@ -2862,8 +2873,14 @@ class YtDownloaderApp {
 					}
 				}
 
+				const bitrateText = formatBitrate(format.vbr || format.tbr);
+
 				const codecHtml = showMoreFormats
 					? `<span class="codec-text">${vcodecText}</span>`
+					: "";
+
+				const bitrateHtml = showMoreFormats
+					? `<span class="bitrate-text">${bitrateText}</span>`
 					: "";
 
 				const gridClass = showMoreFormats
@@ -2871,7 +2888,9 @@ class YtDownloaderApp {
 					: "video-grid-compact";
 
 				const optionTextFallback = showMoreFormats
-					? `${quality} ${format.ext} ${vcodecText} ${displaySize}`
+					? `${quality} ${format.ext} ${vcodecText} ${bitrateText} ${displaySize}`
+							.replace(/\s+/g, " ")
+							.trim()
 					: `${quality} ${format.ext} ${displaySize}`;
 
 				const htmlContent = `
@@ -2879,6 +2898,7 @@ class YtDownloaderApp {
                     <span class="main-text">${quality}</span>
                     <span class="badge badge-format">${format.ext}</span>
                     ${codecHtml}
+                    ${bitrateHtml}
                     <span class="size-text">${displaySize}</span>
                     ${audioMarkup}
                 </div>

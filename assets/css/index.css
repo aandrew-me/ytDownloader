@@ -3199,6 +3199,10 @@ input[type="range"]::-webkit-slider-thumb:hover {
 	padding: 5px 0;
 }
 
+#videoFormatSelectContainer.extended-format-select {
+	width: min(540px, 100%);
+}
+
 /* 8. SlimSelect Custom Styling Overrides */
 
 .ss-main {
@@ -3320,15 +3324,15 @@ body.rtl .ss-content .ss-list .ss-option {
 }
 
 .video-grid-extended {
-	grid-template-columns: 80px 65px 65px 1fr 120px;
+	grid-template-columns: 80px 56px 65px 90px 1fr 80px;
 }
 
 .video-grid-compact {
-	grid-template-columns: 85px 75px 1fr 120px;
+	grid-template-columns: 90px 80px 1fr 90px;
 }
 
 .audio-grid {
-	grid-template-columns: 200px 60px 1fr;
+	grid-template-columns: 170px 60px 1fr;
 	justify-items: center;
 }
 
@@ -3338,20 +3342,31 @@ body.rtl .ss-content .ss-list .ss-option {
 	overflow: hidden;
 	opacity: 0.9;
 	white-space: normal;
+	justify-self: start;
+	padding-left: 6px;
 }
 
 .modern-option-row .codec-text {
 	font-size: 13px;
 	font-family: JetBrains;
-	opacity: 0.6;
+	opacity: 0.75;
+}
+
+.modern-option-row .bitrate-text {
+	font-size: 13px;
+	font-family: JetBrains;
+	opacity: 0.85;
+	justify-self: end;
+	white-space: nowrap;
 }
 
 .modern-option-row .size-text {
 	font-size: 14px;
 	font-weight: 500;
 	justify-self: end;
-	margin-right: 12px;
-	opacity: 0.8;
+	margin-right: 14px;
+	opacity: 0.85;
+	white-space: nowrap;
 }
 
 .badge {
@@ -3371,7 +3386,7 @@ body.rtl .ss-content .ss-list .ss-option {
 
 .audio-indicator,
 .audio-placeholder {
-	width: 120px;
+	width: 80px;
 	box-sizing: border-box;
 	display: inline-flex;
 	align-items: center;
