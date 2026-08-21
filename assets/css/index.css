@@ -2354,7 +2354,7 @@ input[type="number"]::-webkit-outer-spin-button {
 	align-items: center;
 	gap: 12px;
 	margin: 24px auto;
-	padding: 10px 22px;
+	padding: 0 22px;
 	width: fit-content;
 	background: var(--box-main, rgba(255, 255, 255, 0.05));
 	border: 1px solid var(--box-separation, rgba(255, 255, 255, 0.12));
