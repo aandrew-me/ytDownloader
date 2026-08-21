@@ -367,3 +367,15 @@ export function formatVideoCodec(codec) {
 	if (lower.startsWith("theora")) return "Theora";
 	return codec.split(".")[0];
 }
+
+/**
+ * Formats bitrate in kbps into a readable string (e.g. "2500 kbps")
+ * @param {number | string | null | undefined} bitrate
+ * @returns {string}
+ */
+export function formatBitrate(bitrate) {
+	const num = Number(bitrate);
+	if (!num || isNaN(num) || num <= 0) return "";
+	return `${Math.round(num)} kbps`;
+}
+
