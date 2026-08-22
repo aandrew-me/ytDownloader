@@ -76,6 +76,18 @@ test.describe("Playlist Preferences Integration Tests", () => {
 		expect(downloadCmd[oIndex + 1]).toBe(expectedOutputPath);
 	});
 
+	test("default preferred video quality in playlist is 1080", async () => {
+		const res = await launchApp();
+
+		electronApp = res.app;
+		page = res.page;
+		await page.waitForFunction(() => typeof window.switchView === "function");
+		await page.click("#playlistWin");
+
+		const selectedVideo = await page.$eval("#select", (el) => el.value);
+		expect(selectedVideo).toBe("1080");
+	});
+
 	test("preferred video and audio quality defaults are selected in UI dropdowns", async () => {
 		const res = await launchApp({
 			preferredVideoQuality: "720",

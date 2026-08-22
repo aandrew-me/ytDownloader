@@ -124,9 +124,12 @@ test.describe("Preferences Page Tests", () => {
 	test("media settings preferences save to localStorage", async () => {
 		await page.click('button[data-tab="media"]');
 
-		await page.selectOption("#preferredVideoQuality", "1080");
+		const defaultVideoQuality = await page.$eval("#preferredVideoQuality", (el) => el.value);
+		expect(defaultVideoQuality).toBe("1080");
+
+		await page.selectOption("#preferredVideoQuality", "720");
 		const videoQuality = await page.evaluate(() => localStorage.getItem("preferredVideoQuality"));
-		expect(videoQuality).toBe("1080");
+		expect(videoQuality).toBe("720");
 
 		await page.selectOption("#preferredVideoCodec", "vp9");
 		const videoCodec = await page.evaluate(() => localStorage.getItem("preferredVideoCodec"));
