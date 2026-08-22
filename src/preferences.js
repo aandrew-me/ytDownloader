@@ -988,6 +988,38 @@ function initPreferences() {
 	bindCheckboxToStorage("autoUpdateDisabled", "autoUpdate", "false", "true");
 	bindCheckboxToStorage("showMoreFormats", "showMoreFormats", "true", "false");
 
+	// Updates section controls
+	const updateChannelSelect = getId("updateChannelSelect");
+	if (updateChannelSelect) {
+		const savedChannel = localStorage.getItem("updateChannel") || "stable";
+		updateChannelSelect.value = savedChannel;
+		updateChannelSelect.addEventListener("change", () => {
+			const channel = updateChannelSelect.value;
+			localStorage.setItem("updateChannel", channel);
+			ipcRenderer.send("set-update-channel", channel);
+		});
+		ipcRenderer.send("set-update-channel", savedChannel);
+	}
+
+	const checkForUpdatesBtn = getId("checkForUpdatesBtn");
+	const updateCheckStatus = getId("updateCheckStatus");
+
+	function setUpdateStatus(text, type = "") {
+		if (!updateCheckStatus) return;
+		updateCheckStatus.textContent = text;
+		updateCheckStatus.className = "pref-subtitle" + (type ? ` status-${type}` : "");
+	}
+
+	if (checkForUpdatesBtn) {
+		checkForUpdatesBtn.addEventListener("click", () => {
+			const channel = localStorage.getItem("updateChannel") || "stable";
+			setUpdateStatus(window.i18n ? window.i18n.__("checkingForUpdates") : "Checking for updates...", "checking");
+			ipcRenderer.send("check-for-updates", { isManual: true, channel });
+		});
+	}
+
+	window.__setUpdateStatus = setUpdateStatus;
+
 	initDependenciesTab();
 }
 

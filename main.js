@@ -19,6 +19,8 @@ const { platform } = require("os");
 
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = "true";
 autoUpdater.autoDownload = false;
+autoUpdater.allowDowngrade = true;
+autoUpdater.autoInstallOnAppQuit = true;
 
 const USER_DATA_PATH = app.getPath("userData");
 const CONFIG_FILE_PATH = path.join(USER_DATA_PATH, "ytdownloader.json");
@@ -37,6 +39,8 @@ const appState = {
 	config: {},
 	downloadHistory: new DownloadHistory(),
 	autoUpdateEnabled: false,
+	isManualUpdateCheck: false,
+	updateChannel: "stable",
 	/** @type {string | null} Currently registered global hotkey accelerator */
 	registeredHotkeyAccelerator: null,
 };
@@ -268,13 +272,65 @@ function createTray() {
 	});
 }
 
+function configureAutoUpdaterChannel(channel = "stable") {
+	appState.updateChannel = channel;
+	if (channel === "beta") {
+		autoUpdater.allowPrerelease = true;
+		autoUpdater.channel = "beta";
+	} else {
+		autoUpdater.allowPrerelease = false;
+		autoUpdater.channel = "latest";
+	}
+}
+
 function registerIpcHandlers() {
 	ipcMain.on("autoUpdate", (_event, status) => {
 		appState.autoUpdateEnabled = status;
 
 		if (status) {
-			autoUpdater.checkForUpdates();
+			triggerUpdateCheck(false);
 		}
+	});
+
+	ipcMain.on("set-update-channel", (_event, channel) => {
+		configureAutoUpdaterChannel(channel);
+	});
+
+	ipcMain.on("check-for-updates", async (_event, opts = {}) => {
+		if (opts.channel) {
+			configureAutoUpdaterChannel(opts.channel);
+		}
+		triggerUpdateCheck(Boolean(opts.isManual));
+	});
+
+	ipcMain.on("download-update", async () => {
+		if (!app.isPackaged) {
+			if (appState.mainWindow && !appState.mainWindow.isDestroyed()) {
+				appState.mainWindow.webContents.send("update-error", {
+					message: "In-app downloading is only supported in packaged installations (NSIS/AppImage).",
+					isManual: true,
+				});
+			}
+			return;
+		}
+
+		try {
+			await autoUpdater.downloadUpdate();
+		} catch (err) {
+			console.error("Download update failed:", err);
+			if (appState.mainWindow && !appState.mainWindow.isDestroyed()) {
+				appState.mainWindow.webContents.send("update-error", {
+					message: err?.message || "Failed to download update",
+					isManual: true,
+				});
+			}
+		}
+	});
+
+	ipcMain.on("install-update", (_event, opts = {}) => {
+		const isSilent = opts.isSilent !== undefined ? opts.isSilent : true;
+		const isForceRunAfter = opts.isForceRunAfter !== undefined ? opts.isForceRunAfter : true;
+		autoUpdater.quitAndInstall(isSilent, isForceRunAfter);
 	});
 
 	ipcMain.on("reload", () => {
@@ -431,7 +487,7 @@ function registerIpcHandlers() {
 			globalShortcut.unregister(appState.registeredHotkeyAccelerator);
 			appState.registeredHotkeyAccelerator = null;
 		}
-		if (!config.enabled) return;
+		if (!config || !config.enabled) return;
 
 		const defaultAccel = process.platform === "darwin" ? "Cmd+Shift+D" : "Ctrl+Shift+D";
 		const accelerator = config.accelerator || defaultAccel;
@@ -460,9 +516,13 @@ function registerIpcHandlers() {
 				}
 			});
 			appState.registeredHotkeyAccelerator = accelerator;
-		} catch (e) {
-			console.error("Failed to register hotkey:", accelerator, e.message);
+		} catch (error) {
+			console.error("Failed to register global hotkey:", error);
 		}
+	});
+
+	ipcMain.handle("get-registered-hotkey", () => {
+		return appState.registeredHotkeyAccelerator;
 	});
 
 	ipcMain.on("progress", (_event, percentage) => {
@@ -492,14 +552,19 @@ function registerIpcHandlers() {
 			`${locale}.json`,
 		);
 
-		const fallbackData = JSON.parse(readFileSync(fallbackFile, "utf8"));
+		let fallbackData = {};
+		try {
+			fallbackData = JSON.parse(readFileSync(fallbackFile, "utf8"));
+		} catch (error) {
+			console.error("Could not parse default language file", error);
+		}
 
 		let localeData = {};
-		if (locale !== "en" && existsSync(localeFile)) {
+		if (locale && locale !== "en" && existsSync(localeFile)) {
 			try {
 				localeData = JSON.parse(readFileSync(localeFile, "utf8"));
-			} catch (e) {
-				console.error(`Could not parse ${localeFile}`, e);
+			} catch (error) {
+				console.error(`Could not parse ${localeFile}`, error);
 			}
 		}
 
@@ -589,88 +654,110 @@ function isZipBuild() {
 	return !existsSync(uninstallerPath);
 }
 
-function registerAutoUpdaterEvents() {
-	autoUpdater.on("update-available", async (info) => {
-		if (isZipBuild() || platform() === "darwin" || platform() === "linux") {
-			const dialogOpts = {
-				type: "info",
-				buttons: [i18n("download"), i18n("no")],
-				title: "Update Available",
-				detail: info.releaseNotes?.toString().replace(/<[^>]*>?/gm, "") || "",
-				message: i18n(
-					"updateAvailableDownloadPrompt",
-				),
-			};
-			dialog.showMessageBox(dialogOpts).then((returnValue) => {
-				if (returnValue.response === 0) {
-					if (platform() === "win32") {
-						shell.openExternal(
-							"https://github.com/aandrew-me/ytDownloader/releases/latest/download/YTDownloader_Win.zip",
-						);
-					} else if (platform() === "darwin") {
-						if (process.arch === "x64") {
-							shell.openExternal(
-								"https://github.com/aandrew-me/ytDownloader/releases/latest/download/YTDownloader_Mac_x64.dmg",
-							);
-						} else {
-							shell.openExternal(
-								"https://github.com/aandrew-me/ytDownloader/releases/latest/download/YTDownloader_Mac_arm64.dmg",
-							);
-						}
-					} else {
-						shell.openExternal("https://github.com/aandrew-me/ytDownloader/releases/latest");
-					}
-				}
-			});
-		} else {
-			const dialogOpts = {
-				type: "info",
-				buttons: [i18n("update"), i18n("no")],
-				title: "Update Available",
-				message: i18n("updateAvailablePrompt"),
-				detail:
-					info.releaseNotes?.toString().replace(/<[^>]*>?/gm, "") ||
-					"No details available.",
-			};
-			const parentWin = appState.mainWindow && !appState.mainWindow.isDestroyed() ? appState.mainWindow : null;
-			const { response } = await dialog.showMessageBox(
-				parentWin,
-				dialogOpts,
-			);
-			if (response === 0) {
-				autoUpdater.downloadUpdate();
+function hasAppUpdateConfig() {
+	if (!app.isPackaged) return false;
+	const updateYmlPath = path.join(process.resourcesPath, "app-update.yml");
+	return existsSync(updateYmlPath);
+}
+
+function triggerUpdateCheck(isManual = false) {
+	appState.isManualUpdateCheck = isManual;
+	if (hasAppUpdateConfig()) {
+		autoUpdater.checkForUpdates().catch((err) => {
+			console.error("Auto-updater check failed:", err);
+			if (isManual && appState.mainWindow && !appState.mainWindow.isDestroyed()) {
+				appState.mainWindow.webContents.send("update-error", {
+					message: err?.message || "Failed to check for updates",
+					isManual: true,
+				});
 			}
+		});
+	} else if (isManual) {
+		// For builds that don't support auto update check (ZIP/portable/dev), open the latest release link directly
+		const releaseUrl =
+			appState.updateChannel === "beta"
+				? "https://github.com/aandrew-me/ytDownloader/releases"
+				: "https://github.com/aandrew-me/ytDownloader/releases/latest";
+		shell.openExternal(releaseUrl);
+		if (appState.mainWindow && !appState.mainWindow.isDestroyed()) {
+			appState.mainWindow.webContents.send("update-not-available", {
+				version: app.getVersion(),
+				isManual: true,
+			});
+		}
+	}
+}
+
+function registerAutoUpdaterEvents() {
+	autoUpdater.on("checking-for-update", () => {
+		if (appState.mainWindow && !appState.mainWindow.isDestroyed()) {
+			appState.mainWindow.webContents.send("checking-for-update", {
+				isManual: appState.isManualUpdateCheck,
+			});
 		}
 	});
 
-	autoUpdater.on("update-downloaded", async () => {
-		if (appState.mainWindow && !appState.mainWindow.isDestroyed()) {
-			appState.mainWindow.webContents.send("update-downloaded", "");
-		}
-		const dialogOpts = {
-			type: "info",
-			buttons: [i18n("restart"), i18n("later")],
-			title: "Update Ready",
-			message: i18n("installAndRestartPrompt"),
+	autoUpdater.on("update-available", (info) => {
+		const isManual = appState.isManualUpdateCheck;
+		appState.isManualUpdateCheck = false;
+		const payload = {
+			version: info.version,
+			releaseDate: info.releaseDate,
+			releaseNotes: info.releaseNotes || "",
+			isPrerelease: Boolean(
+				info.prerelease ||
+				(info.version && (info.version.includes("-beta") || info.version.includes("-alpha") || info.version.includes("-rc")))
+			),
+			isZipBuild: isZipBuild(),
+			platform: platform(),
+			arch: process.arch,
+			isManual: isManual,
 		};
-		const parentWin = appState.mainWindow && !appState.mainWindow.isDestroyed() ? appState.mainWindow : null;
-		const { response } = await dialog.showMessageBox(
-			parentWin,
-			dialogOpts,
-		);
-		if (response === 0) {
-			autoUpdater.quitAndInstall(true, true);
+		if (appState.mainWindow && !appState.mainWindow.isDestroyed()) {
+			appState.mainWindow.webContents.send("update-available", payload);
+		}
+	});
+
+	autoUpdater.on("update-not-available", (info) => {
+		const isManual = appState.isManualUpdateCheck;
+		appState.isManualUpdateCheck = false;
+		if (appState.mainWindow && !appState.mainWindow.isDestroyed()) {
+			appState.mainWindow.webContents.send("update-not-available", {
+				version: app.getVersion(),
+				isManual: isManual,
+			});
 		}
 	});
 
 	autoUpdater.on("download-progress", (info) => {
 		if (appState.mainWindow && !appState.mainWindow.isDestroyed()) {
-			appState.mainWindow.webContents.send("download-progress", info.percent);
+			appState.mainWindow.webContents.send("download-progress", {
+				percent: info.percent || 0,
+				bytesPerSecond: info.bytesPerSecond || 0,
+				transferred: info.transferred || 0,
+				total: info.total || 0,
+			});
+		}
+	});
+
+	autoUpdater.on("update-downloaded", (info) => {
+		if (appState.mainWindow && !appState.mainWindow.isDestroyed()) {
+			appState.mainWindow.webContents.send("update-downloaded", {
+				version: info?.version || "",
+			});
 		}
 	});
 
 	autoUpdater.on("error", (error) => {
+		const isManual = appState.isManualUpdateCheck;
+		appState.isManualUpdateCheck = false;
 		console.error("Auto-update error:", error);
+		if (appState.mainWindow && !appState.mainWindow.isDestroyed()) {
+			appState.mainWindow.webContents.send("update-error", {
+				message: error?.message || "Auto-update error",
+				isManual: isManual,
+			});
+		}
 	});
 }
 
