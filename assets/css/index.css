@@ -3205,6 +3205,14 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
 /* 8. SlimSelect Custom Styling Overrides */
 
+:root {
+	--ss-font-color: var(--text);
+	--ss-bg-color: var(--select);
+	--ss-placeholder-color: var(--text);
+	--ss-border-color: var(--box-separation);
+	--ss-primary-color: var(--box-toggleOn);
+}
+
 .ss-main {
 	background-color: var(--select);
 	color: var(--text);
@@ -3215,12 +3223,12 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
 .ss-arrow path {
 	stroke: var(--text) !important;
-	opacity: 0.6;
+	opacity: 0.7;
 }
 
 .ss-search {
 	padding: 8px 12px !important;
-	border-bottom: 1px solid var(--select) !important;
+	border-bottom: 1px solid var(--box-separation) !important;
 }
 
 .ss-search input {
@@ -3246,11 +3254,11 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 .prefBox .ss-main {
-	width: min(240px, 100%);
-	min-width: 180px;
+	width: min(280px, 100%);
+	min-width: 200px;
 	height: 38px;
 	min-height: 38px;
-	padding: 4px 10px;
+	padding: 7px 10px;
 	background-color: var(--select);
 	color: var(--text);
 	border: 1px solid var(--box-separation);
@@ -3268,9 +3276,11 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
 .prefBox .ss-main .ss-values .ss-single {
 	margin: 0;
-	padding: 4px;
+	padding: 0 4px;
 	font-size: 0.95rem;
 	color: var(--text);
+	width: 100%;
+	max-width: 100%;
 }
 
 body.rtl .ss-main .ss-values {
@@ -3303,17 +3313,58 @@ body.rtl .ss-content .ss-list .ss-option {
 	border-radius: 5px;
 }
 
+.ss-content .ss-list .ss-option,
 .ss-option {
 	padding: 8px 12px !important;
 	border-radius: 6px !important;
-	color: var(--text);
+	color: var(--text) !important;
+	opacity: 0.92;
+	transition: background-color 0.15s ease, opacity 0.15s ease;
 }
 
+.ss-content .ss-list .ss-option:hover,
+.ss-content .ss-list .ss-option.ss-selected,
+.ss-content .ss-list .ss-option.ss-highlighted,
 .ss-option:hover,
 .ss-selected,
 .ss-highlighted {
 	background-color: var(--box-toggleOn) !important;
 	color: var(--text) !important;
+	opacity: 1 !important;
+}
+
+/* Language Selection UI */
+.lang-option-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+	gap: 12px;
+	box-sizing: border-box;
+}
+
+.lang-option-row .lang-native {
+	font-weight: 500;
+	font-size: 0.92rem;
+	color: var(--text);
+	white-space: nowrap;
+}
+
+.lang-option-row .lang-english {
+	font-size: 0.82rem;
+	color: var(--text);
+	opacity: 0.65;
+	white-space: nowrap;
+}
+
+.ss-option:hover .lang-option-row .lang-english,
+.ss-selected .lang-option-row .lang-english,
+.ss-highlighted .lang-option-row .lang-english {
+	opacity: 0.9;
+}
+
+body.rtl .lang-option-row {
+	flex-direction: row-reverse;
 }
 
 .modern-option-row {
