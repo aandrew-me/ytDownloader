@@ -106,6 +106,25 @@ const CONSTANTS = {
 		UPDATE_POPUP: "updatePopup",
 		UPDATE_POPUP_PROGRESS: "updateProgress",
 		UPDATE_POPUP_BAR: "progressBarFill",
+		// In-app update modal
+		APP_UPDATE_MODAL_BACKDROP: "appUpdateModalBackdrop",
+		APP_UPDATE_TITLE: "appUpdateTitle",
+		APP_UPDATE_BADGE: "appUpdateBadge",
+		APP_UPDATE_DATE: "appUpdateDate",
+		APP_UPDATE_NOTES: "appUpdateNotes",
+		APP_UPDATE_PROGRESS_CONTAINER: "appUpdateProgressContainer",
+		APP_UPDATE_PROGRESS_BAR: "appUpdateProgressBar",
+		APP_UPDATE_PROGRESS_PERCENT: "appUpdateProgressPercent",
+		APP_UPDATE_SPEED: "appUpdateSpeed",
+		APP_UPDATE_SIZE: "appUpdateSize",
+		APP_UPDATE_SKIP_BTN: "appUpdateSkipBtn",
+		APP_UPDATE_LATER_BTN: "appUpdateLaterBtn",
+		APP_UPDATE_ACTION_BTN: "appUpdateActionBtn",
+		APP_UPDATE_CLOSE_BTN: "appUpdateCloseBtn",
+		APP_UPDATE_READY_BANNER: "appUpdateReadyBanner",
+		UPDATE_CHECK_STATUS: "updateCheckStatus",
+		CHECK_FOR_UPDATES_BTN: "checkForUpdatesBtn",
+		UPDATE_CHANNEL_SELECT: "updateChannelSelect",
 		// Menu
 		MENU_ICON: "menuIcon",
 		MENU: "menu",
@@ -131,6 +150,8 @@ const CONSTANTS = {
 		PROXY_MODE: "proxyMode",
 		PROXY: "proxy",
 		AUTO_UPDATE: "autoUpdate",
+		UPDATE_CHANNEL: "updateChannel",
+		SKIPPED_UPDATE_VERSION: "skippedUpdateVersion",
 		CLOSE_TO_TRAY: "closeToTray",
 		YT_DLP_CUSTOM_ARGS: "customYtDlpArgs",
 		YT_DLP_SOURCE: "ytdlpSource",
@@ -216,6 +237,7 @@ class YtDownloaderApp {
 		this._setupDirectories();
 		this._configureTray();
 		this._configureGlobalHotkey();
+		this._setupAutoUpdaterListeners();
 		this._configureAutoUpdate();
 
 		try {
@@ -446,7 +468,285 @@ class YtDownloaderApp {
 		if (windowsStore || (env && env.YTDOWNLOADER_AUTO_UPDATES === "0")) {
 			autoUpdate = false;
 		}
+		const channel = localStorage.getItem(CONSTANTS.LOCAL_STORAGE_KEYS.UPDATE_CHANNEL) || "stable";
+		ipcRenderer.send("set-update-channel", channel);
 		ipcRenderer.send("autoUpdate", autoUpdate);
+	}
+
+	/**
+	 * Sets up listeners and event handlers for application auto-updates.
+	 */
+	_setupAutoUpdaterListeners() {
+		const modal = $(CONSTANTS.DOM_IDS.APP_UPDATE_MODAL_BACKDROP);
+		const titleEl = $(CONSTANTS.DOM_IDS.APP_UPDATE_TITLE);
+		const badgeEl = $(CONSTANTS.DOM_IDS.APP_UPDATE_BADGE);
+		const dateEl = $(CONSTANTS.DOM_IDS.APP_UPDATE_DATE);
+		const notesEl = $(CONSTANTS.DOM_IDS.APP_UPDATE_NOTES);
+		const progressContainer = $(CONSTANTS.DOM_IDS.APP_UPDATE_PROGRESS_CONTAINER);
+		const readyBanner = $(CONSTANTS.DOM_IDS.APP_UPDATE_READY_BANNER);
+		const progressBar = $(CONSTANTS.DOM_IDS.APP_UPDATE_PROGRESS_BAR);
+		const progressPercent = $(CONSTANTS.DOM_IDS.APP_UPDATE_PROGRESS_PERCENT);
+		const speedEl = $(CONSTANTS.DOM_IDS.APP_UPDATE_SPEED);
+		const sizeEl = $(CONSTANTS.DOM_IDS.APP_UPDATE_SIZE);
+		const skipBtn = $(CONSTANTS.DOM_IDS.APP_UPDATE_SKIP_BTN);
+		const laterBtn = $(CONSTANTS.DOM_IDS.APP_UPDATE_LATER_BTN);
+		const actionBtn = $(CONSTANTS.DOM_IDS.APP_UPDATE_ACTION_BTN);
+		const closeBtn = $(CONSTANTS.DOM_IDS.APP_UPDATE_CLOSE_BTN);
+
+		const hideModal = () => {
+			if (modal) modal.classList.add("hidden");
+		};
+
+		const showModal = () => {
+			if (modal) modal.classList.remove("hidden");
+		};
+
+		if (closeBtn) closeBtn.addEventListener("click", hideModal);
+		if (laterBtn) laterBtn.addEventListener("click", hideModal);
+
+		ipcRenderer.on("checking-for-update", (_event, data) => {
+			if (data && data.isManual && window.__setUpdateStatus) {
+				window.__setUpdateStatus(
+					window.i18n ? window.i18n.__("checkingForUpdates") : "Checking for updates...",
+					"checking",
+				);
+			}
+		});
+
+		ipcRenderer.on("update-not-available", (_event, data) => {
+			if (data && data.isManual) {
+				if (window.__setUpdateStatus) {
+					const msg = window.i18n
+						? `${window.i18n.__("upToDate")} (v${data.version || ""})`
+						: `You're on the latest version (v${data.version || ""})`;
+					window.__setUpdateStatus(msg, "success");
+				}
+				this._showPopup(
+					window.i18n ? window.i18n.__("upToDate") : "You're on the latest version",
+					false,
+				);
+			}
+		});
+
+		ipcRenderer.on("update-error", (_event, data) => {
+			if (actionBtn) {
+				actionBtn.disabled = false;
+				actionBtn.textContent = window.i18n ? window.i18n.__("updateNow") : "Update Now";
+			}
+			if (progressContainer) {
+				progressContainer.classList.add("hidden");
+			}
+			const popup = $(CONSTANTS.DOM_IDS.UPDATE_POPUP);
+			if (popup) popup.style.display = "none";
+
+			if (data && data.isManual) {
+				const errMsg = data?.message || (window.i18n ? window.i18n.__("updateCheckFailed") : "Update failed");
+				if (window.__setUpdateStatus) {
+					window.__setUpdateStatus(errMsg, "error");
+				}
+				this._showPopup(errMsg, true);
+			}
+		});
+
+		ipcRenderer.on("update-available", (_event, info) => {
+			if (!info) return;
+
+			if (info.isManual && window.__setUpdateStatus) {
+				const availText = window.i18n ? window.i18n.__("updateAvailable") : "Update available";
+				window.__setUpdateStatus(`${availText}: v${info.version}`, "available");
+			}
+
+			const normalizeVersion = (v) => String(v || "").replace(/^v/i, "").trim().toLowerCase();
+			const rawSkipped = localStorage.getItem(CONSTANTS.LOCAL_STORAGE_KEYS.SKIPPED_UPDATE_VERSION);
+			const skippedVersion = rawSkipped ? normalizeVersion(rawSkipped) : null;
+			const incomingVersion = normalizeVersion(info.version);
+
+			if (!info.isManual && skippedVersion && skippedVersion === incomingVersion) {
+				return;
+			}
+
+			if (titleEl) {
+				titleEl.textContent = window.i18n ? window.i18n.__("updateAvailable") : "Update Available";
+			}
+
+			if (badgeEl) {
+				badgeEl.textContent = `v${info.version}`;
+				if (info.isPrerelease) {
+					badgeEl.classList.add("beta-badge");
+				} else {
+					badgeEl.classList.remove("beta-badge");
+				}
+			}
+
+			if (dateEl) {
+				if (info.releaseDate) {
+					try {
+						dateEl.textContent = new Date(info.releaseDate).toLocaleDateString(undefined, {
+							year: "numeric",
+							month: "short",
+							day: "numeric",
+						});
+					} catch (_) {
+						dateEl.textContent = "";
+					}
+				} else {
+					dateEl.textContent = "";
+				}
+			}
+
+			if (notesEl) {
+				const rawNotes = info.releaseNotes;
+				if (rawNotes) {
+					const cleanText = String(rawNotes).replace(/<[^>]*>?/gm, "").trim();
+					notesEl.textContent = cleanText || (window.i18n ? window.i18n.__("noDetailsAvailable") : "No release notes available.");
+				} else {
+					notesEl.textContent = window.i18n ? window.i18n.__("noDetailsAvailable") : "No release notes available.";
+				}
+			}
+
+			if (progressContainer) progressContainer.classList.add("hidden");
+			if (readyBanner) readyBanner.classList.add("hidden");
+
+			if (skipBtn) {
+				skipBtn.style.display = "block";
+				skipBtn.onclick = () => {
+					localStorage.setItem(CONSTANTS.LOCAL_STORAGE_KEYS.SKIPPED_UPDATE_VERSION, normalizeVersion(info.version));
+					hideModal();
+				};
+			}
+
+			if (laterBtn) {
+				laterBtn.style.display = "block";
+				laterBtn.textContent = window.i18n ? window.i18n.__("remindLater") : "Remind me later";
+				laterBtn.onclick = hideModal;
+			}
+
+			if (actionBtn) {
+				actionBtn.disabled = false;
+				const isBrowserDownload =
+					info.isZipBuild ||
+					info.platform === "darwin" ||
+					(info.platform === "linux" && !env?.APPIMAGE);
+
+				if (isBrowserDownload) {
+					actionBtn.textContent = window.i18n ? window.i18n.__("downloadInBrowser") : "Download in Browser";
+					actionBtn.onclick = () => {
+						const v = info.version;
+						if (info.platform === "win32") {
+							shell.openExternal(
+								`https://github.com/aandrew-me/ytDownloader/releases/download/v${v}/YTDownloader_Win.zip`,
+							);
+						} else if (info.platform === "darwin") {
+							const arch = info.arch === "arm64" ? "arm64" : "x64";
+							shell.openExternal(
+								`https://github.com/aandrew-me/ytDownloader/releases/download/v${v}/YTDownloader_Mac_${arch}.dmg`,
+							);
+						} else {
+							shell.openExternal(
+								`https://github.com/aandrew-me/ytDownloader/releases/tag/v${v}`,
+							);
+						}
+						hideModal();
+					};
+				} else {
+					actionBtn.textContent = window.i18n ? window.i18n.__("updateNow") : "Update Now";
+					actionBtn.onclick = () => {
+						actionBtn.disabled = true;
+						actionBtn.textContent = window.i18n ? window.i18n.__("downloadingUpdate") : "Downloading...";
+						if (progressContainer) progressContainer.classList.remove("hidden");
+						if (progressBar) progressBar.style.width = "0%";
+						if (progressPercent) progressPercent.textContent = "0%";
+						if (speedEl) speedEl.textContent = "...";
+						if (sizeEl) sizeEl.textContent = "...";
+						ipcRenderer.send("download-update");
+					};
+				}
+			}
+
+			showModal();
+		});
+
+		ipcRenderer.on("download-progress", (_event, data) => {
+			const percent = typeof data === "number" ? data : (data?.percent ?? 0);
+			const bytesPerSecond = typeof data === "object" ? (data?.bytesPerSecond ?? 0) : 0;
+			const transferred = typeof data === "object" ? (data?.transferred ?? 0) : 0;
+			const total = typeof data === "object" ? (data?.total ?? 0) : 0;
+
+			// In-app modal progress update
+			if (progressContainer) progressContainer.classList.remove("hidden");
+			if (progressBar) progressBar.style.width = `${percent.toFixed(1)}%`;
+			if (progressPercent) progressPercent.textContent = `${percent.toFixed(1)}%`;
+
+			if (speedEl) {
+				if (bytesPerSecond > 0) {
+					const mbps = (bytesPerSecond / (1024 * 1024)).toFixed(1);
+					speedEl.textContent = `${mbps} MB/s`;
+				} else {
+					speedEl.textContent = "";
+				}
+			}
+			if (sizeEl) {
+				if (total > 0) {
+					const transMB = (transferred / (1024 * 1024)).toFixed(1);
+					const totMB = (total / (1024 * 1024)).toFixed(1);
+					sizeEl.textContent = `${transMB} MB / ${totMB} MB`;
+				} else if (transferred > 0) {
+					const transMB = (transferred / (1024 * 1024)).toFixed(1);
+					sizeEl.textContent = `${transMB} MB`;
+				}
+			}
+
+			// Also update legacy float popup if modal is hidden
+			const popup = $(CONSTANTS.DOM_IDS.UPDATE_POPUP);
+			const textEl = $(CONSTANTS.DOM_IDS.UPDATE_POPUP_PROGRESS);
+			const barEl = $(CONSTANTS.DOM_IDS.UPDATE_POPUP_BAR);
+			if (popup && modal && modal.classList.contains("hidden")) {
+				popup.style.display = "flex";
+			}
+			if (textEl) textEl.textContent = `${percent.toFixed(1)}%`;
+			if (barEl) barEl.style.width = `${percent}%`;
+		});
+
+		ipcRenderer.on("update-downloaded", (_event, _data) => {
+			const popup = $(CONSTANTS.DOM_IDS.UPDATE_POPUP);
+			if (popup) popup.style.display = "none";
+
+			if (progressContainer) progressContainer.classList.add("hidden");
+			if (readyBanner) readyBanner.classList.remove("hidden");
+
+			if (titleEl) {
+				titleEl.textContent = window.i18n
+					? window.i18n.__("updateDownloadedReady")
+					: "Update Ready to Install";
+			}
+
+			if (skipBtn) skipBtn.style.display = "none";
+
+			if (laterBtn) {
+				laterBtn.textContent = window.i18n ? window.i18n.__("installOnExit") : "Install on exit";
+				laterBtn.onclick = () => {
+					hideModal();
+					this._showPopup(
+						window.i18n ? window.i18n.__("installOnExitNotice") : "Update will be installed when you close the app.",
+						false,
+					);
+				};
+			}
+
+			if (actionBtn) {
+				actionBtn.disabled = false;
+				actionBtn.textContent = window.i18n ? window.i18n.__("restartAndInstall") : "Restart & Install";
+				actionBtn.onclick = () => {
+					ipcRenderer.send("install-update", { restartNow: true });
+				};
+			}
+
+			this._showPopup(
+				window.i18n ? window.i18n.__("updateDownloadedReady") : "Update ready to install",
+				false,
+			);
+			showModal();
+		});
 	}
 
 	/**
@@ -1240,22 +1540,6 @@ class YtDownloaderApp {
 				console.log(error);
 				this._showPopup(i18n.__("unableToAccessDir"), true);
 			}
-		});
-
-		ipcRenderer.on("download-progress", (_event, percent) => {
-			if (typeof percent === "number") {
-				const popup = $(CONSTANTS.DOM_IDS.UPDATE_POPUP);
-				const textEl = $(CONSTANTS.DOM_IDS.UPDATE_POPUP_PROGRESS);
-				const barEl = $(CONSTANTS.DOM_IDS.UPDATE_POPUP_BAR);
-
-				if (popup) popup.style.display = "flex";
-				if (textEl) textEl.textContent = `${percent.toFixed(1)}%`;
-				if (barEl) barEl.style.width = `${percent}%`;
-			}
-		});
-
-		ipcRenderer.on("update-downloaded", (_event, _) => {
-			$(CONSTANTS.DOM_IDS.UPDATE_POPUP).style.display = "none";
 		});
 
 		const minSlider = $(CONSTANTS.DOM_IDS.MIN_SLIDER);

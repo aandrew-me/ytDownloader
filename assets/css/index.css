@@ -6166,3 +6166,335 @@ body.rtl .header-core {
 	opacity: 0.45;
 	font-style: italic;
 }
+
+/* ── In-App Update Modal & Telemetry ────────────────────────── */
+.app-update-backdrop {
+	position: fixed;
+	inset: 0;
+	z-index: 10000;
+	background: rgba(0, 0, 0, 0.65);
+	backdrop-filter: blur(8px);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 20px;
+	opacity: 1;
+	transition: opacity 0.2s ease;
+}
+
+.app-update-backdrop.hidden {
+	display: none !important;
+}
+
+.app-update-dialog {
+	background: var(--box-main);
+	border: 1px solid var(--box-separation);
+	border-radius: 16px;
+	width: 100%;
+	max-width: 520px;
+	box-shadow: 0 20px 45px rgba(0, 0, 0, 0.45);
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	animation: updateModalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes updateModalPop {
+	from {
+		opacity: 0;
+		transform: scale(0.95) translateY(10px);
+	}
+	to {
+		opacity: 1;
+		transform: scale(1) translateY(0);
+	}
+}
+
+.app-update-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	padding: 20px 24px 14px;
+	border-bottom: 1px solid var(--box-separation);
+}
+
+.app-update-header-info {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.app-update-title-row {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.app-update-title-row h3 {
+	margin: 0;
+	font-size: 1.25rem;
+	font-weight: 700;
+	color: var(--text);
+}
+
+.app-update-badge {
+	display: inline-flex;
+	align-items: center;
+	padding: 2px 9px;
+	border-radius: 12px;
+	font-size: 0.78rem;
+	font-weight: 600;
+	background: var(--blueBtn);
+	color: #fff;
+	letter-spacing: 0.3px;
+}
+
+.app-update-badge.beta-badge {
+	background: linear-gradient(135deg, #f59e0b, #d97706);
+	color: #fff;
+}
+
+.app-update-date {
+	font-size: 0.8rem;
+	color: var(--text-secondary, #94a3b8);
+	opacity: 0.8;
+}
+
+.app-update-close {
+	background: none;
+	border: none;
+	font-size: 1.5rem;
+	line-height: 1;
+	color: var(--text);
+	opacity: 0.6;
+	cursor: pointer;
+	padding: 4px;
+	border-radius: 6px;
+	transition: opacity 0.15s, background 0.15s;
+}
+
+.app-update-close:hover {
+	opacity: 1;
+	background: var(--select);
+}
+
+.app-update-body {
+	padding: 18px 24px;
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+
+.app-update-notes-wrapper {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.app-update-notes-label {
+	font-size: 0.82rem;
+	font-weight: 600;
+	color: var(--text-secondary, #94a3b8);
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+.app-update-notes {
+	max-height: 200px;
+	overflow-y: auto;
+	background: var(--select);
+	border: 1px solid var(--box-separation);
+	border-radius: 10px;
+	padding: 12px 14px;
+	font-size: 0.85rem;
+	line-height: 1.5;
+	color: var(--text);
+	white-space: pre-wrap;
+	word-break: break-word;
+	text-align: left;
+	scrollbar-width: thin;
+	scrollbar-color: var(--box-separation) transparent;
+}
+
+.app-update-notes::-webkit-scrollbar {
+	width: 6px;
+}
+
+.app-update-notes::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+.app-update-notes::-webkit-scrollbar-thumb {
+	background: var(--box-separation);
+	border-radius: 6px;
+}
+
+.app-update-notes::-webkit-scrollbar-thumb:hover {
+	background: var(--item-bg);
+}
+
+.app-update-notes p {
+	margin: 0 0 8px;
+}
+
+.hidden {
+	display: none !important;
+}
+
+.app-update-progress-container {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	background: var(--select);
+	border: 1px solid var(--box-separation);
+	border-radius: 10px;
+	padding: 14px;
+}
+
+.app-update-progress-container.hidden {
+	display: none !important;
+}
+
+.app-update-ready-banner {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	background: color-mix(in srgb, var(--greenBtn) 15%, var(--select));
+	border: 1px solid color-mix(in srgb, var(--greenBtn) 40%, var(--box-separation));
+	border-radius: 10px;
+	padding: 14px;
+}
+
+.app-update-ready-banner.hidden {
+	display: none !important;
+}
+
+.app-update-ready-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+	background: var(--greenBtn);
+	color: #fff;
+	font-weight: bold;
+	font-size: 1.1rem;
+	flex-shrink: 0;
+}
+
+.app-update-ready-text {
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
+}
+
+.app-update-ready-text strong {
+	color: var(--text);
+	font-size: 0.92rem;
+}
+
+.app-update-progress-info {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	font-size: 0.86rem;
+	font-weight: 500;
+}
+
+.app-update-track {
+	width: 100%;
+	height: 8px;
+	margin: 4px 0;
+}
+
+.app-update-bar {
+	height: 100%;
+	width: 0%;
+	background: var(--greenBtn);
+	border-radius: 4px;
+	transition: width 0.2s ease;
+}
+
+.app-update-telemetry {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	font-size: 0.76rem;
+	color: var(--text-secondary, #94a3b8);
+	opacity: 0.85;
+}
+
+.app-update-footer {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 14px 24px 20px;
+	border-top: 1px solid var(--box-separation);
+	gap: 12px;
+	flex-wrap: wrap;
+}
+
+.app-update-footer-left {
+	display: flex;
+	align-items: center;
+}
+
+.app-update-footer-right {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-left: auto;
+}
+
+.text-btn {
+	background: transparent;
+	border: none;
+	color: var(--text-secondary, #94a3b8);
+	font-size: 0.84rem;
+	cursor: pointer;
+	padding: 6px 8px;
+	border-radius: 6px;
+	transition: color 0.15s, opacity 0.15s;
+	opacity: 0.8;
+}
+
+.text-btn:hover {
+	color: var(--text);
+	opacity: 1;
+	text-decoration: underline;
+}
+
+.secondary-btn {
+	background: var(--select);
+	border: 1px solid var(--box-separation);
+	color: var(--text);
+}
+
+.secondary-btn:hover {
+	background: var(--box-separation);
+}
+
+/* ── Check for Updates Status Indicator ──────────────────────── */
+#updateCheckStatus {
+	font-size: 0.8rem;
+	font-weight: 500;
+	transition: color 0.2s ease;
+}
+
+#updateCheckStatus.status-checking {
+	color: var(--blueBtn);
+}
+
+#updateCheckStatus.status-success {
+	color: var(--greenBtn);
+}
+
+#updateCheckStatus.status-error {
+	color: var(--redBtn);
+}
+
+#updateCheckStatus.status-available {
+	color: #f59e0b;
+}
+
