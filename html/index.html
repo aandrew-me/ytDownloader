@@ -1207,12 +1207,35 @@
                         </section>
 
                         <section class="settings-section">
+                            <div class="prefBox title-box">
+                                <strong data-translate="updates">Updates</strong>
+                            </div>
                             <div class="prefBox" id="autoUpdatesBox">
-                                <span id="autoUpdateTxt" data-translate="disableAutoUpdates">Disable auto updates</span>
+                                <div class="pref-label-group">
+                                    <span id="autoUpdateTxt" data-translate="disableAutoUpdates">Disable auto updates</span>
+                                    <p class="pref-subtitle" data-translate="updatesSubtitle">Automatically check for updates on startup</p>
+                                </div>
                                 <label class="switch">
                                     <input type="checkbox" id="autoUpdateDisabled">
                                     <span class="slider"></span>
                                 </label>
+                            </div>
+                            <div class="prefBox" id="updateChannelBox">
+                                <div class="pref-label-group">
+                                    <span id="updateChannelTxt" data-translate="updateChannel">Update channel</span>
+                                    <p class="pref-subtitle" data-translate="updateChannelSubtitle">Choose between tested stable releases or early beta builds</p>
+                                </div>
+                                <select id="updateChannelSelect">
+                                    <option value="stable" data-translate="channelStable">Stable</option>
+                                    <option value="beta" data-translate="channelBeta">Beta / Pre-release</option>
+                                </select>
+                            </div>
+                            <div class="prefBox" id="manualUpdateBox">
+                                <div class="pref-label-group">
+                                    <span data-translate="checkForUpdates">Check for updates</span>
+                                    <p id="updateCheckStatus" class="pref-subtitle"></p>
+                                </div>
+                                <button id="checkForUpdatesBtn" class="btn blueBtn" type="button" data-translate="checkForUpdates">Check for updates</button>
                             </div>
                         </section>
                     </div>
@@ -1666,6 +1689,57 @@
             <div id="progressBarFill"></div>
         </div>
         <span id="updateProgress">0.0%</span>
+    </div>
+
+    <!-- In-App Update Modal -->
+    <div id="appUpdateModalBackdrop" class="app-update-backdrop hidden">
+        <div class="app-update-dialog" role="dialog" aria-modal="true" aria-labelledby="appUpdateTitle">
+            <div class="app-update-header">
+                <div class="app-update-header-info">
+                    <div class="app-update-title-row">
+                        <h3 id="appUpdateTitle" data-translate="updateAvailable">Update Available</h3>
+                        <span id="appUpdateBadge" class="app-update-badge">v4.0.0</span>
+                    </div>
+                    <span id="appUpdateDate" class="app-update-date"></span>
+                </div>
+                <button class="app-update-close" id="appUpdateCloseBtn" aria-label="Close" title="Close">&times;</button>
+            </div>
+            <div class="app-update-body">
+                <div class="app-update-notes-wrapper">
+                    <span class="app-update-notes-label" data-translate="releaseNotes">Release Notes</span>
+                    <div id="appUpdateNotes" class="app-update-notes"></div>
+                </div>
+                <div id="appUpdateProgressContainer" class="app-update-progress-container hidden">
+                    <div class="app-update-progress-info">
+                        <span id="appUpdateProgressStatus" data-translate="downloadingUpdate">Downloading update...</span>
+                        <span id="appUpdateProgressPercent">0%</span>
+                    </div>
+                    <div class="progress-track app-update-track">
+                        <div id="appUpdateProgressBar" class="app-update-bar"></div>
+                    </div>
+                    <div class="app-update-telemetry">
+                        <span id="appUpdateSpeed">0 KB/s</span>
+                        <span id="appUpdateSize">0 MB / 0 MB</span>
+                    </div>
+                </div>
+                <div id="appUpdateReadyBanner" class="app-update-ready-banner hidden">
+                    <span class="app-update-ready-icon">✓</span>
+                    <div class="app-update-ready-text">
+                        <strong data-translate="updateDownloadedReady">Update downloaded and ready to install</strong>
+                        <p class="pref-subtitle">Choose to restart and install now or automatically apply upon closing the application.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="app-update-footer">
+                <div class="app-update-footer-left">
+                    <button class="btn text-btn" id="appUpdateSkipBtn" type="button" data-translate="skipThisVersion">Skip this version</button>
+                </div>
+                <div class="app-update-footer-right">
+                    <button class="btn secondary-btn" id="appUpdateLaterBtn" type="button" data-translate="remindLater">Remind me later</button>
+                    <button class="btn greenBtn" id="appUpdateActionBtn" type="button" data-translate="updateNow">Update Now</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>

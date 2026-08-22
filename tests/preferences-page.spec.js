@@ -119,6 +119,10 @@ test.describe("Preferences Page Tests", () => {
 		});
 		const savedAutoUpdate = await page.evaluate(() => localStorage.getItem("autoUpdate"));
 		expect(savedAutoUpdate).toBe("false");
+
+		await page.selectOption("#updateChannelSelect", "beta");
+		const savedChannel = await page.evaluate(() => localStorage.getItem("updateChannel"));
+		expect(savedChannel).toBe("beta");
 	});
 
 	test("media settings preferences save to localStorage", async () => {
