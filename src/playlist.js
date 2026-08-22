@@ -218,13 +218,15 @@ const playlistDownloader = {
 			localStorage.setItem("downloadPath", defaultDownloadsDir);
 		}
 
-		const preferredVideo = localStorage.getItem("preferredVideoQuality");
-		if (preferredVideo && this.ui.videoQualitySelect) {
+		const preferredVideo =
+			localStorage.getItem("preferredVideoQuality") || "1080";
+		if (this.ui.videoQualitySelect) {
 			this.ui.videoQualitySelect.value = preferredVideo;
 		}
 		if (this.ui.videoQualitySelect && !this.ui.videoQualitySelect.value) {
-			this.ui.videoQualitySelect.value = "best";
+			this.ui.videoQualitySelect.value = "1080";
 		}
+		this.updateVideoTypeVisibility();
 
 		const preferredAudioFormat = localStorage.getItem("preferredAudioQuality");
 		if (preferredAudioFormat && this.ui.audioTypeSelect) {

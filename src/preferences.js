@@ -531,18 +531,22 @@ function initPreferences() {
 		}
 	}
 
-	function bindSelectToStorage(elementId, storageKey) {
+	function bindSelectToStorage(elementId, storageKey, defaultValue) {
 		const el = getId(elementId);
 		if (!el) return;
 		const value = localStorage.getItem(storageKey);
-		if (value) el.value = value;
+		if (value) {
+			el.value = value;
+		} else if (defaultValue) {
+			el.value = defaultValue;
+		}
 
 		const updateVal = (e) => localStorage.setItem(storageKey, e.target.value);
 		el.addEventListener("change", updateVal);
 		el.addEventListener("input", updateVal);
 	}
 
-	bindSelectToStorage("preferredVideoQuality", "preferredVideoQuality");
+	bindSelectToStorage("preferredVideoQuality", "preferredVideoQuality", "1080");
 	bindSelectToStorage("preferredAudioQuality", "preferredAudioQuality");
 	bindSelectToStorage("preferredVideoCodec", "preferredVideoCodec");
 
