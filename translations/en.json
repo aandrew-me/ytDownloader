@@ -272,6 +272,7 @@
 	"singleMode": "Single",
 	"multipleMode": "Multiple",
 	"noDownloadsHint": "Paste a video URL or add multiple links to start downloading.",
+	"noPlaylistDownloadsHint": "Paste a playlist URL to start downloading.",
 	"addUrlsPlaceholder": "Paste video URLs (one per line)...",
 	"addToBatch": "Add",
 	"pasteClipboard": "Paste Clipboard",

@@ -560,7 +560,20 @@
                         </span>
                     </button>
 
-                    <div id="options" class="playlist-hidden-menu">
+                    <!-- Empty State ("No downloads yet") -->
+                    <div id="emptyStatePlaylist" class="empty-state-card">
+                        <div class="empty-state-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="48" height="48">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                        </div>
+                        <h3 id="emptyStatePlaylistTitle" data-translate="noDownloadsYet">No downloads yet</h3>
+                        <p id="emptyStatePlaylistHint" data-translate="noPlaylistDownloadsHint">Paste a playlist URL to start downloading.</p>
+                    </div>
+
+                    <div id="options" class="playlist-hidden-menu" style="display: none;">
                         <!-- Top Header Bar with Close Button -->
                         <div class="playlist-menu-header">
                             <div class="playlist-menu-title-group">
@@ -870,6 +883,19 @@
                     <p id="incorrectMsgSelective"></p>
                     <button class="advancedToggle" id="errorBtnSelective" style="display: none;" data-translate="errorDetails">Error Details ▼</button>
                     <div id="errorDetailsSelective" style="display: none;"></div>
+
+                    <!-- Empty State ("No downloads yet") -->
+                    <div id="emptyStatePlaylistSelective" class="empty-state-card">
+                        <div class="empty-state-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="48" height="48">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                        </div>
+                        <h3 id="emptyStatePlaylistSelectiveTitle" data-translate="noDownloadsYet">No downloads yet</h3>
+                        <p id="emptyStatePlaylistSelectiveHint" data-translate="noPlaylistDownloadsHint">Paste a playlist URL to start downloading.</p>
+                    </div>
 
                     <div id="selectiveContent" style="display: none;">
                         <div class="selective-header-card">

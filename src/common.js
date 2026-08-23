@@ -33,6 +33,9 @@ export function switchView(targetViewId) {
 	if (targetViewId === "view-playlist" && window.playlistDownloader) {
 		window.playlistDownloader.initUI();
 		window.playlistDownloader.loadInitialConfig();
+		if (typeof window.playlistDownloader._updateEmptyStateUI === "function") {
+			window.playlistDownloader._updateEmptyStateUI();
+		}
 	}
 }
 window.switchView = switchView;
