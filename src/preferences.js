@@ -837,6 +837,24 @@ function initPreferences() {
 		maxDownloadsInput.addEventListener("change", updateMax);
 	}
 
+	// Zoom Level Selector
+	const zoomLevelSelect = getId("zoomLevelSelect");
+	if (zoomLevelSelect) {
+		const savedZoom = localStorage.getItem("zoomLevel") || "1";
+		zoomLevelSelect.value = savedZoom;
+		const updateZoom = () => {
+			const val = zoomLevelSelect.value;
+			localStorage.setItem("zoomLevel", val);
+			if (window.applyZoom) {
+				window.applyZoom(val);
+			} else if (window.electronAPI?.webFrame?.setZoomFactor) {
+				window.electronAPI.webFrame.setZoomFactor(parseFloat(val) || 1);
+			}
+		};
+		zoomLevelSelect.addEventListener("change", updateZoom);
+		zoomLevelSelect.addEventListener("input", updateZoom);
+	}
+
 	// UI Switches triggers
 	function bindCheckboxToStorage(
 		checkboxId,

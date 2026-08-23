@@ -123,6 +123,14 @@ test.describe("Preferences Page Tests", () => {
 		await page.selectOption("#updateChannelSelect", "beta");
 		const savedChannel = await page.evaluate(() => localStorage.getItem("updateChannel"));
 		expect(savedChannel).toBe("beta");
+
+		await page.selectOption("#zoomLevelSelect", "0.8");
+		const savedZoom = await page.evaluate(() => localStorage.getItem("zoomLevel"));
+		expect(savedZoom).toBe("0.8");
+		const zoomFactor = await page.evaluate(() => window.electronAPI?.webFrame?.getZoomFactor?.());
+		if (zoomFactor !== undefined) {
+			expect(zoomFactor).toBeCloseTo(0.8);
+		}
 	});
 
 	test("media settings preferences save to localStorage", async () => {

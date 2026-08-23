@@ -15,6 +15,8 @@
 	"start": "Start",
 	"selectLanguageRelaunch": "Select Language",
 	"selectLanguage": "Select Language",
+	"zoomLevel": "UI Zoom",
+	"zoomLevelSubtitle": "Adjust the interface scale",
 	"downloadTimeRange": "Download particular time-range",
 	"end": "End",
 	"timeRangeStartEmptyHint": "If kept empty, it will start from the beginning",

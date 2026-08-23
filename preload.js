@@ -1,4 +1,4 @@
-const { contextBridge, ipcRenderer, shell, clipboard } = require("electron");
+const { contextBridge, ipcRenderer, shell, clipboard, webFrame } = require("electron");
 const path = require("path");
 const os = require("os");
 const fs = require("fs");
@@ -427,4 +427,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	isTest: process.env.NODE_ENV === "test" || process.argv.includes("--is-test") || process.env.YTDOWNLOADER_TEST === "true",
 	windowsStore: process.windowsStore,
 	__dirname: path.join(__dirname, "html"),
+	webFrame: {
+		setZoomFactor: (factor) => webFrame.setZoomFactor(factor),
+		getZoomFactor: () => webFrame.getZoomFactor(),
+	},
 });
