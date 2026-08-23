@@ -2994,19 +2994,23 @@ h2 {
 #compression-status {
 	max-width: 800px;
 	margin: 20px auto 0 auto;
-	border-top: 1px solid var(--item-bg);
+	border-top: 1px solid var(--box-separation, var(--item-bg));
 	padding-top: 20px;
 }
 
 .status-item {
 	padding: 16px;
-	margin: 6px auto;
-	border-radius: 4px;
+	margin: 8px auto;
+	border-radius: 8px;
 	display: flex;
 	justify-content: space-between;
+	align-items: center;
 	flex-direction: row;
-	background-color: var(--item-bg);
+	background-color: var(--box-main);
+	border: 1px solid var(--box-separation, var(--box-toggle));
+	box-shadow: var(--box-shadow, 0 2px 4px rgba(0, 0, 0, 0.08));
 	max-width: 800px;
+	color: var(--text);
 }
 
 .status-item.success {
