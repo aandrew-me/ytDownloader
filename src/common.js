@@ -158,10 +158,55 @@ function initTheme() {
 	}
 }
 
+export function applyZoom(zoom) {
+	const factor = parseFloat(zoom) || 1;
+	if (window.electronAPI?.webFrame?.setZoomFactor) {
+		window.electronAPI.webFrame.setZoomFactor(factor);
+	}
+	const zoomSelect = getId("zoomLevelSelect");
+	if (zoomSelect && zoomSelect.value !== String(zoom)) {
+		zoomSelect.value = String(zoom);
+	}
+}
+window.applyZoom = applyZoom;
+
+export function initZoom() {
+	const savedZoom = localStorage.getItem("zoomLevel") || "1";
+	applyZoom(savedZoom);
+}
+window.initZoom = initZoom;
+
+const ZOOM_STEPS = [0.75, 0.8, 0.9, 1, 1.1, 1.25, 1.5, 1.75, 2];
+
+window.addEventListener("keydown", (e) => {
+	if (!e.ctrlKey && !e.metaKey) return;
+	if (e.key === "=" || e.key === "+") {
+		e.preventDefault();
+		const current = parseFloat(localStorage.getItem("zoomLevel") || "1");
+		const next = ZOOM_STEPS.find((s) => s > current + 0.01) ?? 2;
+		localStorage.setItem("zoomLevel", String(next));
+		applyZoom(next);
+	} else if (e.key === "-") {
+		e.preventDefault();
+		const current = parseFloat(localStorage.getItem("zoomLevel") || "1");
+		const prev = [...ZOOM_STEPS].reverse().find((s) => s < current - 0.01) ?? 0.75;
+		localStorage.setItem("zoomLevel", String(prev));
+		applyZoom(prev);
+	} else if (e.key === "0") {
+		e.preventDefault();
+		localStorage.setItem("zoomLevel", "1");
+		applyZoom(1);
+	}
+});
+
 if (document.readyState === "loading") {
-	document.addEventListener("DOMContentLoaded", initTheme);
+	document.addEventListener("DOMContentLoaded", () => {
+		initTheme();
+		initZoom();
+	});
 } else {
 	initTheme();
+	initZoom();
 }
 
 ////

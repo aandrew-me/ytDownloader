@@ -106,8 +106,8 @@ function createWindow() {
 
 	appState.mainWindow = new BrowserWindow({
 		...bounds,
-		minWidth: 800,
-		minHeight: 600,
+		minWidth: 680,
+		minHeight: 500,
 		autoHideMenuBar: true,
 		show: false,
 		icon: path.join(__dirname, "/assets/images/icon.png"),
@@ -176,8 +176,10 @@ function createSecondaryWindow(file) {
 			sandbox: false,
 			preload: path.join(__dirname, "preload.js"),
 		},
-		width: 1000,
-		height: 800,
+		width: 900,
+		height: 640,
+		minWidth: 680,
+		minHeight: 500,
 	});
 
 	// appState.secondaryWindow.webContents.openDevTools();
@@ -782,7 +784,7 @@ async function loadConfiguration() {
 			error.message,
 		);
 		appState.config = {
-			bounds: { width: 1024, height: 768 },
+			bounds: { width: 900, height: 640 },
 			isMaximized: false,
 		};
 	}

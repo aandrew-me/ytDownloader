@@ -1200,6 +1200,26 @@
 
                         <section class="settings-section">
                             <div class="prefBox">
+                                <div class="pref-label-group">
+                                    <span id="zoomLevelTxt" data-translate="zoomLevel">UI Zoom</span>
+                                    <p class="pref-subtitle" data-translate="zoomLevelSubtitle">Adjust the interface scale</p>
+                                </div>
+                                <select id="zoomLevelSelect">
+                                    <option value="0.75">75%</option>
+                                    <option value="0.8">80%</option>
+                                    <option value="0.9">90%</option>
+                                    <option value="1" selected>100%</option>
+                                    <option value="1.1">110%</option>
+                                    <option value="1.25">125%</option>
+                                    <option value="1.5">150%</option>
+                                    <option value="1.75">175%</option>
+                                    <option value="2">200%</option>
+                                </select>
+                            </div>
+                        </section>
+
+                        <section class="settings-section">
+                            <div class="prefBox">
                                 <span id="maxTxt" data-translate="maxActiveDownloads">Maximum number of active downloads</span>
                                 <input type="number" min="1" class="input input-num" id="maxDownloads" value="5">
                             </div>
