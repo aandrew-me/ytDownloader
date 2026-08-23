@@ -239,4 +239,63 @@ test.describe("Compressor Page Tests", () => {
 		const outputPath = ffmpegCmd[ffmpegCmd.length - 1];
 		expect(outputPath.endsWith(".mkv")).toBe(true);
 	});
+
+	test("empty suffix on same folder falls back to _compressed to prevent source overwrite", async () => {
+		await attachTestFile(page, "video_to_compress.mp4");
+
+		await page.click('button[data-quality="balanced"]');
+		await page.fill("#output-suffix", "");
+
+		await clearExecutedCommands(page);
+
+		await page.click("#compress-btn");
+		await waitForFfmpegCommand(page);
+
+		const commands = await getFfmpegCommands(page);
+		expect(commands.length).toBeGreaterThan(0);
+		const ffmpegCmd = commands[commands.length - 1];
+
+		const outputPath = ffmpegCmd[ffmpegCmd.length - 1];
+		expect(outputPath.includes("video_to_compress_compressed.mp4")).toBe(true);
+	});
+
+	test("custom suffix is applied when custom file extension is selected", async () => {
+		await attachTestFile(page, "sample.mp4");
+
+		await page.click('button[data-quality="balanced"]');
+		await page.selectOption("#file_extension", "mkv");
+		await page.fill("#output-suffix", "_small720");
+
+		await clearExecutedCommands(page);
+
+		await page.click("#compress-btn");
+		await waitForFfmpegCommand(page);
+
+		const commands = await getFfmpegCommands(page);
+		expect(commands.length).toBeGreaterThan(0);
+		const ffmpegCmd = commands[commands.length - 1];
+
+		const outputPath = ffmpegCmd[ffmpegCmd.length - 1];
+		expect(outputPath.endsWith("sample_small720.mkv")).toBe(true);
+	});
+
+	test("case-insensitive extension match falls back to _compressed on Windows/macOS", async () => {
+		await attachTestFile(page, "video_uppercase.MP4");
+
+		await page.click('button[data-quality="balanced"]');
+		await page.selectOption("#file_extension", "mp4");
+		await page.fill("#output-suffix", "");
+
+		await clearExecutedCommands(page);
+
+		await page.click("#compress-btn");
+		await waitForFfmpegCommand(page);
+
+		const commands = await getFfmpegCommands(page);
+		expect(commands.length).toBeGreaterThan(0);
+		const ffmpegCmd = commands[commands.length - 1];
+
+		const outputPath = ffmpegCmd[ffmpegCmd.length - 1];
+		expect(outputPath.toLowerCase().includes("video_uppercase_compressed.mp4")).toBe(true);
+	});
 });

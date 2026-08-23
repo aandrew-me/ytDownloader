@@ -16,11 +16,7 @@ document.addEventListener("translations-loaded", () => {
 	window.i18n.translatePage();
 });
 
-let menuIsOpen = false;
-
 const dom = {
-	menuIcon: getId("menuIcon"),
-	menu: getId("menu"),
 	fileInput: getId("fileInput"),
 	selectedFilesDiv: getId("selected-files"),
 	customFolderSelect: getId("custom-folder-select"),
@@ -28,14 +24,7 @@ const dom = {
 	compressBtn: getId("compress-btn"),
 	cancelBtn: getId("cancel-btn"),
 	compressionStatus: getId("compression-status"),
-	themeToggle: getId("themeToggle"),
 	outputFolderInput: getId("output-folder-input"),
-	preferenceWin: getId("preferenceWin"),
-	playlistWin: getId("playlistWin"),
-	aboutWin: getId("aboutWin"),
-	historyWin: getId("historyWin"),
-	homeWin: getId("homeWin"),
-	searchWin: getId("searchWin"),
 	encoder: getId("encoder"),
 	compressionSpeed: getId("compression-speed"),
 	videoQuality: getId("video-quality"),
@@ -51,41 +40,6 @@ const dom = {
 	advancedToggleBtn: getId("advanced-toggle-btn"),
 	advancedSettingsCollapse: getId("advanced-settings-collapse"),
 };
-
-function openMenu() {
-	dom.menuIcon.style.transform = "rotate(90deg)";
-	menuIsOpen = true;
-	dom.menu.style.display = "flex";
-
-	setTimeout(() => {
-		dom.menu.style.opacity = "1";
-	}, 20);
-}
-
-function closeMenu() {
-	dom.menuIcon.style.transform = "rotate(0deg)";
-	menuIsOpen = false;
-	let count = 0;
-	let opacity = 1;
-	const fade = setInterval(() => {
-		if (count >= 10) {
-			dom.menu.style.display = "none";
-			clearInterval(fade);
-		} else {
-			opacity -= 0.1;
-			dom.menu.style.opacity = opacity.toFixed(2);
-			count++;
-		}
-	}, 50);
-}
-
-dom.menuIcon.addEventListener("click", () => {
-	if (menuIsOpen) {
-		closeMenu();
-	} else {
-		openMenu();
-	}
-});
 
 const vaapi_device = "/dev/dri/renderD128";
 
@@ -115,8 +69,8 @@ export function initCompressorGPU() {
 			};
 
 			info.controllers.forEach((gpu) => {
-				const gpuName = gpu.vendor.toLowerCase();
-				const gpuModel = gpu.model.toLowerCase();
+				const gpuName = (gpu.vendor || "").toLowerCase();
+				const gpuModel = (gpu.model || "").toLowerCase();
 				let selector = null;
 
 				if (gpuName.includes("nvidia") || gpuModel.includes("nvidia")) {
@@ -191,64 +145,84 @@ function updateSelectedFiles() {
 	dom.selectedFilesDiv.innerHTML = fileList || "No files selected";
 }
 
+let isCompressing = false;
+
 // Compression Logic
 dom.compressBtn.addEventListener("click", startCompression);
 dom.cancelBtn.addEventListener("click", cancelCompression);
 
 async function startCompression() {
+	if (isCompressing) return;
 	if (files.length === 0) return alert("Please select files first!");
 
-	const settings = getEncoderSettings();
-	isCancelled = false; // Ensure clean state at the start
-
-	for (const file of files) {
-		// Check if cancellation happened before starting this file
-		if (isCancelled) break;
-
-		const itemId = "f" + crypto.randomUUID().replace(/-/g, "");
-		currentItemId = itemId;
-
-		const outputPath = generateOutputPath(file, settings);
-
-		try {
-			await compressVideo(file, settings, itemId, outputPath);
-
-			if (isCancelled) {
-				break; // Break the loop if cancelled during compression
-			} else {
-				updateProgress("success", "", itemId);
-				const fileSavedElement = document.createElement("b");
-				fileSavedElement.textContent = i18n.__("fileSavedClickToOpen");
-				fileSavedElement.onclick = () => {
-					ipcRenderer.send("show-file", outputPath);
-				};
-				getId(itemId + "_prog")?.appendChild(fileSavedElement);
-			}
-		} catch (error) {
-			if (isCancelled) {
-				break; // Break loop if process was killed by cancel button
-			}
-
-			const errorElement = document.createElement("div");
-			errorElement.onclick = () => {
-				ipcRenderer.send("error_dialog", error.message);
-			};
-			errorElement.textContent = i18n.__("errorClickForDetails");
-			updateProgress("error", "", itemId);
-			getId(itemId + "_prog")?.appendChild(errorElement);
-		}
-	}
-
-	// Reset states when queue finishes or is broken
-	currentItemId = "";
+	isCompressing = true;
 	isCancelled = false;
+	if (dom.compressBtn) dom.compressBtn.disabled = true;
+	if (dom.fileInput) dom.fileInput.disabled = true;
+
+	try {
+		const settings = getEncoderSettings();
+
+		for (const file of files) {
+			// Check if cancellation happened before starting this file
+			if (isCancelled) break;
+
+			const itemId = "f" + crypto.randomUUID().replace(/-/g, "");
+			currentItemId = itemId;
+
+			const outputPath = generateOutputPath(file, settings);
+
+			try {
+				await compressVideo(file, settings, itemId, outputPath);
+
+				if (isCancelled) {
+					break; // Break the loop if cancelled during compression
+				} else {
+					updateProgress("success", "", itemId);
+					const fileSavedElement = document.createElement("b");
+					fileSavedElement.textContent = i18n.__("fileSavedClickToOpen");
+					fileSavedElement.onclick = () => {
+						ipcRenderer.send("show-file", outputPath);
+					};
+					getId(itemId + "_prog")?.appendChild(fileSavedElement);
+				}
+			} catch (error) {
+				if (isCancelled) {
+					break; // Break loop if process was killed by cancel button
+				}
+
+				const errorElement = document.createElement("div");
+				errorElement.onclick = () => {
+					ipcRenderer.send("error_dialog", error.message);
+				};
+				errorElement.textContent = i18n.__("errorClickForDetails");
+				updateProgress("error", "", itemId);
+				getId(itemId + "_prog")?.appendChild(errorElement);
+			}
+		}
+	} finally {
+		// Reset states when queue finishes or is broken
+		currentItemId = "";
+		isCancelled = false;
+		isCompressing = false;
+		if (dom.compressBtn) dom.compressBtn.disabled = false;
+		if (dom.fileInput) dom.fileInput.disabled = false;
+	}
 }
 
 function cancelCompression() {
 	isCancelled = true;
 
 	activeProcesses.forEach((child) => {
-		child.stdin.write("q");
+		try {
+			if (child.stdin && child.stdin.writable) {
+				child.stdin.write("q");
+			} else {
+				child.kill("SIGTERM");
+			}
+		} catch {
+			child.kill("SIGTERM");
+		}
 	});
 	activeProcesses.clear();
 
@@ -257,23 +231,37 @@ function cancelCompression() {
 
 /**
  * @param {File} file
+ * @param {{ extension: string; outputPath: string; outputSuffix: string }} settings
  */
 function generateOutputPath(file, settings) {
-	const output_extension = settings.extension;
-	const parsed_file = path.parse(file.path);
-	const outputDir = settings.outputPath || parsed_file.dir;
+	const outputExtension = settings.extension;
+	const parsedFile = path.parse(file.path);
+	const outputDir = settings.outputPath || parsedFile.dir;
+	const suffix = settings.outputSuffix ?? "_compressed";
+	const ext =
+		outputExtension === "unchanged" ? parsedFile.ext : `.${outputExtension}`;
 
-	if (output_extension === "unchanged") {
-		return path.join(
+	let outputPath = path.join(
+		outputDir,
+		`${parsedFile.name}${suffix}${ext}`,
+	);
+
+	// Guard against overwriting source file if output path equals input file
+	const isCaseInsensitive = os.platform() === "win32" || os.platform() === "darwin";
+	const resolvedOutput = path.resolve(outputPath);
+	const resolvedInput = path.resolve(file.path);
+	const isSamePath = isCaseInsensitive
+		? resolvedOutput.toLowerCase() === resolvedInput.toLowerCase()
+		: resolvedOutput === resolvedInput;
+
+	if (isSamePath) {
+		outputPath = path.join(
 			outputDir,
-			`${parsed_file.name}${settings.outputSuffix}${parsed_file.ext}`,
+			`${parsedFile.name}_compressed${ext}`,
 		);
 	}
 
-	return path.join(
-		outputDir,
-		`${parsed_file.name}_compressed.${output_extension}`,
-	);
+	return outputPath;
 }
 
 /**
@@ -312,6 +300,9 @@ async function compressVideo(file, settings, itemId, outputPath) {
 			const dataStr = data.toString();
 
 			stderrOutput += dataStr;
+			if (stderrOutput.length > 50000) {
+				stderrOutput = stderrOutput.slice(-30000);
+			}
 
 			// Parse duration
 			const duration_match = dataStr.match(/Duration:\s*([\d:.]+)/);
@@ -320,16 +311,17 @@ async function compressVideo(file, settings, itemId, outputPath) {
 			}
 
 			// Parse progress
-			const progressTime = dataStr.match(/time=(\d+:\d+:\d+\.\d+)/);
+			const progressTime = dataStr.match(/time=\s*(\d+(?::\d+){1,2}(?:\.\d+)?)/);
 			const totalSeconds = timeToSeconds(video_info.duration);
 			const currentSeconds =
 				progressTime && progressTime.length > 1
 					? timeToSeconds(progressTime[1])
 					: null;
 
-			if (currentSeconds && totalSeconds > 0 && !isCancelled) {
-				const progress = Math.round(
-					(currentSeconds / totalSeconds) * 100,
+			if (currentSeconds !== null && totalSeconds > 0 && !isCancelled) {
+				const progress = Math.min(
+					100,
+					Math.round((currentSeconds / totalSeconds) * 100),
 				);
 
 				const progElem = getId(itemId + "_prog");
@@ -861,14 +853,15 @@ async function buildFFmpegArgs(file, settings, outputPath) {
  * @returns {{ encoder: string; speed: string; videoQuality: string; audioQuality?: string; audioFormat: string, extension: string, outputPath:string, outputSuffix: string }} settings
  */
 function getEncoderSettings() {
+	const useSameFolder = dom.outputFolderInput ? dom.outputFolderInput.checked : true;
 	return {
 		encoder: dom.encoder.value,
 		speed: dom.compressionSpeed.value,
 		videoQuality: dom.videoQuality.value,
 		audioFormat: dom.audioFormat.value,
 		extension: dom.fileExtension.value,
-		outputPath: dom.customFolderPath.textContent,
-		outputSuffix: dom.outputSuffix.value,
+		outputPath: useSameFolder ? "" : (dom.customFolderPath?.textContent?.trim() || ""),
+		outputSuffix: dom.outputSuffix ? dom.outputSuffix.value : "_compressed",
 		targetSize: dom.targetSizeInput ? dom.targetSizeInput.value : "25",
 		targetPercent: dom.targetPercentInput
 			? dom.targetPercentInput.value
@@ -929,18 +922,21 @@ function createProgressItem(filename, status, data, itemId) {
 	dom.compressionStatus.scrollIntoView({behavior: "smooth", block: "end"});
 }
 
-
-
 /**
  * @param {string} timeStr
  */
 function timeToSeconds(timeStr) {
 	if (!timeStr) return 0;
-	const [hh, mm, ss] = timeStr.split(":").map(parseFloat);
-	return hh * 3600 + mm * 60 + ss;
+	const parts = timeStr.split(":").map(parseFloat);
+	if (parts.length === 3) {
+		return (parts[0] || 0) * 3600 + (parts[1] || 0) * 60 + (parts[2] || 0);
+	} else if (parts.length === 2) {
+		return (parts[0] || 0) * 60 + (parts[1] || 0);
+	} else if (parts.length === 1) {
+		return parts[0] || 0;
+	}
+	return 0;
 }
-
-
 
 dom.outputFolderInput.addEventListener("change", (e) => {
 	const checked = e.target.checked;
@@ -956,35 +952,6 @@ dom.outputFolderInput.addEventListener("change", (e) => {
 ipcRenderer.on("directory-path", (_event, msg) => {
 	dom.customFolderPath.textContent = msg;
 	dom.customFolderPath.style.display = "inline";
-});
-
-const menuRoutes = {
-	preferenceWin: {page: "/preferences.html", channel: "load-page"},
-	playlistWin: {page: "/playlist.html", channel: "load-win"},
-	aboutWin: {page: "/about.html", channel: "load-page"},
-	historyWin: {page: "/history.html", channel: "load-page"},
-	homeWin: {page: "/index.html", channel: "load-win"},
-	searchWin: {page: "/search.html", channel: "load-win"},
-};
-
-const routeToViewMap = {
-	preferenceWin: "view-preferences",
-	playlistWin: "view-playlist",
-	aboutWin: "view-about",
-	historyWin: "view-history",
-	homeWin: "view-home",
-	searchWin: "view-search",
-};
-
-Object.entries(menuRoutes).forEach(([domKey, route]) => {
-	dom[domKey]?.addEventListener("click", () => {
-		closeMenu();
-		if (routeToViewMap[domKey] && typeof window.switchView === "function") {
-			window.switchView(routeToViewMap[domKey]);
-			return;
-		}
-		ipcRenderer.send(route.channel, __dirname + route.page);
-	});
 });
 
 // Target Size / CRF Mode helper functions
