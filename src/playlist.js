@@ -137,6 +137,8 @@ const playlistDownloader = {
 			selectiveStopBtn: container.querySelector("#selectiveStopBtn"),
 			selectiveOpenFolderBtn: container.querySelector("#selectiveOpenFolderBtn"),
 			selectiveItemsList: container.querySelector("#selectiveItemsList"),
+			emptyStateBatch: container.querySelector("#emptyStatePlaylist") || getId("emptyStatePlaylist"),
+			emptyStateSelective: container.querySelector("#emptyStatePlaylistSelective") || getId("emptyStatePlaylistSelective"),
 
 			menuIcon: getId("menuIcon"),
 			menu: getId("menu"),
@@ -162,6 +164,7 @@ const playlistDownloader = {
 				this.ui.videoToggle.style.backgroundColor = "var(--box-toggleOn)";
 			}
 			this.updateVideoTypeVisibility();
+			this._updateEmptyStateUI();
 		};
 
 		if (document.readyState === "loading") {
@@ -413,19 +416,68 @@ const playlistDownloader = {
 		});
 	},
 
+	/**
+	 * Shows or hides the 'No downloads yet' empty state components on playlist page.
+	 */
+	_updateEmptyStateUI() {
+		const emptyBatch =
+			this.ui.emptyStateBatch || getId("emptyStatePlaylist");
+		if (emptyBatch) {
+			const optionsVisible =
+				this.ui.optionsContainer &&
+				this.ui.optionsContainer.style.display !== "none";
+			const hasDownloads =
+				this.ui.downloadList &&
+				this.ui.downloadList.children.length > 0;
+
+			if (optionsVisible || hasDownloads || this.state.isDownloading) {
+				emptyBatch.style.display = "none";
+			} else {
+				emptyBatch.style.display = "flex";
+			}
+		}
+
+		const emptySelective =
+			this.ui.emptyStateSelective || getId("emptyStatePlaylistSelective");
+		if (emptySelective) {
+			const selectiveContentVisible =
+				this.ui.selectiveContent &&
+				this.ui.selectiveContent.style.display !== "none";
+			const loadingVisible =
+				this.ui.selectiveLoadingWrapper &&
+				this.ui.selectiveLoadingWrapper.style.display !== "none";
+			const hasEntries =
+				this.selectiveState.entries &&
+				this.selectiveState.entries.length > 0;
+
+			if (
+				selectiveContentVisible ||
+				loadingVisible ||
+				hasEntries ||
+				this.selectiveState.isFetching ||
+				this.selectiveState.isDownloading
+			) {
+				emptySelective.style.display = "none";
+			} else {
+				emptySelective.style.display = "flex";
+			}
+		}
+	},
+
 	switchPlaylistMode(mode) {
 		this.state.currentMode = mode;
 		if (mode === "batch") {
 			this.ui.playlistModeBatchBtn?.classList.add("active");
 			this.ui.playlistModeSelectiveBtn?.classList.remove("active");
-			if (this.ui.playlistBatchSection) this.ui.playlistBatchSection.style.display = "block";
+			if (this.ui.playlistBatchSection) this.ui.playlistBatchSection.style.display = "flex";
 			if (this.ui.playlistSelectiveSection) this.ui.playlistSelectiveSection.style.display = "none";
 		} else {
 			this.ui.playlistModeSelectiveBtn?.classList.add("active");
 			this.ui.playlistModeBatchBtn?.classList.remove("active");
 			if (this.ui.playlistBatchSection) this.ui.playlistBatchSection.style.display = "none";
-			if (this.ui.playlistSelectiveSection) this.ui.playlistSelectiveSection.style.display = "block";
+			if (this.ui.playlistSelectiveSection) this.ui.playlistSelectiveSection.style.display = "flex";
 		}
+		this._updateEmptyStateUI();
 	},
 
 	// ==========================================
@@ -464,6 +516,7 @@ const playlistDownloader = {
 			this.ui.selectiveErrorDetails.textContent = "";
 		}
 		if (this.ui.selectiveContent) this.ui.selectiveContent.style.display = "none";
+		this._updateEmptyStateUI();
 
 		const args = [
 			"--yes-playlist",
@@ -570,6 +623,7 @@ const playlistDownloader = {
 						if (this.ui.selectiveContent) {
 							this.ui.selectiveContent.style.display = "block";
 						}
+						this._updateEmptyStateUI();
 					} else {
 						this.handleSelectiveError(
 							window.i18n ? window.i18n.__("errorNetworkOrUrl") : "No video entries found in playlist",
@@ -1000,6 +1054,7 @@ const playlistDownloader = {
 
 		if (this.ui.selectiveDownloadBtn) this.ui.selectiveDownloadBtn.style.display = "inline-flex";
 		if (this.ui.selectiveStopBtn) this.ui.selectiveStopBtn.style.display = "none";
+		this._updateEmptyStateUI();
 	},
 
 	handleSelectiveError(error, url = "") {
@@ -1014,6 +1069,7 @@ const playlistDownloader = {
 		if (this.ui.selectiveErrorDetails) {
 			this.ui.selectiveErrorDetails.innerHTML = `<strong>URL: ${url}</strong><br><br>${String(error)}`;
 		}
+		this._updateEmptyStateUI();
 	},
 
 	// ==========================================
@@ -1036,6 +1092,7 @@ const playlistDownloader = {
 
 			this.state.isDownloading = true;
 			this.state.isCancelled = false;
+			this._updateEmptyStateUI();
 
 			this.state.currentAbortController = new AbortController();
 			const baseArgs = this.buildBaseArgs();
@@ -1363,6 +1420,7 @@ const playlistDownloader = {
 		if (lastBar) {
 			lastBar.classList.add("cancelled");
 		}
+		this._updateEmptyStateUI();
 	},
 
 	pasteLink() {
@@ -1374,6 +1432,7 @@ const playlistDownloader = {
 		this.ui.optionsContainer.classList.add("fade-in");
 		this.ui.errorMsgDisplay.textContent = "";
 		this.ui.errorBtn.style.display = "none";
+		this._updateEmptyStateUI();
 	},
 
 	updatePlaylistUI(videoInfo, count, type) {
@@ -1543,6 +1602,7 @@ const playlistDownloader = {
 			if (this.ui.openDownloadsBtn) this.ui.openDownloadsBtn.style.display = "inline-block";
 			if (this.ui.stopDownloadBtn) this.ui.stopDownloadBtn.style.display = "inline-block";
 		}
+		this._updateEmptyStateUI();
 	},
 
 	finishDownload(count) {
@@ -1571,6 +1631,7 @@ const playlistDownloader = {
 		});
 
 		notify.onclick = () => this.openDownloadsFolder();
+		this._updateEmptyStateUI();
 	},
 
 	showError(error) {
@@ -1603,6 +1664,7 @@ const playlistDownloader = {
 				this.state.url
 			)}</strong><br><br>${escapeHtml(error?.toString?.() || String(error))}`;
 		}
+		this._updateEmptyStateUI();
 	},
 
 	openDownloadsFolder() {

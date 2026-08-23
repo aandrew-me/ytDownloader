@@ -336,6 +336,9 @@ body {
 
 #playlistBatchSection,
 #playlistSelectiveSection {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
 	width: 100%;
 	box-sizing: border-box;
 }
@@ -2243,6 +2246,8 @@ input[type="number"]::-webkit-outer-spin-button {
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 	margin: 15px;
 	font-weight: bold;
+	align-self: center;
+	max-width: fit-content;
 }
 
 #pasteUrl:hover,
@@ -5765,7 +5770,8 @@ body.rtl .header-core {
 	cursor: pointer;
 }
 
-#view-home.active {
+#view-home.active,
+#view-playlist.active {
 	display: flex;
 	flex-direction: column;
 	min-height: calc(100vh - 60px);

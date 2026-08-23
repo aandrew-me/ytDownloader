@@ -296,5 +296,33 @@ test.describe("Playlist Page Download Tests", () => {
 		await expect(page.locator("#selectiveDownloadCount")).toHaveText("2");
 		expect(await page.locator(".selective-cb:checked").count()).toBe(2);
 	});
+
+	test("playlist page shows empty state card initially and hides when options/content are shown", async () => {
+		// Verify batch mode empty state is visible initially
+		const emptyBatch = page.locator("#emptyStatePlaylist");
+		await expect(emptyBatch).toBeVisible();
+		await expect(emptyBatch.locator("h3")).toHaveText("No downloads yet");
+
+		// Paste link in batch mode -> empty state hides
+		const playlistUrl = "https://www.youtube.com/playlist?list=PL123456789";
+		await page.evaluate((url) => {
+			window.electronAPI.clipboard.writeText(url);
+		}, playlistUrl);
+		await page.click("#pasteLink");
+		await waitForPlaylistOptions(page);
+		await expect(emptyBatch).toBeHidden();
+
+		// Switch to Selective mode -> selective empty state is visible initially
+		await page.click("#playlistModeSelectiveBtn");
+		const emptySelective = page.locator("#emptyStatePlaylistSelective");
+		await expect(emptySelective).toBeVisible();
+		await expect(emptySelective.locator("h3")).toHaveText("No downloads yet");
+
+		// Fetch selective playlist -> selective empty state hides
+		await page.click("#pasteLinkSelective");
+		await page.waitForSelector("#selectiveContent", { state: "visible" });
+		await expect(emptySelective).toBeHidden();
+	});
 });
+
 
