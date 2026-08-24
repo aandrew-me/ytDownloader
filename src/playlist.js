@@ -241,6 +241,23 @@ const playlistDownloader = {
 		if (this.ui.audioQualitySelect && !this.ui.audioQualitySelect.value) {
 			this.ui.audioQualitySelect.value = "auto";
 		}
+
+		// Sync selective bulk preset selects from saved preferences.
+		const hasOption = (sel, val) =>
+			sel && [...sel.options].some((o) => o.value === val);
+
+		if (hasOption(this.ui.selectiveBulkResSelect, preferredVideo)) {
+			this.ui.selectiveBulkResSelect.value = preferredVideo;
+			this.selectiveState.bulkPreset.quality = preferredVideo;
+		}
+		const preferredAudioExt =
+			localStorage.getItem("preferredAudioQuality") ||
+			localStorage.getItem("preferredAudioFormat") ||
+			"mp3";
+		if (hasOption(this.ui.selectiveBulkAudioExtSelect, preferredAudioExt)) {
+			this.ui.selectiveBulkAudioExtSelect.value = preferredAudioExt;
+			this.selectiveState.bulkPreset.audioExt = preferredAudioExt;
+		}
 	},
 
 	initEventListeners() {
