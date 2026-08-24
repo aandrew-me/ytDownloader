@@ -4884,7 +4884,7 @@ input:checked+.slider:before {
 }
 
 .item-hidden {
-	display: none;
+	display: none !important;
 }
 
 @keyframes fadeInTab {
