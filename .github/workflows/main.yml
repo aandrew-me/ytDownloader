@@ -42,7 +42,7 @@ jobs:
                     - target: windows-x64
                       os: windows-latest
                     - target: windows-arm64
-                      os: windows-latest
+                      os: windows-11-arm
 
         steps:
             - name: Checkout code
