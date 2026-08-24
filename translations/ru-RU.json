@@ -301,5 +301,17 @@
 	"downloadFailedHint": "Не удалось скачать yt-dlp автоматически. Вы можете повторить попытку, выбрать существующий файл или скачать вручную.",
 	"quitApp": "Выйти",
 	"validatingBinary": "Проверка файла...",
-	"invalidBinarySelected": "Выбранный файл не является исполняемым файлом yt-dlp. Пожалуйста, выберите корректный файл yt-dlp."
+	"invalidBinarySelected": "Выбранный файл не является исполняемым файлом yt-dlp. Пожалуйста, выберите корректный файл yt-dlp.",
+	"copyVideo": "Копировать видео",
+	"active": "Активно",
+	"bundled": "Встроенный",
+	"ytdlpSubtitle": "Движок загрузки видео и аудио",
+	"channelNightlyDesc": "Новейшие функции и быстрые исправления (Рекомендуется)",
+	"channelStableDesc": "Последний официальный стабильный релиз",
+	"channelMasterDesc": "Новейшая сборка в разработке",
+	"ffmpegSubtitle": "Медиаконвертер, мультиплексор и анализатор потоков",
+	"ffmpegVersionLabel": "Версия ffmpeg",
+	"ffprobeVersionLabel": "Версия ffprobe",
+	"jsRuntimeSubtitle": "Среда выполнения JavaScript для экстракторов",
+	"builtinRuntimeDesc": "Встроенная среда выполнения"
 }

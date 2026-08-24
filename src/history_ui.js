@@ -53,6 +53,21 @@ export function filterHistory() {
 	renderHistory(filteredHistory);
 }
 
+async function showConfirmDialog(message, confirmLabel) {
+	if (ipcRenderer && ipcRenderer.invoke) {
+		try {
+			return await ipcRenderer.invoke("show-confirm-dialog", {
+				message,
+				confirmLabel: confirmLabel || t("delete", "Delete"),
+				cancelLabel: t("cancel", "Cancel"),
+			});
+		} catch (e) {
+			console.error("Failed to show confirm dialog:", e);
+		}
+	}
+	return confirm(message);
+}
+
 export function renderHistory(historyItems) {
 	const container = document.getElementById("historyListContainer");
 	if (!container) return;
@@ -113,21 +128,21 @@ export function renderHistory(historyItems) {
 		meta.className = "history-item-meta";
 
 		const formatSpan = document.createElement("span");
-		formatSpan.textContent = "Format: ";
+		formatSpan.textContent = `${t("format", "Format")}: `;
 		const formatStrong = document.createElement("strong");
 		formatStrong.textContent = item.format || "unknown";
 		formatSpan.appendChild(formatStrong);
 		meta.appendChild(formatSpan);
 
 		const sizeSpan = document.createElement("span");
-		sizeSpan.textContent = "Size: ";
+		sizeSpan.textContent = `${t("size", "Size")}: `;
 		const sizeStrong = document.createElement("strong");
 		sizeStrong.textContent = formatFileSize(item.fileSize);
 		sizeSpan.appendChild(sizeStrong);
 		meta.appendChild(sizeSpan);
 
 		const dateSpan = document.createElement("span");
-		dateSpan.textContent = "Date: ";
+		dateSpan.textContent = `${t("date", "Date")}: `;
 		const dateStrong = document.createElement("strong");
 		dateStrong.textContent = item.downloadDate
 			? new Date(item.downloadDate).toLocaleDateString()
@@ -137,7 +152,7 @@ export function renderHistory(historyItems) {
 
 		if (item.duration) {
 			const durationSpan = document.createElement("span");
-			durationSpan.textContent = "Duration: ";
+			durationSpan.textContent = `${t("duration", "Duration")}: `;
 			const durationStrong = document.createElement("strong");
 			durationStrong.textContent = formatDuration(item.duration);
 			durationSpan.appendChild(durationStrong);
@@ -155,9 +170,8 @@ export function renderHistory(historyItems) {
 			copyBtn.className = "copy-url-btn";
 			copyBtn.textContent = t("copyUrl", "Copy URL");
 			copyBtn.addEventListener("click", () => {
-			clipboard.writeText(item.url);
-			showPopup(t("urlCopiedToClipboard", "URL copied to clipboard"));
-
+				clipboard.writeText(item.url);
+				showPopup(t("urlCopiedToClipboard", "URL copied to clipboard"));
 			});
 			actions.appendChild(copyBtn);
 		}
@@ -175,8 +189,15 @@ export function renderHistory(historyItems) {
 		const deleteBtn = document.createElement("button");
 		deleteBtn.className = "delete-btn";
 		deleteBtn.textContent = t("delete", "Delete");
-		deleteBtn.addEventListener("click", () => {
-			if (confirm(t("confirmDeleteHistoryItem", "Delete this item?"))) {
+		deleteBtn.addEventListener("click", async () => {
+			const confirmed = await showConfirmDialog(
+				t(
+					"confirmDeleteHistoryItem",
+					"Are you sure you want to delete this item from history?",
+				),
+				t("delete", "Delete"),
+			);
+			if (confirmed) {
 				ipcRenderer
 					.invoke("delete-history-item", item.id)
 					.then(() => {
@@ -239,13 +260,22 @@ export function updateStats() {
 					: "N/A";
 
 			statsContainer.appendChild(
-				createStatCard("Total Downloads", stats.totalDownloads || 0),
+				createStatCard(
+					t("totalDownloads", "Total Downloads"),
+					stats.totalDownloads || 0,
+				),
 			);
 			statsContainer.appendChild(
-				createStatCard("Total Size", formatFileSize(stats.totalSize || 0)),
+				createStatCard(
+					t("totalSize", "Total Size"),
+					formatFileSize(stats.totalSize || 0),
+				),
 			);
 			statsContainer.appendChild(
-				createStatCard("Most Common Format", mostCommonFormat),
+				createStatCard(
+					t("mostCommonFormat", "Most Common Format"),
+					mostCommonFormat,
+				),
 			);
 		})
 		.catch(() => {});
@@ -259,15 +289,15 @@ document.addEventListener("DOMContentLoaded", () => {
 	if (searchBox) searchBox.addEventListener("input", filterHistory);
 	if (formatFilter) formatFilter.addEventListener("change", filterHistory);
 	if (clearAllBtn) {
-		clearAllBtn.addEventListener("click", () => {
-			if (
-				confirm(
-					t(
-						"confirmClearAllHistory",
-						"Are you sure you want to clear all history?",
-					),
-				)
-			) {
+		clearAllBtn.addEventListener("click", async () => {
+			const confirmed = await showConfirmDialog(
+				t(
+					"confirmClearAllHistory",
+					"Are you sure you want to clear all download history? This cannot be undone!",
+				),
+				t("clearAllHistory", "Clear All History"),
+			);
+			if (confirmed) {
 				ipcRenderer
 					.invoke("clear-all-history")
 					.then(() => {
@@ -276,6 +306,13 @@ document.addEventListener("DOMContentLoaded", () => {
 					.catch((err) => console.error("Failed to clear history:", err));
 			}
 		});
+	}
+});
+
+document.addEventListener("translations-loaded", () => {
+	if (allHistory && allHistory.length > 0) {
+		filterHistory();
+		updateStats();
 	}
 });
 

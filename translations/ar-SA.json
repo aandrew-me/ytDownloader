@@ -301,5 +301,17 @@
 	"downloadFailedHint": "تعذر تنزيل yt-dlp تلقائياً. يمكنك إعادة المحاولة، أو اختيار ملف تنفيذي موجود، أو التنزيل يدوياً.",
 	"quitApp": "إنهاء",
 	"validatingBinary": "جاري التحقق من الملف...",
-	"invalidBinarySelected": "الملف المحدد ليس ملف yt-dlp صالحاً. يرجى اختيار ملف تنفيذي صحيح لـ yt-dlp."
+	"invalidBinarySelected": "الملف المحدد ليس ملف yt-dlp صالحاً. يرجى اختيار ملف تنفيذي صحيح لـ yt-dlp.",
+	"copyVideo": "نسخ الفيديو",
+	"active": "نشط",
+	"bundled": "مدمج",
+	"ytdlpSubtitle": "محرك تنزيل الفيديو والصوت",
+	"channelNightlyDesc": "أحدث الميزات والإصلاحات السريعة (موصى به)",
+	"channelStableDesc": "أحدث إصدار رسمي مستقر",
+	"channelMasterDesc": "إصدار التطوير الأحدث",
+	"ffmpegSubtitle": "محول الوسائط ومجمع البثوف وفاحص التدفقات",
+	"ffmpegVersionLabel": "إصدار ffmpeg",
+	"ffprobeVersionLabel": "إصدار ffprobe",
+	"jsRuntimeSubtitle": "بيئة تشغيل JavaScript للمستخرجات",
+	"builtinRuntimeDesc": "بيئة تشغيل مدمجة"
 }

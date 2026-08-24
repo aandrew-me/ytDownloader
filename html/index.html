@@ -1064,7 +1064,7 @@
                                     <option class="vaapi_opt" value="hevc_vaapi">x265 (VA-API Hardware Acceleration)</option>
                                     <option class="videotoolbox_opt" value="videotoolbox">x264 (VideoToolbox Hardware Acceleration)</option>
                                     <option class="videotoolbox_opt" value="hevc_videotoolbox">x265 (VideoToolbox Hardware Acceleration)</option>
-                                    <option value="copy">Copy video</option>
+                                    <option value="copy" data-translate="copyVideo">Copy video</option>
                                 </select>
                             </div>
 
@@ -1117,9 +1117,9 @@
             <section id="view-history" class="page-view hidden">
                 <div class="history-container">
                     <div class="history-controls">
-                        <input type="text" id="searchBox" placeholder="Search history...">
+                        <input type="text" id="searchBox" data-translate-placeholder="searchByTitleOrUrl" placeholder="Search by title or URL...">
                         <select id="formatFilter">
-                            <option value="">All Formats</option>
+                            <option data-translate="allFormats" value="">All Formats</option>
                             <option value="mp4">MP4</option>
                             <option value="mp3">MP3</option>
                             <option value="m4a">M4A</option>
@@ -1505,9 +1505,9 @@
                                 <div class="dep-card-title-group">
                                     <div class="dep-title-row">
                                         <h3 class="dep-title">yt-dlp</h3>
-                                        <span id="depYtdlpVersion" class="dep-version-badge">Checking...</span>
+                                        <span id="depYtdlpVersion" class="dep-version-badge" data-translate="checking">Checking...</span>
                                     </div>
-                                    <span class="dep-subtitle">Video &amp; audio download engine</span>
+                                    <span class="dep-subtitle" data-translate="ytdlpSubtitle">Video &amp; audio download engine</span>
                                 </div>
                             </div>
 
@@ -1530,31 +1530,31 @@
                                         <div class="dep-radio-circle"></div>
                                         <div class="dep-option-content">
                                             <span class="dep-option-title" data-translate="channelNightly">Nightly</span>
-                                            <span class="dep-option-desc">Newest features &amp; quick fixes (Recommended)</span>
+                                            <span class="dep-option-desc" data-translate="channelNightlyDesc">Newest features &amp; quick fixes (Recommended)</span>
                                         </div>
-                                        <span class="dep-active-tag">Active</span>
+                                        <span class="dep-active-tag" data-translate="active">Active</span>
                                     </div>
                                     <div class="dep-option-item" data-channel="stable">
                                         <div class="dep-radio-circle"></div>
                                         <div class="dep-option-content">
                                             <span class="dep-option-title" data-translate="channelStable">Stable</span>
-                                            <span class="dep-option-desc">Latest official stable release</span>
+                                            <span class="dep-option-desc" data-translate="channelStableDesc">Latest official stable release</span>
                                         </div>
-                                        <span class="dep-active-tag">Active</span>
+                                        <span class="dep-active-tag" data-translate="active">Active</span>
                                     </div>
                                     <div class="dep-option-item" data-channel="master">
                                         <div class="dep-radio-circle"></div>
                                         <div class="dep-option-content">
                                             <span class="dep-option-title" data-translate="channelMaster">Master</span>
-                                            <span class="dep-option-desc">Bleeding edge development build</span>
+                                            <span class="dep-option-desc" data-translate="channelMasterDesc">Bleeding edge development build</span>
                                         </div>
-                                        <span class="dep-active-tag">Active</span>
+                                        <span class="dep-active-tag" data-translate="active">Active</span>
                                     </div>
                                 </div>
                                 <select id="depYtdlpChannel" class="dep-hidden-select">
-                                    <option value="nightly">Nightly</option>
-                                    <option value="stable">Stable</option>
-                                    <option value="master">Master</option>
+                                    <option value="nightly" data-translate="channelNightly">Nightly</option>
+                                    <option value="stable" data-translate="channelStable">Stable</option>
+                                    <option value="master" data-translate="channelMaster">Master</option>
                                 </select>
                             </div>
 
@@ -1581,7 +1581,7 @@
                                     <div class="dep-title-row">
                                         <h3 class="dep-title">ffmpeg &amp; ffprobe</h3>
                                     </div>
-                                    <span class="dep-subtitle">Media converter, multiplexer &amp; stream prober</span>
+                                    <span class="dep-subtitle" data-translate="ffmpegSubtitle">Media converter, multiplexer &amp; stream prober</span>
                                 </div>
                             </div>
 
@@ -1599,12 +1599,12 @@
 
                             <div class="dep-sub-details">
                                 <div class="dep-detail-row">
-                                    <span class="dep-detail-label">ffmpeg version</span>
-                                    <span id="depFfmpegVersion" class="dep-version-badge">Checking...</span>
+                                    <span class="dep-detail-label" data-translate="ffmpegVersionLabel">ffmpeg version</span>
+                                    <span id="depFfmpegVersion" class="dep-version-badge" data-translate="checking">Checking...</span>
                                 </div>
                                 <div class="dep-detail-row">
-                                    <span class="dep-detail-label">ffprobe version</span>
-                                    <span id="depFfprobeVersion" class="dep-version-badge">Checking...</span>
+                                    <span class="dep-detail-label" data-translate="ffprobeVersionLabel">ffprobe version</span>
+                                    <span id="depFfprobeVersion" class="dep-version-badge" data-translate="checking">Checking...</span>
                                 </div>
                             </div>
 
@@ -1630,9 +1630,9 @@
                                 <div class="dep-card-title-group">
                                     <div class="dep-title-row">
                                         <h3 class="dep-title" data-translate="jsRuntime">JS Runtime</h3>
-                                        <span id="depJsRuntimeVersion" class="dep-version-badge">Checking...</span>
+                                        <span id="depJsRuntimeVersion" class="dep-version-badge" data-translate="checking">Checking...</span>
                                     </div>
-                                    <span class="dep-subtitle">JavaScript execution environment for extractors</span>
+                                    <span class="dep-subtitle" data-translate="jsRuntimeSubtitle">JavaScript execution environment for extractors</span>
                                 </div>
                             </div>
 
@@ -1652,9 +1652,9 @@
                                         <div class="dep-radio-circle"></div>
                                         <div class="dep-option-content">
                                             <span class="dep-option-title">Node.js</span>
-                                            <span class="dep-option-desc">Built-in runtime environment</span>
+                                            <span class="dep-option-desc" data-translate="builtinRuntimeDesc">Built-in runtime environment</span>
                                         </div>
-                                        <span class="dep-active-tag">Active</span>
+                                        <span class="dep-active-tag" data-translate="active">Active</span>
                                     </div>
                                 </div>
                             </div>

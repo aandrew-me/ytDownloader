@@ -301,5 +301,17 @@
 	"downloadFailedHint": "yt-dlp স্বয়ংক্রিয়ভাবে ডাউনলোড করা যায়নি। আপনি আবার চেষ্টা করতে পারেন, বিদ্যমান ফাইল নির্বাচন করতে পারেন অথবা ম্যানুয়ালি ডাউনলোড করতে পারেন।",
 	"quitApp": "বন্ধ করুন",
 	"validatingBinary": "ফাইল যাচাই করা হচ্ছে...",
-	"invalidBinarySelected": "নির্বাচিত ফাইলটি কোনো বৈধ yt-dlp ফাইল নয়। অনুগ্রহ করে একটি বৈধ yt-dlp এক্সিকিউটেবল ফাইল নির্বাচন করুন।"
+	"invalidBinarySelected": "নির্বাচিত ফাইলটি কোনো বৈধ yt-dlp ফাইল নয়। অনুগ্রহ করে একটি বৈধ yt-dlp এক্সিকিউটেবল ফাইল নির্বাচন করুন।",
+	"copyVideo": "ভিডিও কপি করুন",
+	"active": "সক্রিয়",
+	"bundled": "বান্ডিল করা",
+	"ytdlpSubtitle": "ভিডিও ও অডিও ডাউনলোড ইঞ্জিন",
+	"channelNightlyDesc": "নতুন বৈশিষ্ট্য ও দ্রুত সমাধান (প্রস্তাবিত)",
+	"channelStableDesc": "সর্বশেষ অফিসিয়াল স্থিতিশীল সংস্করণ",
+	"channelMasterDesc": "উন্নয়নমূলক বিল্ড",
+	"ffmpegSubtitle": "মিডিয়া রূপান্তরকারী ও স্ট্রিম প্রোবার",
+	"ffmpegVersionLabel": "ffmpeg সংস্করণ",
+	"ffprobeVersionLabel": "ffprobe সংস্করণ",
+	"jsRuntimeSubtitle": "এক্সট্রাক্টরগুলির জন্য JavaScript এক্সিকিউশন এনভায়রনমেন্ট",
+	"builtinRuntimeDesc": "বিল্ট-ইন রানটাইম পরিবেশ"
 }

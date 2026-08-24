@@ -1041,6 +1041,9 @@ function initPreferences() {
 	initDependenciesTab();
 }
 
+let depsTabInitialized = false;
+let refreshDependenciesLabels = () => {};
+
 function initDependenciesTab() {
 	const depYtdlpSource = getId("depYtdlpSource");
 	const depYtdlpChannel = getId("depYtdlpChannel");
@@ -1066,6 +1069,7 @@ function initDependenciesTab() {
 	}
 
 	const notFoundText = () => (window.i18n ? window.i18n.__("notFound") : "Not found");
+	const bundledText = () => (window.i18n ? window.i18n.__("bundled") : "Bundled");
 	const isTestMode = window.electronAPI && window.electronAPI.isTest;
 
 	function checkYtdlp() {
@@ -1124,11 +1128,11 @@ function initDependenciesTab() {
 					if (!err && stdout) {
 						setUI(`${stdout.trim()} (${channel})`, targetPath, false);
 					} else {
-						setUI(`Bundled (${channel})`, targetPath, false);
+						setUI(`${bundledText()} (${channel})`, targetPath, false);
 					}
 				});
 			} else {
-				setUI(`Bundled (${channel})`, targetPath || "", false);
+				setUI(`${bundledText()} (${channel})`, targetPath || "", false);
 			}
 		}
 	}
@@ -1219,9 +1223,9 @@ function initDependenciesTab() {
 					if (!err && stdout) {
 						const firstLine = stdout.trim().split(/\r?\n/)[0] || "";
 						const match = firstLine.match(/ffmpeg version (\S+)/i);
-						setFfmpegUI(match ? match[1] : "Bundled", bundledFfmpegBin, false);
+						setFfmpegUI(match ? match[1] : bundledText(), bundledFfmpegBin, false);
 					} else {
-						setFfmpegUI("Bundled", bundledFfmpegBin, false);
+						setFfmpegUI(bundledText(), bundledFfmpegBin, false);
 					}
 				});
 				const bundledFfprobeBin = bundledFfmpegBin.replace(/ffmpeg(\.exe)?$/, "ffprobe$1");
@@ -1230,17 +1234,17 @@ function initDependenciesTab() {
 						if (!err && stdout) {
 							const firstLine = stdout.trim().split(/\r?\n/)[0] || "";
 							const match = firstLine.match(/ffprobe version (\S+)/i);
-							setFfprobeUI(match ? match[1] : "Bundled", false);
+							setFfprobeUI(match ? match[1] : bundledText(), false);
 						} else {
-							setFfprobeUI("Bundled", false);
+							setFfprobeUI(bundledText(), false);
 						}
 					});
 				} else {
-					setFfprobeUI("Bundled", false);
+					setFfprobeUI(bundledText(), false);
 				}
 			} else {
-				setFfmpegUI("Bundled", bundledFfmpegBin || "", false);
-				setFfprobeUI("Bundled", false);
+				setFfmpegUI(bundledText(), bundledFfmpegBin || "", false);
+				setFfprobeUI(bundledText(), false);
 			}
 		}
 	}
@@ -1302,6 +1306,18 @@ function initDependenciesTab() {
 			checkYtdlp();
 		}
 	}
+
+	refreshDependenciesLabels = () => {
+		checkYtdlp();
+		checkFfmpegAndFfprobe();
+		checkJsRuntime();
+	};
+
+	if (depsTabInitialized) {
+		refreshDependenciesLabels();
+		return;
+	}
+	depsTabInitialized = true;
 
 	if (depYtdlpSource) {
 		depYtdlpSource.addEventListener("change", () => {
@@ -1425,9 +1441,7 @@ function initDependenciesTab() {
 		if (shell && shell.openExternal) shell.openExternal("https://ffmpeg.org");
 	});
 
-	checkYtdlp();
-	checkFfmpegAndFfprobe();
-	checkJsRuntime();
+	refreshDependenciesLabels();
 }
 
 function startPreferences() {
@@ -1445,6 +1459,7 @@ document.addEventListener("translations-loaded", () => {
 	if (window.i18n && typeof window.i18n.translatePage === "function") {
 		window.i18n.translatePage();
 	}
+	refreshDependenciesLabels();
 	const cookieContainer = getId("cookieBlocksContainer");
 	if (cookieContainer && cookieContainer.children.length > 0) {
 		const cookieSourceSelect = getId("cookieSource");

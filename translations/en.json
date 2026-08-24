@@ -138,7 +138,7 @@
 	"installOnExit": "Install on exit",
 	"installOnExitNotice": "Update will be installed when you close the app",
 	"releaseNotes": "Release Notes",
-	"downloadingUpdate": "Downloading update...",
+	"downloadingUpdate": "Downloading update",
 	"downloadSpeed": "Speed",
 	"updateDownloadedReady": "Update downloaded and ready to install",
 	"downloadInBrowser": "Download in Browser",
@@ -301,5 +301,17 @@
 	"downloadFailedHint": "Could not download yt-dlp automatically. You can retry, select an existing binary, or download manually.",
 	"quitApp": "Quit",
 	"validatingBinary": "Validating binary...",
-	"invalidBinarySelected": "The selected file is not a valid yt-dlp binary. Please choose a valid yt-dlp executable."
+	"invalidBinarySelected": "The selected file is not a valid yt-dlp binary. Please choose a valid yt-dlp executable.",
+	"copyVideo": "Copy video",
+	"active": "Active",
+	"bundled": "Bundled",
+	"ytdlpSubtitle": "Video & audio download engine",
+	"channelNightlyDesc": "Newest features & quick fixes (Recommended)",
+	"channelStableDesc": "Latest official stable release",
+	"channelMasterDesc": "Bleeding edge development build",
+	"ffmpegSubtitle": "Media converter, multiplexer & stream prober",
+	"ffmpegVersionLabel": "ffmpeg version",
+	"ffprobeVersionLabel": "ffprobe version",
+	"jsRuntimeSubtitle": "JavaScript execution environment for extractors",
+	"builtinRuntimeDesc": "Built-in runtime environment"
 }

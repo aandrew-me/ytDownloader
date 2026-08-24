@@ -301,5 +301,17 @@
 	"downloadFailedHint": "Δεν ήταν δυνατή η αυτόματη λήψη του yt-dlp. Μπορείτε να δοκιμάσετε ξανά, να επιλέξετε ένα υπάρχον εκτελέσιμο ή να το κατεβάσετε χειροκίνητα.",
 	"quitApp": "Έξοδος",
 	"validatingBinary": "Επικύρωση εκτελέσιμου αρχείου...",
-	"invalidBinarySelected": "Το επιλεγμένο αρχείο δεν είναι έγκυρο εκτελέσιμο yt-dlp. Επιλέξτε ένα έγκυρο εκτελέσιμο yt-dlp."
+	"invalidBinarySelected": "Το επιλεγμένο αρχείο δεν είναι έγκυρο εκτελέσιμο yt-dlp. Επιλέξτε ένα έγκυρο εκτελέσιμο yt-dlp.",
+	"copyVideo": "Αντιγραφή βίντεο",
+	"active": "Ενεργό",
+	"bundled": "Ενσωματωμένο",
+	"ytdlpSubtitle": "Μηχανή λήψης βίντεο & ήχου",
+	"channelNightlyDesc": "Νεότερες δυνατότητες & γρήγορες διορθώσεις (Συνιστάται)",
+	"channelStableDesc": "Τελευταία επίσημη σταθερή έκδοση",
+	"channelMasterDesc": "Έκδοση ανάπτυξης αιχμής",
+	"ffmpegSubtitle": "Μετατροπέας πολυμέσων, πολυπλέκτης & εξερευνητής ροών",
+	"ffmpegVersionLabel": "Έκδοση ffmpeg",
+	"ffprobeVersionLabel": "Έκδοση ffprobe",
+	"jsRuntimeSubtitle": "Περιβάλλον εκτέλεσης JavaScript για εξαγωγείς",
+	"builtinRuntimeDesc": "Ενσωματωμένο περιβάλλον εκτέλεσης"
 }

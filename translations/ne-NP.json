@@ -301,5 +301,17 @@
 	"downloadFailedHint": "yt-dlp स्वचालित रूपमा डाउनलोड हुन सकेन। तपाईं पुनः प्रयास गर्न, अवस्थित फाइल चयन गर्न वा म्यानुअल रूपमा डाउनलोड गर्न सक्नुहुन्छ।",
 	"quitApp": "बन्द गर्नुहोस्",
 	"validatingBinary": "फाइल प्रमाणीकरण गर्दै...",
-	"invalidBinarySelected": "चयन गरिएको फाइल मान्य yt-dlp फाइल होइन। कृपया मान्य yt-dlp फाइल छान्नुहोस्।"
+	"invalidBinarySelected": "चयन गरिएको फाइल मान्य yt-dlp फाइल होइन। कृपया मान्य yt-dlp फाइल छान्नुहोस्।",
+	"copyVideo": "भिडियो प्रतिलिपि गर्नुहोस्",
+	"active": "सक्रिय",
+	"bundled": "बन्डल गरिएको",
+	"ytdlpSubtitle": "भिडियो र अडियो डाउनलोड इन्जिन",
+	"channelNightlyDesc": "नयाँ सुविधाहरू र द्रुत समाधानहरू (सिफारिस गरिएको)",
+	"channelStableDesc": "पछिल्लो आधिकारिक स्थिर रिलीज",
+	"channelMasterDesc": "विकास निर्माण",
+	"ffmpegSubtitle": "मिडिया कन्भर्टर र स्ट्रिम प्रोबर",
+	"ffmpegVersionLabel": "ffmpeg संस्करण",
+	"ffprobeVersionLabel": "ffprobe संस्करण",
+	"jsRuntimeSubtitle": "एक्स्ट्र्याक्टरहरूका लागि JavaScript कार्यान्वयन वातावरण",
+	"builtinRuntimeDesc": "निर्मित रनटाइम वातावरण"
 }

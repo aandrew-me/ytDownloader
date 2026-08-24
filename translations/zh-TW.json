@@ -301,5 +301,17 @@
 	"downloadFailedHint": "無法自動下載 yt-dlp。您可以重試、選擇現有的二進位檔案或手動下載。",
 	"quitApp": "結束",
 	"validatingBinary": "正在驗證二進位檔案...",
-	"invalidBinarySelected": "選取的檔案不是有效的 yt-dlp 二進位檔案。請選擇有效的 yt-dlp 執行檔。"
+	"invalidBinarySelected": "選取的檔案不是有效的 yt-dlp 二進位檔案。請選擇有效的 yt-dlp 執行檔。",
+	"copyVideo": "複製影片",
+	"active": "使用中",
+	"bundled": "內建",
+	"ytdlpSubtitle": "影片與音訊下載引擎",
+	"channelNightlyDesc": "最新功能與快速修復（推薦）",
+	"channelStableDesc": "最新官方穩定版",
+	"channelMasterDesc": "最新前沿開發版本",
+	"ffmpegSubtitle": "媒體轉換器、多工器與串流探測器",
+	"ffmpegVersionLabel": "ffmpeg 版本",
+	"ffprobeVersionLabel": "ffprobe 版本",
+	"jsRuntimeSubtitle": "擷取器的 JavaScript 執行環境",
+	"builtinRuntimeDesc": "內建執行環境"
 }
