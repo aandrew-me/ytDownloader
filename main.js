@@ -123,11 +123,12 @@ function createWindow() {
 	appState.mainWindow.loadFile("html/index.html");
 
 	appState.mainWindow.once("ready-to-show", () => {
-		if (appState.config.isMaximized) {
-			appState.mainWindow.maximize();
-		}
 		if (!isTestEnv) {
 			appState.mainWindow.show();
+		}
+
+		if (appState.config.isMaximized) {
+			appState.mainWindow.maximize();
 		}
 	});
 
@@ -822,7 +823,7 @@ async function loadTranslations() {
 			try {
 				const altContent = await fs.readFile(altPath, "utf8");
 				localeData = JSON.parse(altContent);
-			} catch (_) {}
+			} catch (_) { }
 		}
 	}
 
