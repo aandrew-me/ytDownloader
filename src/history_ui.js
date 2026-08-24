@@ -2,11 +2,14 @@
  * Download History UI Renderer for Single Page Application
  */
 
+import { showPopup } from "./utils.js";
+
 const { ipcRenderer, clipboard } = window.electronAPI || {};
 
 let allHistory = [];
 let filteredHistory = [];
 
+// Translate function
 function t(key, fallback) {
 	if (window.i18n && typeof window.i18n.__ === "function") {
 		const res = window.i18n.__(key);
@@ -152,7 +155,9 @@ export function renderHistory(historyItems) {
 			copyBtn.className = "copy-url-btn";
 			copyBtn.textContent = t("copyUrl", "Copy URL");
 			copyBtn.addEventListener("click", () => {
-				clipboard.writeText(item.url);
+			clipboard.writeText(item.url);
+			showPopup(t("urlCopiedToClipboard", "URL copied to clipboard"));
+
 			});
 			actions.appendChild(copyBtn);
 		}
