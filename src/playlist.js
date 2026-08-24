@@ -540,6 +540,8 @@ const playlistDownloader = {
 			"--flat-playlist",
 			"-J",
 			"--no-warnings",
+			"--compat-options",
+			"no-youtube-unavailable-videos",
 			...(this.config.cookie.arg && this.config.cookie.val
 				? [this.config.cookie.arg, this.config.cookie.val]
 				: []),
