@@ -301,5 +301,17 @@
 	"downloadFailedHint": "yt-dlp:n automaattinen lataaminen epäonnistui. Voit yrittää uudelleen, valita olemassa olevan tiedoston tai ladata manuaalisesti.",
 	"quitApp": "Lopeta",
 	"validatingBinary": "Vahvistetaan tiedostoa...",
-	"invalidBinarySelected": "Valittu tiedosto ei ole kelvollinen yt-dlp-tiedosto. Valitse kelvollinen suoritettava yt-dlp-tiedosto."
+	"invalidBinarySelected": "Valittu tiedosto ei ole kelvollinen yt-dlp-tiedosto. Valitse kelvollinen suoritettava yt-dlp-tiedosto.",
+	"copyVideo": "Kopioi video",
+	"active": "Aktiivinen",
+	"bundled": "Paketoitu",
+	"ytdlpSubtitle": "Videon ja äänen latausmoottori",
+	"channelNightlyDesc": "Uusimmat ominaisuudet ja nopeat korjaukset (Suositeltu)",
+	"channelStableDesc": "Uusin virallinen vakaa versio",
+	"channelMasterDesc": "Uusin kehitysversio",
+	"ffmpegSubtitle": "Mediamuunnin, multiplekseri ja virrantutkija",
+	"ffmpegVersionLabel": "ffmpeg-versio",
+	"ffprobeVersionLabel": "ffprobe-versio",
+	"jsRuntimeSubtitle": "JavaScript-ajoympäristö erottimille",
+	"builtinRuntimeDesc": "Sisäänrakennettu ajoympäristö"
 }

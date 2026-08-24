@@ -301,5 +301,17 @@
 	"downloadFailedHint": "A yt-dlp automatikus letöltése sikertelen. Újrapróbálhatja, kiválaszthat egy meglévő binárist, vagy letöltheti manuálisan.",
 	"quitApp": "Kilépés",
 	"validatingBinary": "Bináris ellenőrzése...",
-	"invalidBinarySelected": "A kiválasztott fájl nem érvényes yt-dlp bináris. Kérjük, válasszon egy érvényes yt-dlp futtatható fájlt."
+	"invalidBinarySelected": "A kiválasztott fájl nem érvényes yt-dlp bináris. Kérjük, válasszon egy érvényes yt-dlp futtatható fájlt.",
+	"copyVideo": "Videó másolása",
+	"active": "Aktív",
+	"bundled": "Beépített",
+	"ytdlpSubtitle": "Videó- és hangletöltő motor",
+	"channelNightlyDesc": "Legújabb funkciók és gyors hibajavítások (Ajánlott)",
+	"channelStableDesc": "Legfrissebb hivatalos stabil kiadás",
+	"channelMasterDesc": "Legfrissebb fejlesztői kiadás",
+	"ffmpegSubtitle": "Médiakonvertáló, multiplexer és adatfolyam-vizsgáló",
+	"ffmpegVersionLabel": "ffmpeg verzió",
+	"ffprobeVersionLabel": "ffprobe verzió",
+	"jsRuntimeSubtitle": "JavaScript futtatókörnyezet a kinyerőkhöz",
+	"builtinRuntimeDesc": "Beépített futtatókörnyezet"
 }

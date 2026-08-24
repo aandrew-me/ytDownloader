@@ -301,5 +301,17 @@
 	"downloadFailedHint": "Ezin izan da yt-dlp automatikoki deskargatu. Berriro saia zaitezke, lehendik dagoen fitxategi bat hautatu edo eskuz deskargatu.",
 	"quitApp": "Irten",
 	"validatingBinary": "Fitxategia balioztatzen...",
-	"invalidBinarySelected": "Hautatutako fitxategia ez da baliozko yt-dlp fitxategi bat. Mesedez, aukeratu baliozko yt-dlp exekutagarri bat."
+	"invalidBinarySelected": "Hautatutako fitxategia ez da baliozko yt-dlp fitxategi bat. Mesedez, aukeratu baliozko yt-dlp exekutagarri bat.",
+	"copyVideo": "Bideoa kopiatu",
+	"active": "Aktiboa",
+	"bundled": "Paketatua",
+	"ytdlpSubtitle": "Bideo eta audio deskarga motorea",
+	"channelNightlyDesc": "Ezaugarri berrienak eta konponketa azkarrak (Gomendatua)",
+	"channelStableDesc": "Azken bertsio egonkor ofiziala",
+	"channelMasterDesc": "Garapeneko azken eraikuntza",
+	"ffmpegSubtitle": "Multimedia bihurgailua, multiplexadorea eta korronte-aztertzailea",
+	"ffmpegVersionLabel": "ffmpeg bertsioa",
+	"ffprobeVersionLabel": "ffprobe bertsioa",
+	"jsRuntimeSubtitle": "JavaScript exekuzio-ingurunea erauzleetarako",
+	"builtinRuntimeDesc": "Integratutako exekuzio-ingurunea"
 }

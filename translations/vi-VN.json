@@ -301,5 +301,17 @@
 	"downloadFailedHint": "Không thể tự động tải xuống yt-dlp. Bạn có thể thử lại, chọn tệp nhị phân hiện có hoặc tải xuống thủ công.",
 	"quitApp": "Thoát",
 	"validatingBinary": "Đang xác thực tệp...",
-	"invalidBinarySelected": "Tệp đã chọn không phải là tệp nhị phân yt-dlp hợp lệ. Vui lòng chọn tệp thực thi yt-dlp hợp lệ."
+	"invalidBinarySelected": "Tệp đã chọn không phải là tệp nhị phân yt-dlp hợp lệ. Vui lòng chọn tệp thực thi yt-dlp hợp lệ.",
+	"copyVideo": "Sao chép video",
+	"active": "Hoạt động",
+	"bundled": "Tích hợp",
+	"ytdlpSubtitle": "Công cụ tải xuống video và âm thanh",
+	"channelNightlyDesc": "Tính năng mới nhất & sửa lỗi nhanh (Được đề xuất)",
+	"channelStableDesc": "Bản phát hành ổn định chính thức mới nhất",
+	"channelMasterDesc": "Bản dựng phát triển mới nhất",
+	"ffmpegSubtitle": "Bộ chuyển đổi đa phương tiện, ghép kênh & thăm dò luồng",
+	"ffmpegVersionLabel": "Phiên bản ffmpeg",
+	"ffprobeVersionLabel": "Phiên bản ffprobe",
+	"jsRuntimeSubtitle": "Môi trường thực thi JavaScript cho bộ trích xuất",
+	"builtinRuntimeDesc": "Môi trường thực thi tích hợp sẵn"
 }

@@ -543,6 +543,26 @@ function registerIpcHandlers() {
 		if (response === 1) clipboard.writeText(message);
 	});
 
+	ipcMain.handle("show-confirm-dialog", async (event, options = {}) => {
+		const win =
+			(event && event.sender && BrowserWindow.fromWebContents(event.sender)) ||
+			(appState.mainWindow && !appState.mainWindow.isDestroyed()
+				? appState.mainWindow
+				: null);
+		const { response } = await dialog.showMessageBox(win, {
+			type: options.type || "question",
+			message: options.message || "",
+			buttons: options.buttons || [
+				options.confirmLabel || "OK",
+				options.cancelLabel || "Cancel",
+			],
+			defaultId: options.defaultId ?? 0,
+			cancelId: options.cancelId ?? 1,
+			title: options.title || "",
+		});
+		return response === (options.confirmIndex ?? 0);
+	});
+
 	ipcMain.handle("get-system-locale", async (_event) => {
 		return app.getSystemLocale();
 	});

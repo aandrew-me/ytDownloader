@@ -301,5 +301,17 @@
 	"downloadFailedHint": "دانلود خودکار yt-dlp انجام نشد. می‌توانید دوباره امتحان کنید، یک فایل موجود را انتخاب کنید یا به صورت دستی دانلود کنید.",
 	"quitApp": "خروج",
 	"validatingBinary": "در حال اعتبارسنجی فایل...",
-	"invalidBinarySelected": "فایل انتخاب شده یک فایل اجرایی معتبر yt-dlp نیست. لطفاً یک فایل معتبر انتخاب کنید."
+	"invalidBinarySelected": "فایل انتخاب شده یک فایل اجرایی معتبر yt-dlp نیست. لطفاً یک فایل معتبر انتخاب کنید.",
+	"copyVideo": "کپی ویدیو",
+	"active": "فعال",
+	"bundled": "همراه برنامه",
+	"ytdlpSubtitle": "موتور دانلود ویدیو و صدا",
+	"channelNightlyDesc": "جدیدترین ویژگی‌ها و رفع سریع مشکلات (پیشنهادی)",
+	"channelStableDesc": "آخرین نسخه پایدار رسمی",
+	"channelMasterDesc": "جدیدترین ساخت در حال توسعه",
+	"ffmpegSubtitle": "مبدل چندرسانه‌ای، چندگانه‌ساز و بررسی‌کننده جریان",
+	"ffmpegVersionLabel": "نسخه ffmpeg",
+	"ffprobeVersionLabel": "نسخه ffprobe",
+	"jsRuntimeSubtitle": "محیط اجرای جاوااسکریپت برای استخراج‌کننده‌ها",
+	"builtinRuntimeDesc": "محیط اجرای داخلی"
 }

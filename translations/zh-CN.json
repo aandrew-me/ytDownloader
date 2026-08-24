@@ -301,5 +301,17 @@
 	"downloadFailedHint": "无法自动下载 yt-dlp。您可以重试、选择已有二进制文件或手动下载。",
 	"quitApp": "退出",
 	"validatingBinary": "正在验证二进制文件...",
-	"invalidBinarySelected": "所选文件不是有效的 yt-dlp 二进制文件。请选择有效的 yt-dlp 可执行文件。"
+	"invalidBinarySelected": "所选文件不是有效的 yt-dlp 二进制文件。请选择有效的 yt-dlp 可执行文件。",
+	"copyVideo": "复制视频",
+	"active": "活跃",
+	"bundled": "内置",
+	"ytdlpSubtitle": "视频与音频下载引擎",
+	"channelNightlyDesc": "最新功能与快速修复（推荐）",
+	"channelStableDesc": "最新官方稳定版",
+	"channelMasterDesc": "最新前沿开发版本",
+	"ffmpegSubtitle": "媒体转换器、复用器和流探测器",
+	"ffmpegVersionLabel": "ffmpeg 版本",
+	"ffprobeVersionLabel": "ffprobe 版本",
+	"jsRuntimeSubtitle": "提取器的 JavaScript 执行环境",
+	"builtinRuntimeDesc": "内置运行环境"
 }

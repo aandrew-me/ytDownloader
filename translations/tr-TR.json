@@ -301,5 +301,17 @@
 	"downloadFailedHint": "yt-dlp otomatik olarak indirilemedi. Tekrar deneyebilir, mevcut bir ikili dosyayı seçebilir veya manuel olarak indirebilirsiniz.",
 	"quitApp": "Çıkış",
 	"validatingBinary": "İkili dosya doğrulanıyor...",
-	"invalidBinarySelected": "Seçilen dosya geçerli bir yt-dlp ikili dosyası değil. Lütfen geçerli bir yt-dlp çalıştırılabilir dosyası seçin."
+	"invalidBinarySelected": "Seçilen dosya geçerli bir yt-dlp ikili dosyası değil. Lütfen geçerli bir yt-dlp çalıştırılabilir dosyası seçin.",
+	"copyVideo": "Videoyu kopyala",
+	"active": "Aktif",
+	"bundled": "Paket halinde",
+	"ytdlpSubtitle": "Video ve ses indirme motoru",
+	"channelNightlyDesc": "En yeni özellikler ve hızlı düzeltmeler (Önerilen)",
+	"channelStableDesc": "En son resmi kararlı sürüm",
+	"channelMasterDesc": "En yeni geliştirme sürümü",
+	"ffmpegSubtitle": "Medya dönüştürücü, çoğullayıcı ve akış yoklayıcı",
+	"ffmpegVersionLabel": "ffmpeg sürümü",
+	"ffprobeVersionLabel": "ffprobe sürümü",
+	"jsRuntimeSubtitle": "Ayıklayıcılar için JavaScript çalışma zamanı ortamı",
+	"builtinRuntimeDesc": "Yerleşik çalışma zamanı ortamı"
 }

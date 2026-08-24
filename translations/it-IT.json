@@ -301,5 +301,17 @@
 	"downloadFailedHint": "Impossibile scaricare yt-dlp automaticamente. Puoi riprovare, selezionare un binario esistente o scaricarlo manualmente.",
 	"quitApp": "Esci",
 	"validatingBinary": "Convalida binario in corso...",
-	"invalidBinarySelected": "Il file selezionato non è un binario yt-dlp valido. Scegli un eseguibile yt-dlp valido."
+	"invalidBinarySelected": "Il file selezionato non è un binario yt-dlp valido. Scegli un eseguibile yt-dlp valido.",
+	"copyVideo": "Copia video",
+	"active": "Attivo",
+	"bundled": "Incluso",
+	"ytdlpSubtitle": "Motore di download video e audio",
+	"channelNightlyDesc": "Funzionalità più recenti e correzioni rapide (Consigliato)",
+	"channelStableDesc": "Ultima versione stabile ufficiale",
+	"channelMasterDesc": "Build di sviluppo all'avanguardia",
+	"ffmpegSubtitle": "Convertitore multimediale, multiplexer e analizzatore di flussi",
+	"ffmpegVersionLabel": "Versione di ffmpeg",
+	"ffprobeVersionLabel": "Versione di ffprobe",
+	"jsRuntimeSubtitle": "Ambiente di runtime JavaScript per gli estrattori",
+	"builtinRuntimeDesc": "Ambiente di runtime integrato"
 }

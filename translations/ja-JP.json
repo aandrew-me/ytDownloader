@@ -301,5 +301,17 @@
 	"downloadFailedHint": "yt-dlp を自動的にダウンロードできませんでした。再試行するか、既存のバイナリを選択するか、手動でダウンロードしてください。",
 	"quitApp": "終了",
 	"validatingBinary": "バイナリを検証中...",
-	"invalidBinarySelected": "選択されたファイルは有効な yt-dlp バイナリではありません。有効な yt-dlp 実行可能ファイルを選択してください。"
+	"invalidBinarySelected": "選択されたファイルは有効な yt-dlp バイナリではありません。有効な yt-dlp 実行可能ファイルを選択してください。",
+	"copyVideo": "動画をコピー",
+	"active": "有効",
+	"bundled": "バンドル版",
+	"ytdlpSubtitle": "動画・音声ダウンロードエンジン",
+	"channelNightlyDesc": "最新機能と迅速な修正（推奨）",
+	"channelStableDesc": "最新の公式安定版",
+	"channelMasterDesc": "最先端の開発ビルド",
+	"ffmpegSubtitle": "メディアコンバーター、マルチプレクサー、ストリームプローバー",
+	"ffmpegVersionLabel": "ffmpeg バージョン",
+	"ffprobeVersionLabel": "ffprobe バージョン",
+	"jsRuntimeSubtitle": "エクストラクター用 JavaScript 実行環境",
+	"builtinRuntimeDesc": "内蔵ランタイム環境"
 }
