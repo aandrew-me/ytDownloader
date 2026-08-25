@@ -249,6 +249,15 @@ function initPreferences() {
 	const cookieSourceSelect = getId("cookieSource");
 	const browserSelectBox = getId("browserSelectBox");
 	const netscapeCookiesBox = getId("netscapeCookiesBox");
+	const flatpakEl = getId("flatpakTxt");
+
+	if (flatpakEl && env && env.FLATPAK_ID) {
+		flatpakEl.addEventListener("click", () => {
+			shell.openExternal(
+				"https://flathub.org/apps/com.github.tchx84.Flatseal",
+			);
+		});
+	}
 
 	function extractDomainsFromNetscape(text) {
 		if (!text) return [];
@@ -479,6 +488,10 @@ function initPreferences() {
 	});
 
 	function updateCookieSourceUI(source) {
+		if (flatpakEl) {
+			flatpakEl.style.display =
+				env && env.FLATPAK_ID && source === "browser" ? "block" : "none";
+		}
 		if (source === "browser") {
 			if (browserSelectBox) browserSelectBox.style.display = "flex";
 			if (netscapeCookiesBox) netscapeCookiesBox.style.display = "none";
@@ -1467,18 +1480,6 @@ document.addEventListener("translations-loaded", () => {
 			// Trigger re-render of cookie blocks with translated strings
 			const addBtn = getId("addCookieBlockBtn");
 			if (addBtn) addBtn.dispatchEvent(new Event("ytdownloader-refresh-blocks"));
-		}
-	}
-
-	if (env && env.FLATPAK_ID) {
-		const flatpakEl = getId("flatpakTxt");
-		if (flatpakEl) {
-			flatpakEl.addEventListener("click", () => {
-				shell.openExternal(
-					"https://flathub.org/apps/com.github.tchx84.Flatseal",
-				);
-			});
-			flatpakEl.style.display = "block";
 		}
 	}
 });
