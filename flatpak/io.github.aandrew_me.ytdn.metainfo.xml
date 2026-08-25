@@ -55,6 +55,21 @@
   <content_rating type="oars-1.1" />
 
   <releases>
+    <release version="4.0.0" date="2026-08-25">
+      <description>
+        <p>Redesigned as a Single Page Application with a sidebar and updated UI elements</p>
+        <p>Improved default format selection</p>
+        <p>Homepage: Added batch download, auto download media, video output format selection, and option to view yt-dlp command</p>
+        <p>Homepage: Improved download start speed, added pause option, and added video bitrate display in format list</p>
+        <p>Playlist page: Added Selective mode, improved download items UI, and improved menu UI</p>
+        <p>Compressor page: Minor optimizations</p>
+        <p>Preferences page: Added UI zoom, global hotkeys, update channels selection, and individual site cookie pasting</p>
+        <p>Preferences page: Improved output template settings and language selection</p>
+        <p>Preferences page: Added ability to set yt-dlp channel, use system yt-dlp, and use system ffmpeg &amp; ffprobe</p>
+        <p>Bug fixes and minor UI/UX improvements</p>
+      </description>
+    </release>
+
     <release version="3.22.0" date="2026-07-17">
       <description>
         <p>Improved format listing UI</p>
