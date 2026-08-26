@@ -13,6 +13,7 @@
 		"dist": "electron-builder",
 		"debug": "electron --inspect=5858 .",
 		"windows": "electron-builder -w",
+		"appx-test": "powershell -ExecutionPolicy Bypass -File ./test-appx.ps1",
 		"linux": "electron-builder -l",
 		"mac": "electron-builder -m",
 		"gh-windows": "electron-builder -w --publish=always",
@@ -131,7 +132,8 @@
 			"publisherDisplayName": "aandrew-me",
 			"identityName": "aandrew-me.YTDownloaderPlus",
 			"applicationId": "YTDownloaderPlus",
-			"displayName": "YTDownloader Plus"
+			"displayName": "YTDownloader Plus",
+			"backgroundColor": "transparent"
 		}
 	}
 }
