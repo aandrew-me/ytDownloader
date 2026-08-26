@@ -379,3 +379,13 @@ export function formatBitrate(bitrate) {
 	return `${Math.round(num)} kbps`;
 }
 
+/**
+ * Determines whether a yt-dlp format object contains an audio stream.
+ * @param {object | null | undefined} format
+ * @returns {boolean}
+ */
+export function formatHasAudio(format) {
+	if (!format) return false;
+	return format.acodec !== "none";
+}
+

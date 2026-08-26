@@ -5,6 +5,7 @@ import {
 	formatTime,
 	formatVideoCodec,
 	formatBitrate,
+	formatHasAudio,
 	findFfmpeg,
 	ensureFfmpegLibsLoadable,
 	getJsRuntimePath,
@@ -2999,7 +3000,9 @@ class YtDownloaderApp {
 
 		// Separate audio formats
 		const audioOnlyFormats = formats.filter(
-			(f) => f.acodec !== "none" && f.video_ext === "none",
+			(f) =>
+				formatHasAudio(f) &&
+				(f.vcodec === "none" || f.video_ext === "none"),
 		);
 
 		// Helper to score audio formats for ranking & selection
@@ -3117,8 +3120,7 @@ class YtDownloaderApp {
 				}
 
 				let isSelected = false;
-				const hasAudio =
-					format.acodec !== "none" && format.acodec !== undefined;
+				const hasAudio = formatHasAudio(format);
 
 				if (
 					!isAVideoSelected &&
@@ -3197,8 +3199,8 @@ class YtDownloaderApp {
 
 				// PROCESS AUDIO ONLY CHANNELS
 			} else if (
-				format.acodec !== "none" &&
-				format.video_ext === "none"
+				formatHasAudio(format) &&
+				(format.vcodec === "none" || format.video_ext === "none")
 			) {
 				if (!showMoreFormats && format.ext === "webm") return;
 
@@ -3232,10 +3234,10 @@ class YtDownloaderApp {
 
 		const hasAudioTrack = formats.some(
 			(f) =>
-				f.acodec !== "none" &&
-				f.acodec !== undefined &&
-				f.vcodec === "none",
+				formatHasAudio(f) &&
+				(f.vcodec === "none" || f.video_ext === "none"),
 		);
+
 		const audioSection = $(CONSTANTS.DOM_IDS.AUDIO_PRESENT_SECTION);
 
 		if (audioSection) {
