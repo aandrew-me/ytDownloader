@@ -41,8 +41,6 @@ jobs:
                       os: ubuntu-latest
                     - target: windows-x64
                       os: windows-latest
-                    - target: windows-arm64
-                      os: windows-11-arm
 
         steps:
             - name: Checkout code
@@ -103,16 +101,4 @@ jobs:
                   Move-Item -Path .\ffmpeg_win64 -Destination .\ffmpeg
                   Remove-Item -Path ffmpeg_win64.zip
                   npm i
-                  npm run gh-windows
-
-            - name: Windows Arm64 Build
-              if: matrix.target == 'windows-arm64'
-              shell: powershell
-              run: |
-                  curl.exe -fsSL "https://nodejs.org/dist/latest-v22.x/win-arm64/node.exe" -o node.exe
-                  curl.exe -fsSL "https://github.com/aandrew-me/ffmpeg-builds/releases/download/v8/ffmpeg_win_arm64.zip" -o ffmpeg_win_arm64.zip
-                  Expand-Archive -Path ffmpeg_win_arm64.zip -DestinationPath .
-                  Get-ChildItem -Directory -Filter "ffmpeg*" | ForEach-Object { Move-Item $_.FullName .\ffmpeg }
-                  Remove-Item -Path ffmpeg_win_arm64.zip
-                  npm i
-                  npm run gh-windows-arm64
+                  npm run gh-windows

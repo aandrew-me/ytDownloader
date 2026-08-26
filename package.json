@@ -5,7 +5,7 @@
 		"yt-dlp-wrap-plus": "^2.5.0"
 	},
 	"name": "ytdownloader",
-	"version": "4.0.0",
+	"version": "4.0.1",
 	"main": "main.js",
 	"scripts": {
 		"start": "electron .",
@@ -17,7 +17,7 @@
 		"linux": "electron-builder -l",
 		"mac": "electron-builder -m",
 		"gh-windows": "electron-builder -w --publish=always",
-		"gh-windows-arm64": "electron-builder -w --arm64 -c.win.artifactName=\"${productName}_Win_arm64.${ext}\" --publish=always",
+		"gh-windows-arm64": "electron-builder -w --arm64 -c.win.artifactName=\"${productName}_Win_arm64.${ext}\" --publish=never",
 		"gh-linux": "electron-builder -l --publish=always",
 		"gh-mac": "electron-builder -m --publish=always"
 	},
