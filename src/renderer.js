@@ -157,6 +157,7 @@ const CONSTANTS = {
 		YT_DLP_CUSTOM_ARGS: "customYtDlpArgs",
 		YT_DLP_SOURCE: "ytdlpSource",
 		AUTO_DOWNLOAD_ON_PASTE: "autoDownloadOnPaste",
+		YOUTUBE_PLAYER_CLIENTS: "youtubePlayerClients",
 	},
 	// yt-dlp source selectable in preferences.
 	// "nightly": app-managed standalone binary kept on the nightly channel.
@@ -207,6 +208,7 @@ class YtDownloaderApp {
 				netscapeCookies: "",
 				browserForCookies: "",
 				customYtDlpArgs: "",
+				youtubePlayerClients: "default",
 				videoOutputTemplate: "%(title)s.%(ext)s",
 				audioOutputTemplate: "%(title)s.%(ext)s",
 			},
@@ -1311,6 +1313,13 @@ class YtDownloaderApp {
 			localStorage.getItem(
 				CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_CUSTOM_ARGS,
 			) || "";
+		const savedPlayerClients = localStorage.getItem(
+			CONSTANTS.LOCAL_STORAGE_KEYS.YOUTUBE_PLAYER_CLIENTS,
+		);
+		prefs.youtubePlayerClients =
+			savedPlayerClients !== null
+				? savedPlayerClients
+				: "default";
 		prefs.videoOutputTemplate =
 			localStorage.getItem("filenameTemplateVideo") ||
 			"%(title)s.%(ext)s";
@@ -1582,11 +1591,17 @@ class YtDownloaderApp {
 
 		try {
 			await this._loadSettings("https://youtube.com");
-			const {proxy} = this.state.preferences;
+			const {proxy, youtubePlayerClients} = this.state.preferences;
+			const playerClients = (youtubePlayerClients !== undefined && youtubePlayerClients !== null)
+				? youtubePlayerClients.trim()
+				: "default";
 			const args = [
 				"--flat-playlist",
 				"-j",
 				"--no-warnings",
+				...(playerClients
+					? ["--extractor-args", `youtube:player_client=${playerClients}`]
+					: []),
 				...(proxy ? ["--proxy", proxy] : []),
 				...this._getCookieArgs(),
 				...(this.state.jsRuntimePath
@@ -1910,11 +1925,17 @@ class YtDownloaderApp {
 	 */
 	_fetchVideoMetadata(url) {
 		return new Promise((resolve, reject) => {
-			const {proxy} = this.state.preferences;
+			const {proxy, youtubePlayerClients} = this.state.preferences;
+			const playerClients = (youtubePlayerClients !== undefined && youtubePlayerClients !== null)
+				? youtubePlayerClients.trim()
+				: "default";
 			const args = [
 				"-j",
 				"--no-playlist",
 				"--no-warnings",
+				...(playerClients
+					? ["--extractor-args", `youtube:player_client=${playerClients}`]
+					: []),
 
 				...(proxy ? ["--proxy", proxy] : []),
 
@@ -2438,7 +2459,12 @@ class YtDownloaderApp {
 			browserForCookies,
 			videoOutputTemplate = "%(title)s.%(ext)s",
 			audioOutputTemplate = "%(title)s.%(ext)s",
+			youtubePlayerClients = "default",
 		} = this.state.preferences || {};
+
+		const playerClients = (youtubePlayerClients !== undefined && youtubePlayerClients !== null)
+			? youtubePlayerClients.trim()
+			: "default";
 
 		let format_id, ext, audioForVideoFormat_id, audioFormat;
 
@@ -2449,6 +2475,10 @@ class YtDownloaderApp {
 		const baseArgs = [
 			"--no-playlist",
 			"--no-mtime",
+
+			...(playerClients
+				? ["--extractor-args", `youtube:player_client=${playerClients}`]
+				: []),
 
 			...this._getCookieArgs(),
 

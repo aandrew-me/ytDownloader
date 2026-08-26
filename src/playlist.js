@@ -542,6 +542,7 @@ const playlistDownloader = {
 			"--no-warnings",
 			"--compat-options",
 			"no-youtube-unavailable-videos",
+			...this._getPlayerClientArgs(),
 			...(this.config.cookie.arg && this.config.cookie.val
 				? [this.config.cookie.arg, this.config.cookie.val]
 				: []),
@@ -971,6 +972,7 @@ const playlistDownloader = {
 				outputPath,
 				"--ffmpeg-location",
 				this.state.ffmpegPath,
+				...this._getPlayerClientArgs(),
 				...(this.state.jsRuntimePath
 					? ["--no-js-runtimes", "--js-runtime", this.state.jsRuntimePath]
 					: []),
@@ -1170,6 +1172,8 @@ const playlistDownloader = {
 			"--ffmpeg-location",
 			this.state.ffmpegPath,
 
+			...this._getPlayerClientArgs(),
+
 			...(this.state.jsRuntimePath
 				? ["--no-js-runtimes", "--js-runtime", this.state.jsRuntimePath]
 				: []),
@@ -1244,6 +1248,12 @@ const playlistDownloader = {
 				? "--embed-thumbnail"
 				: "",
 		].filter(Boolean);
+	},
+
+	_getPlayerClientArgs() {
+		const raw = localStorage.getItem("youtubePlayerClients");
+		const clients = (raw !== null && raw !== undefined) ? raw.trim() : "default";
+		return clients ? ["--extractor-args", `youtube:player_client=${clients}`] : [];
 	},
 
 	getAudioArgs() {

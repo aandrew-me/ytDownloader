@@ -644,6 +644,42 @@ function initPreferences() {
 		ytDlpArgsInput.addEventListener("change", updateArgs);
 	}
 
+	// YouTube Player Clients
+	const playerClientsInput = getId("youtubePlayerClients");
+	const resetPlayerClientsBtn = getId("resetPlayerClients");
+	if (playerClientsInput) {
+		const savedClients = localStorage.getItem("youtubePlayerClients");
+		if (savedClients !== null) {
+			playerClientsInput.value = savedClients;
+		}
+		const updateClients = () => {
+			localStorage.setItem("youtubePlayerClients", playerClientsInput.value.trim());
+		};
+		playerClientsInput.addEventListener("input", updateClients);
+		playerClientsInput.addEventListener("change", updateClients);
+
+		if (resetPlayerClientsBtn) {
+			resetPlayerClientsBtn.addEventListener("click", () => {
+				playerClientsInput.value = "default";
+				localStorage.setItem("youtubePlayerClients", "default");
+			});
+		}
+
+		document.querySelectorAll(".client-tag-chip").forEach((chip) => {
+			chip.addEventListener("click", () => {
+				const client = chip.getAttribute("data-client");
+				if (!client) return;
+				const current = playerClientsInput.value.trim();
+				const items = current ? current.split(",").map((s) => s.trim()).filter(Boolean) : [];
+				if (!items.includes(client)) {
+					items.push(client);
+					playerClientsInput.value = items.join(",");
+					updateClients();
+				}
+			});
+		});
+	}
+
 	getId("learnMoreYtdlpArgs")?.addEventListener("click", () => {
 		shell.openExternal(
 			"https://github.com/aandrew-me/ytDownloader/wiki/Custom-yt%E2%80%90dlp-options",

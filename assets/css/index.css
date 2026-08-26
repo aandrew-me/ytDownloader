@@ -4388,6 +4388,7 @@ body.rtl .highlighted-template-input {
 	color: var(--sub-text);
 	text-transform: uppercase;
 	letter-spacing: 0.4px;
+	padding: 6px 0;
 }
 
 .template-tags-container,

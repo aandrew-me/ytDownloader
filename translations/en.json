@@ -313,5 +313,7 @@
 	"ffmpegVersionLabel": "ffmpeg version",
 	"ffprobeVersionLabel": "ffprobe version",
 	"jsRuntimeSubtitle": "JavaScript execution environment for extractors",
-	"builtinRuntimeDesc": "Built-in runtime environment"
+	"builtinRuntimeDesc": "Built-in runtime environment",
+	"youtubePlayerClients": "YouTube Player Clients",
+	"youtubePlayerClientsSubtitle": "Extractor client fallbacks for fetching video metadata (comma-separated)"
 }

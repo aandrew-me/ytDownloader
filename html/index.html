@@ -1484,6 +1484,35 @@
                             </div>
                         </section>
 
+                        <section class="settings-section">
+                            <div class="prefBox">
+                                <div class="pref-label-group">
+                                    <span id="playerClientsTxt" data-translate="youtubePlayerClients">YouTube Player Clients</span>
+                                    <p class="pref-subtitle" data-translate="youtubePlayerClientsSubtitle">Extractor client fallbacks for fetching video metadata (comma-separated)</p>
+                                </div>
+                                <div style="display: flex; gap: 8px; align-items: center; justify-content: flex-end; width: 45%;">
+                                    <input type="text" id="youtubePlayerClients" class="input" style="width: 100%; height: 38px;" placeholder="default" value="default" spellcheck="false">
+                                    <button class="btn redBtn sm" id="resetPlayerClients" data-translate="resetToDefault" style="white-space: nowrap;">Reset</button>
+                                </div>
+                            </div>
+                            <div class="template-tags-helper" style="margin-top: 10px;">
+                                <div class="template-helper-group">
+                                    <span class="template-tags-label" data-translate="clickTagToInsert">Quick Insert:</span>
+                                    <div class="template-tags-container" id="playerClientChips">
+                                        <button type="button" class="template-tag-chip client-tag-chip" data-client="default">default</button>
+                                        <button type="button" class="template-tag-chip client-tag-chip" data-client="web_safari">web_safari</button>
+                                        <button type="button" class="template-tag-chip client-tag-chip" data-client="web">web</button>
+                                        <button type="button" class="template-tag-chip client-tag-chip" data-client="mweb">mweb</button>
+                                        <button type="button" class="template-tag-chip client-tag-chip" data-client="android">android</button>
+                                        <button type="button" class="template-tag-chip client-tag-chip" data-client="ios">ios</button>
+                                        <button type="button" class="template-tag-chip client-tag-chip" data-client="tv">tv</button>
+                                        <button type="button" class="template-tag-chip client-tag-chip" data-client="tv_embedded">tv_embedded</button>
+                                        <button type="button" class="template-tag-chip client-tag-chip" data-client="creator">creator</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
                         <section id="pathConfig" class="settings-section">
                             <div id="ytDlpArgBox">
                                 <p>
