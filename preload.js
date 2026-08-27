@@ -242,15 +242,7 @@ const spawnWrapper = (command, args = [], options = {}) => {
 	return childWrapper;
 };
 
-const envObj = {
-	FLATPAK_ID: process.env.FLATPAK_ID,
-	LD_LIBRARY_PATH: process.env.LD_LIBRARY_PATH,
-	YTDOWNLOADER_NODE_PATH: process.env.YTDOWNLOADER_NODE_PATH,
-	YTDOWNLOADER_DENO_PATH: process.env.YTDOWNLOADER_DENO_PATH,
-	YTDOWNLOADER_FFMPEG_PATH: process.env.YTDOWNLOADER_FFMPEG_PATH,
-	YTDOWNLOADER_YTDLP_PATH: process.env.YTDOWNLOADER_YTDLP_PATH,
-	YTDOWNLOADER_AUTO_UPDATES: process.env.YTDOWNLOADER_AUTO_UPDATES,
-};
+const envObj = { ...process.env };
 
 contextBridge.exposeInMainWorld("electronAPI", {
 	ipcRenderer: {

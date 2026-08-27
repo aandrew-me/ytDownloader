@@ -624,10 +624,11 @@ class YtDownloaderApp {
 
 			if (actionBtn) {
 				actionBtn.disabled = false;
+				const isAppImage = info.isAppImage ?? Boolean(env?.APPIMAGE);
 				const isBrowserDownload =
 					info.isZipBuild ||
 					info.platform === "darwin" ||
-					(info.platform === "linux" && !env?.APPIMAGE);
+					(info.platform === "linux" && !isAppImage);
 
 				if (isBrowserDownload) {
 					actionBtn.textContent = window.i18n ? window.i18n.__("downloadInBrowser") : "Download in Browser";
