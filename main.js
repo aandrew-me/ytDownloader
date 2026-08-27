@@ -732,6 +732,7 @@ function registerAutoUpdaterEvents() {
 				(info.version && (info.version.includes("-beta") || info.version.includes("-alpha") || info.version.includes("-rc")))
 			),
 			isZipBuild: isZipBuild(),
+			isAppImage: Boolean(process.env.APPIMAGE),
 			platform: platform(),
 			arch: process.arch,
 			isManual: isManual,
