@@ -42,6 +42,7 @@
 	"build": {
 		"productName": "YTDownloader",
 		"appId": "io.github.aandrew_me.ytdn",
+		"copyright": "Copyright © Andrew",
 		"artifactName": "${productName}.${ext}",
 		"files": [
 			"./resources/**/*",
@@ -119,7 +120,7 @@
 			"allowToChangeInstallationDirectory": true,
 			"oneClick": false,
 			"deleteAppDataOnUninstall": true,
-			"license": "./LICENSE"
+			"license": "./LICENSE.rtf"
 		},
 		"msi": {
 			"oneClick": true,
