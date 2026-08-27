@@ -178,6 +178,7 @@ async function startCompression() {
 				if (isCancelled) {
 					break; // Break the loop if cancelled during compression
 				} else {
+					window.electronAPI?.logger?.success?.(`Compressed video: ${file.name || file}`, { details: `Output: ${outputPath}` });
 					updateProgress("success", "", itemId);
 					const fileSavedElement = document.createElement("b");
 					fileSavedElement.textContent = i18n.__("fileSavedClickToOpen");
@@ -191,6 +192,7 @@ async function startCompression() {
 					break; // Break loop if process was killed by cancel button
 				}
 
+				window.electronAPI?.logger?.error?.(`Compression error: ${error.message || error}`, { details: error.stack || String(error) });
 				const errorElement = document.createElement("div");
 				errorElement.onclick = () => {
 					ipcRenderer.send("error_dialog", error.message);

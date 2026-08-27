@@ -313,5 +313,20 @@
 	"ffmpegVersionLabel": "ffmpeg version",
 	"ffprobeVersionLabel": "ffprobe version",
 	"jsRuntimeSubtitle": "JavaScript execution environment for extractors",
-	"builtinRuntimeDesc": "Built-in runtime environment"
+	"builtinRuntimeDesc": "Built-in runtime environment",
+	"logs": "Logs",
+	"searchLogsPlaceholder": "Search logs...",
+	"filterAll": "All",
+	"filterCommands": "Commands",
+	"filterSuccess": "Success",
+	"filterInfo": "Info",
+	"filterErrors": "Errors",
+	"filterDetail": "Detail",
+	"logDetail": "Log detail",
+	"refresh": "Refresh",
+	"export": "Export",
+	"clear": "Clear",
+	"noLogsPlaceholder": "No logs recorded for this session",
+	"copiedToClipboard": "Copied to clipboard",
+	"logsExportedSuccess": "Logs exported successfully"
 }

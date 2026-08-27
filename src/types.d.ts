@@ -80,6 +80,19 @@ interface ElectronAPI {
         readText(): string;
         writeText(text: string): void;
     };
+    logger?: {
+        log(level: string, message: string, meta?: any): Promise<any>;
+        info(message: string, meta?: any): Promise<any>;
+        command(message: string, meta?: any): Promise<any>;
+        success(message: string, meta?: any): Promise<any>;
+        error(message: string, meta?: any): Promise<any>;
+        detail(message: string, meta?: any): Promise<any>;
+        getLogs(options?: any): Promise<any[]>;
+        clearLogs(): Promise<boolean>;
+        exportLogs(format?: string): Promise<any>;
+        openLogDirectory(): Promise<boolean>;
+        onNewLog(cb: (entry: any) => void): () => void;
+    };
     YTDlpWrap: YTDlpWrapBridge;
     homedir: string;
     platform: string;

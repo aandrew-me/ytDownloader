@@ -26,6 +26,10 @@ export function switchView(targetViewId) {
 		window.loadHistory();
 	}
 
+	if (targetViewId === "view-logs" && typeof window.loadLogs === "function") {
+		window.loadLogs();
+	}
+
 	if (targetViewId === "view-compressor" && typeof window.initCompressorGPU === "function") {
 		window.initCompressorGPU();
 	}

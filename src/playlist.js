@@ -577,6 +577,10 @@ const playlistDownloader = {
 				if (this.ui.selectiveLoadingWrapper) this.ui.selectiveLoadingWrapper.style.display = "none";
 
 				if (!stdout) {
+					window.electronAPI?.logger?.error?.(
+						`Failed to fetch playlist: ${stderr || "Unknown error"}`,
+						{ url, details: stderr },
+					);
 					this.handleSelectiveError(
 						stderr || "Failed to fetch playlist data",
 						url,
@@ -588,6 +592,12 @@ const playlistDownloader = {
 					const parsed = JSON.parse(stdout);
 					if (parsed && Array.isArray(parsed.entries) && parsed.entries.length > 0) {
 						this.selectiveState.title = parsed.title || "Playlist";
+						const validEntries = parsed.entries.filter((e) => e && (e.url || e.id));
+						this.selectiveState.items = validEntries;
+						window.electronAPI?.logger?.info?.(
+							`Fetched playlist - '${this.selectiveState.title}' (${validEntries.length} items)`,
+							{ url },
+						);
 						this.selectiveState.channel = parsed.channel || parsed.uploader || "";
 
 						const prefVideo = localStorage.getItem("preferredVideoQuality") || "1080";
@@ -1023,6 +1033,7 @@ const playlistDownloader = {
 									duration: entry.duration,
 									filePath: this.state.downloadDir,
 								});
+								window.electronAPI?.logger?.success?.(`Downloaded: '${entry.title}'`, { url: entry.url });
 							} catch (_) { }
 						}
 						resolve();

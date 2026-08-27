@@ -16,6 +16,7 @@ const {
 	shell,
 	ipcRenderer,
 	clipboard,
+	logger,
 	YTDlpWrap,
 	constants,
 	homedir,
@@ -269,6 +270,34 @@ class YtDownloaderApp {
 			console.log("ffmpeg path:", this.state.ffmpegPath);
 			console.log("JS runtime:", this.state.jsRuntimePath);
 
+			let ytdlpVer = "";
+			try {
+				if (this.state.ytDlp && typeof this.state.ytDlp.version === "function") {
+					ytdlpVer = await this.state.ytDlp.version();
+				}
+			} catch (_) {}
+
+			let ffmpegVer = "";
+			try {
+				if (this.state.ffmpegPath) {
+					const exeName = platform() === "win32" ? "ffmpeg.exe" : "ffmpeg";
+					const ffmpegExe = join(this.state.ffmpegPath, exeName);
+					const targetBin = existsSync(ffmpegExe) ? ffmpegExe : (existsSync(this.state.ffmpegPath) ? this.state.ffmpegPath : null);
+					if (targetBin && execSync) {
+						const out = execSync(`"${targetBin}" -version`, { encoding: "utf8" });
+						const match = out.match(/ffmpeg version (\S+)/i);
+						ffmpegVer = match ? match[1] : (out.split(/\r?\n/)[0] || "");
+					}
+				}
+			} catch (_) {}
+
+			logger?.info?.(
+				`Resolved binaries: yt-dlp ${ytdlpVer ? `v${ytdlpVer}` : ""} | ffmpeg ${ffmpegVer ? `v${ffmpegVer}` : ""}`,
+				{
+					details: `yt-dlp: ${this.state.ytDlpPath} ${ytdlpVer ? `(v${ytdlpVer})` : ""}\nffmpeg: ${this.state.ffmpegPath} ${ffmpegVer ? `(v${ffmpegVer})` : ""}\nJS Runtime: ${this.state.jsRuntimePath || "None (built-in)"}`,
+				},
+			);
+
 			window.addEventListener("ytdownloader-reload-binaries", () => {
 				this.reloadBinaries();
 			});
@@ -360,6 +389,10 @@ class YtDownloaderApp {
 					"Re-resolved binary paths in-memory:",
 					window.AppBinaries,
 				);
+
+				logger?.info?.("Re-resolved binary paths", {
+					details: `yt-dlp: ${this.state.ytDlpPath}\nffmpeg: ${this.state.ffmpegPath}\nJS Runtime: ${this.state.jsRuntimePath || "None (built-in)"}`,
+				});
 			} catch (error) {
 				console.error("Binary re-resolution failed:", error);
 			}

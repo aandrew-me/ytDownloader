@@ -98,11 +98,35 @@ function killProcessSafely(proc, signal) {
 	}
 }
 
+function formatCommandLine(args = [], binary = "yt-dlp") {
+	const cmdParts = [binary, ...args.map((a) => {
+		const s = String(a);
+		return s.includes(" ") ? `"${s}"` : s;
+	})];
+	return cmdParts.join(" ");
+}
+
+function findUrlInArgs(args = []) {
+	if (!Array.isArray(args)) return "";
+	const urlArg = args.find((a) => typeof a === "string" && (a.startsWith("http://") || a.startsWith("https://")));
+	return urlArg || "";
+}
+
 function createYTDlpWrapInstance(binaryPath) {
 	const instance = new YTDlpWrap(binaryPath);
 	return {
 		exec: (args = [], options = {}, cancellationSignal) => {
 			const { options: localOpts, signal: realSignal } = normalizeSignal(options, cancellationSignal);
+			const cmdString = formatCommandLine(args, "yt-dlp");
+			const foundUrl = findUrlInArgs(args);
+			ipcRenderer.invoke("add-log", {
+				level: "COMMAND",
+				message: `yt-dlp ${args[0] || ""}`.trim(),
+				command: cmdString,
+				url: foundUrl,
+				timestamp: Date.now(),
+			}).catch(() => {});
+
 			const proc = instance.exec(args, localOpts, realSignal);
 			const spawnargs =
 				proc.ytDlpProcess && proc.ytDlpProcess.spawnargs
@@ -169,6 +193,15 @@ function createYTDlpWrapInstance(binaryPath) {
 		},
 		execPromise: (args = [], options = {}, cancellationSignal) => {
 			const { options: localOpts, signal: realSignal } = normalizeSignal(options, cancellationSignal);
+			const cmdString = formatCommandLine(args, "yt-dlp");
+			const foundUrl = findUrlInArgs(args);
+			ipcRenderer.invoke("add-log", {
+				level: "COMMAND",
+				message: `yt-dlp ${args[0] || ""}`.trim(),
+				command: cmdString,
+				url: foundUrl,
+				timestamp: Date.now(),
+			}).catch(() => {});
 			return instance.execPromise(args, localOpts, realSignal);
 		},
 		getExtractorTitles: () => {
@@ -408,6 +441,29 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	crypto: {
 		randomUUID: () => crypto.randomUUID(),
 		randomBytes: (size) => crypto.randomBytes(size),
+	},
+	logger: {
+		log: (level, message, meta = {}) =>
+			ipcRenderer.invoke("add-log", { level, message, ...meta, timestamp: Date.now() }),
+		info: (message, meta = {}) =>
+			ipcRenderer.invoke("add-log", { level: "INFO", message, ...meta, timestamp: Date.now() }),
+		command: (message, meta = {}) =>
+			ipcRenderer.invoke("add-log", { level: "COMMAND", message, ...meta, timestamp: Date.now() }),
+		success: (message, meta = {}) =>
+			ipcRenderer.invoke("add-log", { level: "SUCCESS", message, ...meta, timestamp: Date.now() }),
+		error: (message, meta = {}) =>
+			ipcRenderer.invoke("add-log", { level: "ERROR", message, ...meta, timestamp: Date.now() }),
+		detail: (message, meta = {}) =>
+			ipcRenderer.invoke("add-log", { level: "DETAIL", message, ...meta, timestamp: Date.now() }),
+		getLogs: (options) => ipcRenderer.invoke("get-logs", options),
+		clearLogs: () => ipcRenderer.invoke("clear-logs"),
+		exportLogs: (format) => ipcRenderer.invoke("export-logs", format),
+		openLogDirectory: () => ipcRenderer.invoke("open-log-directory"),
+		onNewLog: (cb) => {
+			const sub = (_event, entry) => cb(entry);
+			ipcRenderer.on("new-log-entry", sub);
+			return () => ipcRenderer.removeListener("new-log-entry", sub);
+		},
 	},
 	YTDlpWrap: YTDlpWrapBridge,
 	getEnv: (key) => process.env[key],

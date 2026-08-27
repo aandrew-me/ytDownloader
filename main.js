@@ -15,7 +15,20 @@ const fs = require("fs").promises;
 const { existsSync, readFileSync, writeFileSync } = require("fs");
 const path = require("path");
 const DownloadHistory = require("./src/history");
-const { platform } = require("os");
+const Logger = require("./src/logger");
+const os = require("os");
+const { platform } = os;
+
+function getPackageType() {
+	if (process.windowsStore) return "Windows Store / AppX";
+	if (process.env.APPIMAGE) return "Linux AppImage";
+	if (process.env.SNAP) return "Linux Snap";
+	if (process.env.FLATPAK_ID) return "Linux Flatpak";
+	if (process.platform === "darwin") return "macOS DMG / Zip";
+	if (process.platform === "win32") return "Windows NSIS / Installer";
+	if (process.platform === "linux") return "Linux Package (Deb / RPM / Zip)";
+	return "Standard / Unpacked";
+}
 
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = "true";
 autoUpdater.autoDownload = false;
@@ -38,6 +51,7 @@ const appState = {
 	loadedLanguage: {},
 	config: {},
 	downloadHistory: new DownloadHistory(),
+	logger: new Logger(),
 	autoUpdateEnabled: false,
 	isManualUpdateCheck: false,
 	updateChannel: "stable",
@@ -90,6 +104,21 @@ app.on("window-all-closed", () => {
  */
 async function initialize() {
 	await Promise.all([loadConfiguration(), loadTranslations()]);
+
+	const osInfo = `${process.platform} (${os.type()} ${os.release()}, ${os.arch()})`;
+	const pkgType = getPackageType();
+	const appVer = app.getVersion ? app.getVersion() : "4.0.1";
+	appState.logger.addLog({
+		level: "INFO",
+		message: `ytDownloader v${appVer} (${pkgType})`,
+		details: `Operating System: ${osInfo}\nPackage Type: ${pkgType}\nApp Version: ${appVer}\nElectron: ${process.versions.electron}\nNode: ${process.versions.node}\nChrome: ${process.versions.chrome}`,
+	});
+
+	appState.logger.onLog((entry) => {
+		if (appState.mainWindow && !appState.mainWindow.isDestroyed()) {
+			appState.mainWindow.webContents.send("new-log-entry", entry);
+		}
+	});
 
 	registerIpcHandlers();
 	registerAutoUpdaterEvents();
@@ -626,6 +655,48 @@ function registerIpcHandlers() {
 	ipcMain.handle("export-history-csv", () =>
 		appState.downloadHistory.exportAsCSV(),
 	);
+
+	ipcMain.handle("get-logs", (_, options) =>
+		appState.logger.getLogs(options),
+	);
+	ipcMain.handle("add-log", (_, entry) =>
+		appState.logger.addLog(entry),
+	);
+	ipcMain.handle("clear-logs", async () => {
+		await appState.logger.clearLogs();
+		return true;
+	});
+	ipcMain.handle("export-logs", async (_event, format = "txt") => {
+		const content = await appState.logger.exportLogs(format);
+		const win =
+			appState.mainWindow && !appState.mainWindow.isDestroyed()
+				? appState.mainWindow
+				: null;
+		const defaultExt = format === "json" ? "json" : "txt";
+		const { canceled, filePath } = await dialog.showSaveDialog(win, {
+			title: "Export Logs",
+			defaultPath: path.join(
+				app.getPath("documents"),
+				`ytdownloader_session_logs.${defaultExt}`,
+			),
+			filters: [
+				format === "json"
+					? { name: "JSON File", extensions: ["json"] }
+					: { name: "Text File", extensions: ["txt", "log"] },
+				{ name: "All Files", extensions: ["*"] },
+			],
+		});
+
+		if (!canceled && filePath) {
+			await fs.writeFile(filePath, content, "utf8");
+			return { success: true, filePath };
+		}
+		return { success: false, canceled: true };
+	});
+	ipcMain.handle("open-log-directory", () => {
+		shell.openPath(appState.logger.getLogsDirectory());
+		return true;
+	});
 
 	ipcMain.handle(
 		"get-system-proxy",

@@ -20,6 +20,7 @@
     <script type="module" src="../src/compressor.js"></script>
     <script type="module" src="../src/preferences.js"></script>
     <script type="module" src="../src/history_ui.js"></script>
+    <script type="module" src="../src/logger_ui.js"></script>
     <script type="module" src="../src/common.js"></script>
 
 </head>
@@ -109,6 +110,11 @@
                 <button class="nav-item" id="historyWin" data-target="view-history" title="History">
                     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                     <span data-translate="downloadHistory">History</span>
+                </button>
+
+                <button class="nav-item" id="logWin" data-target="view-logs" title="Logs">
+                    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                    <span data-translate="logs">Logs</span>
                 </button>
 
                 <button class="nav-item" id="preferenceWin" data-target="view-preferences" title="Preferences">
@@ -1128,6 +1134,51 @@
                         <button id="clearAllBtn" class="danger-btn" data-translate="clearAllHistory">Clear All History</button>
                     </div>
                     <div id="historyListContainer" class="history-list"></div>
+                </div>
+            </section>
+
+            <!-- View: Logs -->
+            <section id="view-logs" class="page-view hidden">
+                <div class="logs-container">
+                    <div class="logs-header-title-row">
+                        <h2 class="logs-page-title" data-translate="logs">Logs</h2>
+                    </div>
+                    <div class="logs-search-row">
+                        <div class="logs-search-wrapper">
+                            <svg viewBox="0 0 24 24" class="logs-search-icon"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                            <input type="text" id="logSearchInput" data-translate-placeholder="searchLogsPlaceholder" placeholder="Search logs...">
+                        </div>
+                    </div>
+                    <div class="logs-controls-bar">
+                        <div class="logs-filter-pills" id="logFilterPills">
+                            <button type="button" class="log-filter-btn active" data-filter="ALL" data-translate="filterAll">All</button>
+                            <button type="button" class="log-filter-btn" data-filter="COMMAND" data-translate="filterCommands">Commands</button>
+                            <button type="button" class="log-filter-btn" data-filter="SUCCESS" data-translate="filterSuccess">Success</button>
+                            <button type="button" class="log-filter-btn" data-filter="INFO" data-translate="filterInfo">Info</button>
+                            <button type="button" class="log-filter-btn" data-filter="ERROR" data-translate="filterErrors">Errors</button>
+                            <button type="button" class="log-filter-btn" data-filter="DETAIL" data-translate="filterDetail">Detail</button>
+                        </div>
+                        <div class="logs-action-buttons">
+                            <label class="log-detail-toggle-label">
+                                <span data-translate="logDetail">Log detail</span>
+                                <input type="checkbox" id="logDetailToggle" class="log-switch-input">
+                                <span class="log-switch-slider"></span>
+                            </label>
+                            <button type="button" id="logRefreshBtn" class="log-action-btn" title="Refresh">
+                                <svg viewBox="0 0 24 24" class="log-btn-svg"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                                <span data-translate="refresh">Refresh</span>
+                            </button>
+                            <button type="button" id="logExportBtn" class="log-action-btn" title="Export">
+                                <svg viewBox="0 0 24 24" class="log-btn-svg"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                <span data-translate="export">Export</span>
+                            </button>
+                            <button type="button" id="logClearBtn" class="log-action-btn log-clear-btn" title="Clear">
+                                <svg viewBox="0 0 24 24" class="log-btn-svg"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                                <span data-translate="clear">Clear</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="logListContainer" class="log-list-container"></div>
                 </div>
             </section>
 
