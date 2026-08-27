@@ -594,6 +594,7 @@ function initPreferences() {
 				"None (Direct connection)";
 		}
 	}
+	refreshSystemProxyDisplay = updateSystemProxyDisplay;
 
 	function updateProxyModeUI(mode) {
 		if (customProxyBox) {
@@ -1056,6 +1057,7 @@ function initPreferences() {
 
 let depsTabInitialized = false;
 let refreshDependenciesLabels = () => {};
+let refreshSystemProxyDisplay = () => {};
 
 function initDependenciesTab() {
 	const depYtdlpSource = getId("depYtdlpSource");
@@ -1473,6 +1475,7 @@ document.addEventListener("translations-loaded", () => {
 		window.i18n.translatePage();
 	}
 	refreshDependenciesLabels();
+	refreshSystemProxyDisplay();
 	const cookieContainer = getId("cookieBlocksContainer");
 	if (cookieContainer && cookieContainer.children.length > 0) {
 		const cookieSourceSelect = getId("cookieSource");
