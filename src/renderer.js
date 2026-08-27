@@ -1342,18 +1342,6 @@ class YtDownloaderApp {
 				this._updateHomePathDisplay();
 			}
 		}
-
-		// Sync quick preset defaults from preferences
-		const qualitySelect = document.getElementById("presetQualitySelect");
-		if (qualitySelect && prefs.videoQuality) {
-			const matchingOpt = Array.from(qualitySelect.options).find(
-				(opt) => opt.value === String(prefs.videoQuality),
-			);
-			if (matchingOpt) {
-				qualitySelect.value = String(prefs.videoQuality);
-				this.state.batchPreset.quality = String(prefs.videoQuality);
-			}
-		}
 	}
 
 	/**
