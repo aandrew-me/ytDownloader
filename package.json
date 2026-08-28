@@ -32,7 +32,7 @@
 		"private": false
 	},
 	"license": "GPL-3.0",
-	"description": "Download videos and audios from YouTube and many other sites",
+	"description": "YTDownloader installer",
 	"devDependencies": {
 		"@playwright/test": "^1.45.0",
 		"electron": "^30.5.1",
@@ -120,6 +120,7 @@
 			"allowToChangeInstallationDirectory": true,
 			"oneClick": false,
 			"deleteAppDataOnUninstall": true,
+			"uninstallDisplayName": "YTDownloader",
 			"license": "./LICENSE.rtf"
 		},
 		"msi": {
