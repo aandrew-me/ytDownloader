@@ -11,6 +11,7 @@
 		"start": "electron .",
 		"test": "playwright test",
 		"dist": "electron-builder",
+		"postinstall": "node patch-snap.js",
 		"debug": "electron --inspect=5858 .",
 		"windows": "electron-builder -w",
 		"appx-test": "powershell -ExecutionPolicy Bypass -File ./test-appx.ps1",
@@ -36,7 +37,7 @@
 	"devDependencies": {
 		"@playwright/test": "^1.45.0",
 		"electron": "^30.5.1",
-		"electron-builder": "^26.15.3",
+		"electron-builder": "^26.15.7",
 		"typescript": "^5.3.3"
 	},
 	"build": {
