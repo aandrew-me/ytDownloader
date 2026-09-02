@@ -47,7 +47,7 @@ test.describe("Preferences Integration Tests", () => {
 		const testUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
 		await page.evaluate((url) => window.electronAPI.clipboard.writeText(url), testUrl);
 
-		await page.click("#pasteUrl");
+		await triggerClick(page, "pasteUrl");
 		await waitForInfoPanel(page);
 
 		await clearExecutedCommands(page);
@@ -74,7 +74,7 @@ test.describe("Preferences Integration Tests", () => {
 		const testUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
 		await page.evaluate((url) => window.electronAPI.clipboard.writeText(url), testUrl);
 
-		await page.click("#pasteUrl");
+		await triggerClick(page, "pasteUrl");
 		await waitForInfoPanel(page);
 
 		// Verify selected format in video dropdown is 720p (format_id 22)
@@ -96,7 +96,7 @@ test.describe("Preferences Integration Tests", () => {
 		const testUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
 		await page.evaluate((url) => window.electronAPI.clipboard.writeText(url), testUrl);
 
-		await page.click("#pasteUrl");
+		await triggerClick(page, "pasteUrl");
 		await waitForInfoPanel(page);
 
 		const formatValuesHide = await page.$$eval(
@@ -112,7 +112,7 @@ test.describe("Preferences Integration Tests", () => {
 		await page.reload();
 
 		await page.evaluate((url) => window.electronAPI.clipboard.writeText(url), testUrl);
-		await page.click("#pasteUrl");
+		await triggerClick(page, "pasteUrl");
 		await waitForInfoPanel(page);
 
 		const formatValuesShow = await page.$$eval(
@@ -138,7 +138,7 @@ test.describe("Preferences Integration Tests", () => {
 		const testUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
 		await page.evaluate((url) => window.electronAPI.clipboard.writeText(url), testUrl);
 
-		await page.click("#pasteUrl");
+		await triggerClick(page, "pasteUrl");
 		await waitForInfoPanel(page);
 
 		await clearExecutedCommands(page);
@@ -187,7 +187,7 @@ test.describe("Preferences Integration Tests", () => {
 		const testUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
 		await page.evaluate((url) => window.electronAPI.clipboard.writeText(url), testUrl);
 
-		await page.click("#pasteUrl");
+		await triggerClick(page, "pasteUrl");
 		await waitForInfoPanel(page);
 
 		await clearExecutedCommands(page);
@@ -213,7 +213,7 @@ test.describe("Preferences Integration Tests", () => {
 		const testUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
 		await page.evaluate((url) => window.electronAPI.clipboard.writeText(url), testUrl);
 
-		await page.click("#pasteUrl");
+		await triggerClick(page, "pasteUrl");
 		await waitForInfoPanel(page);
 
 		await clearExecutedCommands(page);
@@ -245,7 +245,7 @@ test.describe("Preferences Integration Tests", () => {
 		const testUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
 		await page.evaluate((url) => window.electronAPI.clipboard.writeText(url), testUrl);
 
-		await page.click("#pasteUrl");
+		await triggerClick(page, "pasteUrl");
 		await waitForInfoPanel(page);
 
 		await clearExecutedCommands(page);
@@ -275,7 +275,7 @@ test.describe("Preferences Integration Tests", () => {
 		const testUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
 		await page.evaluate((url) => window.electronAPI.clipboard.writeText(url), testUrl);
 
-		await page.click("#pasteUrl");
+		await triggerClick(page, "pasteUrl");
 		await waitForInfoPanel(page);
 
 		await clearExecutedCommands(page);
@@ -293,5 +293,36 @@ test.describe("Preferences Integration Tests", () => {
 		expect(downloadCmd).toBeDefined();
 		expect(downloadCmd).toContain("--no-check-certificates");
 		expect(downloadCmd).toContain("--geo-bypass");
+	});
+
+	test("concurrent fragments preference is included in yt-dlp command when > 1", async () => {
+		const res = await launchApp({
+			concurrentFragments: "4",
+		});
+		electronApp = res.app;
+		page = res.page;
+
+		const testUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+		await page.evaluate((url) => window.electronAPI.clipboard.writeText(url), testUrl);
+
+		await triggerClick(page, "pasteUrl");
+		await waitForInfoPanel(page);
+
+		await clearExecutedCommands(page);
+
+		await triggerClick(page, "videoDownload");
+
+		await page.waitForFunction(() => {
+			const cmds = window.__executedCommands || [];
+			return cmds.some((cmd) => cmd.includes("-f"));
+		});
+
+		const commands = await getExecutedCommands(page);
+		const downloadCmd = commands.find((cmd) => cmd.includes("-f"));
+
+		expect(downloadCmd).toBeDefined();
+		expect(downloadCmd).toContain("--concurrent-fragments");
+		const fragIdx = downloadCmd.indexOf("--concurrent-fragments");
+		expect(downloadCmd[fragIdx + 1]).toBe("4");
 	});
 });

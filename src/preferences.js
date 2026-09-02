@@ -851,6 +851,24 @@ function initPreferences() {
 		maxDownloadsInput.addEventListener("change", updateMax);
 	}
 
+	// Concurrent fragments validation parameters
+	const concurrentFragmentsInput = getId("concurrentFragments");
+	if (concurrentFragmentsInput) {
+		if (localStorage.getItem("concurrentFragments")) {
+			concurrentFragmentsInput.value = localStorage.getItem("concurrentFragments");
+		}
+		const updateFragments = () => {
+			const num = Number(concurrentFragmentsInput.value);
+			const resolved =
+				Number.isFinite(num) && num >= 1
+					? String(Math.min(16, Math.floor(num)))
+					: "1";
+			localStorage.setItem("concurrentFragments", resolved);
+		};
+		concurrentFragmentsInput.addEventListener("input", updateFragments);
+		concurrentFragmentsInput.addEventListener("change", updateFragments);
+	}
+
 	// Zoom Level Selector
 	const zoomLevelSelect = getId("zoomLevelSelect");
 	if (zoomLevelSelect) {

@@ -84,6 +84,8 @@
 	"selectVideoFormat": "Select Video Format ",
 	"selectAudioFormat": "Select Audio Format ",
 	"maxActiveDownloads": "Maximum number of active downloads",
+	"concurrentFragments": "Concurrent fragments (download acceleration)",
+	"concurrentFragmentsSubtitle": "Number of simultaneous connection streams per video (default: 1)",
 	"preferredVideoQuality": "Preferred video quality",
 	"preferredAudioFormat": "Preferred audio format",
 	"best": "Best",

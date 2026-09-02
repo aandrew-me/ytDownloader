@@ -157,6 +157,7 @@ const CONSTANTS = {
 		YT_DLP_CUSTOM_ARGS: "customYtDlpArgs",
 		YT_DLP_SOURCE: "ytdlpSource",
 		AUTO_DOWNLOAD_ON_PASTE: "autoDownloadOnPaste",
+		CONCURRENT_FRAGMENTS: "concurrentFragments",
 	},
 	// yt-dlp source selectable in preferences.
 	// "nightly": app-managed standalone binary kept on the nightly channel.
@@ -1325,6 +1326,16 @@ class YtDownloaderApp {
 		);
 		this.state.maxActiveDownloads = maxDownloads >= 1 ? maxDownloads : 5;
 
+		const concurrentFragments = Number(
+			localStorage.getItem(
+				CONSTANTS.LOCAL_STORAGE_KEYS.CONCURRENT_FRAGMENTS,
+			),
+		);
+		prefs.concurrentFragments =
+			concurrentFragments >= 1
+				? Math.min(16, Math.floor(concurrentFragments))
+				: 1;
+
 		if (updateUI) {
 			const customArgsInput = $(CONSTANTS.DOM_IDS.CUSTOM_ARGS_INPUT);
 			if (customArgsInput) customArgsInput.value = prefs.customYtDlpArgs;
@@ -2427,6 +2438,7 @@ class YtDownloaderApp {
 			browserForCookies,
 			videoOutputTemplate = "%(title)s.%(ext)s",
 			audioOutputTemplate = "%(title)s.%(ext)s",
+			concurrentFragments = 1,
 		} = this.state.preferences || {};
 
 		let format_id, ext, audioForVideoFormat_id, audioFormat;
@@ -2438,6 +2450,10 @@ class YtDownloaderApp {
 		const baseArgs = [
 			"--no-playlist",
 			"--no-mtime",
+
+			...(concurrentFragments > 1
+				? ["--concurrent-fragments", String(concurrentFragments)]
+				: []),
 
 			...this._getCookieArgs(),
 

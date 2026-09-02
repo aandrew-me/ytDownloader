@@ -28,7 +28,7 @@ test.describe("Playlist Page Download Tests", () => {
 		electronApp = res.app;
 		page = res.page;
 		await page.waitForFunction(() => typeof window.switchView === "function");
-		await page.click("#playlistWin");
+		await triggerClick(page, "playlistWin");
 	});
 
 	test.afterEach(async () => {
@@ -44,7 +44,7 @@ test.describe("Playlist Page Download Tests", () => {
 			window.electronAPI.clipboard.writeText(url);
 		}, playlistUrl);
 
-		await page.click("#pasteLink");
+		await triggerClick(page, "pasteLink");
 		await waitForPlaylistOptions(page);
 
 		await page.selectOption("#select", "1080");
@@ -72,7 +72,7 @@ test.describe("Playlist Page Download Tests", () => {
 			window.electronAPI.clipboard.writeText(url);
 		}, playlistUrl);
 
-		await page.click("#pasteLink");
+		await triggerClick(page, "pasteLink");
 		await waitForPlaylistOptions(page);
 
 		await triggerClick(page, "audioTogglePlaylist");
@@ -82,7 +82,7 @@ test.describe("Playlist Page Download Tests", () => {
 
 		await clearExecutedCommands(page);
 
-		await page.click("#audioDownloadPlaylist");
+		await triggerClick(page, "audioDownloadPlaylist");
 
 		const commands = await getExecutedCommands(page);
 		expect(commands.length).toBeGreaterThan(0);
@@ -105,7 +105,7 @@ test.describe("Playlist Page Download Tests", () => {
 			window.electronAPI.clipboard.writeText(url);
 		}, playlistUrl);
 
-		await page.click("#pasteLink");
+		await triggerClick(page, "pasteLink");
 		await waitForPlaylistOptions(page);
 
 		await triggerClick(page, "advancedToggle");
@@ -136,7 +136,7 @@ test.describe("Playlist Page Download Tests", () => {
 			window.electronAPI.clipboard.writeText(url);
 		}, playlistUrl);
 
-		await page.click("#pasteLink");
+		await triggerClick(page, "pasteLink");
 		await waitForPlaylistOptions(page);
 
 		await triggerClick(page, "advancedToggle");
@@ -166,7 +166,7 @@ test.describe("Playlist Page Download Tests", () => {
 			window.electronAPI.clipboard.writeText(url);
 		}, playlistUrl);
 
-		await page.click("#pasteLink");
+		await triggerClick(page, "pasteLink");
 		await waitForPlaylistOptions(page);
 
 		await triggerClick(page, "advancedToggle");
@@ -193,7 +193,7 @@ test.describe("Playlist Page Download Tests", () => {
 			window.electronAPI.clipboard.writeText(url);
 		}, playlistUrl);
 
-		await page.click("#pasteLink");
+		await triggerClick(page, "pasteLink");
 		await waitForPlaylistOptions(page);
 
 		await triggerClick(page, "advancedToggle");
