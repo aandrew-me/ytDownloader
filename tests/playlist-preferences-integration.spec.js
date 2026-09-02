@@ -50,7 +50,7 @@ test.describe("Playlist Preferences Integration Tests", () => {
 		electronApp = res.app;
 		page = res.page;
 		await page.waitForFunction(() => typeof window.switchView === "function");
-		await page.click("#playlistWin");
+		await triggerClick(page, "playlistWin");
 
 		const playlistUrl = "https://www.youtube.com/playlist?list=PL123456789";
 
@@ -58,7 +58,7 @@ test.describe("Playlist Preferences Integration Tests", () => {
 			window.electronAPI.clipboard.writeText(url);
 		}, playlistUrl);
 
-		await page.click("#pasteLink");
+		await triggerClick(page, "pasteLink");
 		await waitForPlaylistOptions(page);
 
 		await clearExecutedCommands(page);
@@ -82,7 +82,7 @@ test.describe("Playlist Preferences Integration Tests", () => {
 		electronApp = res.app;
 		page = res.page;
 		await page.waitForFunction(() => typeof window.switchView === "function");
-		await page.click("#playlistWin");
+		await triggerClick(page, "playlistWin");
 
 		const selectedVideo = await page.$eval("#select", (el) => el.value);
 		expect(selectedVideo).toBe("1080");
@@ -97,7 +97,7 @@ test.describe("Playlist Preferences Integration Tests", () => {
 		electronApp = res.app;
 		page = res.page;
 		await page.waitForFunction(() => typeof window.switchView === "function");
-		await page.click("#playlistWin");
+		await triggerClick(page, "playlistWin");
 
 		const selectedVideo = await page.$eval("#select", (el) => el.value);
 		expect(selectedVideo).toBe("720");
@@ -115,12 +115,12 @@ test.describe("Playlist Preferences Integration Tests", () => {
 		electronApp = res.app;
 		page = res.page;
 		await page.waitForFunction(() => typeof window.switchView === "function");
-		await page.click("#playlistWin");
+		await triggerClick(page, "playlistWin");
 
 		const playlistUrl = "https://www.youtube.com/playlist?list=PL123456789";
 		await page.evaluate((url) => window.electronAPI.clipboard.writeText(url), playlistUrl);
 
-		await page.click("#pasteLink");
+		await triggerClick(page, "pasteLink");
 		await waitForPlaylistOptions(page);
 
 		await clearExecutedCommands(page);
@@ -143,12 +143,12 @@ test.describe("Playlist Preferences Integration Tests", () => {
 		electronApp = res.app;
 		page = res.page;
 		await page.waitForFunction(() => typeof window.switchView === "function");
-		await page.click("#playlistWin");
+		await triggerClick(page, "playlistWin");
 
 		const playlistUrl = "https://www.youtube.com/playlist?list=PL123456789";
 		await page.evaluate((url) => window.electronAPI.clipboard.writeText(url), playlistUrl);
 
-		await page.click("#pasteLink");
+		await triggerClick(page, "pasteLink");
 		await waitForPlaylistOptions(page);
 
 		await clearExecutedCommands(page);
@@ -160,5 +160,33 @@ test.describe("Playlist Preferences Integration Tests", () => {
 
 		expect(downloadCmd).toContain("--proxy");
 		expect(downloadCmd).toContain(proxyUrl);
+	});
+
+	test("concurrent fragments preference is included in playlist yt-dlp command when > 1", async () => {
+		const res = await launchApp({
+			concurrentFragments: "5",
+		});
+
+		electronApp = res.app;
+		page = res.page;
+		await page.waitForFunction(() => typeof window.switchView === "function");
+		await triggerClick(page, "playlistWin");
+
+		const playlistUrl = "https://www.youtube.com/playlist?list=PL123456789";
+		await page.evaluate((url) => window.electronAPI.clipboard.writeText(url), playlistUrl);
+
+		await triggerClick(page, "pasteLink");
+		await waitForPlaylistOptions(page);
+
+		await clearExecutedCommands(page);
+
+		await triggerClick(page, "download");
+
+		const commands = await getExecutedCommands(page);
+		const downloadCmd = commands[commands.length - 1];
+
+		expect(downloadCmd).toContain("--concurrent-fragments");
+		const fragIdx = downloadCmd.indexOf("--concurrent-fragments");
+		expect(downloadCmd[fragIdx + 1]).toBe("5");
 	});
 });

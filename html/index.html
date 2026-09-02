@@ -1227,6 +1227,16 @@
 
                         <section class="settings-section">
                             <div class="prefBox">
+                                <div class="pref-label-group">
+                                    <span id="concurrentFragmentsTxt" data-translate="concurrentFragments">Concurrent fragments</span>
+                                    <p class="pref-subtitle" data-translate="concurrentFragmentsSubtitle">Number of simultaneous connection streams per video (default: 1)</p>
+                                </div>
+                                <input type="number" min="1" max="16" class="input input-num" id="concurrentFragments" value="1">
+                            </div>
+                        </section>
+
+                        <section class="settings-section">
+                            <div class="prefBox">
                                 <span id="trayTxt" data-translate="closeAppToTray">Close to system tray</span>
                                 <label class="switch">
                                     <input type="checkbox" id="closeToTray">

@@ -258,6 +258,12 @@ const playlistDownloader = {
 			this.ui.selectiveBulkAudioExtSelect.value = preferredAudioExt;
 			this.selectiveState.bulkPreset.audioExt = preferredAudioExt;
 		}
+
+		const prefFragments = Number(localStorage.getItem("concurrentFragments"));
+		this.config.concurrentFragments =
+			Number.isFinite(prefFragments) && prefFragments >= 1
+				? Math.min(16, Math.floor(prefFragments))
+				: 1;
 	},
 
 	initEventListeners() {
@@ -965,10 +971,18 @@ const playlistDownloader = {
 				filenameTemplate,
 			);
 
+			const concurrentFragments =
+				this.config.concurrentFragments ||
+				Number(localStorage.getItem("concurrentFragments")) ||
+				1;
+
 			const args = [
 				"--no-playlist",
 				"-o",
 				outputPath,
+				...(concurrentFragments > 1
+					? ["--concurrent-fragments", String(concurrentFragments)]
+					: []),
 				"--ffmpeg-location",
 				this.state.ffmpegPath,
 				...(this.state.jsRuntimePath
@@ -1158,6 +1172,10 @@ const playlistDownloader = {
 			this.config.foldernameFormat,
 			this.config.filenameFormat,
 		);
+		const concurrentFragments =
+			this.config.concurrentFragments ||
+			Number(localStorage.getItem("concurrentFragments")) ||
+			1;
 
 		return [
 			"--yes-playlist",
@@ -1166,6 +1184,10 @@ const playlistDownloader = {
 
 			"-I",
 			`${start}:${end}`,
+
+			...(concurrentFragments > 1
+				? ["--concurrent-fragments", String(concurrentFragments)]
+				: []),
 
 			"--ffmpeg-location",
 			this.state.ffmpegPath,

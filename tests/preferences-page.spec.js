@@ -11,7 +11,10 @@ test.describe("Preferences Page Tests", () => {
 		electronApp = res.app;
 		page = res.page;
 		await page.waitForFunction(() => typeof window.switchView === "function");
-		await page.click("#preferenceWin");
+		await page.evaluate(() => {
+			const el = document.getElementById("preferenceWin");
+			if (el) el.click();
+		});
 	});
 
 	test.afterEach(async () => {
@@ -103,6 +106,14 @@ test.describe("Preferences Page Tests", () => {
 		await page.fill("#maxDownloads", "8");
 		const savedMax = await page.evaluate(() => localStorage.getItem("maxActiveDownloads"));
 		expect(savedMax).toBe("8");
+
+		await page.fill("#concurrentFragments", "4");
+		const savedFragments = await page.evaluate(() => localStorage.getItem("concurrentFragments"));
+		expect(savedFragments).toBe("4");
+
+		await page.fill("#concurrentFragments", "100");
+		const clampedFragments = await page.evaluate(() => localStorage.getItem("concurrentFragments"));
+		expect(clampedFragments).toBe("16");
 
 		await page.evaluate(() => {
 			const cb = document.getElementById("closeToTray");
