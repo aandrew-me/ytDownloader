@@ -9,6 +9,7 @@ import {
 	findFfmpeg,
 	ensureFfmpegLibsLoadable,
 	getJsRuntimePath,
+	buildCodecFilter,
 } from "./utils.js";
 import {selectVideo, selectAudio} from "./index.js";
 
@@ -1876,6 +1877,12 @@ class YtDownloaderApp {
 				presetFormat ||
 				this.state.batchPreset.format ||
 				(type === "video" ? "mp4" : "mp3"),
+			videoCodec:
+				this.state.preferences?.videoCodec ||
+				localStorage.getItem(
+					CONSTANTS.LOCAL_STORAGE_KEYS.PREFERRED_VIDEO_CODEC,
+				) ||
+				"avc1",
 			// Capture UI values at the moment of click
 			uiSnapshot: {
 				videoFormat: videoFormatVal,
@@ -2439,6 +2446,7 @@ class YtDownloaderApp {
 			videoOutputTemplate = "%(title)s.%(ext)s",
 			audioOutputTemplate = "%(title)s.%(ext)s",
 			concurrentFragments = 1,
+			videoCodec = "avc1",
 		} = this.state.preferences || {};
 
 		let format_id, ext, audioForVideoFormat_id, audioFormat;
@@ -2483,11 +2491,13 @@ class YtDownloaderApp {
 
 			if (type === "video") {
 				template = videoOutputTemplate;
+				const codecFilter = buildCodecFilter(job.videoCodec || videoCodec);
+
 				let formatArgs = [];
 				if (presetFormat === "mp4") {
 					formatArgs = [
 						"-f",
-						`bestvideo[height<=${presetQuality}]+bestaudio[ext=m4a]/best[height<=${presetQuality}]/best`,
+						`bestvideo[height<=${presetQuality}]${codecFilter}+bestaudio[ext=m4a]/bestvideo[height<=${presetQuality}]+bestaudio[ext=m4a]/best[height<=${presetQuality}]/best`,
 						"--merge-output-format",
 						"mp4",
 						// TODO: Consider doing a smart selection between remux/recode in future
@@ -2497,7 +2507,7 @@ class YtDownloaderApp {
 				} else if (presetFormat === "webm") {
 					formatArgs = [
 						"-f",
-						`bestvideo[height<=${presetQuality}]+bestaudio[ext=webm]/best[height<=${presetQuality}]/best`,
+						`bestvideo[height<=${presetQuality}]${codecFilter}+bestaudio[ext=webm]/bestvideo[height<=${presetQuality}]+bestaudio[ext=webm]/best[height<=${presetQuality}]/best`,
 						"--merge-output-format",
 						"webm",
 						"--recode-video",
@@ -2506,7 +2516,7 @@ class YtDownloaderApp {
 				} else {
 					formatArgs = [
 						"-f",
-						`bv*[height<=${presetQuality}]+ba/best[height<=${presetQuality}]/best`,
+						`bv*[height<=${presetQuality}]${codecFilter}+ba/bv*[height<=${presetQuality}]+ba/best[height<=${presetQuality}]/best`,
 						"--merge-output-format",
 						presetFormat || "mkv",
 					];
@@ -4406,6 +4416,14 @@ class YtDownloaderApp {
 						subs: "",
 						subLangs: "",
 					},
+					presetQuality: preset.quality,
+					presetFormat: preset.format,
+					videoCodec:
+						this.state.preferences?.videoCodec ||
+						localStorage.getItem(
+							CONSTANTS.LOCAL_STORAGE_KEYS.PREFERRED_VIDEO_CODEC,
+						) ||
+						"avc1",
 					uiSnapshot: {
 						videoFormat: preset.quality,
 						audioForVideoFormat: "best",

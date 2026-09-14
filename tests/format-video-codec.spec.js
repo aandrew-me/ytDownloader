@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { formatVideoCodec } from "../src/utils.js";
+import { formatVideoCodec, buildCodecFilter } from "../src/utils.js";
 
 test.describe("formatVideoCodec", () => {
 	test("maps AVC/H.264 codecs properly", () => {
@@ -40,5 +40,23 @@ test.describe("formatVideoCodec", () => {
 		expect(formatVideoCodec("")).toBe("");
 		expect(formatVideoCodec("none")).toBe("");
 		expect(formatVideoCodec("custom_codec.123")).toBe("custom_codec");
+	});
+});
+
+test.describe("buildCodecFilter", () => {
+	test("generates regex filter for vp9", () => {
+		expect(buildCodecFilter("vp9")).toBe("[vcodec~='(?i)^vp0?9']");
+	});
+
+	test("generates prefix filter for other codecs", () => {
+		expect(buildCodecFilter("avc1")).toBe("[vcodec^=avc1]");
+		expect(buildCodecFilter("av01")).toBe("[vcodec^=av01]");
+		expect(buildCodecFilter("mp4v")).toBe("[vcodec^=mp4v]");
+	});
+
+	test("falls back to avc1 (H.264) when codec is not specified", () => {
+		expect(buildCodecFilter()).toBe("[vcodec^=avc1]");
+		expect(buildCodecFilter(null)).toBe("[vcodec^=avc1]");
+		expect(buildCodecFilter("")).toBe("[vcodec^=avc1]");
 	});
 });
