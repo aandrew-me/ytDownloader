@@ -1,4 +1,4 @@
-import { getId, formatTime, escapeHtml } from "./utils.js";
+import { getId, formatTime, escapeHtml, buildCodecFilter } from "./utils.js";
 
 const {
 	clipboard,
@@ -937,14 +937,19 @@ const playlistDownloader = {
 
 			let formatArgs = [];
 			if (entry.type === "video") {
+				const codecFilter = buildCodecFilter();
+
 				if (entry.quality === "best") {
-					formatArgs = ["-f", "bv*+ba/best"];
+					formatArgs = [
+						"-f",
+						`bv*${codecFilter}+ba/bv*+ba/best`,
+					];
 				} else if (entry.quality === "worst") {
 					formatArgs = ["-f", "wv+wa/worst"];
 				} else {
 					formatArgs = [
 						"-f",
-						`bestvideo[height<=${entry.quality}]+bestaudio/best[height<=${entry.quality}]/best`,
+						`bestvideo[height<=${entry.quality}]${codecFilter}+bestaudio/bestvideo[height<=${entry.quality}]+bestaudio/best[height<=${entry.quality}]/best`,
 					];
 				}
 
@@ -1214,17 +1219,21 @@ const playlistDownloader = {
 	getVideoArgs() {
 		const quality = this.ui.videoQualitySelect.value;
 		const videoType = this.ui.videoTypeSelect.value;
+		const codecFilter = buildCodecFilter();
 		let formatArgs = [];
 
 		if (quality === "best") {
-			formatArgs = ["-f", "bv*+ba/best"];
+			formatArgs = [
+				"-f",
+				`bv*${codecFilter}+ba/bv*+ba/best`,
+			];
 		} else if (quality === "worst") {
 			formatArgs = ["-f", "wv+wa/worst"];
 		} else {
 			if (videoType === "mp4") {
 				formatArgs = [
 					"-f",
-					`bestvideo[height<=${quality}]+bestaudio[ext=m4a]/best[height<=${quality}]/best`,
+					`bestvideo[height<=${quality}]${codecFilter}+bestaudio[ext=m4a]/bestvideo[height<=${quality}]+bestaudio[ext=m4a]/best[height<=${quality}]/best`,
 					"--merge-output-format",
 					"mp4",
 					"--recode-video",
@@ -1233,7 +1242,7 @@ const playlistDownloader = {
 			} else if (videoType === "webm") {
 				formatArgs = [
 					"-f",
-					`bestvideo[height<=${quality}]+bestaudio[ext=webm]/best[height<=${quality}]/best`,
+					`bestvideo[height<=${quality}]${codecFilter}+bestaudio[ext=webm]/bestvideo[height<=${quality}]+bestaudio[ext=webm]/best[height<=${quality}]/best`,
 					"--merge-output-format",
 					"webm",
 					"--recode-video",
@@ -1242,7 +1251,7 @@ const playlistDownloader = {
 			} else {
 				formatArgs = [
 					"-f",
-					`bv*[height=${quality}]+ba/best[height=${quality}]/best[height<=${quality}]`,
+					`bv*[height<=${quality}]${codecFilter}+ba/bv*[height<=${quality}]+ba/best[height<=${quality}]/best`,
 				];
 			}
 		}

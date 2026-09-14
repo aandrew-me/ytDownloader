@@ -325,4 +325,60 @@ test.describe("Preferences Integration Tests", () => {
 		const fragIdx = downloadCmd.indexOf("--concurrent-fragments");
 		expect(downloadCmd[fragIdx + 1]).toBe("4");
 	});
+
+	test("preferred video codec is respected in auto mode on homepage", async () => {
+		const res = await launchApp({
+			autoDownloadOnPaste: "true",
+			preferredVideoCodec: "avc1",
+			preferredVideoQuality: "1080",
+		});
+		electronApp = res.app;
+		page = res.page;
+
+		const testUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+		await page.evaluate((url) => window.electronAPI.clipboard.writeText(url), testUrl);
+
+		await triggerClick(page, "pasteUrl");
+
+		await page.waitForFunction(() => {
+			const cmds = window.__executedCommands || [];
+			return cmds.some((cmd) => cmd.includes("-f"));
+		});
+
+		const commands = await getExecutedCommands(page);
+		const downloadCmd = commands.find((cmd) => cmd.includes("-f"));
+		expect(downloadCmd).toBeDefined();
+
+		const fIndex = downloadCmd.indexOf("-f");
+		const formatArg = downloadCmd[fIndex + 1];
+		expect(formatArg).toContain("vcodec^=avc1");
+	});
+
+	test("preferred video codec (vp9) is respected in auto mode on homepage", async () => {
+		const res = await launchApp({
+			autoDownloadOnPaste: "true",
+			preferredVideoCodec: "vp9",
+			preferredVideoQuality: "1080",
+		});
+		electronApp = res.app;
+		page = res.page;
+
+		const testUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+		await page.evaluate((url) => window.electronAPI.clipboard.writeText(url), testUrl);
+
+		await triggerClick(page, "pasteUrl");
+
+		await page.waitForFunction(() => {
+			const cmds = window.__executedCommands || [];
+			return cmds.some((cmd) => cmd.includes("-f"));
+		});
+
+		const commands = await getExecutedCommands(page);
+		const downloadCmd = commands.find((cmd) => cmd.includes("-f"));
+		expect(downloadCmd).toBeDefined();
+
+		const fIndex = downloadCmd.indexOf("-f");
+		const formatArg = downloadCmd[fIndex + 1];
+		expect(formatArg).toContain("vcodec~='(?i)^vp0?9'");
+	});
 });

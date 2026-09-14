@@ -369,6 +369,24 @@ export function formatVideoCodec(codec) {
 }
 
 /**
+ * Builds a yt-dlp format filter string for the preferred video codec.
+ * Defaults to "avc1" (H.264) if no codec is specified or found in localStorage.
+ * @param {string | null | undefined} [preferredCodec]
+ * @returns {string}
+ */
+export function buildCodecFilter(preferredCodec) {
+	const codec =
+		preferredCodec ||
+		(typeof localStorage !== "undefined"
+			? localStorage.getItem("preferredVideoCodec")
+			: null) ||
+		"avc1";
+	return codec === "vp9"
+		? "[vcodec~='(?i)^vp0?9']"
+		: `[vcodec^=${codec}]`;
+}
+
+/**
  * Formats bitrate in kbps into a readable string (e.g. "2500 kbps")
  * @param {number | string | null | undefined} bitrate
  * @returns {string}
