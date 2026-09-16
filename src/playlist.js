@@ -1259,7 +1259,9 @@ const playlistDownloader = {
 		const isYouTube =
 			this.state.url.includes("youtube.com/") ||
 			this.state.url.includes("youtu.be/");
-		const canEmbedThumb = os.platform() !== "darwin";
+		const canEmbedThumb =
+			os.platform() !== "darwin" &&
+			localStorage.getItem("embedThumbnail") !== "false";
 
 		return [
 			...formatArgs,
@@ -1283,7 +1285,9 @@ const playlistDownloader = {
 		const isYouTube =
 			this.state.url.includes("youtube.com/") ||
 			this.state.url.includes("youtu.be/");
-		const canEmbedThumb = os.platform() !== "darwin";
+		const canEmbedThumb =
+			os.platform() !== "darwin" &&
+			localStorage.getItem("embedThumbnail") !== "false";
 
 		if (isYouTube && format === "m4a" && quality === "auto") {
 			return [
