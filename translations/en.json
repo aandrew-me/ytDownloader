@@ -160,6 +160,7 @@
 	"themeSolarizedDark": "Solarized Dark",
 	"preferredVideoCodec": "Preferred video codec",
 	"showMoreFormatOptions": "Show more format options",
+	"embedThumbnail": "Embed thumbnail",
 	"flatsealPermissionWarning": "You need to give the app permission to access home directory to use this. You can do it with Flatseal by enabling the permission with text 'filesystem=home'",
 	"noAudio": "No Audio",
 	"proxy": "Proxy",

@@ -894,10 +894,12 @@ function initPreferences() {
 		checkValue = "true",
 		uncheckValue = "false",
 		onChangeCallback = null,
+		defaultValue = false,
 	) {
 		const cb = getId(checkboxId);
 		if (!cb) return;
-		cb.checked = localStorage.getItem(storageKey) === checkValue;
+		const stored = localStorage.getItem(storageKey);
+		cb.checked = stored !== null ? stored === checkValue : defaultValue;
 
 		cb.addEventListener("change", () => {
 			const value = cb.checked ? checkValue : uncheckValue;
@@ -1037,6 +1039,7 @@ function initPreferences() {
 
 	bindCheckboxToStorage("autoUpdateDisabled", "autoUpdate", "false", "true");
 	bindCheckboxToStorage("showMoreFormats", "showMoreFormats", "true", "false");
+	bindCheckboxToStorage("embedThumbnail", "embedThumbnail", "true", "false", null, true);
 
 	// Updates section controls
 	const updateChannelSelect = getId("updateChannelSelect");

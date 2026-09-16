@@ -146,6 +146,7 @@ const CONSTANTS = {
 		PREFERRED_AUDIO_QUALITY: "preferredAudioQuality",
 		PREFERRED_VIDEO_CODEC: "preferredVideoCodec",
 		SHOW_MORE_FORMATS: "showMoreFormats",
+		EMBED_THUMBNAIL: "embedThumbnail",
 		COOKIE_SOURCE: "cookieSource",
 		NETSCAPE_COOKIES: "netscapeCookies",
 		BROWSER_COOKIES: "browser",
@@ -202,6 +203,7 @@ class YtDownloaderApp {
 				audioQuality: "",
 				videoCodec: "avc1",
 				showMoreFormats: false,
+				embedThumbnail: true,
 				proxyMode: "system",
 				proxy: "",
 				cookieSource: "none",
@@ -1252,6 +1254,10 @@ class YtDownloaderApp {
 			localStorage.getItem(
 				CONSTANTS.LOCAL_STORAGE_KEYS.SHOW_MORE_FORMATS,
 			) === "true";
+		prefs.embedThumbnail =
+			localStorage.getItem(
+				CONSTANTS.LOCAL_STORAGE_KEYS.EMBED_THUMBNAIL,
+			) !== "false";
 		prefs.proxyMode =
 			localStorage.getItem(CONSTANTS.LOCAL_STORAGE_KEYS.PROXY_MODE) ||
 			(localStorage.getItem(CONSTANTS.LOCAL_STORAGE_KEYS.PROXY)
@@ -2447,7 +2453,14 @@ class YtDownloaderApp {
 			audioOutputTemplate = "%(title)s.%(ext)s",
 			concurrentFragments = 1,
 			videoCodec = "avc1",
+			embedThumbnail = true,
 		} = this.state.preferences || {};
+
+		const shouldEmbedThumbnail =
+			embedThumbnail &&
+			localStorage.getItem(
+				CONSTANTS.LOCAL_STORAGE_KEYS.EMBED_THUMBNAIL,
+			) !== "false";
 
 		let format_id, ext, audioForVideoFormat_id, audioFormat;
 
@@ -2487,7 +2500,7 @@ class YtDownloaderApp {
 			const isYouTube =
 				url &&
 				(url.includes("youtube.com/") || url.includes("youtu.be/"));
-			const canEmbedThumb = platform() !== "darwin";
+			const canEmbedThumb = shouldEmbedThumbnail && platform() !== "darwin";
 
 			if (type === "video") {
 				template = videoOutputTemplate;
@@ -2621,13 +2634,15 @@ class YtDownloaderApp {
 				template,
 			];
 
-			if (type === "audio") {
-				if (ext === "m4a" || ext === "mp3" || ext === "mp4") {
-					baseArgs.unshift("--embed-thumbnail");
-				}
-			} else if (type === "extract") {
-				if (ext === "mp3" || ext === "m4a") {
-					baseArgs.unshift("--embed-thumbnail");
+			if (shouldEmbedThumbnail) {
+				if (type === "audio") {
+					if (ext === "m4a" || ext === "mp3" || ext === "mp4") {
+						baseArgs.unshift("--embed-thumbnail");
+					}
+				} else if (type === "extract") {
+					if (ext === "mp3" || ext === "m4a") {
+						baseArgs.unshift("--embed-thumbnail");
+					}
 				}
 			}
 
