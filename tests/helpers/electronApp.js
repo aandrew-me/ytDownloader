@@ -92,6 +92,21 @@ async function launchApp(customLocalStorage = {}, customMetadata = DEFAULT_MOCK_
 		window.__executedCommands = [];
 		window.__mockMetadata = meta;
 
+		const disableAnimStyle = document.createElement("style");
+		disableAnimStyle.textContent = `*, *::before, *::after {
+			animation-duration: 0s !important;
+			animation-delay: 0s !important;
+			transition-duration: 0s !important;
+			transition-delay: 0s !important;
+		}`;
+		if (document.head) {
+			document.head.appendChild(disableAnimStyle);
+		} else {
+			document.addEventListener("DOMContentLoaded", () => {
+				document.head?.appendChild(disableAnimStyle);
+			});
+		}
+
 		const createMockProcess = (args, options = {}, abortSignal = null) => {
 			window.__executedCommands.push(args);
 			const callbacks = {};
@@ -289,6 +304,15 @@ async function launchApp(customLocalStorage = {}, customMetadata = DEFAULT_MOCK_
 	} else {
 		await page.reload();
 		await page.waitForLoadState("domcontentloaded");
+		await page
+			.waitForFunction(
+				() =>
+					(!window.app || window.app.isInitialized) &&
+					typeof window.switchView === "function",
+				null,
+				{ timeout: 5000 },
+			)
+			.catch(() => {});
 	}
 
 	return { app, page };
@@ -297,7 +321,17 @@ async function launchApp(customLocalStorage = {}, customMetadata = DEFAULT_MOCK_
 /**
  * Gets array of commands executed by yt-dlp/ffmpeg in page context.
  */
-async function getExecutedCommands(page) {
+async function getExecutedCommands(page, minCount = 1, timeout = 5000) {
+	if (minCount > 0) {
+		await page
+			.waitForFunction(
+				(expected) =>
+					(window.__executedCommands || []).length >= expected,
+				minCount,
+				{ timeout },
+			)
+			.catch(() => {});
+	}
 	return await page.evaluate(() => window.__executedCommands || []);
 }
 

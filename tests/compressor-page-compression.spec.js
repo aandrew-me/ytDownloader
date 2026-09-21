@@ -40,6 +40,7 @@ test.describe("Compressor Page Tests", () => {
 		page = res.page;
 		await page.waitForFunction(() => typeof window.switchView === "function");
 		await page.click("#compressorWin");
+		await page.waitForSelector("#view-compressor.active");
 	});
 
 	test.afterEach(async () => {

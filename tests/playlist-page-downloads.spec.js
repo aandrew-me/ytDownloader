@@ -29,6 +29,7 @@ test.describe("Playlist Page Download Tests", () => {
 		page = res.page;
 		await page.waitForFunction(() => typeof window.switchView === "function");
 		await triggerClick(page, "playlistWin");
+		await page.waitForSelector("#view-playlist.active");
 	});
 
 	test.afterEach(async () => {
