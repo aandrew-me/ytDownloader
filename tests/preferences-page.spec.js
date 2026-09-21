@@ -15,6 +15,7 @@ test.describe("Preferences Page Tests", () => {
 			const el = document.getElementById("preferenceWin");
 			if (el) el.click();
 		});
+		await page.waitForSelector("#view-preferences.active");
 	});
 
 	test.afterEach(async () => {

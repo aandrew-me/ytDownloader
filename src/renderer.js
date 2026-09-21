@@ -297,6 +297,7 @@ class YtDownloaderApp {
 			this._syncPresetDefaultsFromPreferences();
 			this._updateAutoModeUI();
 			this._updateEmptyStateUI();
+			this.isInitialized = true;
 		} catch (error) {
 			console.error("Initialization failed:", error);
 			$(CONSTANTS.DOM_IDS.INCORRECT_MSG).textContent = error.message;

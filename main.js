@@ -22,6 +22,15 @@ autoUpdater.autoDownload = false;
 autoUpdater.allowDowngrade = true;
 autoUpdater.autoInstallOnAppQuit = true;
 
+const isTestEnv = process.env.NODE_ENV === "test" || process.argv.includes("--is-test") || process.env.YTDOWNLOADER_TEST === "true";
+
+if (isTestEnv) {
+	app.commandLine.appendSwitch("disable-renderer-backgrounding");
+	app.commandLine.appendSwitch("disable-background-timer-throttling");
+	app.commandLine.appendSwitch("disable-backgrounding-occluded-windows");
+	app.commandLine.appendSwitch("disable-features", "CalculateNativeWinOcclusion");
+}
+
 const USER_DATA_PATH = app.getPath("userData");
 const CONFIG_FILE_PATH = path.join(USER_DATA_PATH, "ytdownloader.json");
 
@@ -45,7 +54,6 @@ const appState = {
 	registeredHotkeyAccelerator: null,
 };
 
-const isTestEnv = process.env.NODE_ENV === "test" || process.argv.includes("--is-test") || process.env.YTDOWNLOADER_TEST === "true";
 const gotTheLock = isTestEnv ? true : app.requestSingleInstanceLock();
 
 if (!gotTheLock) {
@@ -106,10 +114,14 @@ function createWindow() {
 
 	appState.mainWindow = new BrowserWindow({
 		...bounds,
+		x: isTestEnv ? -10000 : bounds.x,
+		y: isTestEnv ? -10000 : bounds.y,
 		minWidth: 680,
 		minHeight: 500,
 		autoHideMenuBar: true,
-		show: false,
+		show: isTestEnv ? true : false,
+		skipTaskbar: isTestEnv ? true : false,
+		opacity: isTestEnv ? 0 : 1,
 		icon: path.join(__dirname, "/assets/images/icon.png"),
 		webPreferences: {
 			nodeIntegration: false,
@@ -117,6 +129,7 @@ function createWindow() {
 			sandbox: false,
 			preload: path.join(__dirname, "preload.js"),
 			spellcheck: false,
+			backgroundThrottling: false,
 		},
 	});
 
@@ -125,15 +138,14 @@ function createWindow() {
 	appState.mainWindow.once("ready-to-show", () => {
 		if (!isTestEnv) {
 			appState.mainWindow.show();
-		}
-
-		if (appState.config.isMaximized) {
-			appState.mainWindow.maximize();
+			if (appState.config.isMaximized) {
+				appState.mainWindow.maximize();
+			}
 		}
 	});
 
 	const saveBounds = () => {
-		if (appState.mainWindow && !appState.mainWindow.isMaximized()) {
+		if (!isTestEnv && appState.mainWindow && !appState.mainWindow.isMaximized()) {
 			appState.config.bounds = appState.mainWindow.getBounds();
 		}
 	};
@@ -171,6 +183,10 @@ function createSecondaryWindow(file) {
 		parent: appState.mainWindow,
 		modal: true,
 		show: false,
+		x: isTestEnv ? -10000 : undefined,
+		y: isTestEnv ? -10000 : undefined,
+		skipTaskbar: isTestEnv ? true : false,
+		opacity: isTestEnv ? 0 : 1,
 		webPreferences: {
 			nodeIntegration: false,
 			contextIsolation: true,
@@ -187,7 +203,9 @@ function createSecondaryWindow(file) {
 	appState.secondaryWindow.loadFile(file);
 	appState.secondaryWindow.setMenu(null);
 	appState.secondaryWindow.once("ready-to-show", () => {
-		appState.secondaryWindow.show();
+		if (!isTestEnv) {
+			appState.secondaryWindow.show();
+		}
 	});
 
 	appState.secondaryWindow.on("closed", () => {
