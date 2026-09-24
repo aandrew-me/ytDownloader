@@ -313,5 +313,13 @@
 	"ffmpegVersionLabel": "ffmpeg 版本",
 	"ffprobeVersionLabel": "ffprobe 版本",
 	"jsRuntimeSubtitle": "擷取器的 JavaScript 執行環境",
-	"builtinRuntimeDesc": "內建執行環境"
+	"builtinRuntimeDesc": "內建執行環境",
+	"concurrentFragments": "並行分段（下載加速）",
+	"concurrentFragmentsSubtitle": "每個影片的同時連線串流數（預設值：1）",
+	"embedThumbnail": "內嵌縮圖",
+	"toggleSidebar": "切換側邊欄",
+	"history": "歷史",
+	"invalidUrl": "無效的 URL",
+	"queued": "排隊中",
+	"autoDownloadOnPaste": "貼上時自動下載"
 }

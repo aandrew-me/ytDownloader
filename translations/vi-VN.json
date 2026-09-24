@@ -313,5 +313,13 @@
 	"ffmpegVersionLabel": "Phiên bản ffmpeg",
 	"ffprobeVersionLabel": "Phiên bản ffprobe",
 	"jsRuntimeSubtitle": "Môi trường thực thi JavaScript cho bộ trích xuất",
-	"builtinRuntimeDesc": "Môi trường thực thi tích hợp sẵn"
+	"builtinRuntimeDesc": "Môi trường thực thi tích hợp sẵn",
+	"concurrentFragments": "Phân đoạn đồng thời (tăng tốc tải xuống)",
+	"concurrentFragmentsSubtitle": "Số luồng kết nối đồng thời trên mỗi video (mặc định: 1)",
+	"embedThumbnail": "Nhúng hình thu nhỏ",
+	"toggleSidebar": "Bật/tắt thanh bên",
+	"history": "Lịch sử",
+	"invalidUrl": "URL không hợp lệ",
+	"queued": "Đang chờ hàng đợi",
+	"autoDownloadOnPaste": "Tự động tải xuống khi dán"
 }

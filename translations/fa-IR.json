@@ -313,5 +313,13 @@
 	"ffmpegVersionLabel": "نسخه ffmpeg",
 	"ffprobeVersionLabel": "نسخه ffprobe",
 	"jsRuntimeSubtitle": "محیط اجرای جاوااسکریپت برای استخراج‌کننده‌ها",
-	"builtinRuntimeDesc": "محیط اجرای داخلی"
+	"builtinRuntimeDesc": "محیط اجرای داخلی",
+	"concurrentFragments": "قطعات همزمان (شتاب دانلود)",
+	"concurrentFragmentsSubtitle": "تعداد جریان‌های اتصال همزمان در هر ویدیو (پیش‌فرض: 1)",
+	"embedThumbnail": "بازتولید تصویر بندانگشتی",
+	"toggleSidebar": "تغییر وضعیت نوار کناری",
+	"history": "تاریخچه",
+	"invalidUrl": "نشانی نامعتبر",
+	"queued": "در صف",
+	"autoDownloadOnPaste": "دانلود خودکار هنگام جای‌گذاری"
 }

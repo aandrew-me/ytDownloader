@@ -313,5 +313,13 @@
 	"ffmpegVersionLabel": "ffmpeg sürümü",
 	"ffprobeVersionLabel": "ffprobe sürümü",
 	"jsRuntimeSubtitle": "Ayıklayıcılar için JavaScript çalışma zamanı ortamı",
-	"builtinRuntimeDesc": "Yerleşik çalışma zamanı ortamı"
+	"builtinRuntimeDesc": "Yerleşik çalışma zamanı ortamı",
+	"concurrentFragments": "Eşzamanlı parçalar (indirme hızlandırma)",
+	"concurrentFragmentsSubtitle": "Video başına eşzamanlı bağlantı akışı sayısı (varsayılan: 1)",
+	"embedThumbnail": "Küçük resmi göm",
+	"toggleSidebar": "Kenar çubuğunu aç/kapat",
+	"history": "Geçmiş",
+	"invalidUrl": "Geçersiz URL",
+	"queued": "Kuyrukta",
+	"autoDownloadOnPaste": "Yapıştırıldığında otomatik indir"
 }

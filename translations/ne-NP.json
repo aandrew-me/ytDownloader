@@ -313,5 +313,13 @@
 	"ffmpegVersionLabel": "ffmpeg संस्करण",
 	"ffprobeVersionLabel": "ffprobe संस्करण",
 	"jsRuntimeSubtitle": "एक्स्ट्र्याक्टरहरूका लागि JavaScript कार्यान्वयन वातावरण",
-	"builtinRuntimeDesc": "निर्मित रनटाइम वातावरण"
+	"builtinRuntimeDesc": "निर्मित रनटाइम वातावरण",
+	"concurrentFragments": "समवर्ती टुक्राहरू (डाउनलोड त्वरण)",
+	"concurrentFragmentsSubtitle": "प्रति भिडियो एकै पटक जडान स्ट्रिमहरूको संख्या (पूर्वनिर्धारित: 1)",
+	"embedThumbnail": "थम्बनेल इम्बेड गर्नुहोस्",
+	"toggleSidebar": "साइडबार टगल गर्नुहोस्",
+	"history": "ईतिहास",
+	"invalidUrl": "अमान्य यूआरएल",
+	"queued": "पर्खाइमा",
+	"autoDownloadOnPaste": "टाँस्दा स्वचालित डाउनलोड"
 }

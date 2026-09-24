@@ -313,5 +313,13 @@
 	"ffmpegVersionLabel": "Версія ffmpeg",
 	"ffprobeVersionLabel": "Версія ffprobe",
 	"jsRuntimeSubtitle": "Середовище виконання JavaScript для екстракторів",
-	"builtinRuntimeDesc": "Вбудоване середовище виконання"
+	"builtinRuntimeDesc": "Вбудоване середовище виконання",
+	"concurrentFragments": "Одночасні фрагменти (прискорення завантаження)",
+	"concurrentFragmentsSubtitle": "Кількість одночасних потоків підключення на відео (за замовчуванням: 1)",
+	"embedThumbnail": "Вбудувати мініатюру",
+	"toggleSidebar": "Перемкнути бічну панель",
+	"history": "Історія",
+	"invalidUrl": "Недійсна URL-адреса",
+	"queued": "У черзі",
+	"autoDownloadOnPaste": "Автозавантаження при вставці"
 }

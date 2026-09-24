@@ -313,5 +313,13 @@
 	"ffmpegVersionLabel": "Έκδοση ffmpeg",
 	"ffprobeVersionLabel": "Έκδοση ffprobe",
 	"jsRuntimeSubtitle": "Περιβάλλον εκτέλεσης JavaScript για εξαγωγείς",
-	"builtinRuntimeDesc": "Ενσωματωμένο περιβάλλον εκτέλεσης"
+	"builtinRuntimeDesc": "Ενσωματωμένο περιβάλλον εκτέλεσης",
+	"concurrentFragments": "Ταυτόχρονα τμήματα (επιτάχυνση λήψης)",
+	"concurrentFragmentsSubtitle": "Αριθμός ταυτόχρονων ροών σύνδεσης ανά βίντεο (προεπιλογή: 1)",
+	"embedThumbnail": "Ενσωμάτωση εικονιδίου",
+	"toggleSidebar": "Εναλλαγή πλευρικής γραμμής",
+	"history": "Ιστορικό",
+	"invalidUrl": "Μη έγκυρο URL",
+	"queued": "Στην ουρά",
+	"autoDownloadOnPaste": "Αυτόματη λήψη κατά την επικόλληση"
 }

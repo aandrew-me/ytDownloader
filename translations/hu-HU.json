@@ -313,5 +313,13 @@
 	"ffmpegVersionLabel": "ffmpeg verzió",
 	"ffprobeVersionLabel": "ffprobe verzió",
 	"jsRuntimeSubtitle": "JavaScript futtatókörnyezet a kinyerőkhöz",
-	"builtinRuntimeDesc": "Beépített futtatókörnyezet"
+	"builtinRuntimeDesc": "Beépített futtatókörnyezet",
+	"concurrentFragments": "Párhuzamos töredékek (letöltés gyorsítása)",
+	"concurrentFragmentsSubtitle": "Egyidejű kapcsolati streamek száma videónként (alapértelmezett: 1)",
+	"embedThumbnail": "Előnézet beágyazása",
+	"toggleSidebar": "Oldalsáv ki/be",
+	"history": "Előzmények",
+	"invalidUrl": "Érvénytelen URL",
+	"queued": "Sorban áll",
+	"autoDownloadOnPaste": "Automatikus letöltés beillesztéskor"
 }
