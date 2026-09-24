@@ -313,5 +313,13 @@
 	"ffmpegVersionLabel": "ffmpeg バージョン",
 	"ffprobeVersionLabel": "ffprobe バージョン",
 	"jsRuntimeSubtitle": "エクストラクター用 JavaScript 実行環境",
-	"builtinRuntimeDesc": "内蔵ランタイム環境"
+	"builtinRuntimeDesc": "内蔵ランタイム環境",
+	"concurrentFragments": "同時フラグメント数（ダウンロード加速）",
+	"concurrentFragmentsSubtitle": "動画ごとの同時接続ストリーム数（デフォルト: 1）",
+	"embedThumbnail": "サムネイルを埋め込む",
+	"toggleSidebar": "サイドバーの切り替え",
+	"history": "履歴",
+	"invalidUrl": "無効なURL",
+	"queued": "待機中",
+	"autoDownloadOnPaste": "貼り付け時に自動ダウンロード"
 }

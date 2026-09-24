@@ -313,5 +313,13 @@
 	"ffmpegVersionLabel": "إصدار ffmpeg",
 	"ffprobeVersionLabel": "إصدار ffprobe",
 	"jsRuntimeSubtitle": "بيئة تشغيل JavaScript للمستخرجات",
-	"builtinRuntimeDesc": "بيئة تشغيل مدمجة"
+	"builtinRuntimeDesc": "بيئة تشغيل مدمجة",
+	"concurrentFragments": "أجزاء متزامنة (تسريع التنزيل)",
+	"concurrentFragmentsSubtitle": "عدد تدفقات الاتصال المتزامنة لكل فيديو (الافتراضي: 1)",
+	"embedThumbnail": "تضمين الصورة المصغرة",
+	"toggleSidebar": "تبديل الشريط الجانبي",
+	"history": "السجل",
+	"invalidUrl": "رابط غير صالح",
+	"queued": "في قائمة الانتظار",
+	"autoDownloadOnPaste": "تنزيل تلقائي عند اللصق"
 }

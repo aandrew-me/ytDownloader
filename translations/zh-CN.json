@@ -313,5 +313,13 @@
 	"ffmpegVersionLabel": "ffmpeg 版本",
 	"ffprobeVersionLabel": "ffprobe 版本",
 	"jsRuntimeSubtitle": "提取器的 JavaScript 执行环境",
-	"builtinRuntimeDesc": "内置运行环境"
+	"builtinRuntimeDesc": "内置运行环境",
+	"concurrentFragments": "并发分片（下载加速）",
+	"concurrentFragmentsSubtitle": "每个视频的同时连接流数（默认值：1）",
+	"embedThumbnail": "嵌入缩略图",
+	"toggleSidebar": "切换侧边栏",
+	"history": "历史",
+	"invalidUrl": "无效的 URL",
+	"queued": "排队中",
+	"autoDownloadOnPaste": "粘贴时自动下载"
 }

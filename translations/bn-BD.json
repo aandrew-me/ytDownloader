@@ -313,5 +313,13 @@
 	"ffmpegVersionLabel": "ffmpeg সংস্করণ",
 	"ffprobeVersionLabel": "ffprobe সংস্করণ",
 	"jsRuntimeSubtitle": "এক্সট্রাক্টরগুলির জন্য JavaScript এক্সিকিউশন এনভায়রনমেন্ট",
-	"builtinRuntimeDesc": "বিল্ট-ইন রানটাইম পরিবেশ"
+	"builtinRuntimeDesc": "বিল্ট-ইন রানটাইম পরিবেশ",
+	"concurrentFragments": "একযোগে ফ্র্যাগমেন্ট (ডাউনলোড গতি বৃদ্ধি)",
+	"concurrentFragmentsSubtitle": "প্রতি ভিডিওতে একযোগে সংযোগ স্ট্রিমের সংখ্যা (ডিফল্ট: 1)",
+	"embedThumbnail": "থাম্বনেইল এম্বেড করুন",
+	"toggleSidebar": "সাইডবার টগল করুন",
+	"history": "ইতিহাস",
+	"invalidUrl": "অকার্যকর ইউআরএল",
+	"queued": "অপেক্ষারত",
+	"autoDownloadOnPaste": "পেস্ট করার সাথে সাথে স্বয়ংক্রিয় ডাউনলোড"
 }

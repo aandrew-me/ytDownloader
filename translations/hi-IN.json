@@ -313,5 +313,13 @@
 	"ffmpegVersionLabel": "ffmpeg संस्करण",
 	"ffprobeVersionLabel": "ffprobe संस्करण",
 	"jsRuntimeSubtitle": "एक्स्ट्रैक्टर्स के लिए जावास्क्रिप्ट निष्पादन वातावरण",
-	"builtinRuntimeDesc": "अंतर्निहित निष्पादन वातावरण"
+	"builtinRuntimeDesc": "अंतर्निहित निष्पादन वातावरण",
+	"concurrentFragments": "समवर्ती खंड (डाउनलोड त्वरण)",
+	"concurrentFragmentsSubtitle": "प्रति वीडियो एक साथ कनेक्शन स्ट्रीम की संख्या (डिफ़ॉल्ट: 1)",
+	"embedThumbnail": "थंबनेल एम्बेड करें",
+	"toggleSidebar": "साइडबार टॉगल करें",
+	"history": "इतिहास",
+	"invalidUrl": "अमान्य यूआरएल",
+	"queued": "कतार में",
+	"autoDownloadOnPaste": "पेस्ट करने पर स्वचालित डाउनलोड"
 }

@@ -313,5 +313,13 @@
 	"ffmpegVersionLabel": "ffmpeg bertsioa",
 	"ffprobeVersionLabel": "ffprobe bertsioa",
 	"jsRuntimeSubtitle": "JavaScript exekuzio-ingurunea erauzleetarako",
-	"builtinRuntimeDesc": "Integratutako exekuzio-ingurunea"
+	"builtinRuntimeDesc": "Integratutako exekuzio-ingurunea",
+	"concurrentFragments": "Aldi bereko zatiak (deskarga bizkortzea)",
+	"concurrentFragmentsSubtitle": "Bideo bakoitzeko aldi bereko konexio-korronteen kopurua (lehenetsia: 1)",
+	"embedThumbnail": "Kapsulatu miniatura",
+	"toggleSidebar": "Txandakatu alboko barra",
+	"history": "Historia",
+	"invalidUrl": "URL baliogabea",
+	"queued": "Ilaran",
+	"autoDownloadOnPaste": "Deskarga automatikoa itsastean"
 }

@@ -316,5 +316,10 @@
 	"ffmpegVersionLabel": "ffmpeg version",
 	"ffprobeVersionLabel": "ffprobe version",
 	"jsRuntimeSubtitle": "JavaScript execution environment for extractors",
-	"builtinRuntimeDesc": "Built-in runtime environment"
+	"builtinRuntimeDesc": "Built-in runtime environment",
+	"toggleSidebar": "Toggle Sidebar",
+	"history": "History",
+	"invalidUrl": "Invalid URL",
+	"queued": "Queued",
+	"autoDownloadOnPaste": "Auto download on paste"
 }

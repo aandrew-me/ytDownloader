@@ -313,5 +313,13 @@
 	"ffmpegVersionLabel": "ffmpeg-Version",
 	"ffprobeVersionLabel": "ffprobe-Version",
 	"jsRuntimeSubtitle": "JavaScript-Laufzeitumgebung für Extraktoren",
-	"builtinRuntimeDesc": "Integrierte Laufzeitumgebung"
+	"builtinRuntimeDesc": "Integrierte Laufzeitumgebung",
+	"concurrentFragments": "Gleichzeitige Fragmente (Download-Beschleunigung)",
+	"concurrentFragmentsSubtitle": "Anzahl gleichzeitiger Verbindungs-Streams pro Video (Standard: 1)",
+	"embedThumbnail": "Miniaturansicht einbetten",
+	"toggleSidebar": "Seitenleiste umschalten",
+	"history": "Verlauf",
+	"invalidUrl": "Ungültige URL",
+	"queued": "In der Warteschlange",
+	"autoDownloadOnPaste": "Automatischer Download beim Einfügen"
 }

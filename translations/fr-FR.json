@@ -313,5 +313,13 @@
 	"ffmpegVersionLabel": "Version de ffmpeg",
 	"ffprobeVersionLabel": "Version de ffprobe",
 	"jsRuntimeSubtitle": "Environnement d'exécution JavaScript pour les extracteurs",
-	"builtinRuntimeDesc": "Environnement d'exécution intégré"
+	"builtinRuntimeDesc": "Environnement d'exécution intégré",
+	"concurrentFragments": "Fragments simultanés (accélération du téléchargement)",
+	"concurrentFragmentsSubtitle": "Nombre de flux de connexion simultanés par vidéo (par défaut : 1)",
+	"embedThumbnail": "Intégrer la miniature",
+	"toggleSidebar": "Basculer la barre latérale",
+	"history": "Historique",
+	"invalidUrl": "URL non valide",
+	"queued": "En file d'attente",
+	"autoDownloadOnPaste": "Téléchargement automatique lors du collage"
 }

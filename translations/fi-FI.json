@@ -313,5 +313,13 @@
 	"ffmpegVersionLabel": "ffmpeg-versio",
 	"ffprobeVersionLabel": "ffprobe-versio",
 	"jsRuntimeSubtitle": "JavaScript-ajoympäristö erottimille",
-	"builtinRuntimeDesc": "Sisäänrakennettu ajoympäristö"
+	"builtinRuntimeDesc": "Sisäänrakennettu ajoympäristö",
+	"concurrentFragments": "Samanaikaiset fragmentit (latauksen kiihdytys)",
+	"concurrentFragmentsSubtitle": "Samanaikaisten yhteysvirtojen määrä videota kohti (oletus: 1)",
+	"embedThumbnail": "Upota pikkukuva",
+	"toggleSidebar": "Vaihda sivupalkkia",
+	"history": "Historia",
+	"invalidUrl": "Virheellinen URL-osoite",
+	"queued": "Jonossa",
+	"autoDownloadOnPaste": "Automaattinen lataus liitettäessä"
 }
