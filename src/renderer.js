@@ -2680,7 +2680,12 @@ class YtDownloaderApp {
 
 		if (subs) downloadArgs.push(...subs.split(/\s+/));
 		if (subLangs) downloadArgs.push(...subLangs.split(/\s+/));
-		if (rangeOption) downloadArgs.push(rangeOption, rangeCmd);
+		if (rangeOption) {
+			downloadArgs.push(rangeOption, rangeCmd);
+			if (type === "video") {
+				downloadArgs.push("--force-keyframes-at-cuts");
+			}
+		}
 
 		const customArgsString =
 			job.customArgs !== undefined
