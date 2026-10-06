@@ -499,5 +499,44 @@ test.describe("Main Page Download Tests", () => {
 			return btn && btn.style.display === "none";
 		});
 	});
+
+	test("trimmed video download includes --force-keyframes-at-cuts", async () => {
+		const testUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+
+		await page.evaluate((url) => {
+			window.electronAPI.clipboard.writeText(url);
+		}, testUrl);
+
+		await page.click("#pasteUrl");
+		await waitForInfoPanel(page);
+
+		await page.evaluate(() => {
+			const minSlider = document.getElementById("min-slider");
+			const maxSlider = document.getElementById("max-slider");
+			if (minSlider) {
+				minSlider.value = "10";
+				minSlider.dispatchEvent(new Event("input", { bubbles: true }));
+			}
+			if (maxSlider) {
+				maxSlider.value = "20";
+				maxSlider.dispatchEvent(new Event("input", { bubbles: true }));
+			}
+		});
+
+		await clearExecutedCommands(page);
+		await triggerClick(page, "videoDownload");
+
+		await page.waitForFunction(() => {
+			const cmds = window.__executedCommands || [];
+			return cmds.some((cmd) => cmd.includes("--download-sections"));
+		});
+
+		const commands = await getExecutedCommands(page);
+		const downloadCmd = commands.find((cmd) => cmd.includes("--download-sections"));
+		expect(downloadCmd).toBeDefined();
+		expect(downloadCmd).toContain("--download-sections");
+		expect(downloadCmd).toContain("*00:10-00:20");
+		expect(downloadCmd).toContain("--force-keyframes-at-cuts");
+	});
 });
 
