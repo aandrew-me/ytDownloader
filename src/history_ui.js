@@ -169,8 +169,8 @@ export function renderHistory(historyItems) {
 			const copyBtn = document.createElement("button");
 			copyBtn.className = "copy-url-btn";
 			copyBtn.textContent = t("copyUrl", "Copy URL");
-			copyBtn.addEventListener("click", () => {
-				clipboard.writeText(item.url);
+			copyBtn.addEventListener("click", async () => {
+				await clipboard.writeText(item.url);
 				showPopup(t("urlCopiedToClipboard", "URL copied to clipboard"));
 			});
 			actions.appendChild(copyBtn);

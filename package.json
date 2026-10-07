@@ -36,7 +36,7 @@
 	"description": "Download videos and audios from YouTube and many other sites",
 	"devDependencies": {
 		"@playwright/test": "^1.45.0",
-		"electron": "^30.5.1",
+		"electron": "^44.6.0",
 		"electron-builder": "^26.15.7",
 		"typescript": "^5.3.3"
 	},

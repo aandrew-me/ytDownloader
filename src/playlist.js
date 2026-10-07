@@ -507,9 +507,9 @@ const playlistDownloader = {
 	// SELECTIVE PLAYLIST MODE IMPLEMENTATION
 	// ==========================================
 
-	pasteLinkSelective() {
+	async pasteLinkSelective() {
 		if (this.selectiveState.isFetching || this.selectiveState.isDownloading) return;
-		const rawUrl = clipboard.readText();
+		const rawUrl = await clipboard.readText();
 		this.fetchSelectivePlaylist(rawUrl);
 	},
 
@@ -1477,9 +1477,9 @@ const playlistDownloader = {
 		this._updateEmptyStateUI();
 	},
 
-	pasteLink() {
+	async pasteLink() {
 		if (this.state.isDownloading) return;
-		this.state.url = clipboard.readText();
+		this.state.url = await clipboard.readText();
 		this.ui.linkDisplay.textContent = ` ${this.state.url}`;
 		this.ui.optionsContainer.style.display = "block";
 		this.ui.optionsContainer.classList.remove("fade-out");

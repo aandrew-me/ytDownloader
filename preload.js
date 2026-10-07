@@ -1,4 +1,4 @@
-const { contextBridge, ipcRenderer, shell, clipboard, webFrame } = require("electron");
+const { contextBridge, ipcRenderer, shell, webFrame, webUtils } = require("electron");
 const path = require("path");
 const os = require("os");
 const fs = require("fs");
@@ -277,12 +277,15 @@ contextBridge.exposeInMainWorld("electronAPI", {
 		openPath: (p) => shell.openPath(p),
 	},
 	clipboard: {
-		readText: () => (isTest ? window.__testClipboardText || "" : clipboard.readText()),
-		writeText: (text) => {
+		readText: async () => {
+			if (isTest) return window.__testClipboardText || "";
+			return await ipcRenderer.invoke("clipboard-read-text");
+		},
+		writeText: async (text) => {
 			if (isTest) {
 				window.__testClipboardText = text;
 			} else {
-				clipboard.writeText(text);
+				await ipcRenderer.invoke("clipboard-write-text", text);
 			}
 		},
 	},
@@ -422,5 +425,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	webFrame: {
 		setZoomFactor: (factor) => webFrame.setZoomFactor(factor),
 		getZoomFactor: () => webFrame.getZoomFactor(),
+	},
+	webUtils: {
+		getPathForFile: (file) => webUtils.getPathForFile(file),
 	},
 });

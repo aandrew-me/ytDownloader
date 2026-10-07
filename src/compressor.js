@@ -10,7 +10,13 @@ const {
 	crypto,
 	env,
 	__dirname,
+	webUtils,
 } = window.electronAPI;
+
+const getFilePath = (file) =>
+	(file && (webUtils?.getPathForFile ? webUtils.getPathForFile(file) : null)) ||
+	file?.path ||
+	"";
 
 document.addEventListener("translations-loaded", () => {
 	window.i18n.translatePage();
@@ -235,7 +241,8 @@ function cancelCompression() {
  */
 function generateOutputPath(file, settings) {
 	const outputExtension = settings.extension;
-	const parsedFile = path.parse(file.path);
+	const inputPath = getFilePath(file);
+	const parsedFile = path.parse(inputPath);
 	const outputDir = settings.outputPath || parsedFile.dir;
 	const suffix = settings.outputSuffix ?? "_compressed";
 	const ext =
@@ -249,7 +256,7 @@ function generateOutputPath(file, settings) {
 	// Guard against overwriting source file if output path equals input file
 	const isCaseInsensitive = os.platform() === "win32" || os.platform() === "darwin";
 	const resolvedOutput = path.resolve(outputPath);
-	const resolvedInput = path.resolve(file.path);
+	const resolvedInput = path.resolve(inputPath);
 	const isSamePath = isCaseInsensitive
 		? resolvedOutput.toLowerCase() === resolvedInput.toLowerCase()
 		: resolvedOutput === resolvedInput;
@@ -290,7 +297,7 @@ async function compressVideo(file, settings, itemId, outputPath) {
 		let stderrOutput = "";
 
 		createProgressItem(
-			path.basename(file.path),
+			path.basename(getFilePath(file)),
 			"progress",
 			"Starting...",
 			itemId,
@@ -391,7 +398,7 @@ function getCRFValue(settings) {
  * @param {string} outputPath
  */
 async function buildFFmpegArgs(file, settings, outputPath) {
-	const inputPath = file.path;
+	const inputPath = getFilePath(file);
 	console.log("Output path: " + outputPath);
 
 	const resolvedSettings = {...settings};
