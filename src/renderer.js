@@ -1418,8 +1418,8 @@ class YtDownloaderApp {
 		// Batch controls listeners
 		document
 			.getElementById("pasteBatchClipboardBtn")
-			?.addEventListener("click", () => {
-				const text = clipboard.readText();
+			?.addEventListener("click", async () => {
+				const text = await clipboard.readText();
 				const textarea = document.getElementById("batchUrlsInput");
 				if (textarea) textarea.value = text;
 			});
@@ -1524,9 +1524,9 @@ class YtDownloaderApp {
 		);
 
 		// Error details
-		$(CONSTANTS.DOM_IDS.ERROR_DETAILS)?.addEventListener("click", (e) => {
+		$(CONSTANTS.DOM_IDS.ERROR_DETAILS)?.addEventListener("click", async (e) => {
 			// @ts-ignore
-			clipboard.writeText(e.target.innerText);
+			await clipboard.writeText(e.target.innerText);
 			this._showPopup(i18n.__("copiedText"), false);
 		});
 
@@ -1746,21 +1746,32 @@ class YtDownloaderApp {
 	/**
 	 * Pastes URL from clipboard and initiates fetching video info.
 	 */
-	pasteAndGetInfo() {
+	async pasteAndGetInfo() {
 		const pasteBtn = $(CONSTANTS.DOM_IDS.PASTE_URL_BTN);
 		if (pasteBtn && pasteBtn.disabled) return;
 		if (this.state.isFetchingInfo) return;
-		this.getInfo(clipboard.readText());
+		this.state.isFetchingInfo = true;
+		if (pasteBtn) pasteBtn.disabled = true;
+		try {
+			const text = await clipboard.readText();
+			this.getInfo(text, true);
+		} catch (error) {
+			this.state.isFetchingInfo = false;
+			if (pasteBtn) pasteBtn.disabled = false;
+		}
 	}
 
 	/**
 	 * Fetches video metadata from a given URL.
 	 * @param {string} url The video URL.
+	 * @param {boolean} [isFromPaste=false] Whether the request originated from paste button.
 	 */
-	async getInfo(url) {
+	async getInfo(url, isFromPaste = false) {
 		const pasteBtn = $(CONSTANTS.DOM_IDS.PASTE_URL_BTN);
-		if (pasteBtn && pasteBtn.disabled) return;
-		if (this.state.isFetchingInfo) return;
+		if (!isFromPaste) {
+			if (pasteBtn && pasteBtn.disabled) return;
+			if (this.state.isFetchingInfo) return;
+		}
 
 		this.state.isFetchingInfo = true;
 		if (pasteBtn) pasteBtn.disabled = true;

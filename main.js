@@ -241,7 +241,7 @@ function createTray() {
 		{
 			label: i18n("pasteVideoLink"),
 			click: async () => {
-				const text = clipboard.readText();
+				const text = await clipboard.readText();
 
 				appState.mainWindow?.show();
 				if (app.dock) app.dock.show();
@@ -432,9 +432,10 @@ function registerIpcHandlers() {
 
 	ipcMain.on("select-location-main", async () => {
 		if (!appState.mainWindow) return;
+		const defaultPath = appState.config.downloadPath || app.getPath("downloads");
 		const { canceled, filePaths } = await dialog.showOpenDialog(
 			appState.mainWindow,
-			{ properties: ["openDirectory"] },
+			{ defaultPath, properties: ["openDirectory"] },
 		);
 		if (!canceled && filePaths.length > 0) {
 			appState.mainWindow.webContents.send("downloadPath", filePaths);
@@ -444,9 +445,10 @@ function registerIpcHandlers() {
 	ipcMain.on("select-location-secondary", async (event) => {
 		const targetWindow = appState.secondaryWindow || appState.mainWindow || (event && event.sender && BrowserWindow.fromWebContents(event.sender));
 		if (!targetWindow || targetWindow.isDestroyed()) return;
+		const defaultPath = appState.config.downloadPath || app.getPath("downloads");
 		const { canceled, filePaths } = await dialog.showOpenDialog(
 			targetWindow,
-			{ properties: ["openDirectory"] },
+			{ defaultPath, properties: ["openDirectory"] },
 		);
 		if (!canceled && filePaths.length > 0 && !targetWindow.isDestroyed()) {
 			targetWindow.webContents.send(
@@ -458,9 +460,10 @@ function registerIpcHandlers() {
 
 	ipcMain.on("get-directory", async () => {
 		if (!appState.mainWindow) return;
+		const defaultPath = appState.config.downloadPath || app.getPath("downloads");
 		const { canceled, filePaths } = await dialog.showOpenDialog(
 			appState.mainWindow,
-			{ properties: ["openDirectory"] },
+			{ defaultPath, properties: ["openDirectory"] },
 		);
 		if (!canceled && filePaths.length > 0) {
 			appState.mainWindow.webContents.send("directory-path", filePaths);
@@ -470,9 +473,11 @@ function registerIpcHandlers() {
 	ipcMain.handle("select-ytdlp-file", async () => {
 		if (!appState.mainWindow) return null;
 		const isWin = process.platform === "win32";
+		const defaultPath = app.getPath("downloads");
 		const { canceled, filePaths } = await dialog.showOpenDialog(
 			appState.mainWindow,
 			{
+				defaultPath,
 				properties: ["openFile"],
 				filters: [
 					{
@@ -487,6 +492,25 @@ function registerIpcHandlers() {
 			return filePaths[0];
 		}
 		return null;
+	});
+
+	ipcMain.handle("clipboard-read-text", async () => {
+		try {
+			return (await clipboard.readText()) || "";
+		} catch (error) {
+			console.error("Failed to read clipboard:", error);
+			return "";
+		}
+	});
+
+	ipcMain.handle("clipboard-write-text", async (_event, text) => {
+		try {
+			await clipboard.writeText(text || "");
+			return true;
+		} catch (error) {
+			console.error("Failed to write clipboard:", error);
+			return false;
+		}
 	});
 
 	ipcMain.handle("get-cookies-path", () => {
@@ -515,7 +539,8 @@ function registerIpcHandlers() {
 
 		try {
 			globalShortcut.register(accelerator, async () => {
-				const text = clipboard.readText().trim();
+				const rawText = await clipboard.readText();
+				const text = (rawText || "").trim();
 				if (!appState.mainWindow || appState.mainWindow.isDestroyed()) return;
 
 				if (appState.mainWindow.isMinimized()) appState.mainWindow.restore();
@@ -558,7 +583,7 @@ function registerIpcHandlers() {
 			message: message,
 			buttons: ["Ok", i18n("clickToCopy")],
 		});
-		if (response === 1) clipboard.writeText(message);
+		if (response === 1) await clipboard.writeText(message);
 	});
 
 	ipcMain.handle("show-confirm-dialog", async (event, options = {}) => {
@@ -582,7 +607,7 @@ function registerIpcHandlers() {
 	});
 
 	ipcMain.handle("get-system-locale", async (_event) => {
-		return app.getSystemLocale();
+		return isTestEnv ? "en" : app.getSystemLocale();
 	});
 
 	ipcMain.handle("get-translation", (_event, locale) => {
@@ -839,7 +864,7 @@ function saveConfiguration() {
 }
 
 async function loadTranslations() {
-	const locale = app.getSystemLocale();
+	const locale = isTestEnv ? "en" : app.getSystemLocale();
 	const defaultLangPath = path.join(__dirname, "translations", "en.json");
 	let fallbackData = {};
 	try {
