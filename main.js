@@ -430,9 +430,9 @@ function registerIpcHandlers() {
 		app.quit();
 	});
 
-	ipcMain.on("select-location-main", async () => {
+	ipcMain.on("select-location-main", async (_event, currentDir) => {
 		if (!appState.mainWindow) return;
-		const defaultPath = appState.config.downloadPath || app.getPath("downloads");
+		const defaultPath = (typeof currentDir === "string" && currentDir) || app.getPath("downloads");
 		const { canceled, filePaths } = await dialog.showOpenDialog(
 			appState.mainWindow,
 			{ defaultPath, properties: ["openDirectory"] },
