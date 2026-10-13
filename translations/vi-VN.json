@@ -321,5 +321,10 @@
 	"history": "Lịch sử",
 	"invalidUrl": "URL không hợp lệ",
 	"queued": "Đang chờ hàng đợi",
-	"autoDownloadOnPaste": "Tự động tải xuống khi dán"
+	"autoDownloadOnPaste": "Tự động tải xuống khi dán",
+	"overallProgress": "Overall Progress",
+	"autoScroll": "Auto-scroll",
+	"autoScrollDownloads": "Auto-scroll downloads",
+	"autoScrollSubtitle": "Automatically scroll to follow items currently downloading",
+	"completed": "Completed"
 }

@@ -321,5 +321,10 @@
 	"history": "Історія",
 	"invalidUrl": "Недійсна URL-адреса",
 	"queued": "У черзі",
-	"autoDownloadOnPaste": "Автозавантаження при вставці"
+	"autoDownloadOnPaste": "Автозавантаження при вставці",
+	"overallProgress": "Загальний прогрес",
+	"autoScroll": "Автопрокручування",
+	"autoScrollDownloads": "Автопрокручування завантажень",
+	"autoScrollSubtitle": "Автоматично прокручувати до поточних завантажень",
+	"completed": "Завершено"
 }

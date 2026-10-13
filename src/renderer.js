@@ -10,6 +10,9 @@ import {
 	ensureFfmpegLibsLoadable,
 	getJsRuntimePath,
 	buildCodecFilter,
+	isAutoScrollEnabled,
+	setAutoScrollEnabled,
+	scrollItemIntoView,
 } from "./utils.js";
 import {selectVideo, selectAudio} from "./index.js";
 
@@ -3608,6 +3611,11 @@ class YtDownloaderApp {
 			"beforeend",
 			itemHTML,
 		);
+
+		const newItemEl = $(randomId);
+		if (newItemEl) {
+			scrollItemIntoView(newItemEl);
+		}
 
 		$(`${randomId}_close`)?.addEventListener("click", () =>
 			this._cancelDownload(randomId),

@@ -321,5 +321,10 @@
 	"history": "Verlauf",
 	"invalidUrl": "Ungültige URL",
 	"queued": "In der Warteschlange",
-	"autoDownloadOnPaste": "Automatischer Download beim Einfügen"
+	"autoDownloadOnPaste": "Automatischer Download beim Einfügen",
+	"overallProgress": "Gesamtfortschritt",
+	"autoScroll": "Automatischer Bildlauf",
+	"autoScrollDownloads": "Automatischer Bildlauf bei Downloads",
+	"autoScrollSubtitle": "Automatisch scrollen, um aktuell herunterladende Elemente zu verfolgen",
+	"completed": "Abgeschlossen"
 }

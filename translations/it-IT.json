@@ -321,5 +321,10 @@
 	"history": "Cronologia",
 	"invalidUrl": "URL non valido",
 	"queued": "In coda",
-	"autoDownloadOnPaste": "Download automatico all'incolla"
+	"autoDownloadOnPaste": "Download automatico all'incolla",
+	"overallProgress": "Avanzamento complessivo",
+	"autoScroll": "Scorrimento automatico",
+	"autoScrollDownloads": "Scorrimento automatico download",
+	"autoScrollSubtitle": "Scorri automaticamente per seguire gli elementi in fase di download",
+	"completed": "Completato"
 }

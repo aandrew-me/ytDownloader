@@ -850,6 +850,21 @@
                             <button class="playlist-btn-status" id="openDownloads" data-translate="openDownloadFolder" style="display: none;">Open download folder</button>
                             <button class="playlist-btn-status danger-btn" id="stopDownload" data-translate="cancel" style="display: none;">Cancel</button>
                         </div>
+                        <div id="playlistBatchProgressCard" class="overall-progress-card" style="display: none;">
+                            <div class="overall-progress-header">
+                                <div class="overall-progress-info">
+                                    <span class="overall-progress-title" data-translate="overallProgress">Overall Progress</span>
+                                    <span class="overall-progress-status" id="playlistBatchProgressStatus">0 / 0 (0%)</span>
+                                </div>
+                                <button type="button" class="autoscroll-toggle-btn active" id="playlistBatchAutoScrollBtn" title="Auto-scroll to current item">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v14M5 10l7 7 7-7"/><path d="M4 21h16"/></svg>
+                                    <span data-translate="autoScroll">Auto-scroll</span>
+                                </button>
+                            </div>
+                            <div class="custom-progress overall-progress-track">
+                                <div class="custom-progress-fill overall-progress-fill" id="playlistBatchProgressFill" style="width: 0%;"></div>
+                            </div>
+                        </div>
                     </div>
                     <div id="listPlaylist"></div>
                 </div>
@@ -959,6 +974,23 @@
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M12 17V3"/><path d="m6 11 6 6 6-6"/><path d="M19 21H5"/></svg>
                                     <span data-translate="downloadSelected">Download Selected</span> <span>(<span id="selectiveDownloadCount">0</span>)</span>
                                 </button>
+                            </div>
+                        </div>
+
+                        <!-- Overall Progress Card for Selective Mode -->
+                        <div id="selectiveOverallProgressCard" class="overall-progress-card" style="display: none;">
+                            <div class="overall-progress-header">
+                                <div class="overall-progress-info">
+                                    <span class="overall-progress-title" data-translate="overallProgress">Overall Progress</span>
+                                    <span class="overall-progress-status" id="selectiveProgressStatus">0 / 0 (0%)</span>
+                                </div>
+                                <button type="button" class="autoscroll-toggle-btn active" id="selectiveAutoScrollBtn" title="Auto-scroll to current item">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v14M5 10l7 7 7-7"/><path d="M4 21h16"/></svg>
+                                    <span data-translate="autoScroll">Auto-scroll</span>
+                                </button>
+                            </div>
+                            <div class="custom-progress overall-progress-track">
+                                <div class="custom-progress-fill overall-progress-fill" id="selectiveProgressFill" style="width: 0%;"></div>
                             </div>
                         </div>
 
@@ -1240,6 +1272,19 @@
                                 <span id="trayTxt" data-translate="closeAppToTray">Close to system tray</span>
                                 <label class="switch">
                                     <input type="checkbox" id="closeToTray">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </section>
+
+                        <section class="settings-section">
+                            <div class="prefBox">
+                                <div class="pref-label-group">
+                                    <span id="autoScrollTxt" data-translate="autoScrollDownloads">Auto-scroll downloads</span>
+                                    <p class="pref-subtitle" data-translate="autoScrollSubtitle">Automatically scroll to follow items currently downloading</p>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" id="autoScrollDownloads" checked>
                                     <span class="slider"></span>
                                 </label>
                             </div>

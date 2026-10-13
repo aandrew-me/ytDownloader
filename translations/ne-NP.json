@@ -321,5 +321,10 @@
 	"history": "ईतिहास",
 	"invalidUrl": "अमान्य यूआरएल",
 	"queued": "पर्खाइमा",
-	"autoDownloadOnPaste": "टाँस्दा स्वचालित डाउनलोड"
+	"autoDownloadOnPaste": "टाँस्दा स्वचालित डाउनलोड",
+	"overallProgress": "Overall Progress",
+	"autoScroll": "Auto-scroll",
+	"autoScrollDownloads": "Auto-scroll downloads",
+	"autoScrollSubtitle": "Automatically scroll to follow items currently downloading",
+	"completed": "Completed"
 }

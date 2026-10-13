@@ -321,5 +321,10 @@
 	"history": "Historial",
 	"invalidUrl": "URL no válida",
 	"queued": "En cola",
-	"autoDownloadOnPaste": "Descarga automática al pegar"
+	"autoDownloadOnPaste": "Descarga automática al pegar",
+	"overallProgress": "Progreso general",
+	"autoScroll": "Desplazamiento automático",
+	"autoScrollDownloads": "Desplazamiento automático de descargas",
+	"autoScrollSubtitle": "Desplazar automáticamente para seguir los elementos que se están descargando",
+	"completed": "Completado"
 }

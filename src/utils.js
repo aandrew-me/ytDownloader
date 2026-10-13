@@ -407,3 +407,36 @@ export function formatHasAudio(format) {
 	return format.acodec !== "none";
 }
 
+/**
+ * Checks whether auto-scrolling to active download items is enabled.
+ * @returns {boolean}
+ */
+export function isAutoScrollEnabled() {
+	return localStorage.getItem("autoScrollDownloads") !== "false";
+}
+
+/**
+ * Sets auto-scroll preference and synchronizes UI toggles.
+ * @param {boolean} enabled
+ */
+export function setAutoScrollEnabled(enabled) {
+	localStorage.setItem("autoScrollDownloads", enabled ? "true" : "false");
+	document.querySelectorAll(".autoscroll-toggle-btn").forEach((btn) => {
+		btn.classList.toggle("active", enabled);
+	});
+	const prefCb = document.getElementById("autoScrollDownloads");
+	if (prefCb && prefCb.checked !== enabled) {
+		prefCb.checked = enabled;
+	}
+}
+
+/**
+ * Smoothly scrolls an element into view if auto-scroll is enabled.
+ * @param {HTMLElement | null} element
+ */
+export function scrollItemIntoView(element) {
+	if (!element || !isAutoScrollEnabled()) return;
+	element.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+

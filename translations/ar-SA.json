@@ -321,5 +321,10 @@
 	"history": "السجل",
 	"invalidUrl": "رابط غير صالح",
 	"queued": "في قائمة الانتظار",
-	"autoDownloadOnPaste": "تنزيل تلقائي عند اللصق"
+	"autoDownloadOnPaste": "تنزيل تلقائي عند اللصق",
+	"overallProgress": "Overall Progress",
+	"autoScroll": "Auto-scroll",
+	"autoScrollDownloads": "Auto-scroll downloads",
+	"autoScrollSubtitle": "Automatically scroll to follow items currently downloading",
+	"completed": "Completed"
 }
