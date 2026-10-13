@@ -1877,6 +1877,93 @@ img {
 	transform: translateY(0) scale(0.98);
 }
 
+/* Overall Progress Card */
+.overall-progress-card {
+	width: 100%;
+	max-width: 820px;
+	background: var(--box-main, rgba(255, 255, 255, 0.05));
+	border: 1px solid var(--box-separation, rgba(255, 255, 255, 0.1));
+	border-radius: 14px;
+	padding: 14px 18px;
+	box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+	box-sizing: border-box;
+	margin: 12px auto 16px;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	animation: itemFadeSlide 0.25s ease-out forwards;
+}
+
+.overall-progress-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	flex-wrap: wrap;
+}
+
+.overall-progress-info {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.overall-progress-title {
+	font-size: 0.95rem;
+	font-weight: 700;
+	color: var(--text);
+}
+
+.overall-progress-status {
+	font-size: 0.85rem;
+	font-weight: 600;
+	color: var(--blueBtn, #3b82f6);
+	background: color-mix(in srgb, var(--blueBtn, #3b82f6) 15%, transparent);
+	padding: 2px 10px;
+	border-radius: 999px;
+}
+
+.overall-progress-track {
+	height: 8px;
+	border-radius: 999px;
+	background: var(--box-separation, rgba(255, 255, 255, 0.1));
+	overflow: hidden;
+}
+
+.overall-progress-fill {
+	height: 100%;
+	border-radius: 999px;
+	background: linear-gradient(90deg, var(--blueBtn, #3b82f6), var(--blueBtn-bottom, #6366f1));
+	transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.autoscroll-toggle-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 0.82rem;
+	font-weight: 600;
+	color: var(--text-secondary, #94a3b8);
+	background: var(--box-main, rgba(255, 255, 255, 0.05));
+	border: 1px solid var(--box-separation, rgba(255, 255, 255, 0.15));
+	border-radius: 20px;
+	padding: 5px 12px;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	user-select: none;
+}
+
+.autoscroll-toggle-btn:hover {
+	color: var(--text, #ffffff);
+	border-color: var(--blueBtn, #3b82f6);
+}
+
+.autoscroll-toggle-btn.active {
+	color: #ffffff;
+	background: color-mix(in srgb, var(--blueBtn, #3b82f6) 30%, transparent);
+	border-color: var(--blueBtn, #3b82f6);
+}
+
 /* Download Item Cards */
 #listPlaylist {
 	display: flex;

@@ -321,5 +321,10 @@
 	"history": "Historia",
 	"invalidUrl": "Virheellinen URL-osoite",
 	"queued": "Jonossa",
-	"autoDownloadOnPaste": "Automaattinen lataus liitettäessä"
+	"autoDownloadOnPaste": "Automaattinen lataus liitettäessä",
+	"overallProgress": "Overall Progress",
+	"autoScroll": "Auto-scroll",
+	"autoScrollDownloads": "Auto-scroll downloads",
+	"autoScrollSubtitle": "Automatically scroll to follow items currently downloading",
+	"completed": "Completed"
 }

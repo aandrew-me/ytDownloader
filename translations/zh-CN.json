@@ -321,5 +321,10 @@
 	"history": "历史",
 	"invalidUrl": "无效的 URL",
 	"queued": "排队中",
-	"autoDownloadOnPaste": "粘贴时自动下载"
+	"autoDownloadOnPaste": "粘贴时自动下载",
+	"overallProgress": "总体进度",
+	"autoScroll": "自动滚动",
+	"autoScrollDownloads": "下载自动滚动",
+	"autoScrollSubtitle": "自动滚动以跟踪当前正在下载的项目",
+	"completed": "已完成"
 }

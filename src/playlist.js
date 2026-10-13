@@ -1,4 +1,4 @@
-import { getId, formatTime, escapeHtml, buildCodecFilter } from "./utils.js";
+import { getId, formatTime, escapeHtml, buildCodecFilter, isAutoScrollEnabled, setAutoScrollEnabled, scrollItemIntoView } from "./utils.js";
 
 const {
 	clipboard,
@@ -29,6 +29,8 @@ const playlistDownloader = {
 		isCancelled: false,
 		currentLocalCount: 0,
 		currentMode: "batch", // "batch" or "selective"
+		totalPlaylistCount: 0,
+		completedPlaylistCount: 0,
 	},
 
 	selectiveState: {
@@ -139,6 +141,17 @@ const playlistDownloader = {
 			selectiveItemsList: container.querySelector("#selectiveItemsList"),
 			emptyStateBatch: container.querySelector("#emptyStatePlaylist") || getId("emptyStatePlaylist"),
 			emptyStateSelective: container.querySelector("#emptyStatePlaylistSelective") || getId("emptyStatePlaylistSelective"),
+
+			// Overall Progress Elements
+			playlistBatchProgressCard: container.querySelector("#playlistBatchProgressCard"),
+			playlistBatchProgressStatus: container.querySelector("#playlistBatchProgressStatus"),
+			playlistBatchProgressFill: container.querySelector("#playlistBatchProgressFill"),
+			playlistBatchAutoScrollBtn: container.querySelector("#playlistBatchAutoScrollBtn"),
+
+			selectiveOverallProgressCard: container.querySelector("#selectiveOverallProgressCard"),
+			selectiveProgressStatus: container.querySelector("#selectiveProgressStatus"),
+			selectiveProgressFill: container.querySelector("#selectiveProgressFill"),
+			selectiveAutoScrollBtn: container.querySelector("#selectiveAutoScrollBtn"),
 
 			menuIcon: getId("menuIcon"),
 			menu: getId("menu"),
@@ -380,6 +393,17 @@ const playlistDownloader = {
 		this.ui.selectiveOpenFolderBtn?.addEventListener("click", () =>
 			this.openDownloadsFolder(),
 		);
+
+		// Auto-scroll toggle buttons
+		this.ui.playlistBatchAutoScrollBtn?.addEventListener("click", () => {
+			setAutoScrollEnabled(!isAutoScrollEnabled());
+		});
+		this.ui.selectiveAutoScrollBtn?.addEventListener("click", () => {
+			setAutoScrollEnabled(!isAutoScrollEnabled());
+		});
+		const autoScrollInit = isAutoScrollEnabled();
+		this.ui.playlistBatchAutoScrollBtn?.classList.toggle("active", autoScrollInit);
+		this.ui.selectiveAutoScrollBtn?.classList.toggle("active", autoScrollInit);
 
 		this.ui.selectiveErrorBtn?.addEventListener("click", () => {
 			const isHidden = this.ui.selectiveErrorDetails.style.display === "none";
@@ -920,6 +944,11 @@ const playlistDownloader = {
 		const targetFolder = (this.config.foldernameFormat || "%(playlist_title)s")
 			.replaceAll("%(playlist_title)s", safePlaylistTitle);
 
+		const totalSelected = selectedEntries.length;
+		this.selectiveState.totalCount = totalSelected;
+		this.selectiveState.completedCount = 0;
+		this.updateSelectiveOverallProgress(0, totalSelected);
+
 		for (const [index, entry] of this.selectiveState.entries.entries()) {
 			if (!entry.selected) continue;
 			if (this.selectiveState.isCancelled) break;
@@ -927,6 +956,9 @@ const playlistDownloader = {
 			const statusEl = document.getElementById(`sel_status_${index}`);
 			const barEl = document.getElementById(`sel_bar_${index}`);
 			const txtEl = document.getElementById(`sel_txt_${index}`);
+			const selCard = document.getElementById(`sel_card_${index}`);
+
+			scrollItemIntoView(selCard);
 
 			if (statusEl) statusEl.style.display = "flex";
 			if (barEl) barEl.style.width = "0%";
@@ -1031,6 +1063,8 @@ const playlistDownloader = {
 							if (barEl) barEl.style.width = "100%";
 							if (txtEl) txtEl.textContent = window.i18n ? window.i18n.__("fileSaved") : "Completed";
 							entry.status = "completed";
+							this.selectiveState.completedCount = (this.selectiveState.completedCount || 0) + 1;
+							this.updateSelectiveOverallProgress(this.selectiveState.completedCount, totalSelected);
 
 							// Add to history
 							try {
@@ -1053,6 +1087,8 @@ const playlistDownloader = {
 						} else {
 							if (txtEl) txtEl.textContent = err.message || "Error";
 							entry.status = "error";
+							this.selectiveState.completedCount = (this.selectiveState.completedCount || 0) + 1;
+							this.updateSelectiveOverallProgress(this.selectiveState.completedCount, totalSelected);
 						}
 						resolve();
 					});
@@ -1125,8 +1161,8 @@ const playlistDownloader = {
 		}
 
 		try {
-			await this.updateDynamicConfig();
 			this.hideOptions();
+			await this.updateDynamicConfig();
 
 			this.state.isDownloading = true;
 			this.state.isCancelled = false;
@@ -1212,7 +1248,7 @@ const playlistDownloader = {
 			"--compat-options",
 			"no-youtube-unavailable-videos",
 			"--exec",
-			`before_dl:echo [Item info]:::%(playlist_index)q:::%(title)q:::%(thumbnail)q`,
+			`before_dl:echo [Item info]:::%(playlist_index)q:::%(title)q:::%(thumbnail)q:::%(playlist_count)q`,
 		];
 	},
 
@@ -1393,11 +1429,29 @@ const playlistDownloader = {
 					}
 
 					videoInfo.thumbnail = eventItems[3];
+
+					const playlistCountStr = eventItems[4];
+					const countFromYt = Number(playlistCountStr);
+					const start = Number(this.config.playlistRange.start) || 1;
+					const end = this.config.playlistRange.end ? Number(this.config.playlistRange.end) : null;
+
+					if (countFromYt && !isNaN(countFromYt) && countFromYt > 0) {
+						if (end !== null && !isNaN(end) && end >= start) {
+							const effectiveEnd = Math.min(end, countFromYt);
+							this.state.totalPlaylistCount = Math.max(1, effectiveEnd - start + 1);
+						} else {
+							this.state.totalPlaylistCount = Math.max(1, countFromYt - start + 1);
+						}
+					} else if (!this.state.totalPlaylistCount && end !== null && !isNaN(end) && end >= start) {
+						this.state.totalPlaylistCount = Math.max(1, end - start + 1);
+					}
 				} catch (error) { }
 
 				count++;
 				this.state.originalCount++;
 				this.state.currentLocalCount = count;
+				this.state.completedPlaylistCount = Math.max(0, count - 1);
+				this.updateBatchOverallProgress(this.state.completedPlaylistCount, this.state.totalPlaylistCount);
 				this.updatePlaylistUI(videoInfo, count, type);
 			}
 		});
@@ -1474,7 +1528,40 @@ const playlistDownloader = {
 		if (lastBar) {
 			lastBar.classList.add("cancelled");
 		}
+		if (this.ui.playlistBatchProgressStatus && this.state.totalPlaylistCount) {
+			const completedLabel = window.i18n ? window.i18n.__("completed") : "Completed";
+			const cancelLabel = window.i18n ? window.i18n.__("cancel") : "Cancelled";
+			this.ui.playlistBatchProgressStatus.textContent = `${this.state.completedPlaylistCount || 0} / ${this.state.totalPlaylistCount} ${completedLabel} (${cancelLabel})`;
+		}
 		this._updateEmptyStateUI();
+	},
+
+	updateBatchOverallProgress(completed, total) {
+		if (!this.ui.playlistBatchProgressCard) return;
+		this.ui.playlistBatchProgressCard.style.display = "flex";
+		const percent = total > 0 ? Math.min(100, Math.round((completed / total) * 100)) : 0;
+		if (this.ui.playlistBatchProgressFill) {
+			this.ui.playlistBatchProgressFill.style.width = `${percent}%`;
+		}
+		if (this.ui.playlistBatchProgressStatus) {
+			const completedLabel = window.i18n ? window.i18n.__("completed") : "Completed";
+			this.ui.playlistBatchProgressStatus.textContent = total > 0
+				? `${completed} / ${total} ${completedLabel} (${percent}%)`
+				: `${completed} ${completedLabel}`;
+		}
+	},
+
+	updateSelectiveOverallProgress(completed, total) {
+		if (!this.ui.selectiveOverallProgressCard) return;
+		this.ui.selectiveOverallProgressCard.style.display = "flex";
+		const percent = total > 0 ? Math.min(100, Math.round((completed / total) * 100)) : 0;
+		if (this.ui.selectiveProgressFill) {
+			this.ui.selectiveProgressFill.style.width = `${percent}%`;
+		}
+		if (this.ui.selectiveProgressStatus) {
+			const completedLabel = window.i18n ? window.i18n.__("completed") : "Completed";
+			this.ui.selectiveProgressStatus.textContent = `${completed} / ${total} ${completedLabel} (${percent}%)`;
+		}
 	},
 
 	async pasteLink() {
@@ -1561,7 +1648,7 @@ const playlistDownloader = {
 		`;
 
 		this.ui.downloadList.appendChild(itemElement);
-		window.scrollTo(0, document.body.scrollHeight);
+		scrollItemIntoView(itemElement);
 	},
 
 	async updateDynamicConfig() {
@@ -1627,6 +1714,14 @@ const playlistDownloader = {
 				? this.config.playlistRange.start - 1
 				: 0;
 
+		const start = this.config.playlistRange.start;
+		const end = this.config.playlistRange.end ? Number(this.config.playlistRange.end) : null;
+		if (end !== null && !isNaN(end) && end >= start) {
+			this.state.totalPlaylistCount = end - start + 1;
+		} else {
+			this.state.totalPlaylistCount = 0;
+		}
+
 		// Reset playlist name for new download
 		this.state.playlistName = "";
 	},
@@ -1637,6 +1732,14 @@ const playlistDownloader = {
 			this.ui.optionsContainer.classList.remove("fade-in");
 		}
 		if (this.ui.downloadList) this.ui.downloadList.innerHTML = "";
+		if (this.ui.playlistBatchProgressCard) {
+			this.ui.playlistBatchProgressCard.style.display = "none";
+		}
+		if (this.ui.playlistBatchProgressFill) {
+			this.ui.playlistBatchProgressFill.style.width = "0%";
+		}
+		this.state.totalPlaylistCount = 0;
+		this.state.completedPlaylistCount = 0;
 		if (this.ui.errorBtn) this.ui.errorBtn.style.display = "none";
 		if (this.ui.errorDetails) {
 			this.ui.errorDetails.style.display = "none";
@@ -1667,6 +1770,9 @@ const playlistDownloader = {
 		if (!this.state.isDownloading) return;
 		this.state.isDownloading = false;
 		if (this.ui.stopDownloadBtn) this.ui.stopDownloadBtn.style.display = "none";
+
+		this.state.completedPlaylistCount = count;
+		this.updateBatchOverallProgress(count, this.state.totalPlaylistCount || count);
 
 		const lastProgress = getId(`p${count}`);
 		if (lastProgress) {

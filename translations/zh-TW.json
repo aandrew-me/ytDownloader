@@ -321,5 +321,10 @@
 	"history": "歷史",
 	"invalidUrl": "無效的 URL",
 	"queued": "排隊中",
-	"autoDownloadOnPaste": "貼上時自動下載"
+	"autoDownloadOnPaste": "貼上時自動下載",
+	"overallProgress": "整體進度",
+	"autoScroll": "自動滾動",
+	"autoScrollDownloads": "下載自動滾動",
+	"autoScrollSubtitle": "自動滾動以追蹤目前正在下載的項目",
+	"completed": "已完成"
 }

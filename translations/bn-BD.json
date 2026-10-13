@@ -321,5 +321,10 @@
 	"history": "ইতিহাস",
 	"invalidUrl": "অকার্যকর ইউআরএল",
 	"queued": "অপেক্ষারত",
-	"autoDownloadOnPaste": "পেস্ট করার সাথে সাথে স্বয়ংক্রিয় ডাউনলোড"
+	"autoDownloadOnPaste": "পেস্ট করার সাথে সাথে স্বয়ংক্রিয় ডাউনলোড",
+	"overallProgress": "Overall Progress",
+	"autoScroll": "Auto-scroll",
+	"autoScrollDownloads": "Auto-scroll downloads",
+	"autoScrollSubtitle": "Automatically scroll to follow items currently downloading",
+	"completed": "Completed"
 }

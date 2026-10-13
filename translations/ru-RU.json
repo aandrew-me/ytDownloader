@@ -321,5 +321,10 @@
 	"history": "История",
 	"invalidUrl": "Неверный URL",
 	"queued": "В очереди",
-	"autoDownloadOnPaste": "Автоскачивание при вставке"
+	"autoDownloadOnPaste": "Автоскачивание при вставке",
+	"overallProgress": "Общий прогресс",
+	"autoScroll": "Автопрокрутка",
+	"autoScrollDownloads": "Автопрокрутка загрузок",
+	"autoScrollSubtitle": "Автоматически прокручивать к текущим загрузкам",
+	"completed": "Завершено"
 }
