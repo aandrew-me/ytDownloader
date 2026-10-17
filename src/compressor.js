@@ -245,8 +245,13 @@ function generateOutputPath(file, settings) {
 	const parsedFile = path.parse(inputPath);
 	const outputDir = settings.outputPath || parsedFile.dir;
 	const suffix = settings.outputSuffix ?? "_compressed";
-	const ext =
-		outputExtension === "unchanged" ? parsedFile.ext : `.${outputExtension}`;
+	let ext = "";
+	if (settings.audioFormat === "audio-only"){
+		ext = ".mp3";
+	} else {
+		ext =
+		    outputExtension === "unchanged" ? parsedFile.ext : `.${outputExtension}`;
+	}
 
 	let outputPath = path.join(
 		outputDir,
@@ -505,6 +510,7 @@ async function buildFFmpegArgs(file, settings, outputPath) {
 
 	const quality = getCRFValue(resolvedSettings);
 
+    if (resolvedSettings.audioFormat !== "audio-only") {
 	switch (resolvedSettings.encoder) {
 		case "copy":
 			args.push("-c:v", "copy");
@@ -837,19 +843,24 @@ async function buildFFmpegArgs(file, settings, outputPath) {
 				args.push("-q:v", quality);
 			}
 			break;
-	}
+	}}
 
-	const audioFormat =
-		useBitrate && resolvedSettings.audioFormat === "copy"
-			? "aac"
-			: resolvedSettings.audioFormat;
-
-	args.push("-c:a", audioFormat);
-
-	if (audioFormat !== "copy") {
+	if (resolvedSettings.audioFormat === "audio-only") {
 		const audioBitrateString = `${Math.round(audioBitrate / 1000)}k`;
-		args.push("-b:a", audioBitrateString);
-	}
+		args.push("-vn", "-b:a", audioBitrateString, "-c:a", "mp3");
+	    } else {
+			const audioFormat =
+			useBitrate && resolvedSettings.audioFormat === "copy"
+			    ? "aac"
+			    : resolvedSettings.audioFormat;
+			
+			args.push("-c:a", audioFormat);
+			
+			if (audioFormat !== "copy") {
+				const audioBitrateString = `${Math.round(audioBitrate / 1000)}k`;
+				args.push("-b:a", audioBitrateString);
+			}
+		}
 
 	args.push(outputPath);
 

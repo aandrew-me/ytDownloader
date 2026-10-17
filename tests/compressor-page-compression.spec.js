@@ -299,4 +299,27 @@ test.describe("Compressor Page Tests", () => {
 		const outputPath = ffmpegCmd[ffmpegCmd.length - 1];
 		expect(outputPath.toLowerCase().includes("video_uppercase_compressed.mp4")).toBe(true);
 	});
+
+	test("audio format selection passes -c:a audio-only to ffmpeg command", async () => {
+		await attachTestFile(page);
+
+		await page.click('button[data-quality="balanced"]');
+		await page.selectOption("#audio-format", "audio-only");
+
+		await clearExecutedCommands(page);
+
+		await page.click("#compress-btn");
+		await waitForFfmpegCommand(page);
+
+		const commands = await getFfmpegCommands(page);
+		expect(commands.length).toBeGreaterThan(0);
+		const ffmpegCmd = commands[commands.length - 1];
+
+		expect(ffmpegCmd).toContain("-c:a");
+		const caIndex = ffmpegCmd.indexOf("-c:a");
+		expect(ffmpegCmd[caIndex + 1]).toBe("mp3");
+
+		expect(ffmpegCmd).toContain("-vn");
+		expect(ffmpegCmd).not.toContain("-c:v");
+	});
 });
