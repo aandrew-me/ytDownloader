@@ -57,7 +57,6 @@ if (YTDlpWrap && typeof YTDlpWrap.createGetMessage === "function") {
 		return fetchWithRedirects(url, 0);
 	};
 }
-
 const isTest = process.env.NODE_ENV === "test" || process.env.YTDOWNLOADER_TEST === "true" || (process.argv && process.argv.includes("--is-test"));
 
 function normalizeSignal(options, cancellationSignal) {

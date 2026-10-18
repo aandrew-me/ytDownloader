@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { formatVideoCodec, buildCodecFilter } from "../src/utils.js";
+import { formatVideoCodec, buildCodecFilter, getJsRuntimePath } from "../src/utils.js";
 
 test.describe("formatVideoCodec", () => {
 	test("maps AVC/H.264 codecs properly", () => {
@@ -58,5 +58,96 @@ test.describe("buildCodecFilter", () => {
 		expect(buildCodecFilter()).toBe("[vcodec^=avc1]");
 		expect(buildCodecFilter(null)).toBe("[vcodec^=avc1]");
 		expect(buildCodecFilter("")).toBe("[vcodec^=avc1]");
+	});
+});
+
+test.describe("getJsRuntimePath macOS", () => {
+	test("resolves deno if present on macOS", async () => {
+		const originalWindow = global.window;
+		global.window = {
+			electronAPI: {
+				env: {},
+				platform: () => "darwin",
+				__dirname: "/app/html",
+				windowsStore: false,
+				homedir: () => "/Users/test",
+				join: (...parts) => parts.join("/"),
+				fs: {
+					existsSync: (p) => p === "/opt/homebrew/bin/deno",
+				},
+			},
+		};
+		try {
+			expect(await getJsRuntimePath()).toBe("deno:/opt/homebrew/bin/deno");
+		} finally {
+			global.window = originalWindow;
+		}
+	});
+
+	test("falls back to node if deno is absent on macOS", async () => {
+		const originalWindow = global.window;
+		global.window = {
+			electronAPI: {
+				env: {},
+				platform: () => "darwin",
+				__dirname: "/app/html",
+				windowsStore: false,
+				homedir: () => "/Users/test",
+				join: (...parts) => parts.join("/"),
+				fs: {
+					existsSync: (p) => p === "/usr/local/bin/node",
+				},
+			},
+		};
+		try {
+			expect(await getJsRuntimePath()).toBe("node:/usr/local/bin/node");
+		} finally {
+			global.window = originalWindow;
+		}
+	});
+
+	test("resolves user ~/.deno/bin/deno if present on macOS", async () => {
+		const originalWindow = global.window;
+		global.window = {
+			electronAPI: {
+				env: {},
+				platform: () => "darwin",
+				__dirname: "/app/html",
+				windowsStore: false,
+				homedir: () => "/Users/test",
+				join: (...parts) => parts.join("/"),
+				fs: {
+					existsSync: (p) => p === "/Users/test/.deno/bin/deno",
+				},
+			},
+		};
+		try {
+			expect(await getJsRuntimePath()).toBe("deno:/Users/test/.deno/bin/deno");
+		} finally {
+			global.window = originalWindow;
+		}
+	});
+
+	test("resolves runtime via execSync command -v fallback if not in standard locations", async () => {
+		const originalWindow = global.window;
+		global.window = {
+			electronAPI: {
+				env: {},
+				platform: () => "darwin",
+				__dirname: "/app/html",
+				windowsStore: false,
+				homedir: () => "/Users/test",
+				join: (...parts) => parts.join("/"),
+				fs: {
+					existsSync: (p) => p === "/custom/path/deno",
+				},
+				execSync: (cmd) => (cmd.includes("deno") ? "/custom/path/deno\n" : ""),
+			},
+		};
+		try {
+			expect(await getJsRuntimePath()).toBe("deno:/custom/path/deno");
+		} finally {
+			global.window = originalWindow;
+		}
 	});
 });
