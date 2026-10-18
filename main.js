@@ -15,9 +15,16 @@ const fs = require("fs").promises;
 const { existsSync, readFileSync, writeFileSync } = require("fs");
 const path = require("path");
 const DownloadHistory = require("./src/history");
-const { platform } = require("os");
+const { platform, homedir } = require("os");
 
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = "true";
+
+if (process.platform === "darwin") {
+	const userDenoBin = path.join(homedir(), ".deno", "bin");
+	const macPaths = ["/opt/homebrew/bin", "/opt/homebrew/sbin", "/usr/local/bin", "/usr/local/sbin", userDenoBin];
+	const current = (process.env.PATH || "").split(":");
+	process.env.PATH = [...new Set([...macPaths, ...current])].filter(Boolean).join(":");
+}
 autoUpdater.autoDownload = false;
 autoUpdater.allowDowngrade = true;
 autoUpdater.autoInstallOnAppQuit = true;

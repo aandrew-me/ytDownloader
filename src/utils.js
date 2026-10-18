@@ -262,7 +262,7 @@ export function getFfprobePath() {
  * @returns {Promise<string>}
  */
 export async function getJsRuntimePath() {
-	const { env, platform, __dirname, windowsStore, homedir, fs, join } = window.electronAPI;
+	const { env, platform, __dirname, windowsStore, homedir, fs, join, execSync } = window.electronAPI;
 	const existsSync = fs.existsSync;
 	const copyFileSync = fs.copyFileSync;
 	const mkdirSync = fs.mkdirSync;
@@ -271,7 +271,7 @@ export async function getJsRuntimePath() {
 	// Priority 1: Environment Variable (Node)
 	if (env && env.YTDOWNLOADER_NODE_PATH) {
 		if (existsSync(env.YTDOWNLOADER_NODE_PATH)) {
-			return `$node:${env.YTDOWNLOADER_NODE_PATH}`;
+			return `node:${env.YTDOWNLOADER_NODE_PATH}`;
 		}
 
 		return "";
@@ -280,26 +280,54 @@ export async function getJsRuntimePath() {
 	// Priority 2: Environment Variable (Deno)
 	if (env && env.YTDOWNLOADER_DENO_PATH) {
 		if (existsSync(env.YTDOWNLOADER_DENO_PATH)) {
-			return `$deno:${env.YTDOWNLOADER_DENO_PATH}`;
+			return `deno:${env.YTDOWNLOADER_DENO_PATH}`;
 		}
 
 		return "";
 	}
 
-	// Priority 3: System-installed Deno (macOS Fallback)
+	// Priority 3: System-installed Deno / Node (macOS Fallback)
 	if (platform() === "darwin") {
+		const userDeno = homedir ? join(homedir(), ".deno", "bin", "deno") : "";
 		const possiblePaths = [
-			"/opt/homebrew/bin/deno",
-			"/usr/local/bin/deno",
+			["deno", "/opt/homebrew/bin/deno"],
+			["deno", "/usr/local/bin/deno"],
+			["deno", userDeno],
+			["deno", "/opt/local/bin/deno"],
+			["node", "/opt/homebrew/bin/node"],
+			["node", "/usr/local/bin/node"],
+			["node", "/opt/local/bin/node"],
 		];
 
-		for (const p of possiblePaths) {
-			if (existsSync(p)) {
-				return `deno:${p}`;
+		for (const [runtime, p] of possiblePaths) {
+			if (p && existsSync(p)) {
+				return `${runtime}:${p}`;
 			}
 		}
 
-		console.log("No Deno installation found");
+		if (execSync) {
+			try {
+				const sysDeno = execSync("command -v deno || which deno")
+					.toString()
+					.split(/\r?\n/)[0]
+					.trim();
+				if (sysDeno && existsSync(sysDeno)) {
+					return `deno:${sysDeno}`;
+				}
+			} catch (_) {}
+
+			try {
+				const sysNode = execSync("command -v node || which node")
+					.toString()
+					.split(/\r?\n/)[0]
+					.trim();
+				if (sysNode && existsSync(sysNode)) {
+					return `node:${sysNode}`;
+				}
+			} catch (_) {}
+		}
+
+		console.log("No JS runtime installation found.");
 
 		return "";
 	}
