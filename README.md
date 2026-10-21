@@ -142,7 +142,7 @@ Translations into other languages would be highly appreciated. If you want to he
 | Finnish             | ✔️     |
 | Hindi               | ✔️     |
 | French              | ✔️     |
-| Finnish             | ✔️     |
+| Nepali              | ✔️     |
 | German              | ✔️     |
 | Greek               | ✔️     |
 | Hungarian           | ✔️     |
