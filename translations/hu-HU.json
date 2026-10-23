@@ -321,5 +321,10 @@
 	"history": "Előzmények",
 	"invalidUrl": "Érvénytelen URL",
 	"queued": "Sorban áll",
-	"autoDownloadOnPaste": "Automatikus letöltés beillesztéskor"
+	"autoDownloadOnPaste": "Automatikus letöltés beillesztéskor",
+	"overallProgress": "Overall Progress",
+	"autoScroll": "Auto-scroll",
+	"autoScrollDownloads": "Auto-scroll downloads",
+	"autoScrollSubtitle": "Automatically scroll to follow items currently downloading",
+	"completed": "Completed"
 }

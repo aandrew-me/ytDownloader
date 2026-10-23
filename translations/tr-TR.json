@@ -321,5 +321,10 @@
 	"history": "Geçmiş",
 	"invalidUrl": "Geçersiz URL",
 	"queued": "Kuyrukta",
-	"autoDownloadOnPaste": "Yapıştırıldığında otomatik indir"
+	"autoDownloadOnPaste": "Yapıştırıldığında otomatik indir",
+	"overallProgress": "Overall Progress",
+	"autoScroll": "Auto-scroll",
+	"autoScrollDownloads": "Auto-scroll downloads",
+	"autoScrollSubtitle": "Automatically scroll to follow items currently downloading",
+	"completed": "Completed"
 }

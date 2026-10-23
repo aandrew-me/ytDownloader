@@ -321,5 +321,10 @@
 	"history": "Historia",
 	"invalidUrl": "URL baliogabea",
 	"queued": "Ilaran",
-	"autoDownloadOnPaste": "Deskarga automatikoa itsastean"
+	"autoDownloadOnPaste": "Deskarga automatikoa itsastean",
+	"overallProgress": "Overall Progress",
+	"autoScroll": "Auto-scroll",
+	"autoScrollDownloads": "Auto-scroll downloads",
+	"autoScrollSubtitle": "Automatically scroll to follow items currently downloading",
+	"completed": "Completed"
 }

@@ -321,5 +321,10 @@
 	"history": "تاریخچه",
 	"invalidUrl": "نشانی نامعتبر",
 	"queued": "در صف",
-	"autoDownloadOnPaste": "دانلود خودکار هنگام جای‌گذاری"
+	"autoDownloadOnPaste": "دانلود خودکار هنگام جای‌گذاری",
+	"overallProgress": "Overall Progress",
+	"autoScroll": "Auto-scroll",
+	"autoScrollDownloads": "Auto-scroll downloads",
+	"autoScrollSubtitle": "Automatically scroll to follow items currently downloading",
+	"completed": "Completed"
 }

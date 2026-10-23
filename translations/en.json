@@ -321,5 +321,10 @@
 	"history": "History",
 	"invalidUrl": "Invalid URL",
 	"queued": "Queued",
-	"autoDownloadOnPaste": "Auto download on paste"
+	"autoDownloadOnPaste": "Auto download on paste",
+	"overallProgress": "Overall Progress",
+	"autoScroll": "Auto-scroll",
+	"autoScrollDownloads": "Auto-scroll downloads",
+	"autoScrollSubtitle": "Automatically scroll to follow items currently downloading",
+	"completed": "Completed"
 }

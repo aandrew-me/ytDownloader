@@ -918,6 +918,19 @@ function initPreferences() {
 		},
 	);
 
+	bindCheckboxToStorage(
+		"autoScrollDownloads",
+		"autoScrollDownloads",
+		"true",
+		"false",
+		(checked) => {
+			document.querySelectorAll(".autoscroll-toggle-btn").forEach((btn) => {
+				btn.classList.toggle("active", checked);
+			});
+		},
+		true,
+	);
+
 	if (localStorage.getItem("closeToTray") === "true") {
 		ipcRenderer.send("useTray", true);
 	}

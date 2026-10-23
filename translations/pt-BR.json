@@ -321,5 +321,10 @@
 	"history": "Histórico",
 	"invalidUrl": "URL inválida",
 	"queued": "Na fila",
-	"autoDownloadOnPaste": "Download automático ao colar"
+	"autoDownloadOnPaste": "Download automático ao colar",
+	"overallProgress": "Progresso geral",
+	"autoScroll": "Rolagem automática",
+	"autoScrollDownloads": "Rolagem automática de downloads",
+	"autoScrollSubtitle": "Rolar automaticamente para seguir os itens sendo baixados",
+	"completed": "Concluído"
 }

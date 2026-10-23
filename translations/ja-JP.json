@@ -321,5 +321,10 @@
 	"history": "履歴",
 	"invalidUrl": "無効なURL",
 	"queued": "待機中",
-	"autoDownloadOnPaste": "貼り付け時に自動ダウンロード"
+	"autoDownloadOnPaste": "貼り付け時に自動ダウンロード",
+	"overallProgress": "全体の進捗",
+	"autoScroll": "自動スクロール",
+	"autoScrollDownloads": "ダウンロードの自動スクロール",
+	"autoScrollSubtitle": "現在ダウンロード中のアイテムを自動的に追従スクロールします",
+	"completed": "完了"
 }

@@ -321,5 +321,10 @@
 	"history": "Ιστορικό",
 	"invalidUrl": "Μη έγκυρο URL",
 	"queued": "Στην ουρά",
-	"autoDownloadOnPaste": "Αυτόματη λήψη κατά την επικόλληση"
+	"autoDownloadOnPaste": "Αυτόματη λήψη κατά την επικόλληση",
+	"overallProgress": "Overall Progress",
+	"autoScroll": "Auto-scroll",
+	"autoScrollDownloads": "Auto-scroll downloads",
+	"autoScrollSubtitle": "Automatically scroll to follow items currently downloading",
+	"completed": "Completed"
 }
