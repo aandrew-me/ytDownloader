@@ -300,11 +300,12 @@ test.describe("Compressor Page Tests", () => {
 		expect(outputPath.toLowerCase().includes("video_uppercase_compressed.mp4")).toBe(true);
 	});
 
-	test("audio format selection passes -c:a audio-only to ffmpeg command", async () => {
+	test("no video format saves the selected audio and drops the picture", async () => {
 		await attachTestFile(page);
 
 		await page.click('button[data-quality="balanced"]');
-		await page.selectOption("#audio-format", "audio-only");
+		await page.selectOption("#file_extension", "no-video");
+		await page.selectOption("#audio-format", "mp3");
 
 		await clearExecutedCommands(page);
 
@@ -315,11 +316,10 @@ test.describe("Compressor Page Tests", () => {
 		expect(commands.length).toBeGreaterThan(0);
 		const ffmpegCmd = commands[commands.length - 1];
 
-		expect(ffmpegCmd).toContain("-c:a");
-		const caIndex = ffmpegCmd.indexOf("-c:a");
-		expect(ffmpegCmd[caIndex + 1]).toBe("mp3");
-
 		expect(ffmpegCmd).toContain("-vn");
 		expect(ffmpegCmd).not.toContain("-c:v");
+		const caIndex = ffmpegCmd.indexOf("-c:a");
+		expect(ffmpegCmd[caIndex + 1]).toBe("mp3");
+		expect(ffmpegCmd[ffmpegCmd.length - 1].endsWith(".mp3")).toBe(true);
 	});
 });
