@@ -467,4 +467,22 @@ export function scrollItemIntoView(element) {
 	element.scrollIntoView({ behavior: "smooth", block: "center" });
 }
 
+/**
+ * Converts a timestamp string (HH:MM:SS, MM:SS, or SS) to seconds.
+ * @param {string} timeStr
+ * @returns {number}
+ */
+export function timeToSeconds(timeStr) {
+	if (!timeStr) return 0;
+	const parts = timeStr.trim().split(":").map(parseFloat);
+	if (parts.length === 3) {
+		return (parts[0] || 0) * 3600 + (parts[1] || 0) * 60 + (parts[2] || 0);
+	} else if (parts.length === 2) {
+		return (parts[0] || 0) * 60 + (parts[1] || 0);
+	} else if (parts.length === 1) {
+		return parts[0] || 0;
+	}
+	return 0;
+}
+
 

@@ -1,4 +1,4 @@
-import { getId, formatBytes, getFfmpegPath, getFfprobePath } from "./utils.js";
+import { getId, formatBytes, getFfmpegPath, getFfprobePath, timeToSeconds } from "./utils.js";
 
 const {
 	spawn,
@@ -953,21 +953,6 @@ function createProgressItem(filename, status, data, itemId) {
 	dom.compressionStatus.scrollIntoView({behavior: "smooth", block: "end"});
 }
 
-/**
- * @param {string} timeStr
- */
-function timeToSeconds(timeStr) {
-	if (!timeStr) return 0;
-	const parts = timeStr.split(":").map(parseFloat);
-	if (parts.length === 3) {
-		return (parts[0] || 0) * 3600 + (parts[1] || 0) * 60 + (parts[2] || 0);
-	} else if (parts.length === 2) {
-		return (parts[0] || 0) * 60 + (parts[1] || 0);
-	} else if (parts.length === 1) {
-		return parts[0] || 0;
-	}
-	return 0;
-}
 
 dom.outputFolderInput.addEventListener("change", (e) => {
 	const checked = e.target.checked;
