@@ -3,6 +3,7 @@ import {
 	escapeHtml,
 	showPopup,
 	formatTime,
+	timeToSeconds,
 	formatVideoCodec,
 	formatBitrate,
 	formatHasAudio,
@@ -2140,6 +2141,72 @@ class YtDownloaderApp {
 					.replace(/(^["'])|(["']$)/g, "");
 		});
 
+		const isTrimJob = Boolean(
+			job?.options?.rangeOption && job?.options?.rangeCmd,
+		);
+		let targetDuration = 0;
+		if (isTrimJob) {
+			const cleanRange = job.options.rangeCmd.replace(/^\*/, "");
+			const parts = cleanRange.split("-");
+			if (parts.length >= 2) {
+				const startSec = timeToSeconds(parts[0]);
+				const endSec =
+					parts[1] === "inf"
+						? Number(job.duration) || 0
+						: timeToSeconds(parts[1]);
+				if (endSec > startSec) {
+					targetDuration = endSec - startSec;
+				}
+			}
+		}
+
+		let lastFfmpegSpeed = "";
+		downloadProcess.ytDlpProcess.stderr?.on?.("data", (data) => {
+			if (controller?.isPaused || controller?.signal?.aborted) return;
+			const dataStr = data.toString();
+
+			if (isTrimJob) {
+				const timeMatches = [
+					...dataStr.matchAll(/time=\s*(\d+(?::\d+){1,2}(?:\.\d+)?)/g),
+				];
+				if (timeMatches.length > 0) {
+					const lastTime = timeMatches[timeMatches.length - 1][1];
+					const currentSeconds = timeToSeconds(lastTime);
+
+					const speedMatches = [
+						...dataStr.matchAll(/speed=\s*([0-9.]+(?:\s*x)?)/gi),
+					];
+					if (speedMatches.length > 0) {
+						const rawSpeed = speedMatches[speedMatches.length - 1][1].trim();
+						if (rawSpeed && rawSpeed !== "N/A") {
+							lastFfmpegSpeed = rawSpeed.endsWith("x")
+								? rawSpeed
+								: `${rawSpeed}x`;
+						}
+					}
+
+					if (targetDuration > 0 && Number.isFinite(currentSeconds)) {
+						const rawPercent = (currentSeconds / targetDuration) * 100;
+						if (Number.isFinite(rawPercent)) {
+							const percent = Math.min(
+								99,
+								Math.max(0, rawPercent),
+							);
+							this._updateProgressUI(randomId, {
+								percent,
+								currentSpeed: lastFfmpegSpeed,
+							});
+						}
+					} else if (lastTime) {
+						this._updateProgressUI(randomId, {
+							statusText: `${i18n.__("downloading") || "Downloading..."} ${lastTime}`,
+							currentSpeed: lastFfmpegSpeed,
+						});
+					}
+				}
+			}
+		});
+
 		downloadProcess
 			.on("progress", (progress) => {
 				this._updateProgressUI(randomId, progress);
@@ -3555,7 +3622,7 @@ class YtDownloaderApp {
 					}
                     <span class="itemType">${i18n.__(
 						job.type === "video" ? "video" : "audio",
-					)}</span>
+					)}${job?.options?.rangeCmd ? ` • ${escapeHtml(job.options.rangeCmd.replace("*", ""))}` : ""}</span>
                 </div>
                 <div class="itemTopActions">
                     ${
@@ -3679,7 +3746,12 @@ class YtDownloaderApp {
 		const fillEl = $(`${randomId}_fill`);
 		if (!fillEl) return;
 
-		if (progress.percent === 100) {
+		const hasValidPercent =
+			typeof progress?.percent === "number" &&
+			Number.isFinite(progress.percent) &&
+			!Number.isNaN(progress.percent);
+
+		if (hasValidPercent && progress.percent === 100) {
 			fillEl.style.width = "100%";
 			if (speedEl) speedEl.textContent = "";
 			if (statusEl) statusEl.textContent = i18n.__("processing") || "Processing...";
@@ -3688,16 +3760,25 @@ class YtDownloaderApp {
 			return;
 		}
 
-		const percentNum = typeof progress.percent === "number" ? Math.round(progress.percent) : 0;
 		if (statusEl) {
-			statusEl.textContent = `${i18n.__("downloading") || "Downloading..."} ${percentNum}%`;
+			if (progress?.statusText) {
+				statusEl.textContent = progress.statusText;
+			} else if (hasValidPercent) {
+				const percentNum = Math.round(progress.percent);
+				statusEl.textContent = `${i18n.__("downloading") || "Downloading..."} ${percentNum}%`;
+			} else {
+				statusEl.textContent = i18n.__("downloading") || "Downloading...";
+			}
 		}
-		if (speedEl) {
-			speedEl.textContent = progress.currentSpeed ? `${progress.currentSpeed}` : "";
-		}
-		fillEl.style.width = `${progress.percent}%`;
 
-		ipcRenderer.send("progress", progress.percent / 100);
+		if (speedEl) {
+			speedEl.textContent = progress?.currentSpeed ? `${progress.currentSpeed}` : "";
+		}
+
+		if (hasValidPercent) {
+			fillEl.style.width = `${progress.percent}%`;
+			ipcRenderer.send("progress", progress.percent / 100);
+		}
 	}
 
 	/**

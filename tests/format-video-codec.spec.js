@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { formatVideoCodec, buildCodecFilter, getJsRuntimePath } from "../src/utils.js";
+import { formatVideoCodec, buildCodecFilter, getJsRuntimePath, timeToSeconds } from "../src/utils.js";
 
 test.describe("formatVideoCodec", () => {
 	test("maps AVC/H.264 codecs properly", () => {
@@ -149,5 +149,37 @@ test.describe("getJsRuntimePath macOS", () => {
 		} finally {
 			global.window = originalWindow;
 		}
+	});
+});
+
+test.describe("timeToSeconds", () => {
+	test("parses HH:MM:SS, MM:SS, and seconds with decimals", () => {
+		expect(timeToSeconds("01:23:45")).toBe(5025);
+		expect(timeToSeconds("00:01:30")).toBe(90);
+		expect(timeToSeconds("10:20")).toBe(620);
+		expect(timeToSeconds("45")).toBe(45);
+		expect(timeToSeconds("00:00:01.92")).toBeCloseTo(1.92);
+		expect(timeToSeconds("01:30.5")).toBeCloseTo(90.5);
+	});
+
+	test("handles null, empty, and invalid strings gracefully", () => {
+		expect(timeToSeconds("")).toBe(0);
+		expect(timeToSeconds(null)).toBe(0);
+		expect(timeToSeconds(undefined)).toBe(0);
+	});
+
+	test("correctly computes section duration from rangeCmd", () => {
+		const computeDuration = (rangeCmd, totalDuration) => {
+			const clean = rangeCmd.replace(/^\*/, "");
+			const parts = clean.split("-");
+			const startSec = timeToSeconds(parts[0]);
+			const endSec = parts[1] === "inf" ? (totalDuration || 0) : timeToSeconds(parts[1]);
+			return Math.max(0, endSec - startSec);
+		};
+
+		expect(computeDuration("*00:10-00:20", 120)).toBe(10);
+		expect(computeDuration("*10-25", 120)).toBe(15);
+		expect(computeDuration("*00:30-inf", 120)).toBe(90);
+		expect(computeDuration("*01:00:00-01:30:00", 7200)).toBe(1800);
 	});
 });
