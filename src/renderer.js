@@ -2052,6 +2052,12 @@ class YtDownloaderApp {
 			if (statusEl) {
 				statusEl.textContent = i18n.__("downloading") || "Downloading...";
 				statusEl.classList.remove("status-error");
+				statusEl.onclick = null;
+				statusEl.onkeydown = null;
+				statusEl.removeAttribute("role");
+				statusEl.removeAttribute("tabindex");
+				statusEl.removeAttribute("title");
+				$(`${randomId}_errBtn`)?.remove();
 			}
 			const pauseBtn = $(`${randomId}_pause`);
 			if (pauseBtn) {
@@ -2907,13 +2913,49 @@ class YtDownloaderApp {
 		const statusEl = $(`${randomId}_status`) || $(`${randomId}_prog`);
 		const fillEl = $(`${randomId}_fill`);
 		const speedEl = $(`${randomId}_speed`);
+		const itemTitle = $(`${randomId}_title`)?.textContent || "Video";
+		const errorMessage = error?.message || String(error || "Unknown error");
+
 		if (statusEl) {
-			statusEl.textContent = i18n.__("errorHoverForDetails");
-			statusEl.title = error.message;
+			statusEl.textContent = i18n.__("errorClickForDetails");
+			statusEl.title = i18n.__("errorDetails") || "Error Details";
 			statusEl.classList.add("status-error");
+			statusEl.setAttribute("role", "button");
+			statusEl.setAttribute("tabindex", "0");
+			const openErr = () => this._showErrorModal(itemTitle, errorMessage);
+			statusEl.onclick = openErr;
+			statusEl.onkeydown = (e) => {
+				if (e.key === "Enter" || e.key === " ") {
+					e.preventDefault();
+					openErr();
+				}
+			};
 		}
 		if (speedEl) speedEl.textContent = "";
 		if (fillEl) fillEl.style.background = "var(--redBtn, #ef4444)";
+
+		let errBtn = $(`${randomId}_errBtn`);
+		if (!errBtn) {
+			const metaRight = $(`${randomId}`)?.querySelector(".itemMetaRight");
+			if (metaRight) {
+				errBtn = document.createElement("button");
+				errBtn.id = `${randomId}_errBtn`;
+				errBtn.className = "errMetaBtn";
+				errBtn.type = "button";
+				errBtn.title = i18n.__("errorDetails") || "Error Details";
+				errBtn.setAttribute("aria-label", i18n.__("errorDetails") || "Error Details");
+				errBtn.innerHTML = `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
+				const cmdBtn = $(`${randomId}_cmdMetaBtn`);
+				if (cmdBtn) {
+					cmdBtn.insertAdjacentElement("beforebegin", errBtn);
+				} else {
+					metaRight.appendChild(errBtn);
+				}
+			}
+		}
+		if (errBtn) {
+			errBtn.onclick = () => this._showErrorModal(itemTitle, errorMessage);
+		}
 		this.state.downloadedItems.add(randomId);
 		this._updateClearAllButton();
 		if (wasActive) {
@@ -3590,6 +3632,97 @@ class YtDownloaderApp {
 					if (copyTextEl) copyTextEl.textContent = i18n.__("clickToCopy") || "Copy Command";
 				}, 2000);
 			}
+		});
+	}
+
+	/**
+	 * Shows a modal dialog displaying download error details with a one-click copy option.
+	 * @param {string} title The video or task title.
+	 * @param {string} errorMessage The formatted error message.
+	 */
+	_showErrorModal(title, errorMessage) {
+		const existingModal = document.getElementById("errModalBackdrop");
+		if (existingModal) existingModal.remove();
+
+		const safeTitle = escapeHtml(title || "Download Error");
+		const safeErr = escapeHtml(errorMessage || "Unknown error occurred.");
+		const modalHTML = `
+            <div id="errModalBackdrop" class="cmd-modal-backdrop">
+                <div class="cmd-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="errModalTitle">
+                    <div class="cmd-modal-header">
+                        <div class="cmd-modal-title" id="errModalTitle" style="color: var(--redBtn, #ef4444);">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="8" x2="12" y2="12"></line>
+                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                            </svg>
+                            <span>${i18n.__("errorDetails") || "Error Details"}</span>
+                        </div>
+                        <button class="cmd-modal-close" id="errModalCloseBtn" aria-label="Close" title="${i18n.__("close") || "Close"}">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="cmd-modal-body">
+                        <div style="font-size: 13px; font-weight: 500; opacity: 0.85; margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${safeTitle}</div>
+                        <pre class="cmd-code-box err-code-box" id="errCodeText"><code>${safeErr}</code></pre>
+                    </div>
+                    <div class="cmd-modal-footer">
+                        <button class="cmd-modal-btn cmd-modal-btn-close" id="errModalCancelBtn" type="button">${i18n.__("close") || "Close"}</button>
+                        <button class="cmd-modal-btn cmd-modal-btn-copy" id="errModalCopyBtn" type="button">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                            </svg>
+                            <span id="errModalCopyText">${i18n.__("clickToCopy") || "Copy Error"}</span>
+                        </button>
+                    </div>
+                </div>
+            </div>`;
+
+		document.body.insertAdjacentHTML("beforeend", modalHTML);
+		const backdrop = document.getElementById("errModalBackdrop");
+
+		// Trigger entrance animation
+		requestAnimationFrame(() => {
+			backdrop?.classList.add("active");
+		});
+
+		const closeModal = () => {
+			backdrop?.classList.remove("active");
+			document.removeEventListener("keydown", onKeyDown);
+			setTimeout(() => backdrop?.remove(), 200);
+		};
+
+		const onKeyDown = (e) => {
+			if (e.key === "Escape") {
+				closeModal();
+			}
+		};
+		document.addEventListener("keydown", onKeyDown);
+
+		document.getElementById("errModalCloseBtn")?.addEventListener("click", closeModal);
+		document.getElementById("errModalCancelBtn")?.addEventListener("click", closeModal);
+		backdrop?.addEventListener("click", (e) => {
+			if (e.target === backdrop) closeModal();
+		});
+
+		document.getElementById("errModalCopyBtn")?.addEventListener("click", () => {
+			const clipApi = window.electronAPI?.clipboard || clipboard;
+			const textToCopy = errorMessage || "";
+			if (clipApi) {
+				clipApi.writeText(textToCopy);
+			} else if (navigator?.clipboard?.writeText) {
+				navigator.clipboard.writeText(textToCopy);
+			}
+			const copyTextEl = document.getElementById("errModalCopyText");
+			if (copyTextEl) copyTextEl.textContent = i18n.__("copiedText") || "Copied!";
+			this._showPopup(i18n.__("copiedText") || "Copied text");
+			setTimeout(() => {
+				if (copyTextEl) copyTextEl.textContent = i18n.__("clickToCopy") || "Copy Error";
+			}, 2000);
 		});
 	}
 
