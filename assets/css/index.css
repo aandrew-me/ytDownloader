@@ -896,6 +896,36 @@ img {
 	color: var(--redBtn, #ef4444);
 	opacity: 1;
 	font-weight: 600;
+	cursor: pointer;
+	text-decoration: underline;
+	text-decoration-style: dotted;
+	text-underline-offset: 3px;
+	transition: opacity 0.2s ease;
+}
+
+.itemProgStatus.status-error:hover {
+	opacity: 0.8;
+}
+
+.errMetaBtn {
+	background: var(--box-separation, rgba(255, 255, 255, 0.08));
+	border: 1px solid var(--box-separation, rgba(255, 255, 255, 0.12));
+	color: var(--redBtn, #ef4444);
+	border-radius: 6px;
+	cursor: pointer;
+	padding: 3px 6px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	opacity: 0.85;
+	transition: opacity 0.2s ease, transform 0.15s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.errMetaBtn:hover {
+	opacity: 1;
+	background-color: rgba(239, 68, 68, 0.15);
+	border-color: var(--redBtn, #ef4444);
+	transform: translateY(-1px);
 }
 
 .itemMetaRight {
@@ -1110,6 +1140,11 @@ img {
 	max-height: 220px;
 	overflow-y: auto;
 	user-select: text;
+}
+
+.cmd-code-box.err-code-box {
+	color: color-mix(in srgb, var(--text) 85%, var(--redBtn, #ef4444));
+	max-height: 280px;
 }
 
 .cmd-modal-footer {
