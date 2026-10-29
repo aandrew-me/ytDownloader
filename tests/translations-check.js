@@ -59,6 +59,7 @@ const sidebarButtons = [
   'compressorWin',
   'historyWin',
   'preferenceWin',
+  'logsWin',
   'aboutWin'
 ];
 

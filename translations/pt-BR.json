@@ -326,5 +326,12 @@
 	"autoScroll": "Rolagem automática",
 	"autoScrollDownloads": "Rolagem automática de downloads",
 	"autoScrollSubtitle": "Rolar automaticamente para seguir os itens sendo baixados",
-	"completed": "Concluído"
+	"completed": "Concluído",
+	"logs": "Logs",
+	"reportIssue": "Report Issue on GitHub",
+	"copyLogs": "Copy Logs",
+	"clearLogs": "Clear Logs",
+	"noLogsYet": "No logs recorded yet.",
+	"logsCopied": "Logs copied to clipboard!",
+	"openingGithub": "Opening GitHub Issues..."
 }

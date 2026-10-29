@@ -326,5 +326,12 @@
 	"autoScroll": "自動スクロール",
 	"autoScrollDownloads": "ダウンロードの自動スクロール",
 	"autoScrollSubtitle": "現在ダウンロード中のアイテムを自動的に追従スクロールします",
-	"completed": "完了"
+	"completed": "完了",
+	"logs": "Logs",
+	"reportIssue": "Report Issue on GitHub",
+	"copyLogs": "Copy Logs",
+	"clearLogs": "Clear Logs",
+	"noLogsYet": "No logs recorded yet.",
+	"logsCopied": "Logs copied to clipboard!",
+	"openingGithub": "Opening GitHub Issues..."
 }

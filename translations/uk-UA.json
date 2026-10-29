@@ -326,5 +326,12 @@
 	"autoScroll": "Автопрокручування",
 	"autoScrollDownloads": "Автопрокручування завантажень",
 	"autoScrollSubtitle": "Автоматично прокручувати до поточних завантажень",
-	"completed": "Завершено"
+	"completed": "Завершено",
+	"logs": "Logs",
+	"reportIssue": "Report Issue on GitHub",
+	"copyLogs": "Copy Logs",
+	"clearLogs": "Clear Logs",
+	"noLogsYet": "No logs recorded yet.",
+	"logsCopied": "Logs copied to clipboard!",
+	"openingGithub": "Opening GitHub Issues..."
 }

@@ -1801,7 +1801,13 @@ class YtDownloaderApp {
 
 		try {
 			const metadata = await this._fetchVideoMetadata(safeUrl);
-			console.log(metadata);
+			console.log("yt-dlp video info fetched:", {
+				id: metadata.id,
+				title: metadata.title,
+				extractor: metadata.extractor_key,
+				duration: metadata.duration,
+				formatsCount: metadata.formats?.length || 0,
+			});
 
 			const isLive = Boolean(
 				metadata.is_live ||

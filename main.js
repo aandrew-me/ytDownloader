@@ -41,6 +41,47 @@ if (isTestEnv) {
 const USER_DATA_PATH = app.getPath("userData");
 const CONFIG_FILE_PATH = path.join(USER_DATA_PATH, "ytdownloader.json");
 
+const mainLogs = [];
+const origMainConsole = { log: console.log, warn: console.warn, error: console.error };
+
+function formatMainLogArg(arg) {
+	if (arg instanceof Error) {
+		return arg.stack || `${arg.name}: ${arg.message}`;
+	}
+	if (typeof arg === "object" && arg !== null) {
+		try {
+			const str = JSON.stringify(arg);
+			return str.length > 1500 ? str.slice(0, 1500) + "... [truncated]" : str;
+		} catch (_) {
+			return String(arg);
+		}
+	}
+	if (typeof arg === "string") {
+		return arg.length > 2000 ? arg.slice(0, 2000) + "... [truncated]" : arg;
+	}
+	return String(arg);
+}
+["log", "warn", "error"].forEach((level) => {
+	console[level] = (...args) => {
+		origMainConsole[level](...args);
+		try {
+			const message = args.map(formatMainLogArg).join(" ");
+			const entry = {
+			time: new Date().toLocaleTimeString(),
+			level,
+			source: "main",
+			message,
+		};
+			mainLogs.push(entry);
+		if (mainLogs.length > 100) mainLogs.shift();
+		if (appState?.mainWindow && !appState.mainWindow.isDestroyed()) {
+			appState.mainWindow.webContents.send("main-log-entry", entry);
+		}
+	} catch (_) {
+		}
+	};
+});
+
 const appState = {
 	/** @type {BrowserWindow | null} */
 	mainWindow: null,
@@ -312,6 +353,7 @@ function configureAutoUpdaterChannel(channel = "stable") {
 }
 
 function registerIpcHandlers() {
+	ipcMain.handle("get-main-logs", () => mainLogs);
 	ipcMain.on("autoUpdate", (_event, status) => {
 		appState.autoUpdateEnabled = status;
 
