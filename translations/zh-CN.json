@@ -326,5 +326,12 @@
 	"autoScroll": "自动滚动",
 	"autoScrollDownloads": "下载自动滚动",
 	"autoScrollSubtitle": "自动滚动以跟踪当前正在下载的项目",
-	"completed": "已完成"
+	"completed": "已完成",
+	"logs": "Logs",
+	"reportIssue": "Report Issue on GitHub",
+	"copyLogs": "Copy Logs",
+	"clearLogs": "Clear Logs",
+	"noLogsYet": "No logs recorded yet.",
+	"logsCopied": "Logs copied to clipboard!",
+	"openingGithub": "Opening GitHub Issues..."
 }

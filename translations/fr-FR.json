@@ -326,5 +326,12 @@
 	"autoScroll": "Défilement auto",
 	"autoScrollDownloads": "Défilement automatique des téléchargements",
 	"autoScrollSubtitle": "Faire défiler automatiquement pour suivre les éléments en cours de téléchargement",
-	"completed": "Terminé"
+	"completed": "Terminé",
+	"logs": "Logs",
+	"reportIssue": "Report Issue on GitHub",
+	"copyLogs": "Copy Logs",
+	"clearLogs": "Clear Logs",
+	"noLogsYet": "No logs recorded yet.",
+	"logsCopied": "Logs copied to clipboard!",
+	"openingGithub": "Opening GitHub Issues..."
 }

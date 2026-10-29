@@ -326,5 +326,12 @@
 	"autoScroll": "Desplazamiento automático",
 	"autoScrollDownloads": "Desplazamiento automático de descargas",
 	"autoScrollSubtitle": "Desplazar automáticamente para seguir los elementos que se están descargando",
-	"completed": "Completado"
+	"completed": "Completado",
+	"logs": "Logs",
+	"reportIssue": "Report Issue on GitHub",
+	"copyLogs": "Copy Logs",
+	"clearLogs": "Clear Logs",
+	"noLogsYet": "No logs recorded yet.",
+	"logsCopied": "Logs copied to clipboard!",
+	"openingGithub": "Opening GitHub Issues..."
 }

@@ -30,6 +30,10 @@ export function switchView(targetViewId) {
 		window.initCompressorGPU();
 	}
 
+	if (targetViewId === "view-logs" && typeof window.updateLogsUI === "function") {
+		window.updateLogsUI();
+	}
+
 	if (targetViewId === "view-playlist" && window.playlistDownloader) {
 		window.playlistDownloader.initUI();
 		window.playlistDownloader.loadInitialConfig();
