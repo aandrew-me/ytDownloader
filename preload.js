@@ -314,6 +314,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	sep: path.sep,
 
 	os: {
+		arch: () => os.arch(),
+		release: () => os.release(),
 		platform: () => os.platform(),
 		homedir: () => os.homedir(),
 		tmpdir: () => os.tmpdir(),

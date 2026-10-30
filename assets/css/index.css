@@ -6630,3 +6630,209 @@ body.rtl .header-core {
 	color: #f59e0b;
 }
 
+/* ── Application Logs Page ─────────────────────────────────── */
+.logs-container {
+	display: flex;
+	flex-direction: column;
+	height: calc(100vh - 40px);
+	padding: 24px 32px;
+	box-sizing: border-box;
+	overflow: hidden;
+	position: relative;
+	text-align: left;
+}
+
+.logs-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 16px;
+	margin-bottom: 14px;
+	flex-wrap: wrap;
+}
+
+.logs-title-wrap {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.logs-title {
+	font-size: 1.5rem;
+	font-weight: 700;
+	color: var(--text);
+	margin: 0;
+}
+
+.logs-count-badge {
+	background: var(--box-toggleOn);
+	color: var(--text);
+	padding: 3px 10px;
+	border-radius: 12px;
+	font-size: 0.8rem;
+	font-weight: 600;
+	border: 1px solid var(--box-separation);
+}
+
+.logs-actions {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex-wrap: wrap;
+}
+
+.logs-sysinfo-bar {
+	display: flex;
+	gap: 8px;
+	flex-wrap: wrap;
+	margin-bottom: 14px;
+}
+
+.logs-sys-item {
+	background: var(--box-main);
+	border: 1px solid var(--box-separation);
+	border-radius: 8px;
+	padding: 6px 12px;
+	font-size: 0.82rem;
+	color: var(--text);
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+}
+
+.logs-viewer-wrap {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+	position: relative;
+}
+
+.logs-console {
+	flex: 1;
+	background: var(--box-toggle, #191c22);
+	border: 1px solid var(--box-separation);
+	border-radius: 10px;
+	padding: 16px 22px;
+	font-family: "JetBrains", Consolas, "Courier New", monospace;
+	font-size: 0.82rem;
+	line-height: 1.5;
+	overflow-y: auto;
+	overflow-x: auto;
+	user-select: text;
+	white-space: pre-wrap;
+	word-break: break-word;
+	text-align: left;
+}
+
+.logs-empty {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+	color: var(--text);
+	opacity: 0.5;
+	font-size: 0.95rem;
+}
+
+.log-entry {
+	display: flex;
+	align-items: flex-start;
+	gap: 12px;
+	padding: 5px 8px;
+	border-bottom: 1px solid rgba(128, 128, 128, 0.1);
+	font-size: 0.82rem;
+	justify-content: flex-start;
+	text-align: left;
+}
+
+.log-entry:last-child {
+	border-bottom: none;
+}
+
+.log-time {
+	color: var(--text);
+	opacity: 0.5;
+	font-size: 0.78rem;
+	flex-shrink: 0;
+}
+
+.log-source {
+	background: var(--box-main);
+	border: 1px solid var(--box-separation);
+	color: var(--text);
+	font-size: 0.7rem;
+	font-weight: 700;
+	padding: 1px 4px;
+	border-radius: 3px;
+	flex-shrink: 0;
+}
+
+.log-level {
+	font-size: 0.72rem;
+	font-weight: 700;
+	padding: 1px 6px;
+	border-radius: 4px;
+	flex-shrink: 0;
+	text-transform: uppercase;
+}
+
+.log-level-log {
+	color: var(--text);
+	background: rgba(128, 128, 128, 0.18);
+}
+
+.log-level-info {
+	color: var(--blueBtn);
+	background: rgba(59, 130, 246, 0.15);
+}
+
+.log-level-warn {
+	color: #eab308;
+	background: rgba(234, 179, 8, 0.15);
+}
+
+.log-level-error {
+	color: var(--redBtn);
+	background: rgba(220, 38, 38, 0.15);
+}
+
+.log-msg {
+	flex: 1;
+	color: var(--text);
+	text-align: left;
+	padding-left: 8px;
+}
+
+.logs-toast {
+	position: absolute;
+	bottom: 36px;
+	left: 50%;
+	transform: translateX(-50%);
+	background: var(--blueBtn);
+	color: #fff;
+	padding: 10px 20px;
+	border-radius: 8px;
+	font-size: 0.88rem;
+	font-weight: 600;
+	box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+	pointer-events: none;
+	z-index: 100;
+	animation: fadeInToast 0.2s ease;
+}
+
+@keyframes fadeInToast {
+	from {
+		opacity: 0;
+		transform: translate(-50%, 8px);
+	}
+	to {
+		opacity: 1;
+		transform: translate(-50%, 0);
+	}
+}
+
+#updateCheckStatus.status-available {
+	color: #f59e0b;
+}
+

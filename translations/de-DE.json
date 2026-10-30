@@ -326,5 +326,12 @@
 	"autoScroll": "Automatischer Bildlauf",
 	"autoScrollDownloads": "Automatischer Bildlauf bei Downloads",
 	"autoScrollSubtitle": "Automatisch scrollen, um aktuell herunterladende Elemente zu verfolgen",
-	"completed": "Abgeschlossen"
+	"completed": "Abgeschlossen",
+	"logs": "Logs",
+	"reportIssue": "Report Issue on GitHub",
+	"copyLogs": "Copy Logs",
+	"clearLogs": "Clear Logs",
+	"noLogsYet": "No logs recorded yet.",
+	"logsCopied": "Logs copied to clipboard!",
+	"openingGithub": "Opening GitHub Issues..."
 }
