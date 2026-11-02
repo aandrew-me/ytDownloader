@@ -97,11 +97,26 @@ function killProcessSafely(proc, signal) {
 	}
 }
 
+function getSafeCwd(explicitCwd) {
+	if (explicitCwd) return explicitCwd;
+	try {
+		const home = os.homedir();
+		if (home && path.isAbsolute(home)) {
+			const dir = path.join(home, ".ytDownloader");
+			if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+			fs.accessSync(dir, fs.constants.W_OK);
+			return dir;
+		}
+	} catch (_) {}
+	return os.tmpdir();
+}
+
 function createYTDlpWrapInstance(binaryPath) {
 	const instance = new YTDlpWrap(binaryPath);
 	return {
 		exec: (args = [], options = {}, cancellationSignal) => {
 			const { options: localOpts, signal: realSignal } = normalizeSignal(options, cancellationSignal);
+			localOpts.cwd = getSafeCwd(localOpts.cwd);
 			const proc = instance.exec(args, localOpts, realSignal);
 			const spawnargs =
 				proc.ytDlpProcess && proc.ytDlpProcess.spawnargs
@@ -168,6 +183,7 @@ function createYTDlpWrapInstance(binaryPath) {
 		},
 		execPromise: (args = [], options = {}, cancellationSignal) => {
 			const { options: localOpts, signal: realSignal } = normalizeSignal(options, cancellationSignal);
+			localOpts.cwd = getSafeCwd(localOpts.cwd);
 			return instance.execPromise(args, localOpts, realSignal);
 		},
 		getExtractorTitles: () => {
@@ -194,7 +210,8 @@ const YTDlpWrapBridge = {
 };
 
 const spawnWrapper = (command, args = [], options = {}) => {
-	const child = spawn(command, args, options);
+	const safeOpts = { ...options, cwd: getSafeCwd(options?.cwd) };
+	const child = spawn(command, args, safeOpts);
 	const childWrapper = {
 		stdout: {
 			on: (event, cb) => {
