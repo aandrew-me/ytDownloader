@@ -1281,8 +1281,6 @@ class YtDownloaderApp {
 				);
 				if (systemProxy) {
 					prefs.proxy = systemProxy;
-
-					console.log("Using system proxy:", systemProxy);
 				}
 			} catch (err) {
 				console.error("Failed to get system proxy:", err);

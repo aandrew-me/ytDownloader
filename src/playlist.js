@@ -1671,7 +1671,6 @@ const playlistDownloader = {
 			try {
 				const proxy = await ipcRenderer.invoke("get-system-proxy");
 				if (proxy) {
-					console.log("Using system proxy: " + proxy);
 					this.config.proxy = proxy;
 				}
 			} catch (err) {
