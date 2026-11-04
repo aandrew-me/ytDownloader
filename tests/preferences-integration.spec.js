@@ -110,6 +110,7 @@ test.describe("Preferences Integration Tests", () => {
 		// Switch showMoreFormats = true via localStorage and reload page
 		await page.evaluate(() => localStorage.setItem("showMoreFormats", "true"));
 		await page.reload();
+		await page.waitForFunction(() => window.app?.isInitialized);
 
 		await page.evaluate((url) => window.electronAPI.clipboard.writeText(url), testUrl);
 		await triggerClick(page, "pasteUrl");

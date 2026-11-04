@@ -78,11 +78,11 @@ async function launchApp(customLocalStorage = {}, customMetadata = DEFAULT_MOCK_
 			"--no-sandbox",
 			"--disable-gpu",
 		],
-		env: {
-			...process.env,
-			NODE_ENV: "test",
-			YTDOWNLOADER_TEST: "true",
-		},
+		env: (() => {
+			const e = { ...process.env, NODE_ENV: "test", YTDOWNLOADER_TEST: "true" };
+			delete e.ELECTRON_RUN_AS_NODE;
+			return e;
+		})(),
 	});
 
 	const page = await app.firstWindow();
