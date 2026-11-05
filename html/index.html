@@ -385,6 +385,35 @@
 
                     <div id="advanced">
                         <div class="home-advanced-panel">
+                            <!-- Available Chapters -->
+                            <div id="chaptersSection" class="home-advanced-card" style="display: none;">
+                                <div class="home-advanced-header" style="justify-content: space-between;">
+                                    <div class="chapters-header-left">
+                                        <svg class="home-advanced-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <line x1="8" y1="6" x2="21" y2="6"></line>
+                                            <line x1="8" y1="12" x2="21" y2="12"></line>
+                                            <line x1="8" y1="18" x2="21" y2="18"></line>
+                                            <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                                            <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                                            <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                                        </svg>
+                                        <strong class="home-toggle-title">Chapters</strong>
+                                        <span id="chaptersBadge" class="chapters-badge">0</span>
+                                    </div>
+                                    <div class="chapters-header-actions">
+                                        <button type="button" class="chapters-btn-link" id="chaptersSelectAllBtn">Select all</button>
+                                        <span class="chapters-action-sep">•</span>
+                                        <button type="button" class="chapters-btn-link" id="chaptersDeselectAllBtn">Deselect all</button>
+                                    </div>
+                                </div>
+                                <div id="chaptersList" class="chapters-list"></div>
+                                <div class="chapters-footer">
+                                    <button type="button" id="downloadChaptersBtn" class="btn chapters-download-btn" disabled>
+                                        Download Selected Chapters (0)
+                                    </button>
+                                </div>
+                            </div>
+
                             <!-- Download Particular Time-Range -->
                             <div class="home-advanced-card">
                                 <div class="home-advanced-header">

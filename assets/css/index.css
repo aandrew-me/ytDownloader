@@ -2858,6 +2858,218 @@ button {
 	box-shadow: 0 0 0 3px color-mix(in srgb, var(--blueBtn) 22%, transparent);
 }
 
+.home-chapters-container {
+	background: var(--box-main);
+	border: 1px solid var(--box-separation);
+	border-radius: 12px;
+	padding: 14px 18px;
+	margin-top: 14px;
+	margin-bottom: 14px;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	text-align: left;
+	box-sizing: border-box;
+}
+
+.chapters-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.chapters-header-left {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.chapters-icon {
+	opacity: 0.8;
+	color: var(--text);
+}
+
+.chapters-title {
+	font-size: 14px;
+	font-weight: 600;
+	color: var(--text);
+}
+
+.chapters-badge {
+	background: var(--blueBtn);
+	color: #ffffff;
+	font-size: 11px;
+	font-weight: 600;
+	padding: 2px 8px;
+	border-radius: 10px;
+}
+
+.chapters-header-actions {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 12px;
+}
+
+.chapters-btn-link {
+	background: none;
+	border: none;
+	color: var(--blueBtn);
+	cursor: pointer;
+	font-size: 12px;
+	padding: 2px 4px;
+	font-family: inherit;
+	transition: opacity 0.15s ease;
+}
+
+.chapters-btn-link:hover {
+	opacity: 0.8;
+	text-decoration: underline;
+}
+
+.chapters-action-sep {
+	color: var(--text);
+	opacity: 0.4;
+}
+
+.chapters-list {
+	max-height: 200px;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	padding-right: 4px;
+	scrollbar-width: thin;
+	scrollbar-color: var(--box-separation) transparent;
+}
+
+.chapters-list::-webkit-scrollbar {
+	width: 6px;
+}
+
+.chapters-list::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+.chapters-list::-webkit-scrollbar-thumb {
+	background: var(--box-separation);
+	border-radius: 6px;
+}
+
+.chapters-list::-webkit-scrollbar-thumb:hover {
+	background: var(--item-bg);
+}
+
+.chapter-row {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 9px 12px;
+	border-radius: 8px;
+	background: var(--background);
+	border: 1px solid var(--box-separation);
+	cursor: pointer;
+	user-select: none;
+	transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.chapter-row:hover {
+	border-color: var(--blueBtn);
+}
+
+.chapter-row.selected {
+	border-color: var(--blueBtn);
+	background: color-mix(in srgb, var(--blueBtn) 8%, var(--background));
+}
+
+.chapter-cb {
+	appearance: none;
+	-webkit-appearance: none;
+	width: 18px;
+	height: 18px;
+	border: 2px solid var(--box-separation, #555);
+	border-radius: 5px;
+	background-color: var(--box-main, #222);
+	cursor: pointer;
+	margin: 0;
+	padding: 0;
+	position: static;
+	display: inline-grid;
+	place-content: center;
+	flex-shrink: 0;
+	transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.chapter-cb:hover {
+	border-color: var(--blueBtn);
+	box-shadow: 0 0 0 2px color-mix(in srgb, var(--blueBtn) 20%, transparent);
+}
+
+.chapter-cb:checked {
+	background-color: var(--blueBtn);
+	border-color: var(--blueBtn);
+}
+
+.chapter-cb:checked::before {
+	content: "";
+	width: 9px;
+	height: 5px;
+	border-left: 2px solid #ffffff;
+	border-bottom: 2px solid #ffffff;
+	transform: rotate(-45deg) translate(0.5px, -1px);
+}
+
+.chapter-cb:focus-visible {
+	outline: none;
+	box-shadow: 0 0 0 3px color-mix(in srgb, var(--blueBtn) 35%, transparent);
+}
+
+.chapter-row-title {
+	flex: 1;
+	font-size: 13px;
+	color: var(--text);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.chapter-row-time {
+	font-size: 12px;
+	color: var(--text);
+	opacity: 0.8;
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+	padding: 2px 6px;
+	background: var(--box-main);
+	border-radius: 4px;
+	border: 1px solid var(--box-separation);
+}
+
+.chapters-footer {
+	display: flex;
+	justify-content: flex-end;
+	margin-top: 4px;
+}
+
+.chapters-download-btn {
+	padding: 8px 16px;
+	font-size: 13px;
+	font-weight: 600;
+	border-radius: 8px;
+	background-color: var(--blueBtn);
+	color: #ffffff;
+	border: none;
+	cursor: pointer;
+	transition: opacity 0.15s ease;
+}
+
+.chapters-download-btn:disabled {
+	opacity: 0.45;
+	cursor: not-allowed;
+}
+
 .advancedItem {
 	border-radius: 15px;
 	padding: 20px;
