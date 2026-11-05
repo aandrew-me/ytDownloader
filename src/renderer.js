@@ -82,6 +82,13 @@ const CONSTANTS = {
 		VIDEO_DOWNLOAD_BTN: "videoDownload",
 		AUDIO_DOWNLOAD_BTN: "audioDownload",
 		EXTRACT_BTN: "extractBtn",
+		// Chapters
+		CHAPTERS_SECTION: "chaptersSection",
+		CHAPTERS_LIST: "chaptersList",
+		CHAPTERS_BADGE: "chaptersBadge",
+		CHAPTERS_SELECT_ALL_BTN: "chaptersSelectAllBtn",
+		CHAPTERS_DESELECT_ALL_BTN: "chaptersDeselectAllBtn",
+		DOWNLOAD_CHAPTERS_BTN: "downloadChaptersBtn",
 		// Audio Extraction
 		EXTRACT_SELECTION: "extractSelection",
 		EXTRACT_QUALITY_SELECT: "extractQualitySelect",
@@ -193,6 +200,7 @@ class YtDownloaderApp {
 				duration: 0,
 				extractor_key: "",
 				url: "",
+				chapters: [],
 			},
 			// Download options
 			downloadOptions: {
@@ -1513,6 +1521,20 @@ class YtDownloaderApp {
 			this.handleDownloadRequest("extract"),
 		);
 
+		// Chapters actions
+		$(CONSTANTS.DOM_IDS.CHAPTERS_SELECT_ALL_BTN)?.addEventListener(
+			"click",
+			() => this._toggleAllChapters(true),
+		);
+		$(CONSTANTS.DOM_IDS.CHAPTERS_DESELECT_ALL_BTN)?.addEventListener(
+			"click",
+			() => this._toggleAllChapters(false),
+		);
+		$(CONSTANTS.DOM_IDS.DOWNLOAD_CHAPTERS_BTN)?.addEventListener(
+			"click",
+			() => this._downloadSelectedChapters(),
+		);
+
 		// UI controls
 		$(CONSTANTS.DOM_IDS.CLOSE_HIDDEN_BTN)?.addEventListener("click", () =>
 			this._hideInfoPanel(),
@@ -1827,6 +1849,7 @@ class YtDownloaderApp {
 				duration: durationInt,
 				is_live: isLive,
 				extractor_key: metadata.extractor_key,
+				chapters: Array.isArray(metadata.chapters) ? metadata.chapters : [],
 				infoJsonPath: metadata._infoJsonPath || null,
 				infoJsonFetchedAt: metadata._infoJsonFetchedAt || null,
 			};
@@ -2704,7 +2727,19 @@ class YtDownloaderApp {
 				template = audioOutputTemplate;
 			}
 
-			if (rangeCmd) {
+			if (job.chapterTitle) {
+				const safeChapter = String(job.chapterTitle)
+					.replace(/[/\\?%*:|"<>]/g, "_")
+					.trim();
+				if (template.includes(".%(ext)s")) {
+					template = template.replace(
+						".%(ext)s",
+						` - ${safeChapter}.%(ext)s`,
+					);
+				} else {
+					template += ` - ${safeChapter}`;
+				}
+			} else if (rangeCmd) {
 				let rangeTxt = rangeCmd.replace("*", "");
 				if (platform() === "win32")
 					rangeTxt = rangeTxt.replace(/:/g, "_");
@@ -3084,6 +3119,15 @@ class YtDownloaderApp {
 		const noAudioTxt = i18n.__("noAudio");
 		$(CONSTANTS.DOM_IDS.AUDIO_FOR_VIDEO_FORMAT_SELECT).innerHTML =
 			`<option value="none|none">${noAudioTxt}</option>`;
+		if (this.state.videoInfo) {
+			this.state.videoInfo.chapters = [];
+		}
+		const chaptersSec = $(CONSTANTS.DOM_IDS.CHAPTERS_SECTION);
+		if (chaptersSec) {
+			chaptersSec.style.display = "none";
+			const list = $(CONSTANTS.DOM_IDS.CHAPTERS_LIST);
+			if (list) list.innerHTML = "";
+		}
 		const pasteBtn = $(CONSTANTS.DOM_IDS.PASTE_URL_BTN);
 		if (pasteBtn) pasteBtn.disabled = true;
 	}
@@ -3507,7 +3551,209 @@ class YtDownloaderApp {
 		hiddenPanel.style.display = "inline-block";
 		hiddenPanel.classList.remove("scaleUp", "scale", "fade-out");
 		hiddenPanel.classList.add("fade-in");
+		this._renderChaptersUI();
 		this._updateEmptyStateUI();
+	}
+
+	/**
+	 * Renders available chapters if any exist in videoInfo.
+	 */
+	_renderChaptersUI() {
+		const chaptersSection = $(CONSTANTS.DOM_IDS.CHAPTERS_SECTION);
+		const chaptersList = $(CONSTANTS.DOM_IDS.CHAPTERS_LIST);
+		const badge = $(CONSTANTS.DOM_IDS.CHAPTERS_BADGE);
+
+		if (!chaptersSection || !chaptersList) return;
+
+		const chapters = this.state.videoInfo?.chapters;
+		if (!Array.isArray(chapters) || chapters.length === 0) {
+			chaptersSection.style.display = "none";
+			chaptersList.innerHTML = "";
+			return;
+		}
+
+		if (badge) badge.textContent = String(chapters.length);
+		chaptersList.innerHTML = "";
+
+		chapters.forEach((chapter, index) => {
+			const row = document.createElement("label");
+			row.className = "chapter-row";
+			row.htmlFor = `chapter_cb_${index}`;
+
+			const cb = document.createElement("input");
+			cb.type = "checkbox";
+			cb.className = "chapter-cb";
+			cb.id = `chapter_cb_${index}`;
+			cb.dataset.index = String(index);
+			cb.addEventListener("change", () => {
+				row.classList.toggle("selected", cb.checked);
+				this._updateChaptersButtonState();
+			});
+
+			const titleSpan = document.createElement("span");
+			titleSpan.className = "chapter-row-title";
+			const titleText = chapter.title || `Chapter ${index + 1}`;
+			titleSpan.textContent = titleText;
+			titleSpan.title = titleText;
+
+			const timeSpan = document.createElement("span");
+			timeSpan.className = "chapter-row-time";
+			const startSec = Math.max(0, Math.floor(chapter.start_time || 0));
+			const endSec = Math.max(
+				startSec,
+				Math.floor(
+					chapter.end_time || this.state.videoInfo.duration || 0,
+				),
+			);
+			timeSpan.textContent = `${this._formatTime(startSec)} - ${this._formatTime(endSec)}`;
+
+			row.append(cb, titleSpan, timeSpan);
+			chaptersList.appendChild(row);
+		});
+
+		this._updateChaptersButtonState();
+		chaptersSection.style.display = "flex";
+	}
+
+	/**
+	 * Updates the chapter download button label and disabled state.
+	 */
+	_updateChaptersButtonState() {
+		const downloadBtn = $(CONSTANTS.DOM_IDS.DOWNLOAD_CHAPTERS_BTN);
+		if (!downloadBtn) return;
+		const checkedCount = document.querySelectorAll(
+			"#chaptersList .chapter-cb:checked",
+		).length;
+		downloadBtn.disabled = checkedCount === 0;
+		downloadBtn.textContent = `Download Selected Chapters (${checkedCount})`;
+	}
+
+	/**
+	 * Toggles all chapter checkboxes.
+	 * @param {boolean} select
+	 */
+	_toggleAllChapters(select) {
+		const cbs = document.querySelectorAll("#chaptersList .chapter-cb");
+		cbs.forEach((cb) => {
+			cb.checked = select;
+			const row = cb.closest(".chapter-row");
+			if (row) row.classList.toggle("selected", select);
+		});
+		this._updateChaptersButtonState();
+	}
+
+	/**
+	 * Downloads only the selected chapters as individual jobs.
+	 */
+	_downloadSelectedChapters() {
+		const checked = Array.from(
+			document.querySelectorAll("#chaptersList .chapter-cb:checked"),
+		);
+		if (checked.length === 0) return;
+
+		const chapters = this.state.videoInfo.chapters || [];
+		const isAudioTab = $("audioList")?.style.display !== "none";
+		const type = isAudioTab ? "audio" : "video";
+
+		this._updateDownloadOptionsFromUI();
+		this._hideInfoPanel(true);
+
+		const presetQuality = document.getElementById("presetQualitySelect")?.value;
+		const presetFormat = document.getElementById("presetFormatSelect")?.value;
+		const videoFormatVal =
+			$(CONSTANTS.DOM_IDS.VIDEO_FORMAT_SELECT)?.value ||
+			(presetQuality ? presetQuality : "1080");
+		const audioFormatVal =
+			$(CONSTANTS.DOM_IDS.AUDIO_FORMAT_SELECT)?.value ||
+			presetFormat ||
+			"mp3";
+		const extractFormatVal =
+			$(CONSTANTS.DOM_IDS.EXTRACT_SELECTION)?.value ||
+			presetFormat ||
+			"mp3";
+
+		const baseSnapshot = {
+			videoFormat: videoFormatVal,
+			audioForVideoFormat:
+				$(CONSTANTS.DOM_IDS.AUDIO_FOR_VIDEO_FORMAT_SELECT)?.value ||
+				"best",
+			audioFormat: audioFormatVal,
+			extractFormat: extractFormatVal,
+			extractQuality:
+				$(CONSTANTS.DOM_IDS.EXTRACT_QUALITY_SELECT)?.value || "0",
+			outputFormat:
+				$(CONSTANTS.DOM_IDS.HOME_OUTPUT_FORMAT_SELECT)?.value || "auto",
+		};
+
+		const customArgs =
+			$("customArgsInputHome")?.value?.trim() ||
+			$(CONSTANTS.DOM_IDS.CUSTOM_ARGS_INPUT)?.value?.trim() ||
+			"";
+
+		checked.forEach((cb) => {
+			const index = parseInt(cb.dataset.index, 10);
+			const chapter = chapters[index];
+			if (!chapter) return;
+
+			const startSec = Math.max(0, Math.floor(chapter.start_time || 0));
+			const endSec = Math.max(
+				startSec,
+				Math.floor(
+					chapter.end_time || this.state.videoInfo.duration || 0,
+				),
+			);
+			const startTimeStr = this._formatTime(startSec);
+			const endTimeStr = this._formatTime(endSec);
+			const chapterNum = index + 1;
+			const rawTitle = chapter.title?.trim() || `Chapter ${chapterNum}`;
+			const hasIndexPrefix = new RegExp(
+				`^(chapter\\s+0*${chapterNum}|0*${chapterNum})([\\.\\s\\-_:]|$)`,
+				"i",
+			).test(rawTitle);
+			const chapterTitle = hasIndexPrefix
+				? rawTitle
+				: `${chapterNum}. ${rawTitle}`;
+
+			const chapterJob = {
+				type,
+				url: this.state.videoInfo.url,
+				title: `${this.state.videoInfo.title} - ${chapterTitle}`,
+				chapterTitle,
+				chapterIndex: chapterNum,
+				channel: this.state.videoInfo.channel,
+				thumbnail: this.state.videoInfo.thumbnail,
+				duration: Math.max(1, endSec - startSec),
+				infoJsonPath: this.state.videoInfo.infoJsonPath,
+				infoJsonFetchedAt: this.state.videoInfo.infoJsonFetchedAt,
+				options: {
+					...this.state.downloadOptions,
+					rangeOption: "--download-sections",
+					rangeCmd: `*${startTimeStr}-${endTimeStr}`,
+				},
+				isAuto: false,
+				isBatch: false,
+				presetQuality:
+					presetQuality || this.state.batchPreset.quality || "1080",
+				presetFormat:
+					presetFormat ||
+					this.state.batchPreset.format ||
+					(type === "video" ? "mp4" : "mp3"),
+				videoCodec:
+					this.state.preferences?.videoCodec ||
+					localStorage.getItem(
+						CONSTANTS.LOCAL_STORAGE_KEYS.PREFERRED_VIDEO_CODEC,
+					) ||
+					"avc1",
+				uiSnapshot: {...baseSnapshot},
+				customArgs,
+			};
+
+			if (this.state.currentDownloads < this.state.maxActiveDownloads) {
+				this._startDownload(chapterJob);
+			} else {
+				this._queueDownload(chapterJob);
+			}
+		});
 	}
 
 	/**
@@ -3759,7 +4005,7 @@ class YtDownloaderApp {
 					}
                     <span class="itemType">${i18n.__(
 						job.type === "video" ? "video" : "audio",
-					)}${job?.options?.rangeCmd ? ` • ${escapeHtml(job.options.rangeCmd.replace("*", ""))}` : ""}</span>
+					)}${job?.chapterTitle ? ` • ${escapeHtml(job.chapterTitle)}` : (job?.options?.rangeCmd ? ` • ${escapeHtml(job.options.rangeCmd.replace("*", ""))}` : "")}</span>
                 </div>
                 <div class="itemTopActions">
                     ${

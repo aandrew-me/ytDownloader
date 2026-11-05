@@ -538,5 +538,143 @@ test.describe("Main Page Download Tests", () => {
 		expect(downloadCmd).toContain("*00:10-00:20");
 		expect(downloadCmd).toContain("--force-keyframes-at-cuts");
 	});
+
+	test("displays available chapters and downloads selected chapter with --download-sections", async () => {
+		const testUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+
+		await page.evaluate(() => {
+			window.__mockMetadata = {
+				...window.__mockMetadata,
+				chapters: [
+					{ start_time: 0, end_time: 30, title: "Intro Chapter" },
+					{ start_time: 30, end_time: 90, title: "Main Chapter" },
+				],
+			};
+		});
+
+		await page.evaluate((url) => {
+			window.electronAPI.clipboard.writeText(url);
+		}, testUrl);
+
+		await page.click("#pasteUrl");
+		await waitForInfoPanel(page);
+
+		// Open "More options" to view chapters menu
+		await triggerClick(page, "advancedVideoToggle");
+
+		const chaptersVisible = await page.isVisible("#chaptersSection");
+		expect(chaptersVisible).toBe(true);
+
+		const chapterCount = await page.locator("#chaptersList .chapter-row").count();
+		expect(chapterCount).toBe(2);
+
+		await page.check("#chapter_cb_1");
+
+		const downloadBtnText = await page.textContent("#downloadChaptersBtn");
+		expect(downloadBtnText).toContain("(1)");
+
+		await clearExecutedCommands(page);
+		await page.click("#downloadChaptersBtn");
+
+		await page.waitForFunction(() => {
+			const cmds = window.__executedCommands || [];
+			return cmds.some((cmd) => cmd.includes("--download-sections"));
+		});
+
+		const commands = await getExecutedCommands(page);
+		const downloadCmd = commands.find((cmd) => cmd.includes("--download-sections"));
+		expect(downloadCmd).toBeDefined();
+		expect(downloadCmd).toContain("--download-sections");
+		expect(downloadCmd).toContain("*00:30-01:30");
+		expect(downloadCmd).toContain("--force-keyframes-at-cuts");
+		expect(downloadCmd).toContain("%(title)s - 2. Main Chapter.%(ext)s");
+	});
+
+	test("chapters with identical titles receive distinct filenames", async () => {
+		const testUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+
+		await page.evaluate(() => {
+			window.__mockMetadata = {
+				...window.__mockMetadata,
+				chapters: [
+					{ start_time: 10, end_time: 40, title: "Chorus" },
+					{ start_time: 40, end_time: 70, title: "Verse" },
+					{ start_time: 70, end_time: 100, title: "Chorus" },
+				],
+			};
+		});
+
+		await page.evaluate((url) => {
+			window.electronAPI.clipboard.writeText(url);
+		}, testUrl);
+
+		await page.click("#pasteUrl");
+		await waitForInfoPanel(page);
+
+		await triggerClick(page, "advancedVideoToggle");
+
+		// Select both "Chorus" chapters (index 0 and index 2)
+		await page.check("#chapter_cb_0");
+		await page.check("#chapter_cb_2");
+
+		await clearExecutedCommands(page);
+		await page.click("#downloadChaptersBtn");
+
+		await page.waitForFunction(() => {
+			const cmds = window.__executedCommands || [];
+			return cmds.filter((cmd) => cmd.includes("--download-sections")).length >= 2;
+		});
+
+		const commands = await getExecutedCommands(page);
+		const downloadCmds = commands.filter((cmd) => cmd.includes("--download-sections"));
+		expect(downloadCmds.length).toBe(2);
+
+		const filenames = downloadCmds.map((cmd) => {
+			const oIdx = cmd.indexOf("-o");
+			return oIdx !== -1 ? cmd[oIdx + 1] : "";
+		});
+
+		expect(filenames).toContain("%(title)s - 1. Chorus.%(ext)s");
+		expect(filenames).toContain("%(title)s - 3. Chorus.%(ext)s");
+	});
+
+	test("chapters titled only by index are not double-numbered", async () => {
+		const testUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+
+		await page.evaluate(() => {
+			window.__mockMetadata = {
+				...window.__mockMetadata,
+				chapters: [
+					{ start_time: 0, end_time: 30, title: "1" },
+					{ start_time: 30, end_time: 60, title: "2" },
+				],
+			};
+		});
+
+		await page.evaluate((url) => {
+			window.electronAPI.clipboard.writeText(url);
+		}, testUrl);
+
+		await page.click("#pasteUrl");
+		await waitForInfoPanel(page);
+
+		await triggerClick(page, "advancedVideoToggle");
+
+		await page.check("#chapter_cb_1");
+
+		await clearExecutedCommands(page);
+		await page.click("#downloadChaptersBtn");
+
+		await page.waitForFunction(() => {
+			const cmds = window.__executedCommands || [];
+			return cmds.some((cmd) => cmd.includes("--download-sections"));
+		});
+
+		const commands = await getExecutedCommands(page);
+		const downloadCmd = commands.find((cmd) => cmd.includes("--download-sections"));
+		expect(downloadCmd).toBeDefined();
+		expect(downloadCmd).toContain("%(title)s - 2.%(ext)s");
+		expect(downloadCmd).not.toContain("%(title)s - 2. 2.%(ext)s");
+	});
 });
 
