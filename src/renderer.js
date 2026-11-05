@@ -3592,7 +3592,8 @@ class YtDownloaderApp {
 
 			const titleSpan = document.createElement("span");
 			titleSpan.className = "chapter-row-title";
-			const titleText = chapter.title || `Chapter ${index + 1}`;
+			const defaultChapterName = (i18n?.__("chapter") || "Chapter").trim();
+			const titleText = chapter.title || `${defaultChapterName} ${index + 1}`;
 			titleSpan.textContent = titleText;
 			titleSpan.title = titleText;
 
@@ -3625,7 +3626,9 @@ class YtDownloaderApp {
 			"#chaptersList .chapter-cb:checked",
 		).length;
 		downloadBtn.disabled = checkedCount === 0;
-		downloadBtn.textContent = `Download Selected Chapters (${checkedCount})`;
+		const baseDownloadText =
+			i18n?.__("downloadSelectedChapters") || "Download Selected Chapters";
+		downloadBtn.textContent = `${baseDownloadText} (${checkedCount})`;
 	}
 
 	/**
@@ -3705,9 +3708,15 @@ class YtDownloaderApp {
 			const startTimeStr = this._formatTime(startSec);
 			const endTimeStr = this._formatTime(endSec);
 			const chapterNum = index + 1;
-			const rawTitle = chapter.title?.trim() || `Chapter ${chapterNum}`;
+			const defaultChapterName = (i18n?.__("chapter") || "Chapter").trim();
+			const rawTitle =
+				chapter.title?.trim() || `${defaultChapterName} ${chapterNum}`;
+			const escapedDefault = defaultChapterName.replace(
+				/[.*+?^${}()|[\]\\]/g,
+				"\\$&",
+			);
 			const hasIndexPrefix = new RegExp(
-				`^(chapter\\s+0*${chapterNum}|0*${chapterNum})([\\.\\s\\-_:]|$)`,
+				`^((chapter|${escapedDefault})\\s+0*${chapterNum}|0*${chapterNum})([\\.\\s\\-_:]|$)`,
 				"i",
 			).test(rawTitle);
 			const chapterTitle = hasIndexPrefix

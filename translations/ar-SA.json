@@ -333,5 +333,8 @@
 	"clearLogs": "Clear Logs",
 	"noLogsYet": "No logs recorded yet.",
 	"logsCopied": "Logs copied to clipboard!",
-	"openingGithub": "Opening GitHub Issues..."
+	"openingGithub": "Opening GitHub Issues...",
+	"chapters": "الفصول",
+	"chapter": "فصل",
+	"downloadSelectedChapters": "تنزيل الفصول المحددة"
 }

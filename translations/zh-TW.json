@@ -333,5 +333,8 @@
 	"clearLogs": "Clear Logs",
 	"noLogsYet": "No logs recorded yet.",
 	"logsCopied": "Logs copied to clipboard!",
-	"openingGithub": "Opening GitHub Issues..."
+	"openingGithub": "Opening GitHub Issues...",
+	"chapters": "章節",
+	"chapter": "章節",
+	"downloadSelectedChapters": "下載所選章節"
 }

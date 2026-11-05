@@ -333,5 +333,8 @@
 	"clearLogs": "Clear Logs",
 	"noLogsYet": "No logs recorded yet.",
 	"logsCopied": "Logs copied to clipboard!",
-	"openingGithub": "Opening GitHub Issues..."
+	"openingGithub": "Opening GitHub Issues...",
+	"chapters": "अध्यायहरू",
+	"chapter": "अध्याय",
+	"downloadSelectedChapters": "छानिएका अध्यायहरू डाउनलोड गर्नुहोस्"
 }
