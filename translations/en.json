@@ -336,5 +336,10 @@
 	"openingGithub": "Opening GitHub Issues...",
 	"chapters": "Chapters",
 	"chapter": "Chapter",
-	"downloadSelectedChapters": "Download Selected Chapters"
+	"downloadSelectedChapters": "Download Selected Chapters",
+	"entries": "entries",
+	"ready": "Ready",
+	"missing": "Missing",
+	"app": "App",
+	"os": "OS"
 }

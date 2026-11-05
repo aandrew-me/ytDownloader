@@ -185,28 +185,35 @@ export function updateLogsUI() {
 	if (typeof document === "undefined") return;
 
 	const diag = getSystemDiagnostics();
+	const appLabel = typeof window !== "undefined" && window.i18n?.__ ? window.i18n.__("app") : "App";
+	const osLabel = typeof window !== "undefined" && window.i18n?.__ ? window.i18n.__("os") : "OS";
+	const jsRuntimeLabel = typeof window !== "undefined" && window.i18n?.__ ? window.i18n.__("jsRuntime") : "JS Runtime";
+	const readyLabel = typeof window !== "undefined" && window.i18n?.__ ? window.i18n.__("ready") : "Ready";
+	const missingLabel = typeof window !== "undefined" && window.i18n?.__ ? window.i18n.__("missing") : "Missing";
+	const entriesLabel = typeof window !== "undefined" && window.i18n?.__ ? window.i18n.__("entries") : "entries";
+
 	const sysBar = document.getElementById("logsSysInfoBar");
 	if (sysBar) {
 		sysBar.innerHTML = `
-			<div class="logs-sys-item"><strong>App:</strong> v${escapeHtml(diag.version)}</div>
-			<div class="logs-sys-item"><strong>OS:</strong> ${escapeHtml(diag.platform)}</div>
-			<div class="logs-sys-item" title="${escapeHtml(diag.ytDlpPath)}"><strong>yt-dlp:</strong> ${diag.ytDlpPath !== "Not resolved" ? "✓ Ready" : "✗ Missing"}</div>
-			<div class="logs-sys-item" title="${escapeHtml(diag.ffmpegPath)}"><strong>FFmpeg:</strong> ${diag.ffmpegPath !== "Not resolved" ? "✓ Ready" : "✗ Missing"}</div>
-			<div class="logs-sys-item" title="${escapeHtml(diag.jsRuntimePath)}"><strong>JS Runtime:</strong> ${diag.jsRuntimePath !== "Not resolved" ? "✓ Ready" : "✗ Missing"}</div>
+			<div class="logs-sys-item"><strong>${escapeHtml(appLabel)}:</strong> v${escapeHtml(diag.version)}</div>
+			<div class="logs-sys-item"><strong>${escapeHtml(osLabel)}:</strong> ${escapeHtml(diag.platform)}</div>
+			<div class="logs-sys-item" title="${escapeHtml(diag.ytDlpPath)}"><strong>yt-dlp:</strong> ${diag.ytDlpPath !== "Not resolved" ? `✓ ${escapeHtml(readyLabel)}` : `✗ ${escapeHtml(missingLabel)}`}</div>
+			<div class="logs-sys-item" title="${escapeHtml(diag.ffmpegPath)}"><strong>FFmpeg:</strong> ${diag.ffmpegPath !== "Not resolved" ? `✓ ${escapeHtml(readyLabel)}` : `✗ ${escapeHtml(missingLabel)}`}</div>
+			<div class="logs-sys-item" title="${escapeHtml(diag.jsRuntimePath)}"><strong>${escapeHtml(jsRuntimeLabel)}:</strong> ${diag.jsRuntimePath !== "Not resolved" ? `✓ ${escapeHtml(readyLabel)}` : `✗ ${escapeHtml(missingLabel)}`}</div>
 		`;
 	}
 
 	const badge = document.getElementById("logsCountBadge");
 	if (badge) {
-		badge.textContent = `${logBuffer.length} entries`;
+		badge.textContent = `${logBuffer.length} ${entriesLabel}`;
 	}
 
 	const consoleEl = document.getElementById("logsConsole");
 	if (!consoleEl) return;
 
 	if (logBuffer.length === 0) {
-		const emptyText = window.i18n?.__ ? window.i18n.__("noLogsYet") : "No logs recorded yet.";
-		consoleEl.innerHTML = `<div class="logs-empty" id="logsEmptyState">${escapeHtml(emptyText)}</div>`;
+		const emptyText = typeof window !== "undefined" && window.i18n?.__ ? window.i18n.__("noLogsYet") : "No logs recorded yet.";
+		consoleEl.innerHTML = `<div class="logs-empty" id="logsEmptyState" data-translate="noLogsYet">${escapeHtml(emptyText)}</div>`;
 		return;
 	}
 
@@ -252,7 +259,8 @@ export function appendLogEntryToUI(entry) {
 
 	const badge = document.getElementById("logsCountBadge");
 	if (badge) {
-		badge.textContent = `${logBuffer.length} entries`;
+		const entriesLabel = typeof window !== "undefined" && window.i18n?.__ ? window.i18n.__("entries") : "entries";
+		badge.textContent = `${logBuffer.length} ${entriesLabel}`;
 	}
 }
 
@@ -321,6 +329,13 @@ if (typeof window !== "undefined") {
 		document.getElementById("clearLogsBtn")?.addEventListener("click", () => {
 			logBuffer.length = 0;
 			updateLogsUI();
+		});
+
+		document.addEventListener("translations-loaded", () => {
+			const viewLogs = document.getElementById("view-logs");
+			if (viewLogs && !viewLogs.classList.contains("hidden")) {
+				updateLogsUI();
+			}
 		});
 	});
 }

@@ -9,6 +9,7 @@ import {
 	buildIssueMarkdown,
 	buildGitHubIssueUrl,
 	getSystemDiagnostics,
+	updateLogsUI,
 } from "../src/logs.js";
 
 test.describe("Logs module formatting and handling", () => {
@@ -188,6 +189,57 @@ test.describe("Logs module formatting and handling", () => {
 		appendLogEntryToUI({ time: "12:00:01", level: "info", source: "renderer", message: "Overflow entry" });
 		expect(mockConsole.children.length).toBe(MAX_LOGS);
 
+		delete global.document;
+	});
+
+	test("updateLogsUI uses translated labels for sysbar and badge", () => {
+		const mockSysBar = { innerHTML: "" };
+		const mockBadge = { textContent: "" };
+		const mockConsole = { innerHTML: "" };
+
+		global.window = {
+			i18n: {
+				__: (key) => {
+					const dict = {
+						app: "Приложение",
+						os: "ОС",
+						jsRuntime: "Среда выполнения JS",
+						ready: "Готово",
+						missing: "Отсутствует",
+						entries: "записей",
+						noLogsYet: "Записей в журнале пока нет.",
+					};
+					return dict[key] || key;
+				},
+			},
+			AppBinaries: {
+				ytDlpPath: "/path/to/yt-dlp",
+				ffmpegPath: "Not resolved",
+				jsRuntimePath: "/path/to/node",
+			},
+		};
+
+		global.document = {
+			getElementById(id) {
+				if (id === "logsSysInfoBar") return mockSysBar;
+				if (id === "logsCountBadge") return mockBadge;
+				if (id === "logsConsole") return mockConsole;
+				return null;
+			},
+		};
+
+		logBuffer.length = 0;
+		updateLogsUI();
+
+		expect(mockBadge.textContent).toBe("0 записей");
+		expect(mockSysBar.innerHTML).toContain("<strong>Приложение:</strong>");
+		expect(mockSysBar.innerHTML).toContain("<strong>ОС:</strong>");
+		expect(mockSysBar.innerHTML).toContain("<strong>Среда выполнения JS:</strong>");
+		expect(mockSysBar.innerHTML).toContain("✓ Готово");
+		expect(mockSysBar.innerHTML).toContain("✗ Отсутствует");
+		expect(mockConsole.innerHTML).toContain("Записей в журнале пока нет.");
+
+		delete global.window;
 		delete global.document;
 	});
 });

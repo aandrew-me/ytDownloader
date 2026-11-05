@@ -85,4 +85,33 @@ for (const sf of srcFiles) {
   }
 }
 console.log('✓ All i18n.__ calls in src/ reference valid translation keys.');
+
+// 5. Check log page translation keys exist and are populated
+const logKeys = [
+  'logs',
+  'reportIssue',
+  'copyLogs',
+  'clearLogs',
+  'noLogsYet',
+  'logsCopied',
+  'openingGithub',
+  'entries',
+  'ready',
+  'missing',
+  'app',
+  'os'
+];
+for (const lk of logKeys) {
+  assert(enKeys.has(lk), `Expected log key "${lk}" in en.json`);
+}
+for (const file of jsonFiles) {
+  if (file === 'en.json') continue;
+  const filePath = path.join(transDir, file);
+  const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  for (const lk of logKeys) {
+    assert(data[lk] && data[lk].trim().length > 0, `${file} missing value for "${lk}"`);
+  }
+}
+console.log(`✓ All ${jsonFiles.length} translation files have populated log page keys.`);
+
 console.log('All checks passed successfully!');
