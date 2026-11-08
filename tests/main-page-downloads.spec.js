@@ -676,5 +676,247 @@ test.describe("Main Page Download Tests", () => {
 		expect(downloadCmd).toContain("%(title)s - 2.%(ext)s");
 		expect(downloadCmd).not.toContain("%(title)s - 2. 2.%(ext)s");
 	});
+
+	test("displays available subtitles, allows format selection, and downloads subtitles with download button", async () => {
+		const testUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+
+		await page.evaluate(() => {
+			window.__mockMetadata = {
+				...window.__mockMetadata,
+				subtitles: {
+					en: [{ ext: "vtt", name: "English" }],
+					es: [{ ext: "vtt", name: "Spanish" }],
+				},
+				automatic_captions: {},
+			};
+		});
+
+		await page.evaluate((url) => {
+			window.electronAPI.clipboard.writeText(url);
+		}, testUrl);
+
+		await page.click("#pasteUrl");
+		await waitForInfoPanel(page);
+
+		await triggerClick(page, "advancedVideoToggle");
+
+		const subSelect = page.locator("#subLanguageSelect");
+		await expect(subSelect).toBeEnabled();
+
+		const optionsCount = await page.locator("#subLanguageSelect option").count();
+		expect(optionsCount).toBe(3); // All Subtitles (2), English, Spanish
+
+		await page.selectOption("#subLanguageSelect", "es");
+		await page.selectOption("#subFormatSelect", "vtt");
+
+		const downloadBtn = page.locator("#downloadSubtitlesBtn");
+		await expect(downloadBtn).toBeEnabled();
+
+		await clearExecutedCommands(page);
+		await page.click("#downloadSubtitlesBtn");
+
+		await page.waitForFunction(() => {
+			const cmds = window.__executedCommands || [];
+			return cmds.some((cmd) => cmd.includes("--skip-download"));
+		});
+
+		const commands = await getExecutedCommands(page);
+		const subCmd = commands.find((cmd) => cmd.includes("--skip-download"));
+		expect(subCmd).toBeDefined();
+		expect(subCmd).toContain("--skip-download");
+		expect(subCmd).toContain("--write-subs");
+		expect(subCmd).toContain("--write-auto-subs");
+		expect(subCmd).toContain("--sub-format");
+		expect(subCmd).toContain("vtt/best");
+		expect(subCmd).toContain("--convert-subs");
+		expect(subCmd).toContain("vtt");
+		expect(subCmd).toContain("--sub-langs");
+		expect(subCmd).toContain("es");
+	});
+
+	test("download subtitles alongside video uses selected subtitle language and format", async () => {
+		const testUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+
+		await page.evaluate(() => {
+			window.__mockMetadata = {
+				...window.__mockMetadata,
+				subtitles: {
+					en: [{ ext: "vtt", name: "English" }],
+					fr: [{ ext: "vtt", name: "French" }],
+				},
+				automatic_captions: {},
+			};
+		});
+
+		await page.evaluate((url) => {
+			window.electronAPI.clipboard.writeText(url);
+		}, testUrl);
+
+		await page.click("#pasteUrl");
+		await waitForInfoPanel(page);
+
+		await triggerClick(page, "advancedVideoToggle");
+
+		await page.check("#subChecked");
+		await page.selectOption("#subLanguageSelect", "fr");
+		await page.selectOption("#subFormatSelect", "ass");
+
+		await clearExecutedCommands(page);
+		await triggerClick(page, "videoDownload");
+
+		await page.waitForFunction(() => {
+			const cmds = window.__executedCommands || [];
+			return cmds.length > 0;
+		});
+
+		const commands = await getExecutedCommands(page);
+		const downloadCmd = commands[commands.length - 1];
+
+		expect(downloadCmd).not.toContain("--skip-download");
+		expect(downloadCmd).toContain("--write-subs");
+		expect(downloadCmd).toContain("--write-auto-subs");
+		expect(downloadCmd).toContain("--sub-format");
+		expect(downloadCmd).toContain("ass/best");
+		expect(downloadCmd).toContain("--convert-subs");
+		expect(downloadCmd).toContain("ass");
+		expect(downloadCmd).toContain("--sub-langs");
+		expect(downloadCmd).toContain("fr");
+	});
+
+	test("downloading subtitles in .ass format resolves final file with .ass extension on completion", async () => {
+		const testUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+
+		await page.evaluate(() => {
+			window.__mockMetadata = {
+				...window.__mockMetadata,
+				subtitles: {
+					en: [{ ext: "vtt", name: "English" }],
+				},
+				automatic_captions: {},
+			};
+		});
+
+		await page.evaluate((url) => {
+			window.electronAPI.clipboard.writeText(url);
+		}, testUrl);
+
+		await page.click("#pasteUrl");
+		await waitForInfoPanel(page);
+
+		await triggerClick(page, "advancedVideoToggle");
+
+		await page.selectOption("#subFormatSelect", "ass");
+
+		await electronApp.evaluate(({ ipcMain }) => {
+			global.__lastShowFile = null;
+			ipcMain.prependListener("show-file", (_event, fullPath) => {
+				global.__lastShowFile = fullPath;
+			});
+		});
+
+		await clearExecutedCommands(page);
+		await page.click("#downloadSubtitlesBtn");
+
+		await page.waitForFunction(() => {
+			const openBtn = document.querySelector(".openFileBtn");
+			return openBtn && window.getComputedStyle(openBtn).display !== "none";
+		});
+
+		await page.locator(".openFileBtn").first().click();
+
+		const shownPath = await electronApp.evaluate(() => global.__lastShowFile);
+		expect(shownPath).toBeDefined();
+		expect(shownPath).toMatch(/\.ass$/);
+		expect(shownPath).not.toMatch(/\.vtt$/);
+	});
+
+	test("'All Subtitles' selection drops --write-auto-subs in command", async () => {
+		const testUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+
+		await page.evaluate(() => {
+			window.__mockMetadata = {
+				...window.__mockMetadata,
+				subtitles: {
+					en: [{ ext: "vtt", name: "English" }],
+					es: [{ ext: "vtt", name: "Spanish" }],
+				},
+				automatic_captions: {
+					fr: [{ ext: "vtt", name: "French" }],
+				},
+			};
+		});
+
+		await page.evaluate((url) => {
+			window.electronAPI.clipboard.writeText(url);
+		}, testUrl);
+
+		await page.click("#pasteUrl");
+		await waitForInfoPanel(page);
+
+		await triggerClick(page, "advancedVideoToggle");
+
+		await page.selectOption("#subLanguageSelect", "all");
+
+		await clearExecutedCommands(page);
+		await page.click("#downloadSubtitlesBtn");
+
+		await page.waitForFunction(() => {
+			const cmds = window.__executedCommands || [];
+			return cmds.some((cmd) => cmd.includes("--skip-download"));
+		});
+
+		const commands = await getExecutedCommands(page);
+		const subCmd = commands.find((cmd) => cmd.includes("--skip-download"));
+		expect(subCmd).toBeDefined();
+		expect(subCmd).toContain("--write-subs");
+		expect(subCmd).not.toContain("--write-auto-subs");
+		expect(subCmd).toContain("--sub-langs");
+		expect(subCmd).toContain("all");
+	});
+
+	test("subtitles download ignores trim slider range in filename template", async () => {
+		const testUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+
+		await page.evaluate(() => {
+			window.__mockMetadata = {
+				...window.__mockMetadata,
+				duration: 100,
+				subtitles: {
+					en: [{ ext: "vtt", name: "English" }],
+				},
+			};
+		});
+
+		await page.evaluate((url) => {
+			window.electronAPI.clipboard.writeText(url);
+		}, testUrl);
+
+		await page.click("#pasteUrl");
+		await waitForInfoPanel(page);
+
+		await triggerClick(page, "advancedVideoToggle");
+
+		// Set a trim range
+		await page.fill("#min-time", "00:10");
+		await page.fill("#max-time", "00:50");
+
+		await clearExecutedCommands(page);
+		await page.click("#downloadSubtitlesBtn");
+
+		await page.waitForFunction(() => {
+			const cmds = window.__executedCommands || [];
+			return cmds.some((cmd) => cmd.includes("--skip-download"));
+		});
+
+		const commands = await getExecutedCommands(page);
+		const subCmd = commands.find((cmd) => cmd.includes("--skip-download"));
+		expect(subCmd).toBeDefined();
+		expect(subCmd).not.toContain("--download-sections");
+		const oIndex = subCmd.indexOf("-o");
+		expect(oIndex).toBeGreaterThan(-1);
+		const templateArg = subCmd[oIndex + 1];
+		expect(templateArg).not.toContain("[00_10-00_50]");
+		expect(templateArg).toBe("%(title)s.%(ext)s");
+	});
 });
 

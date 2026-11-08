@@ -2836,7 +2836,9 @@ button {
 	border-radius: 8px;
 }
 
-#homeOutputFormatSelect {
+#homeOutputFormatSelect,
+.subtitles-select,
+.subtitles-format-select {
 	width: 100%;
 	max-width: 100%;
 	margin: 0;
@@ -2853,9 +2855,41 @@ button {
 	transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-#homeOutputFormatSelect:focus {
+#homeOutputFormatSelect:focus,
+.subtitles-select:focus,
+.subtitles-format-select:focus {
 	border-color: var(--blueBtn);
 	box-shadow: 0 0 0 3px color-mix(in srgb, var(--blueBtn) 22%, transparent);
+}
+
+.subtitles-select:disabled,
+.subtitles-format-select:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+.subtitles-header-left {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.subtitles-controls {
+	display: flex;
+	gap: 10px;
+	align-items: center;
+	flex-wrap: wrap;
+	margin-top: 4px;
+}
+
+.subtitles-select {
+	flex: 2;
+	min-width: 140px;
+}
+
+.subtitles-format-select {
+	flex: 1;
+	min-width: 100px;
 }
 
 .home-chapters-container {
