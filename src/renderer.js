@@ -101,6 +101,10 @@ const CONSTANTS = {
 		MAX_SLIDER: "max-slider",
 		SLIDER_RANGE_HIGHLIGHT: "range-highlight",
 		SUB_CHECKED: "subChecked",
+		SUB_LANGUAGE_SELECT: "subLanguageSelect",
+		SUB_FORMAT_SELECT: "subFormatSelect",
+		DOWNLOAD_SUBTITLES_BTN: "downloadSubtitlesBtn",
+		SUBTITLES_BADGE: "subtitlesBadge",
 		QUIT_CHECKED: "quitChecked",
 		// Popups
 		POPUP_BOX: "popupBox",
@@ -1535,6 +1539,12 @@ class YtDownloaderApp {
 			() => this._downloadSelectedChapters(),
 		);
 
+		// Subtitles action
+		$(CONSTANTS.DOM_IDS.DOWNLOAD_SUBTITLES_BTN)?.addEventListener(
+			"click",
+			() => this._downloadSubtitles(),
+		);
+
 		// UI controls
 		$(CONSTANTS.DOM_IDS.CLOSE_HIDDEN_BTN)?.addEventListener("click", () =>
 			this._hideInfoPanel(),
@@ -1850,11 +1860,17 @@ class YtDownloaderApp {
 				is_live: isLive,
 				extractor_key: metadata.extractor_key,
 				chapters: Array.isArray(metadata.chapters) ? metadata.chapters : [],
+				subtitles: metadata.subtitles || {},
+				automatic_captions: metadata.automatic_captions || {},
 				infoJsonPath: metadata._infoJsonPath || null,
 				infoJsonFetchedAt: metadata._infoJsonFetchedAt || null,
 			};
 			this.setVideoLength(durationInt);
 			this._populateFormatSelectors(metadata.formats || []);
+			this._populateSubtitles(
+				metadata.subtitles,
+				metadata.automatic_captions,
+			);
 
 			if (this.state.mode === "single" && this.state.isAutoMode) {
 				this.handleDownloadRequest(this.state.batchPreset.type);
@@ -2154,16 +2170,42 @@ class YtDownloaderApp {
 			const str = data.toString();
 
 			const destMatch = str.match(/Destination:\s+([^\r\n]+)/);
-			if (destMatch)
-				actualFilePath = destMatch[1]
+			if (destMatch) {
+				let matched = destMatch[1]
 					.trim()
 					.replace(/(^["'])|(["']$)/g, "");
+				if (job?.type === "subtitles") {
+					const targetSubFormat =
+						job?.options?.subFormat || job?.uiSnapshot?.subFormat;
+					if (targetSubFormat) {
+						matched = matched.replace(/\.[^.]+$/, `.${targetSubFormat}`);
+					}
+				}
+				actualFilePath = matched;
+			}
 
 			const mergeMatch = str.match(/Merging formats into\s+([^\r\n]+)/);
 			if (mergeMatch)
 				actualFilePath = mergeMatch[1]
 					.trim()
 					.replace(/(^["'])|(["']$)/g, "");
+
+			if (job?.type === "subtitles") {
+				const subMatch = str.match(
+					/Writing video (?:subtitles|auto-generated subtitles) to:\s+([^\r\n]+)/,
+				);
+				if (subMatch) {
+					let matched = subMatch[1]
+						.trim()
+						.replace(/(^["'])|(["']$)/g, "");
+					const targetSubFormat =
+						job?.options?.subFormat || job?.uiSnapshot?.subFormat;
+					if (targetSubFormat) {
+						matched = matched.replace(/\.[^.]+$/, `.${targetSubFormat}`);
+					}
+					actualFilePath = matched;
+				}
+			}
 
 			const existMatch = str.match(
 				/\[download\]\s+([^\r\n]+)\s+has already been downloaded/,
@@ -2739,7 +2781,7 @@ class YtDownloaderApp {
 				} else {
 					template += ` - ${safeChapter}`;
 				}
-			} else if (rangeCmd) {
+			} else if (rangeCmd && type !== "subtitles") {
 				let rangeTxt = rangeCmd.replace("*", "");
 				if (platform() === "win32")
 					rangeTxt = rangeTxt.replace(/:/g, "_");
@@ -2783,6 +2825,26 @@ class YtDownloaderApp {
 					...singleOutputArgs,
 					...baseArgs,
 				];
+			} else if (type === "subtitles") {
+				const subFormat =
+					job.options?.subFormat || uiSnapshot.subFormat || "srt";
+				const subLang =
+					job.options?.subLang || uiSnapshot.subLang || "all";
+				ext = subFormat;
+				const isAll = subLang === "all";
+				downloadArgs = [
+					"--skip-download",
+					"--write-subs",
+					...(isAll ? [] : ["--write-auto-subs"]),
+					"--sub-format",
+					`${subFormat}/best`,
+					"--convert-subs",
+					subFormat,
+					"--sub-langs",
+					subLang,
+					...singleOutputArgs,
+					...baseArgs,
+				];
 			} else {
 				const formatString =
 					type === "video" ? `${format_id}${audioFormat}` : format_id;
@@ -2804,10 +2866,12 @@ class YtDownloaderApp {
 			}
 		}
 
-		if (subs) downloadArgs.push(...subs.split(/\s+/));
-		if (subLangs) downloadArgs.push(...subLangs.split(/\s+/));
-		if (rangeOption) {
-			downloadArgs.push(rangeOption, rangeCmd, "--force-keyframes-at-cuts");
+		if (type !== "subtitles") {
+			if (subs) downloadArgs.push(...subs.split(/\s+/));
+			if (subLangs) downloadArgs.push(...subLangs.split(/\s+/));
+			if (rangeOption) {
+				downloadArgs.push(rangeOption, rangeCmd, "--force-keyframes-at-cuts");
+			}
 		}
 
 		const customArgsString =
@@ -3028,10 +3092,15 @@ class YtDownloaderApp {
 			this.state.downloadOptions.rangeOption = "--download-sections";
 		}
 
-		if ($(CONSTANTS.DOM_IDS.SUB_CHECKED).checked) {
+		if ($(CONSTANTS.DOM_IDS.SUB_CHECKED)?.checked) {
+			const subLang =
+				$(CONSTANTS.DOM_IDS.SUB_LANGUAGE_SELECT)?.value || "all";
+			const subFormat =
+				$(CONSTANTS.DOM_IDS.SUB_FORMAT_SELECT)?.value || "srt";
+			const autoSubsFlag = subLang === "all" ? "" : " --write-auto-subs";
 			this.state.downloadOptions.subs =
-				"--write-subs --sub-format srt/best --convert-subs srt";
-			this.state.downloadOptions.subLangs = "--sub-langs all";
+				`--write-subs${autoSubsFlag} --sub-format ${subFormat}/best --convert-subs ${subFormat}`;
+			this.state.downloadOptions.subLangs = `--sub-langs ${subLang}`;
 		} else {
 			this.state.downloadOptions.subs = "";
 			this.state.downloadOptions.subLangs = "";
@@ -3121,12 +3190,31 @@ class YtDownloaderApp {
 			`<option value="none|none">${noAudioTxt}</option>`;
 		if (this.state.videoInfo) {
 			this.state.videoInfo.chapters = [];
+			this.state.videoInfo.subtitles = {};
+			this.state.videoInfo.automatic_captions = {};
 		}
 		const chaptersSec = $(CONSTANTS.DOM_IDS.CHAPTERS_SECTION);
 		if (chaptersSec) {
 			chaptersSec.style.display = "none";
 			const list = $(CONSTANTS.DOM_IDS.CHAPTERS_LIST);
 			if (list) list.innerHTML = "";
+		}
+		const subSelect = $(CONSTANTS.DOM_IDS.SUB_LANGUAGE_SELECT);
+		if (subSelect) {
+			subSelect.innerHTML = `<option value="" disabled selected>${i18n?.__("none") || "No subtitles available"}</option>`;
+			subSelect.disabled = true;
+		}
+		const subBtn = $(CONSTANTS.DOM_IDS.DOWNLOAD_SUBTITLES_BTN);
+		if (subBtn) subBtn.disabled = true;
+		const subBadge = $(CONSTANTS.DOM_IDS.SUBTITLES_BADGE);
+		if (subBadge) {
+			subBadge.textContent = "0";
+			subBadge.style.display = "none";
+		}
+		const subChecked = $(CONSTANTS.DOM_IDS.SUB_CHECKED);
+		if (subChecked) {
+			subChecked.checked = false;
+			subChecked.disabled = true;
 		}
 		const pasteBtn = $(CONSTANTS.DOM_IDS.PASTE_URL_BTN);
 		if (pasteBtn) pasteBtn.disabled = true;
@@ -3766,6 +3854,168 @@ class YtDownloaderApp {
 	}
 
 	/**
+	 * Populates the subtitles language selector with available subtitles.
+	 * @param {object} [subtitles={}]
+	 * @param {object} [autoCaptions={}]
+	 */
+	_populateSubtitles(subtitles = {}, autoCaptions = {}) {
+		const subSelect = $(CONSTANTS.DOM_IDS.SUB_LANGUAGE_SELECT);
+		const subBtn = $(CONSTANTS.DOM_IDS.DOWNLOAD_SUBTITLES_BTN);
+		const subBadge = $(CONSTANTS.DOM_IDS.SUBTITLES_BADGE);
+		const subChecked = $(CONSTANTS.DOM_IDS.SUB_CHECKED);
+
+		if (!subSelect) return;
+
+		subSelect.innerHTML = "";
+
+		const subs = subtitles || {};
+		const autos = autoCaptions || {};
+		const manualKeys = Object.keys(subs);
+		const autoKeys = Object.keys(autos);
+		const allKeys = Array.from(new Set([...manualKeys, ...autoKeys]));
+
+		if (allKeys.length === 0) {
+			const opt = document.createElement("option");
+			opt.value = "";
+			opt.disabled = true;
+			opt.selected = true;
+			opt.textContent = i18n?.__("none") || "No subtitles available";
+			subSelect.appendChild(opt);
+			subSelect.disabled = true;
+			if (subBtn) subBtn.disabled = true;
+			if (subBadge) {
+				subBadge.textContent = "0";
+				subBadge.style.display = "none";
+			}
+			if (subChecked) {
+				subChecked.checked = false;
+				subChecked.disabled = true;
+			}
+			return;
+		}
+
+		subSelect.disabled = false;
+		if (subBtn) subBtn.disabled = false;
+		if (subChecked) subChecked.disabled = false;
+		if (subBadge) {
+			subBadge.textContent = String(
+				manualKeys.length > 0 ? manualKeys.length : allKeys.length,
+			);
+			subBadge.style.display = "inline-block";
+		}
+
+		let displayNames;
+		try {
+			displayNames = new Intl.DisplayNames(["en"], {type: "language"});
+		} catch (_) {}
+
+		const options = allKeys.map((key) => {
+			const isManual = Boolean(subs[key]);
+			const rawName =
+				(subs[key] && subs[key][0]?.name) ||
+				(autos[key] && autos[key][0]?.name) ||
+				"";
+
+			let label = rawName;
+			if (!label) {
+				try {
+					label = displayNames ? displayNames.of(key) : key;
+				} catch (_) {
+					label = key;
+				}
+			}
+
+			if (!isManual && !label.toLowerCase().includes("auto")) {
+				label = `${label} (auto)`;
+			}
+
+			return {key, label, isManual};
+		});
+
+		options.sort((a, b) => {
+			if (a.isManual !== b.isManual) return a.isManual ? -1 : 1;
+			return a.label.localeCompare(b.label);
+		});
+
+		if (manualKeys.length > 0) {
+			const allOpt = document.createElement("option");
+			allOpt.value = "all";
+			allOpt.textContent =
+				manualKeys.length > 1
+					? `All Subtitles (${manualKeys.length})`
+					: "All Subtitles";
+			subSelect.appendChild(allOpt);
+		}
+
+		options.forEach((item) => {
+			const opt = document.createElement("option");
+			opt.value = item.key;
+			opt.textContent = item.label;
+			subSelect.appendChild(opt);
+		});
+
+		const preferred =
+			options.find((o) => o.key === "en" && o.isManual) ||
+			options.find((o) => o.key.startsWith("en") && o.isManual) ||
+			options.find((o) => o.key === "en") ||
+			options.find((o) => o.isManual) ||
+			options[0];
+
+		if (preferred) {
+			subSelect.value = preferred.key;
+		} else if (manualKeys.length > 0) {
+			subSelect.value = "all";
+		} else if (options[0]) {
+			subSelect.value = options[0].key;
+		}
+	}
+
+	/**
+	 * Downloads only the selected subtitles.
+	 */
+	_downloadSubtitles() {
+		const subSelect = $(CONSTANTS.DOM_IDS.SUB_LANGUAGE_SELECT);
+		const subLang = subSelect?.value;
+		if (!subLang || subSelect.disabled) return;
+		const subFormat = $(CONSTANTS.DOM_IDS.SUB_FORMAT_SELECT)?.value || "srt";
+
+		this._updateDownloadOptionsFromUI();
+		this._hideInfoPanel(true);
+
+		const downloadJob = {
+			type: "subtitles",
+			url: this.state.videoInfo.url,
+			title: this.state.videoInfo.title,
+			channel: this.state.videoInfo.channel,
+			thumbnail: this.state.videoInfo.thumbnail,
+			duration: this.state.videoInfo.duration,
+			infoJsonPath: this.state.videoInfo.infoJsonPath,
+			infoJsonFetchedAt: this.state.videoInfo.infoJsonFetchedAt,
+			options: {
+				...this.state.downloadOptions,
+				rangeCmd: "",
+				rangeOption: "",
+				subLang,
+				subFormat,
+			},
+			uiSnapshot: {
+				subLang,
+				subFormat,
+			},
+			customArgs:
+				$("customArgsInputHome")?.value?.trim() ||
+				$(CONSTANTS.DOM_IDS.CUSTOM_ARGS_INPUT)?.value?.trim() ||
+				"",
+		};
+
+		if (this.state.currentDownloads < this.state.maxActiveDownloads) {
+			this._startDownload(downloadJob);
+		} else {
+			this._queueDownload(downloadJob);
+		}
+	}
+
+	/**
 	 * Formats command arguments into a terminal/shell-friendly command string with proper quoting.
 	 * @param {string[]} args Command arguments
 	 * @param {string} [url] Source video URL
@@ -4013,7 +4263,11 @@ class YtDownloaderApp {
 							: ""
 					}
                     <span class="itemType">${i18n.__(
-						job.type === "video" ? "video" : "audio",
+						job.type === "video"
+							? "video"
+							: job.type === "subtitles"
+								? "subtitles"
+								: "audio",
 					)}${job?.chapterTitle ? ` • ${escapeHtml(job.chapterTitle)}` : (job?.options?.rangeCmd ? ` • ${escapeHtml(job.options.rangeCmd.replace("*", ""))}` : "")}</span>
                 </div>
                 <div class="itemTopActions">
@@ -4203,9 +4457,24 @@ class YtDownloaderApp {
 			return;
 		}
 
-		const expectedExt = fullPath.includes(".")
-			? fullPath.split(".").pop()
-			: "";
+		if (job?.type === "subtitles") {
+			const targetSubFormat =
+				job?.options?.subFormat || job?.uiSnapshot?.subFormat;
+			if (targetSubFormat) {
+				const convertedPath = fullPath.replace(
+					/\.[^.]+$/,
+					`.${targetSubFormat}`,
+				);
+				if (existsSync(convertedPath) || !existsSync(fullPath)) {
+					fullPath = convertedPath;
+				}
+			}
+		}
+
+		const expectedExt =
+			(job?.type === "subtitles" &&
+				(job?.options?.subFormat || job?.uiSnapshot?.subFormat)) ||
+			(fullPath.includes(".") ? fullPath.split(".").pop() : "");
 
 		// If file doesn't exist at the expected path, attempt to find it with a loose matching strategy
 		if (
