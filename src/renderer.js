@@ -2461,7 +2461,10 @@ class YtDownloaderApp {
 			pauseBtn.innerHTML = `<svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"></rect><rect x="14" y="4" width="4" height="16" rx="1"></rect></svg>`;
 		}
 
-		if (this.state.currentDownloads < this.state.maxActiveDownloads) {
+		if (
+			this.state.currentDownloads < this.state.maxActiveDownloads &&
+			!(this._isChapterJob(job) && this._hasActiveChapterJob())
+		) {
 			this._startDownload(job, randomId);
 		} else {
 			const statusEl = $(`${randomId}_status`);
@@ -2565,6 +2568,16 @@ class YtDownloaderApp {
 		this._createDownloadUI(randomId, job, true);
 	}
 
+	_isChapterJob(job) {
+		return Boolean(job?.isChapter || job?.chapterTitle);
+	}
+
+	_hasActiveChapterJob() {
+		return Array.from(this.state.activeJobs.values()).some((j) =>
+			this._isChapterJob(j),
+		);
+	}
+
 	/**
 	 * Checks the queue and starts the next download if a slot is available.
 	 */
@@ -2573,7 +2586,13 @@ class YtDownloaderApp {
 			this.state.downloadQueue.length > 0 &&
 			this.state.currentDownloads < this.state.maxActiveDownloads
 		) {
-			const nextJob = this.state.downloadQueue.shift();
+			const hasActiveChapter = this._hasActiveChapterJob();
+			const nextIndex = this.state.downloadQueue.findIndex(
+				(job) => !(hasActiveChapter && this._isChapterJob(job)),
+			);
+			if (nextIndex === -1) return;
+
+			const [nextJob] = this.state.downloadQueue.splice(nextIndex, 1);
 
 			if (nextJob.isBatch && this.state.isBatchCancelled) {
 				if (nextJob.queueId && nextJob.queueId.startsWith("queue_")) {
@@ -2964,8 +2983,12 @@ class YtDownloaderApp {
 				new Error(`Download process exited with code ${code}.`),
 				randomId,
 				controller,
+				wasActive,
 			);
 			return;
+		} else {
+			this.state.activeJobs.delete(randomId);
+			this.state.pausedJobs.delete(randomId);
 		}
 
 		if (wasActive) {
@@ -2980,9 +3003,10 @@ class YtDownloaderApp {
 	/**
 	 * Handles an error during the download process.
 	 */
-	_handleDownloadError(error, randomId, controller = null) {
-		const wasActive = this.state.downloadControllers.delete(randomId);
-		if (wasActive) {
+	_handleDownloadError(error, randomId, controller = null, wasActive = false) {
+		const removedController = this.state.downloadControllers.delete(randomId);
+		const isActive = wasActive || removedController;
+		if (removedController) {
 			this.state.currentDownloads = Math.max(
 				0,
 				this.state.currentDownloads - 1,
@@ -2990,7 +3014,7 @@ class YtDownloaderApp {
 		}
 
 		if (controller?.isPaused) {
-			if (wasActive) this._processQueue();
+			if (isActive) this._processQueue();
 			return;
 		}
 
@@ -3002,7 +3026,7 @@ class YtDownloaderApp {
 			console.log(`Download ${randomId} was aborted.`);
 			this.state.activeJobs.delete(randomId);
 			this.state.pausedJobs.delete(randomId);
-			if (wasActive) {
+			if (isActive) {
 				this._processQueue();
 			}
 			return; // Don't treat user cancellation as an error
@@ -3061,7 +3085,7 @@ class YtDownloaderApp {
 		}
 		this.state.downloadedItems.add(randomId);
 		this._updateClearAllButton();
-		if (wasActive) {
+		if (isActive) {
 			this._processQueue();
 		}
 	}
@@ -3843,9 +3867,13 @@ class YtDownloaderApp {
 					"avc1",
 				uiSnapshot: {...baseSnapshot},
 				customArgs,
+				isChapter: true,
 			};
 
-			if (this.state.currentDownloads < this.state.maxActiveDownloads) {
+			if (
+				this.state.currentDownloads < this.state.maxActiveDownloads &&
+				!this._hasActiveChapterJob()
+			) {
 				this._startDownload(chapterJob);
 			} else {
 				this._queueDownload(chapterJob);
