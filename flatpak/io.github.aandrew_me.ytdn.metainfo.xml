@@ -55,17 +55,45 @@
   <content_rating type="oars-1.1" />
 
   <releases>
+    <release version="4.1.0" date="2026-11-09">
+      <description>
+        <p>Added subtitle downloading support</p>
+        <p>Added chapter downloading and selection support</p>
+        <p>Added an in-app log viewer page</p>
+        <p>Added a playlist download progress bar</p>
+        <p>Added a progress indicator for trimmed videos</p>
+        <p>Added an option to configure concurrent download fragments</p>
+        <p>Added a toggle for embedding thumbnails</p>
+        <p>Added a 'No video' option to the Compressor</p>
+        <p>Updated Electron to v44</p>
+        <p>Improved error messages for download failures</p>
+        <p>Preferred codecs are now considered for automatic and batch downloads</p>
+        <p>Keyframe cuts are now used for audio extraction</p>
+        <p>Fixed an audio offset issue when trimming</p>
+        <p>Fixed an issue where preferred formats could override presets in automatic downloads</p>
+        <p>Fixed the audio icon not displaying on videos with audio</p>
+        <p>Fixed system proxy text not updating in settings</p>
+        <p>Fixed AppImage environment detection</p>
+        <p>Fixed macOS JavaScript runtime issues</p>
+        <p>Translated all previously untranslated texts</p>
+      </description>
+    </release>
+
     <release version="4.0.0" date="2026-08-25">
       <description>
         <p>Redesigned as a Single Page Application with a sidebar and updated UI elements</p>
         <p>Improved default format selection</p>
-        <p>Homepage: Added batch download, auto download media, video output format selection, and option to view yt-dlp command</p>
-        <p>Homepage: Improved download start speed, added pause option, and added video bitrate display in format list</p>
+        <p>Homepage: Added batch download, auto download media, video output format selection, and
+          option to view yt-dlp command</p>
+        <p>Homepage: Improved download start speed, added pause option, and added video bitrate
+          display in format list</p>
         <p>Playlist page: Added Selective mode, improved download items UI, and improved menu UI</p>
         <p>Compressor page: Minor optimizations</p>
-        <p>Preferences page: Added UI zoom, global hotkeys, update channels selection, and individual site cookie pasting</p>
+        <p>Preferences page: Added UI zoom, global hotkeys, update channels selection, and
+          individual site cookie pasting</p>
         <p>Preferences page: Improved output template settings and language selection</p>
-        <p>Preferences page: Added ability to set yt-dlp channel, use system yt-dlp, and use system ffmpeg &amp; ffprobe</p>
+        <p>Preferences page: Added ability to set yt-dlp channel, use system yt-dlp, and use system
+          ffmpeg &amp; ffprobe</p>
         <p>Bug fixes and minor UI/UX improvements</p>
       </description>
     </release>
