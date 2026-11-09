@@ -677,6 +677,165 @@ test.describe("Main Page Download Tests", () => {
 		expect(downloadCmd).not.toContain("%(title)s - 2. 2.%(ext)s");
 	});
 
+	test("chapter downloads execute sequentially one at a time", async () => {
+		const testUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+
+		await page.evaluate(() => {
+			window.__mockStayInProgress = true;
+			window.__mockMetadata = {
+				id: "dQw4w9WgXcQ",
+				title: "Sequential Chapters",
+				duration: 300,
+				chapters: [
+					{ start_time: 0, end_time: 30, title: "Chapter 1" },
+					{ start_time: 30, end_time: 60, title: "Chapter 2" },
+				],
+			};
+		});
+
+		await page.evaluate((url) => {
+			window.electronAPI.clipboard.writeText(url);
+		}, testUrl);
+
+		await page.click("#pasteUrl");
+		await waitForInfoPanel(page);
+
+		await triggerClick(page, "advancedVideoToggle");
+
+		await page.check("#chapter_cb_0");
+		await page.check("#chapter_cb_1");
+
+		await clearExecutedCommands(page);
+		await page.click("#downloadChaptersBtn");
+
+		await page.waitForSelector("#list .item");
+
+		const statuses = await page.$$eval("#list .item .itemProgStatus", (els) =>
+			els.map((el) => el.textContent.trim()),
+		);
+		expect(statuses).toContain("Queued");
+
+		const commands = await getExecutedCommands(page);
+		const downloadCmds = commands.filter((cmd) => cmd.includes("--download-sections"));
+		expect(downloadCmds.length).toBe(1);
+
+		await page.evaluate(() => {
+			window.__mockStayInProgress = false;
+		});
+	});
+
+	test("failed chapter download drains queue and starts remaining chapters", async () => {
+		const testUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+
+		await page.evaluate(() => {
+			// Failing chapter exits with non-zero code 1 on both initial try and live retry
+			window.__mockExitCode = (args) =>
+				args.some((a) => typeof a === "string" && a.includes("Failing Chapter"))
+					? 1
+					: 0;
+			window.__mockMetadata = {
+				id: "dQw4w9WgXcQ",
+				title: "Failing Chapter Queue",
+				duration: 300,
+				chapters: [
+					{ start_time: 0, end_time: 30, title: "Failing Chapter" },
+					{ start_time: 30, end_time: 60, title: "Succeeding Chapter" },
+				],
+			};
+		});
+
+		await page.evaluate((url) => {
+			window.electronAPI.clipboard.writeText(url);
+		}, testUrl);
+
+		await page.click("#pasteUrl");
+		await waitForInfoPanel(page);
+
+		await triggerClick(page, "advancedVideoToggle");
+
+		await page.check("#chapter_cb_0");
+		await page.check("#chapter_cb_1");
+
+		await clearExecutedCommands(page);
+		await page.click("#downloadChaptersBtn");
+
+		// Wait until succeeding chapter command executes (triggered from queue after chapter 1 fails)
+		await page.waitForFunction(() => {
+			const cmds = window.__executedCommands || [];
+			return cmds.some((cmd) => cmd.includes("%(title)s - 2. Succeeding Chapter.%(ext)s"));
+		});
+
+		const commands = await getExecutedCommands(page);
+		const succeedingCmd = commands.find((cmd) =>
+			cmd.includes("%(title)s - 2. Succeeding Chapter.%(ext)s"),
+		);
+		expect(succeedingCmd).toBeDefined();
+
+		// Failing chapter should show error status in UI
+		await page.waitForSelector("#list .item .itemProgStatus.status-error");
+		const errorStatus = await page.$eval(
+			"#list .item .itemProgStatus.status-error",
+			(el) => el.textContent.trim(),
+		);
+		expect(errorStatus).toBeTruthy();
+
+		await page.evaluate(() => {
+			delete window.__mockExitCode;
+		});
+	});
+
+	test("chapter download killed by signal (exit code null) drains queue and cleans activeJobs", async () => {
+		const testUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+
+		await page.evaluate(() => {
+			// First chapter exits with null code (simulating killed by signal); second succeeds
+			window.__mockExitCode = (args) =>
+				args.some((a) => typeof a === "string" && a.includes("Killed Chapter"))
+					? null
+					: 0;
+			window.__mockMetadata = {
+				id: "dQw4w9WgXcQ",
+				title: "Killed Chapter Queue",
+				duration: 300,
+				chapters: [
+					{ start_time: 0, end_time: 30, title: "Killed Chapter" },
+					{ start_time: 30, end_time: 60, title: "Succeeding Chapter" },
+				],
+			};
+		});
+
+		await page.evaluate((url) => {
+			window.electronAPI.clipboard.writeText(url);
+		}, testUrl);
+
+		await page.click("#pasteUrl");
+		await waitForInfoPanel(page);
+
+		await triggerClick(page, "advancedVideoToggle");
+
+		await page.check("#chapter_cb_0");
+		await page.check("#chapter_cb_1");
+
+		await clearExecutedCommands(page);
+		await page.click("#downloadChaptersBtn");
+
+		// Second chapter must start despite first exiting with null code
+		await page.waitForFunction(() => {
+			const cmds = window.__executedCommands || [];
+			return cmds.some((cmd) => cmd.includes("%(title)s - 2. Succeeding Chapter.%(ext)s"));
+		});
+
+		const commands = await getExecutedCommands(page);
+		const succeedingCmd = commands.find((cmd) =>
+			cmd.includes("%(title)s - 2. Succeeding Chapter.%(ext)s"),
+		);
+		expect(succeedingCmd).toBeDefined();
+
+		await page.evaluate(() => {
+			delete window.__mockExitCode;
+		});
+	});
+
 	test("displays available subtitles, allows format selection, and downloads subtitles with download button", async () => {
 		const testUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
 

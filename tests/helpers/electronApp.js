@@ -213,7 +213,13 @@ async function launchApp(customLocalStorage = {}, customMetadata = DEFAULT_MOCK_
 						(callbacks["progress"] || []).forEach((cb) =>
 							cb({ percent: 100 }),
 						);
-						(callbacks["close"] || []).forEach((cb) => cb(0));
+						const exitCode =
+							typeof window.__mockExitCode === "function"
+								? window.__mockExitCode(args)
+								: window.__mockExitCode !== undefined
+									? window.__mockExitCode
+									: 0;
+						(callbacks["close"] || []).forEach((cb) => cb(exitCode));
 					}
 				}
 			}, delay);
