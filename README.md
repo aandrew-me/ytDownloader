@@ -125,9 +125,7 @@ brew install yt-dlp
 
 ## Internationalization (Localization) 🌍
 
-Translations into other languages would be highly appreciated. If you want to help translating the app to other languages, you can join from [here](https://crowdin.com/project/ytdownloader). Open a new issue and that language will be added to Crowdin. Please don't make pull requests with json files, instead use Crowdin.
-
-[![Crowdin](https://badges.crowdin.net/ytdownloader/localized.svg)](https://crowdin.com/project/ytdownloader)
+Translations into other languages are welcome. To update an existing translation or add a new language, submit a pull request with the changes to the language files in the `translations/` directory. Please include updates to `translations/en.json` for any new translation keys and ensure all language files contain the same keys.
 
 ### ✅ Available languages
 
