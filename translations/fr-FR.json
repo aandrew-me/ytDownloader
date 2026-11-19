@@ -341,5 +341,6 @@
 	"ready": "Prêt",
 	"missing": "Manquant",
 	"app": "App",
-	"os": "OS"
+	"os": "OS",
+	"retry": "Retry"
 }

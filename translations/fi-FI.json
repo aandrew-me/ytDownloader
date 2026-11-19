@@ -341,5 +341,6 @@
 	"ready": "Valmis",
 	"missing": "Puuttuu",
 	"app": "Sovellus",
-	"os": "Käyttöjärjestelmä"
+	"os": "Käyttöjärjestelmä",
+	"retry": "Retry"
 }

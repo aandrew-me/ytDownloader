@@ -341,5 +341,6 @@
 	"ready": "Kész",
 	"missing": "Hiányzik",
 	"app": "Alkalmazás",
-	"os": "OS"
+	"os": "OS",
+	"retry": "Retry"
 }

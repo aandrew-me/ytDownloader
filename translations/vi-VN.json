@@ -341,5 +341,6 @@
 	"ready": "Sẵn sàng",
 	"missing": "Thiếu",
 	"app": "Ứng dụng",
-	"os": "HĐH"
+	"os": "HĐH",
+	"retry": "Retry"
 }

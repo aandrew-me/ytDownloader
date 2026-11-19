@@ -2101,7 +2101,11 @@ class YtDownloaderApp {
 				statusEl.removeAttribute("tabindex");
 				statusEl.removeAttribute("title");
 				$(`${randomId}_errBtn`)?.remove();
+				$(`${randomId}_retryBtn`)?.remove();
+				$(`${randomId}_fill`)?.style.removeProperty("background");
 			}
+			const retryPauseBtn = $(`${randomId}_pause`);
+			if (retryPauseBtn) retryPauseBtn.style.display = "";
 			const pauseBtn = $(`${randomId}_pause`);
 			if (pauseBtn) {
 				pauseBtn.title = i18n.__("pause") || "Pause";
@@ -3032,9 +3036,11 @@ class YtDownloaderApp {
 			return; // Don't treat user cancellation as an error
 		}
 
+		const failedJob = this.state.activeJobs.get(randomId);
 		this.state.activeJobs.delete(randomId);
 		this.state.pausedJobs.delete(randomId);
-		$(`${randomId}_pause`)?.remove();
+		const pauseBtn = $(`${randomId}_pause`);
+		if (pauseBtn) pauseBtn.style.display = "none";
 
 		console.error("Download Error:", error);
 		const statusEl = $(`${randomId}_status`) || $(`${randomId}_prog`);
@@ -3082,6 +3088,46 @@ class YtDownloaderApp {
 		}
 		if (errBtn) {
 			errBtn.onclick = () => this._showErrorModal(itemTitle, errorMessage);
+		}
+		let retryBtn = $(`${randomId}_retryBtn`);
+		if (!retryBtn) {
+			const metaRight = $(`${randomId}`)?.querySelector(".itemMetaRight");
+			if (metaRight && failedJob) {
+				retryBtn = document.createElement("button");
+				retryBtn.id = `${randomId}_retryBtn`;
+				retryBtn.className = "errMetaBtn";
+				retryBtn.type = "button";
+				retryBtn.textContent = i18n.__("retry") || "Retry";
+				retryBtn.title = retryBtn.textContent;
+				retryBtn.setAttribute("aria-label", retryBtn.textContent);
+				metaRight.insertBefore(retryBtn, metaRight.firstChild);
+			}
+		}
+		if (retryBtn && failedJob) {
+			retryBtn.onclick = () => {
+				this.state.downloadedItems.delete(randomId);
+				this._updateClearAllButton();
+				if (
+					this.state.currentDownloads < this.state.maxActiveDownloads &&
+					!(this._isChapterJob(failedJob) && this._hasActiveChapterJob())
+				) {
+					this._startDownload(failedJob, randomId);
+				} else {
+					if (statusEl) {
+						statusEl.textContent = i18n.__("queued") || "Queued";
+						statusEl.classList.remove("status-error");
+						statusEl.onclick = null;
+						statusEl.onkeydown = null;
+						statusEl.removeAttribute("role");
+						statusEl.removeAttribute("tabindex");
+						statusEl.removeAttribute("title");
+					}
+					$(`${randomId}_retryBtn`)?.remove();
+					$(`${randomId}_errBtn`)?.remove();
+					this.state.downloadQueue.push({...failedJob, queueId: randomId});
+					this._processQueue();
+				}
+			};
 		}
 		this.state.downloadedItems.add(randomId);
 		this._updateClearAllButton();

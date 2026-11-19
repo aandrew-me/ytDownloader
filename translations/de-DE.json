@@ -341,5 +341,6 @@
 	"ready": "Bereit",
 	"missing": "Fehlt",
 	"app": "App",
-	"os": "BS"
+	"os": "BS",
+	"retry": "Retry"
 }

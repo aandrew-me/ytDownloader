@@ -341,5 +341,6 @@
 	"ready": "Listo",
 	"missing": "Falta",
 	"app": "App",
-	"os": "SO"
+	"os": "SO",
+	"retry": "Retry"
 }

@@ -341,5 +341,6 @@
 	"ready": "就绪",
 	"missing": "缺失",
 	"app": "应用",
-	"os": "系统"
+	"os": "系统",
+	"retry": "Retry"
 }

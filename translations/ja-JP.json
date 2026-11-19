@@ -341,5 +341,6 @@
 	"ready": "準備完了",
 	"missing": "未検出",
 	"app": "アプリ",
-	"os": "OS"
+	"os": "OS",
+	"retry": "Retry"
 }
