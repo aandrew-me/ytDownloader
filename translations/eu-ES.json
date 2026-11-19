@@ -341,5 +341,6 @@
 	"ready": "Prest",
 	"missing": "Falta da",
 	"app": "Aplikazioa",
-	"os": "SE"
+	"os": "SE",
+	"retry": "Retry"
 }

@@ -341,5 +341,6 @@
 	"ready": "Hazır",
 	"missing": "Eksik",
 	"app": "Uygulama",
-	"os": "İS"
+	"os": "İS",
+	"retry": "Retry"
 }

@@ -341,5 +341,6 @@
 	"ready": "就緒",
 	"missing": "缺失",
 	"app": "應用程式",
-	"os": "系統"
+	"os": "系統",
+	"retry": "Retry"
 }

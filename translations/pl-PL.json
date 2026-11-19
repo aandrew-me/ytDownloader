@@ -341,5 +341,6 @@
 	"ready": "Gotowe",
 	"missing": "Brak",
 	"app": "Aplikacja",
-	"os": "System"
+	"os": "System",
+	"retry": "Retry"
 }
