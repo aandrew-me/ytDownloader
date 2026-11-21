@@ -1823,6 +1823,13 @@ class YtDownloaderApp {
 			return;
 		}
 
+		if (this.isPlaylistUrl(safeUrl)) {
+			this.state.isFetchingInfo = false;
+			if (pasteBtn) pasteBtn.disabled = false;
+			this._redirectToPlaylist(safeUrl);
+			return;
+		}
+
 		await this._loadSettings(safeUrl);
 		this._defaultVideoToggle();
 		this._resetUIForNewLink();
@@ -1879,6 +1886,14 @@ class YtDownloaderApp {
 			}
 		} catch (error) {
 			console.log(error);
+			if (
+				error?.message &&
+				(error.message.includes("is a playlist") ||
+					error.message.includes("--flat-playlist"))
+			) {
+				this._redirectToPlaylist(url);
+				return;
+			}
 			if (
 				error.message.includes("js-runtimes") &&
 				error.message.includes("no such option")
@@ -5362,6 +5377,47 @@ class YtDownloaderApp {
 		}
 
 		return parsed.toString();
+	}
+
+	isPlaylistUrl(rawUrl) {
+		try {
+			const u = new URL(rawUrl);
+			const host = u.hostname.toLowerCase();
+			const path = u.pathname.toLowerCase();
+
+			if (host.includes("youtube.com") || host.includes("youtu.be")) {
+				if (path.includes("/playlist")) return true;
+				if (u.searchParams.has("list")) {
+					const hasVideoId =
+						u.searchParams.has("v") ||
+						(host.includes("youtu.be") && path.length > 1) ||
+						/^\/(shorts|embed|live|v)\/[^/?#]+/i.test(path);
+					return !hasVideoId;
+				}
+				return false;
+			}
+
+			if (host.includes("soundcloud.com") && path.includes("/sets/")) return true;
+			if (path.includes("/playlist/") || path.includes("/album/")) return true;
+		} catch {
+			return false;
+		}
+		return false;
+	}
+
+	_redirectToPlaylist(url) {
+		this._clearError();
+		if (window.switchView) {
+			window.switchView("view-playlist");
+		}
+		if (window.playlistDownloader?.loadPlaylistUrl) {
+			window.playlistDownloader.loadPlaylistUrl(url);
+		}
+		const msg =
+			window.playlistDownloader?.state?.currentMode === "selective"
+				? i18n.__("fetchingPlaylist")
+				: i18n.__("downloadPlaylistButton");
+		this._showPopup(msg);
 	}
 }
 

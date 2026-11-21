@@ -1077,5 +1077,75 @@ test.describe("Main Page Download Tests", () => {
 		expect(templateArg).not.toContain("[00_10-00_50]");
 		expect(templateArg).toBe("%(title)s.%(ext)s");
 	});
+
+	test("pasting a playlist URL on homepage automatically redirects to playlist downloader", async () => {
+		const playlistUrl = "https://www.youtube.com/playlist?list=PL123456789";
+
+		await page.evaluate((url) => {
+			window.electronAPI.clipboard.writeText(url);
+		}, playlistUrl);
+
+		await page.click("#pasteUrl");
+
+		// Should switch to view-playlist
+		await page.waitForSelector("#view-playlist.active");
+		const isHomeActive = await page.$eval("#view-home", (el) => el.classList.contains("active"));
+		expect(isHomeActive).toBe(false);
+
+		// Playlist options should be visible and contain the URL
+		await page.waitForFunction(() => {
+			const options = document.getElementById("options");
+			return options && options.style.display === "block";
+		});
+
+		const displayedLink = await page.$eval("#link", (el) => el.textContent.trim());
+		expect(displayedLink).toBe(playlistUrl);
+	});
+
+	test("pasting a URL where yt-dlp reports playlist error redirects to playlist downloader", async () => {
+		const exoticUrl = "https://example.com/some/custom/path";
+
+		await page.evaluate(() => {
+			window.app._fetchVideoMetadata = async () => {
+				throw new Error("ERROR: This URL is a playlist, but --no-playlist was specified.");
+			};
+		});
+
+		await page.evaluate((url) => {
+			window.electronAPI.clipboard.writeText(url);
+		}, exoticUrl);
+
+		await page.click("#pasteUrl");
+
+		await page.waitForSelector("#view-playlist.active");
+		const isHomeActive = await page.$eval("#view-home", (el) => el.classList.contains("active"));
+		expect(isHomeActive).toBe(false);
+
+		await page.waitForFunction(() => {
+			const options = document.getElementById("options");
+			return options && options.style.display === "block";
+		});
+
+		const displayedLink = await page.$eval("#link", (el) => el.textContent.trim());
+		expect(displayedLink).toBe(exoticUrl);
+	});
+
+	test("pasting a youtu.be or shorts video link with list param stays on homepage", async () => {
+		const videoWithListUrl = "https://youtu.be/dQw4w9WgXcQ?list=PL123456789";
+
+		await page.evaluate((url) => {
+			window.electronAPI.clipboard.writeText(url);
+		}, videoWithListUrl);
+
+		await page.click("#pasteUrl");
+
+		// Should stay on view-home and show info panel
+		await waitForInfoPanel(page);
+		const isHomeActive = await page.$eval("#view-home", (el) => el.classList.contains("active"));
+		expect(isHomeActive).toBe(true);
+
+		const isPlaylistActive = await page.$eval("#view-playlist", (el) => el.classList.contains("active"));
+		expect(isPlaylistActive).toBe(false);
+	});
 });
 
