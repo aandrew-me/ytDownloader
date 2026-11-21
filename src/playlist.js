@@ -1936,6 +1936,34 @@ const playlistDownloader = {
 
 		return parsed.toString();
 	},
+
+	loadPlaylistUrl(rawUrl) {
+		if (!this.ui.linkDisplay && !this.ui.selectiveContent) {
+			this.initUI();
+		}
+		let url;
+		try {
+			url = this.validateUrl(rawUrl);
+		} catch (_) {
+			url = String(rawUrl ?? "").trim();
+		}
+		if (this.state.currentMode === "selective") {
+			if (this.selectiveState.isFetching || this.selectiveState.isDownloading) return;
+			this.fetchSelectivePlaylist(url);
+		} else {
+			if (this.state.isDownloading) return;
+			this.state.url = url;
+			if (this.ui.linkDisplay) this.ui.linkDisplay.textContent = ` ${url}`;
+			if (this.ui.optionsContainer) {
+				this.ui.optionsContainer.style.display = "block";
+				this.ui.optionsContainer.classList.remove("fade-out");
+				this.ui.optionsContainer.classList.add("fade-in");
+			}
+			if (this.ui.errorMsgDisplay) this.ui.errorMsgDisplay.textContent = "";
+			if (this.ui.errorBtn) this.ui.errorBtn.style.display = "none";
+			this._updateEmptyStateUI();
+		}
+	},
 };
 
 window.playlistDownloader = playlistDownloader;
