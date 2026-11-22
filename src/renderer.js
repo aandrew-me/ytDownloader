@@ -106,6 +106,7 @@ const CONSTANTS = {
 		DOWNLOAD_SUBTITLES_BTN: "downloadSubtitlesBtn",
 		SUBTITLES_BADGE: "subtitlesBadge",
 		QUIT_CHECKED: "quitChecked",
+		COMPATIBLE_MODE_CHECKED: "compatibleModeChecked",
 		// Popups
 		POPUP_BOX: "popupBox",
 		POPUP_BOX_MAC: "popupBoxMac",
@@ -175,6 +176,7 @@ const CONSTANTS = {
 		YT_DLP_SOURCE: "ytdlpSource",
 		AUTO_DOWNLOAD_ON_PASTE: "autoDownloadOnPaste",
 		CONCURRENT_FRAGMENTS: "concurrentFragments",
+		COMPATIBLE_MODE: "compatibleMode",
 	},
 	// yt-dlp source selectable in preferences.
 	// "nightly": app-managed standalone binary kept on the nightly channel.
@@ -1568,6 +1570,20 @@ class YtDownloaderApp {
 			ipcRenderer.send("quit", "quit");
 		});
 
+		$(CONSTANTS.DOM_IDS.COMPATIBLE_MODE_CHECKED)?.addEventListener(
+			"change",
+			(e) => {
+				const outputFormatSelect = $(
+					CONSTANTS.DOM_IDS.HOME_OUTPUT_FORMAT_SELECT,
+				);
+				if (outputFormatSelect) {
+					// @ts-ignore
+					outputFormatSelect.disabled = e.target.checked;
+					if (e.target.checked) outputFormatSelect.value = "mp4";
+				}
+			},
+		);
+
 		// IPC listeners
 		ipcRenderer.on("link", (event, text) => this.getInfo(text));
 		ipcRenderer.on("downloadPath", (event, downloadPath) => {
@@ -1976,6 +1992,8 @@ class YtDownloaderApp {
 				outputFormat:
 					$(CONSTANTS.DOM_IDS.HOME_OUTPUT_FORMAT_SELECT)?.value ||
 					"auto",
+				compatibleMode:
+					$(CONSTANTS.DOM_IDS.COMPATIBLE_MODE_CHECKED)?.checked || false,
 			},
 			customArgs:
 				$("customArgsInputHome")?.value?.trim() ||
@@ -2686,12 +2704,15 @@ class YtDownloaderApp {
 		let downloadArgs = [];
 
 		if (job.isBatch || job.isAuto) {
+			const isCompat = Boolean(uiSnapshot?.compatibleMode);
 			const presetQuality =
 				job.presetQuality || uiSnapshot.videoFormat || "1080";
 			const presetFormat =
-				job.presetFormat ||
-				uiSnapshot.audioFormat ||
-				(type === "video" ? "mp4" : "mp3");
+				isCompat
+					? "mp4"
+					: job.presetFormat ||
+					  uiSnapshot.audioFormat ||
+					  (type === "video" ? "mp4" : "mp3");
 			const isYouTube =
 				url &&
 				(url.includes("youtube.com/") || url.includes("youtu.be/"));
@@ -2897,7 +2918,19 @@ class YtDownloaderApp {
 
 		if (type === "video") {
 			const targetFormat = uiSnapshot?.outputFormat;
-			if (targetFormat && targetFormat !== "auto") {
+			if (uiSnapshot?.compatibleMode) {
+				ext = "mp4";
+				downloadArgs.push("--merge-output-format", "mp4");
+				downloadArgs.push("--recode-video", "mp4");
+				downloadArgs.push("--embed-metadata");
+
+				const compatCodecArgs =
+					"-c:v libx264 -preset fast -crf 23 -c:a aac -b:a 128k";
+				downloadArgs.push(
+					"--postprocessor-args",
+					`Metadata+ffmpeg_o:${compatCodecArgs}`,
+				);
+			} else if (targetFormat && targetFormat !== "auto") {
 				ext = targetFormat;
 				downloadArgs.push("--recode-video", targetFormat);
 				downloadArgs.push("--merge-output-format", targetFormat);
@@ -3859,6 +3892,8 @@ class YtDownloaderApp {
 				$(CONSTANTS.DOM_IDS.EXTRACT_QUALITY_SELECT)?.value || "0",
 			outputFormat:
 				$(CONSTANTS.DOM_IDS.HOME_OUTPUT_FORMAT_SELECT)?.value || "auto",
+			compatibleMode:
+				$(CONSTANTS.DOM_IDS.COMPATIBLE_MODE_CHECKED)?.checked || false,
 		};
 
 		const customArgs =
@@ -5298,6 +5333,8 @@ class YtDownloaderApp {
 						audioFormat: preset.format,
 						extractFormat: preset.format,
 						extractQuality: "0",
+						compatibleMode:
+							$(CONSTANTS.DOM_IDS.COMPATIBLE_MODE_CHECKED)?.checked || false,
 					},
 					customArgs:
 						$("customArgsInputHome")?.value?.trim() ||

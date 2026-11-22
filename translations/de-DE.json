@@ -342,5 +342,7 @@
 	"missing": "Fehlt",
 	"app": "App",
 	"os": "BS",
-	"retry": "Retry"
+	"retry": "Retry",
+"compatibleMode": "Compatible mode (H.264 + AAC)",
+"compatibleModeDesc": "Re-encode to H.264 + AAC for maximum device and app compatibility (WhatsApp, iMessage, etc.). Downloads will take longer."
 }
