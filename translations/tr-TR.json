@@ -43,7 +43,6 @@
 	"progress": "Süreç",
 	"speed": "Hız",
 	"quality": "Kalite",
-	"restartApp": "Uygulamayı yeniden başlat",
 	"subtitles": "Altyazılar",
 	"downloadSubtitlesAvailable": "Altyazılar mevcut ise indir",
 	"downloadSubtitlesAuto": "Otomatik oluşturulan altyazıyı indir",
@@ -343,6 +342,6 @@
 	"app": "Uygulama",
 	"os": "İS",
 	"retry": "Retry",
-"compatibleMode": "Compatible mode (H.264 + AAC)",
-"compatibleModeDesc": "Re-encode to H.264 + AAC for maximum device and app compatibility (WhatsApp, iMessage, etc.). Downloads will take longer."
+	"compatibleMode": "Compatible mode (H.264 + AAC)",
+	"compatibleModeDesc": "Re-encode to H.264 + AAC for maximum device and app compatibility (WhatsApp, iMessage, etc.). Downloads will take longer."
 }

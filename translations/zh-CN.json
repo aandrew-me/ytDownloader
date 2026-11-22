@@ -43,7 +43,6 @@
 	"progress": "进度",
 	"speed": "速度",
 	"quality": "品质",
-	"restartApp": "重启应用程序",
 	"subtitles": "字幕",
 	"downloadSubtitlesAvailable": "若有字幕则下载",
 	"downloadSubtitlesAuto": "下载自动生成的字幕",
@@ -343,6 +342,6 @@
 	"app": "应用",
 	"os": "系统",
 	"retry": "Retry",
-"compatibleMode": "Compatible mode (H.264 + AAC)",
-"compatibleModeDesc": "Re-encode to H.264 + AAC for maximum device and app compatibility (WhatsApp, iMessage, etc.). Downloads will take longer."
+	"compatibleMode": "Compatible mode (H.264 + AAC)",
+	"compatibleModeDesc": "Re-encode to H.264 + AAC for maximum device and app compatibility (WhatsApp, iMessage, etc.). Downloads will take longer."
 }

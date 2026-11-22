@@ -43,7 +43,6 @@
 	"progress": "پیشرفت",
 	"speed": "سرعت",
 	"quality": "کیفیت",
-	"restartApp": "راه‌اندازی مجدد برنامه",
 	"subtitles": "زیرنویس‌ها",
 	"downloadSubtitlesAvailable": "در صورت وجود زیرنویس‌ها بارگیری شود",
 	"downloadSubtitlesAuto": "زیرنویس‌های به‌طور‌خودکار تولیدشده بارگیری شود",
@@ -343,6 +342,6 @@
 	"app": "برنامه",
 	"os": "سیستم‌عامل",
 	"retry": "Retry",
-"compatibleMode": "Compatible mode (H.264 + AAC)",
-"compatibleModeDesc": "Re-encode to H.264 + AAC for maximum device and app compatibility (WhatsApp, iMessage, etc.). Downloads will take longer."
+	"compatibleMode": "Compatible mode (H.264 + AAC)",
+	"compatibleModeDesc": "Re-encode to H.264 + AAC for maximum device and app compatibility (WhatsApp, iMessage, etc.). Downloads will take longer."
 }

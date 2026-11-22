@@ -43,7 +43,6 @@
 	"progress": "進捗",
 	"speed": "速度",
 	"quality": "品質",
-	"restartApp": "アプリを再起動",
 	"subtitles": "字幕",
 	"downloadSubtitlesAvailable": "利用可能な場合は字幕をダウンロード",
 	"downloadSubtitlesAuto": "自動生成された字幕をダウンロード",
@@ -343,6 +342,6 @@
 	"app": "アプリ",
 	"os": "OS",
 	"retry": "Retry",
-"compatibleMode": "Compatible mode (H.264 + AAC)",
-"compatibleModeDesc": "Re-encode to H.264 + AAC for maximum device and app compatibility (WhatsApp, iMessage, etc.). Downloads will take longer."
+	"compatibleMode": "Compatible mode (H.264 + AAC)",
+	"compatibleModeDesc": "Re-encode to H.264 + AAC for maximum device and app compatibility (WhatsApp, iMessage, etc.). Downloads will take longer."
 }

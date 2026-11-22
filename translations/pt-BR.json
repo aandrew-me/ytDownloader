@@ -43,7 +43,6 @@
 	"progress": "Progresso",
 	"speed": "Velocidade",
 	"quality": "Qualidade",
-	"restartApp": "Reiniciar aplicativo",
 	"subtitles": "Legendas",
 	"downloadSubtitlesAvailable": "Baixar legendas se disponíveis",
 	"downloadSubtitlesAuto": "Baixar legendas geradas automaticamente",
@@ -343,6 +342,6 @@
 	"app": "App",
 	"os": "SO",
 	"retry": "Retry",
-"compatibleMode": "Compatible mode (H.264 + AAC)",
-"compatibleModeDesc": "Re-encode to H.264 + AAC for maximum device and app compatibility (WhatsApp, iMessage, etc.). Downloads will take longer."
+	"compatibleMode": "Compatible mode (H.264 + AAC)",
+	"compatibleModeDesc": "Re-encode to H.264 + AAC for maximum device and app compatibility (WhatsApp, iMessage, etc.). Downloads will take longer."
 }

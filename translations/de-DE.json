@@ -43,7 +43,6 @@
 	"progress": "Fortschritt",
 	"speed": "Geschwindigkeit",
 	"quality": "Qualität",
-	"restartApp": "App neu starten",
 	"subtitles": "Untertitel",
 	"downloadSubtitlesAvailable": "Untertitel herunterladen, falls verfügbar",
 	"downloadSubtitlesAuto": "Automatisch generierte Untertitel herunterladen",
@@ -343,6 +342,6 @@
 	"app": "App",
 	"os": "BS",
 	"retry": "Retry",
-"compatibleMode": "Compatible mode (H.264 + AAC)",
-"compatibleModeDesc": "Re-encode to H.264 + AAC for maximum device and app compatibility (WhatsApp, iMessage, etc.). Downloads will take longer."
+	"compatibleMode": "Compatible mode (H.264 + AAC)",
+	"compatibleModeDesc": "Re-encode to H.264 + AAC for maximum device and app compatibility (WhatsApp, iMessage, etc.). Downloads will take longer."
 }

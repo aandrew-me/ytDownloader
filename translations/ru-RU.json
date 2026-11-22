@@ -43,7 +43,6 @@
 	"progress": "Прогресс",
 	"speed": "Скорость",
 	"quality": "Качество",
-	"restartApp": "Перезапустить приложение",
 	"subtitles": "Субтитры",
 	"downloadSubtitlesAvailable": "Скачать субтитры, если доступны",
 	"downloadSubtitlesAuto": "Скачать автоматически созданные субтитры",
@@ -343,6 +342,6 @@
 	"app": "Приложение",
 	"os": "ОС",
 	"retry": "Retry",
-"compatibleMode": "Compatible mode (H.264 + AAC)",
-"compatibleModeDesc": "Re-encode to H.264 + AAC for maximum device and app compatibility (WhatsApp, iMessage, etc.). Downloads will take longer."
+	"compatibleMode": "Compatible mode (H.264 + AAC)",
+	"compatibleModeDesc": "Re-encode to H.264 + AAC for maximum device and app compatibility (WhatsApp, iMessage, etc.). Downloads will take longer."
 }

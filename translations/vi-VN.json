@@ -43,7 +43,6 @@
 	"progress": "Tiến trình",
 	"speed": "Tốc độ",
 	"quality": "Chất lượng tải xuống",
-	"restartApp": "Khởi động lại",
 	"subtitles": "Phụ đề",
 	"downloadSubtitlesAvailable": "Tải xuống phụ đề nếu có",
 	"downloadSubtitlesAuto": "Tải xuống phụ đề được tạo tự động",
@@ -343,6 +342,6 @@
 	"app": "Ứng dụng",
 	"os": "HĐH",
 	"retry": "Retry",
-"compatibleMode": "Compatible mode (H.264 + AAC)",
-"compatibleModeDesc": "Re-encode to H.264 + AAC for maximum device and app compatibility (WhatsApp, iMessage, etc.). Downloads will take longer."
+	"compatibleMode": "Compatible mode (H.264 + AAC)",
+	"compatibleModeDesc": "Re-encode to H.264 + AAC for maximum device and app compatibility (WhatsApp, iMessage, etc.). Downloads will take longer."
 }
