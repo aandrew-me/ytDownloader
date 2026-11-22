@@ -659,11 +659,6 @@ function initPreferences() {
 		shell.openExternal("https://github.com/yt-dlp/yt-dlp#output-template");
 	});
 
-	getId("restart")?.addEventListener("click", () => {
-		ipcRenderer.send("reload");
-	});
-
-
 	function updateInputHighlight(inputId, backdropId) {
 		const inputEl = getId(inputId);
 		const backdropEl = getId(backdropId);

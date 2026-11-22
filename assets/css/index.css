@@ -4566,11 +4566,6 @@ body.rtl {
 	text-align: right;
 }
 
-body.rtl #top {
-	right: auto;
-	left: 20px;
-}
-
 body.rtl .prefBox,
 body.rtl .outputTemplateItem {
 	flex-direction: row-reverse;
@@ -4941,13 +4936,6 @@ textarea:focus {
 
 .greenBtn {
 	background-color: var(--greenBtn);
-}
-
-/* Navigation Positioning Matrix */
-#top {
-	display: flex;
-	gap: 8px;
-	align-items: center;
 }
 
 /* Dropdown styling */

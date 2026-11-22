@@ -43,7 +43,6 @@
 	"progress": "प्रगति",
 	"speed": "गति",
 	"quality": "गुणवत्ता",
-	"restartApp": "ऐप पुनः आरंभ करें",
 	"subtitles": "उपशीर्षक",
 	"downloadSubtitlesAvailable": "उपलब्ध होने पर उपशीर्षक डाउनलोड करें",
 	"downloadSubtitlesAuto": "स्वचालित रूप से उत्पन्न उपशीर्षक डाउनलोड करें",
@@ -343,6 +342,6 @@
 	"app": "ऐप",
 	"os": "ओएस",
 	"retry": "Retry",
-"compatibleMode": "Compatible mode (H.264 + AAC)",
-"compatibleModeDesc": "Re-encode to H.264 + AAC for maximum device and app compatibility (WhatsApp, iMessage, etc.). Downloads will take longer."
+	"compatibleMode": "Compatible mode (H.264 + AAC)",
+	"compatibleModeDesc": "Re-encode to H.264 + AAC for maximum device and app compatibility (WhatsApp, iMessage, etc.). Downloads will take longer."
 }

@@ -43,7 +43,6 @@
 	"progress": "مستوى التقدُّم",
 	"speed": "السرعة",
 	"quality": "الجودة",
-	"restartApp": "أعد تشغيل التطبيق",
 	"subtitles": "الترجمة",
 	"downloadSubtitlesAvailable": "حمّل الترجَمة إذا وجدت",
 	"downloadSubtitlesAuto": "حمّل التّرجَمة التي تم إنشاؤها تِلقائيا",
@@ -343,6 +342,6 @@
 	"app": "التطبيق",
 	"os": "نظام التشغيل",
 	"retry": "Retry",
-"compatibleMode": "Compatible mode (H.264 + AAC)",
-"compatibleModeDesc": "Re-encode to H.264 + AAC for maximum device and app compatibility (WhatsApp, iMessage, etc.). Downloads will take longer."
+	"compatibleMode": "Compatible mode (H.264 + AAC)",
+	"compatibleModeDesc": "Re-encode to H.264 + AAC for maximum device and app compatibility (WhatsApp, iMessage, etc.). Downloads will take longer."
 }
