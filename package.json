@@ -11,7 +11,6 @@
 		"start": "electron .",
 		"test": "playwright test",
 		"dist": "electron-builder",
-		"postinstall": "node patch-snap.js",
 		"debug": "electron --inspect=5858 .",
 		"windows": "electron-builder -w",
 		"appx-test": "powershell -ExecutionPolicy Bypass -File ./test-appx.ps1",
@@ -105,9 +104,12 @@
 			"category": "Utility",
 			"artifactName": "${productName}_Linux.${ext}"
 		},
-		"snap": {
-			"grade": "stable",
-			"base": "core22"
+		"snapcraft": {
+			"base": "core24",
+			"core24": {
+				"grade": "stable",
+				"useLXD": true
+			}
 		},
 		"win": {
 			"target": [
