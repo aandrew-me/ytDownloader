@@ -1,4 +1,4 @@
-import { getId, formatTime, escapeHtml, buildCodecFilter, isAutoScrollEnabled, setAutoScrollEnabled, scrollItemIntoView } from "./utils.js";
+import { getId, formatTime, escapeHtml, buildCodecFilter, isAutoScrollEnabled, setAutoScrollEnabled, scrollItemIntoView, parseCustomArgs, filterPlaylistArgs } from "./utils.js";
 
 const {
 	clipboard,
@@ -54,6 +54,7 @@ const playlistDownloader = {
 		foldernameFormat: "%(playlist_title)s",
 		filenameFormat: "%(playlist_index)s.%(title)s.%(ext)s",
 		proxy: "",
+		customArgs: "",
 		cookie: {
 			arg: "",
 			val: "",
@@ -1031,6 +1032,9 @@ const playlistDownloader = {
 				...(this.config.proxy
 					? ["--no-check-certificate", "--proxy", this.config.proxy]
 					: []),
+				...filterPlaylistArgs(
+					parseCustomArgs(this.config.customArgs),
+				),
 				...formatArgs,
 				entry.url,
 			].filter(Boolean);
@@ -1244,6 +1248,10 @@ const playlistDownloader = {
 			...(this.config.proxy
 				? ["--no-check-certificate", "--proxy", this.config.proxy]
 				: []),
+
+			...filterPlaylistArgs(
+				parseCustomArgs(this.config.customArgs),
+			),
 
 			"--compat-options",
 			"no-youtube-unavailable-videos",
@@ -1652,6 +1660,9 @@ const playlistDownloader = {
 	},
 
 	async updateDynamicConfig() {
+		this.config.customArgs =
+			localStorage.getItem("customYtDlpArgs") || "";
+
 		// Naming formats from localStorage
 		this.config.foldernameFormat =
 			localStorage.getItem("foldernameFormat") || "%(playlist_title)s";

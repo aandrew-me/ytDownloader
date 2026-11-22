@@ -296,6 +296,37 @@ test.describe("Preferences Integration Tests", () => {
 		expect(downloadCmd).toContain("--geo-bypass");
 	});
 
+	test("custom yt-dlp arguments with spaces in quotes are properly tokenized", async () => {
+		const customArgs = '--sponsorblock-remove "sponsor, intro"';
+		const res = await launchApp({
+			customYtDlpArgs: customArgs,
+		});
+		electronApp = res.app;
+		page = res.page;
+
+		const testUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+		await page.evaluate((url) => window.electronAPI.clipboard.writeText(url), testUrl);
+
+		await triggerClick(page, "pasteUrl");
+		await waitForInfoPanel(page);
+
+		await clearExecutedCommands(page);
+		await triggerClick(page, "videoDownload");
+
+		await page.waitForFunction(() => {
+			const cmds = window.__executedCommands || [];
+			return cmds.some((cmd) => cmd.includes("-f"));
+		});
+
+		const commands = await getExecutedCommands(page);
+		const downloadCmd = commands.find((cmd) => cmd.includes("-f"));
+
+		expect(downloadCmd).toBeDefined();
+		const sbIdx = downloadCmd.indexOf("--sponsorblock-remove");
+		expect(sbIdx).not.toBe(-1);
+		expect(downloadCmd[sbIdx + 1]).toBe("sponsor, intro");
+	});
+
 	test("concurrent fragments preference is included in yt-dlp command when > 1", async () => {
 		const res = await launchApp({
 			concurrentFragments: "4",

@@ -189,4 +189,32 @@ test.describe("Playlist Preferences Integration Tests", () => {
 		const fragIdx = downloadCmd.indexOf("--concurrent-fragments");
 		expect(downloadCmd[fragIdx + 1]).toBe("5");
 	});
+
+	test("custom yt-dlp arguments preference is included in playlist download while filtering output overrides", async () => {
+		const res = await launchApp({
+			customYtDlpArgs: '--sponsorblock-remove all -o "%(title)s.%(ext)s"',
+		});
+
+		electronApp = res.app;
+		page = res.page;
+		await page.waitForFunction(() => typeof window.switchView === "function");
+		await triggerClick(page, "playlistWin");
+
+		const playlistUrl = "https://www.youtube.com/playlist?list=PL123456789";
+		await page.evaluate((url) => window.electronAPI.clipboard.writeText(url), playlistUrl);
+
+		await triggerClick(page, "pasteLink");
+		await waitForPlaylistOptions(page);
+
+		await clearExecutedCommands(page);
+		await triggerClick(page, "download");
+
+		const commands = await getExecutedCommands(page);
+		const downloadCmd = commands[commands.length - 1];
+
+		expect(downloadCmd).toContain("--sponsorblock-remove");
+		expect(downloadCmd).toContain("all");
+		const oCount = downloadCmd.filter((arg) => arg === "-o").length;
+		expect(oCount).toBe(1);
+	});
 });
