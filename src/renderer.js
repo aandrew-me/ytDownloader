@@ -14,6 +14,7 @@ import {
 	isAutoScrollEnabled,
 	setAutoScrollEnabled,
 	scrollItemIntoView,
+	parseCustomArgs,
 } from "./utils.js";
 import {selectVideo, selectAudio} from "./index.js";
 
@@ -1995,10 +1996,7 @@ class YtDownloaderApp {
 				compatibleMode:
 					$(CONSTANTS.DOM_IDS.COMPATIBLE_MODE_CHECKED)?.checked || false,
 			},
-			customArgs:
-				$("customArgsInputHome")?.value?.trim() ||
-				$(CONSTANTS.DOM_IDS.CUSTOM_ARGS_INPUT)?.value?.trim() ||
-				"",
+			customArgs: this._getCustomArgs(),
 		};
 
 		if (this.state.currentDownloads < this.state.maxActiveDownloads) {
@@ -2649,6 +2647,19 @@ class YtDownloaderApp {
 	}
 
 	/**
+	 * Returns combined custom yt-dlp arguments from preferences and home "More options".
+	 * @returns {string}
+	 */
+	_getCustomArgs() {
+		const globalArgs =
+			this.state.preferences?.customYtDlpArgs ||
+			localStorage.getItem(CONSTANTS.LOCAL_STORAGE_KEYS.YT_DLP_CUSTOM_ARGS) ||
+			"";
+		const homeArgs = $("customArgsInputHome")?.value?.trim() || "";
+		return [globalArgs, homeArgs].filter(Boolean).join(" ");
+	}
+
+	/**
 	 * Prepares the command-line arguments for yt-dlp based on the download job.
 	 * @param {object} job The download job object.
 	 * @returns {{downloadArgs: string[], tempFilePath: string}}
@@ -2948,11 +2959,9 @@ class YtDownloaderApp {
 		const customArgsString =
 			job.customArgs !== undefined
 				? job.customArgs
-				: $("customArgsInputHome")?.value?.trim() ||
-					$(CONSTANTS.DOM_IDS.CUSTOM_ARGS_INPUT)?.value?.trim() ||
-					"";
+				: this._getCustomArgs();
 		if (customArgsString) {
-			const customArgs = customArgsString.split(/\s+/);
+			const customArgs = parseCustomArgs(customArgsString);
 			downloadArgs.push(...customArgs);
 		}
 
@@ -3301,6 +3310,8 @@ class YtDownloaderApp {
 		this._hideInfoPanel();
 		$(CONSTANTS.DOM_IDS.LOADING_WRAPPER).style.display = "flex";
 		this._clearError();
+		const customArgsHome = $("customArgsInputHome");
+		if (customArgsHome) customArgsHome.value = "";
 		$(CONSTANTS.DOM_IDS.VIDEO_FORMAT_SELECT).innerHTML = "";
 		$(CONSTANTS.DOM_IDS.AUDIO_FORMAT_SELECT).innerHTML = "";
 		const noAudioTxt = i18n.__("noAudio");
@@ -3896,10 +3907,7 @@ class YtDownloaderApp {
 				$(CONSTANTS.DOM_IDS.COMPATIBLE_MODE_CHECKED)?.checked || false,
 		};
 
-		const customArgs =
-			$("customArgsInputHome")?.value?.trim() ||
-			$(CONSTANTS.DOM_IDS.CUSTOM_ARGS_INPUT)?.value?.trim() ||
-			"";
+		const customArgs = this._getCustomArgs();
 
 		checked.forEach((cb) => {
 			const index = parseInt(cb.dataset.index, 10);
@@ -4126,10 +4134,7 @@ class YtDownloaderApp {
 				subLang,
 				subFormat,
 			},
-			customArgs:
-				$("customArgsInputHome")?.value?.trim() ||
-				$(CONSTANTS.DOM_IDS.CUSTOM_ARGS_INPUT)?.value?.trim() ||
-				"",
+			customArgs: this._getCustomArgs(),
 		};
 
 		if (this.state.currentDownloads < this.state.maxActiveDownloads) {
@@ -5104,6 +5109,8 @@ class YtDownloaderApp {
 			if (hiddenPanel) hiddenPanel.style.display = "none";
 		}
 		this._clearError();
+		const customArgsHome = $("customArgsInputHome");
+		if (customArgsHome) customArgsHome.value = "";
 		this._updateAutoModeUI();
 		this._updateEmptyStateUI();
 	}
@@ -5336,10 +5343,7 @@ class YtDownloaderApp {
 						compatibleMode:
 							$(CONSTANTS.DOM_IDS.COMPATIBLE_MODE_CHECKED)?.checked || false,
 					},
-					customArgs:
-						$("customArgsInputHome")?.value?.trim() ||
-						$(CONSTANTS.DOM_IDS.CUSTOM_ARGS_INPUT)?.value?.trim() ||
-						"",
+					customArgs: this._getCustomArgs(),
 				};
 
 				if (

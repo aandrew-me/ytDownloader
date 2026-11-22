@@ -485,4 +485,143 @@ export function timeToSeconds(timeStr) {
 	return 0;
 }
 
+/**
+ * Splits a command-line argument string into an array of arguments,
+ * respecting single quotes, double quotes, and backslash escapes.
+ * Enclosing quotes are stripped so arguments can be safely passed to spawn().
+ *
+ * @param {string} str The raw arguments string.
+ * @returns {string[]} An array of parsed arguments.
+ */
+export function parseCustomArgs(str) {
+	if (!str || typeof str !== "string") return [];
+	const tokens = [];
+	let current = "";
+	let inSingle = false;
+	let inDouble = false;
+	let hasToken = false;
+
+	for (let i = 0; i < str.length; i++) {
+		const char = str[i];
+
+		if (char === "\\") {
+			const nextChar = str[i + 1];
+			// Inside single quotes: backslash is always literal
+			if (inSingle) {
+				current += char;
+				hasToken = true;
+			} else if (inDouble) {
+				// Inside double quotes: only escape quotes and backslashes (preserves Windows paths)
+				if (nextChar === '"' || nextChar === "\\") {
+					current += nextChar;
+					i++;
+					hasToken = true;
+				} else {
+					current += char;
+					hasToken = true;
+				}
+			} else {
+				// Outside quotes: escape quotes, whitespace, or backslashes
+				if (nextChar === '"' || nextChar === "'" || nextChar === "\\" || /\s/.test(nextChar)) {
+					current += nextChar;
+					i++;
+					hasToken = true;
+				} else {
+					current += char;
+					hasToken = true;
+				}
+			}
+			continue;
+		}
+
+		if (char === "'" && !inDouble) {
+			inSingle = !inSingle;
+			hasToken = true;
+			continue;
+		}
+
+		if (char === '"' && !inSingle) {
+			inDouble = !inDouble;
+			hasToken = true;
+			continue;
+		}
+
+		if (/\s/.test(char) && !inSingle && !inDouble) {
+			if (hasToken) {
+				tokens.push(current);
+				current = "";
+				hasToken = false;
+			}
+			continue;
+		}
+
+		current += char;
+		hasToken = true;
+	}
+
+	if (hasToken) {
+		tokens.push(current);
+	}
+
+	return tokens;
+}
+
+const PLAYLIST_BLOCKED_FLAGS = new Set([
+	"-o",
+	"--output",
+	"--no-playlist",
+	"--yes-playlist",
+	"-I",
+	"--playlist-items",
+	"--playlist-start",
+	"--playlist-end",
+	"--playlist-reverse",
+	"--playlist-random",
+]);
+
+const PLAYLIST_PARAM_FLAGS = new Set([
+	"-o",
+	"--output",
+	"-I",
+	"--playlist-items",
+	"--playlist-start",
+	"--playlist-end",
+]);
+
+/**
+ * Filters out yt-dlp arguments that would conflict with playlist directory
+ * structure, indexing, or batch ranges.
+ *
+ * @param {string[]} args Parsed argument array.
+ * @returns {string[]} Safe arguments for playlist downloads.
+ */
+export function filterPlaylistArgs(args = []) {
+	if (!Array.isArray(args)) return [];
+	const safeArgs = [];
+	for (let i = 0; i < args.length; i++) {
+		const arg = args[i];
+		const flagName = arg.includes("=") ? arg.split("=")[0] : arg;
+
+		// Block full flag or short option with attached value (e.g. -oTemplate or -I1:5)
+		const isShortAttached =
+			!arg.startsWith("--") && (arg.startsWith("-o") || arg.startsWith("-I")) && arg.length > 2;
+
+		if (PLAYLIST_BLOCKED_FLAGS.has(flagName) || isShortAttached) {
+			// If flag takes a parameter in the next token (e.g. -o path), skip that value too
+			if (
+				PLAYLIST_PARAM_FLAGS.has(flagName) &&
+				!arg.includes("=") &&
+				!isShortAttached &&
+				i + 1 < args.length &&
+				!args[i + 1].startsWith("-")
+			) {
+				i++;
+			}
+			continue;
+		}
+		safeArgs.push(arg);
+	}
+	return safeArgs;
+}
+
 
