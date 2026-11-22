@@ -51,6 +51,10 @@ jobs:
               with:
                   node-version: 24
 
+            - name: Setup LXD
+              if: matrix.target == 'linux-x64'
+              uses: canonical/setup-lxd@v1
+
             - name: Linux Build
               if: matrix.target == 'linux-x64'
               run: |
