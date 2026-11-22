@@ -1147,5 +1147,45 @@ test.describe("Main Page Download Tests", () => {
 		const isPlaylistActive = await page.$eval("#view-playlist", (el) => el.classList.contains("active"));
 		expect(isPlaylistActive).toBe(false);
 	});
+
+	test("compatible mode forces mp4 container and passes scoped postprocessor args", async () => {
+		const testUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+
+		await page.evaluate((url) => {
+			window.electronAPI.clipboard.writeText(url);
+		}, testUrl);
+
+		await page.click("#pasteUrl");
+		await waitForInfoPanel(page);
+
+		// Open "More options"
+		await triggerClick(page, "advancedVideoToggle");
+
+		// Toggle compatible mode ON
+		await page.check("#compatibleModeChecked");
+
+		// Check that output format select is disabled and forced to mp4
+		const isDisabled = await page.$eval("#homeOutputFormatSelect", (el) => el.disabled);
+		const formatVal = await page.$eval("#homeOutputFormatSelect", (el) => el.value);
+		expect(isDisabled).toBe(true);
+		expect(formatVal).toBe("mp4");
+
+		await clearExecutedCommands(page);
+		await triggerClick(page, "videoDownload");
+
+		await page.waitForFunction(() => {
+			const cmds = window.__executedCommands || [];
+			return cmds.some((cmd) => cmd.includes("-f"));
+		});
+
+		const commands = await getExecutedCommands(page);
+		const downloadCmd = commands.find((cmd) => cmd.includes("-f"));
+		expect(downloadCmd).toBeDefined();
+		expect(downloadCmd).toContain("--merge-output-format");
+		expect(downloadCmd).toContain("mp4");
+		expect(downloadCmd).toContain("--recode-video");
+		expect(downloadCmd).toContain("Metadata+ffmpeg_o:-c:v libx264 -preset fast -crf 23 -c:a aac -b:a 128k");
+		expect(downloadCmd.join(" ")).not.toContain("ffmpeg:-c:v libx264");
+	});
 });
 
