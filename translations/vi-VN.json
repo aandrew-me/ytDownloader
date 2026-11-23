@@ -343,5 +343,13 @@
 	"os": "HĐH",
 	"retry": "Retry",
 	"compatibleMode": "Compatible mode (H.264 + AAC)",
-	"compatibleModeDesc": "Re-encode to H.264 + AAC for maximum device and app compatibility (WhatsApp, iMessage, etc.). Downloads will take longer."
+	"compatibleModeDesc": "Re-encode to H.264 + AAC for maximum device and app compatibility (WhatsApp, iMessage, etc.). Downloads will take longer.",
+	"networkProxy": "Máy chủ proxy",
+	"networkProxyDesc": "Định tuyến tải xuống qua máy chủ proxy",
+	"proxyType": "Loại proxy",
+	"proxyTypeDesc": "Proxy HTTP hoặc SOCKS5",
+	"proxyHost": "Máy chủ",
+	"proxyPort": "Cổng",
+	"proxyUsername": "Tên người dùng (tùy chọn)",
+	"proxyPassword": "Mật khẩu (tùy chọn)"
 }

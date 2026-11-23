@@ -343,5 +343,13 @@
 	"os": "ОС",
 	"retry": "Retry",
 	"compatibleMode": "Compatible mode (H.264 + AAC)",
-	"compatibleModeDesc": "Re-encode to H.264 + AAC for maximum device and app compatibility (WhatsApp, iMessage, etc.). Downloads will take longer."
+	"compatibleModeDesc": "Re-encode to H.264 + AAC for maximum device and app compatibility (WhatsApp, iMessage, etc.). Downloads will take longer.",
+	"networkProxy": "Мережевий проксі",
+	"networkProxyDesc": "Маршрутизувати завантаження через проксі-сервер",
+	"proxyType": "Тип проксі",
+	"proxyTypeDesc": "Проксі HTTP або SOCKS5",
+	"proxyHost": "Хост",
+	"proxyPort": "Порт",
+	"proxyUsername": "Ім'я користувача (необов'язково)",
+	"proxyPassword": "Пароль (необов'язково)"
 }

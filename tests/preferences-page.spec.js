@@ -259,12 +259,39 @@ test.describe("Preferences Page Tests", () => {
 		savedProxyMode = await page.evaluate(() => localStorage.getItem("proxyMode"));
 		expect(savedProxyMode).toBe("custom");
 
-		const proxyUrl = "http://127.0.0.1:8080";
-		await page.fill("#proxyTxt", proxyUrl);
-		// Dispatch change event for input
-		await page.dispatchEvent("#proxyTxt", "change");
-		const savedProxy = await page.evaluate(() => localStorage.getItem("proxy"));
-		expect(savedProxy).toBe(proxyUrl);
+		await page.selectOption("#proxyMode", "socks5");
+		await page.fill("#proxyHost", "127.0.0.1");
+		await page.fill("#proxyPort", "2080");
+		await page.fill("#proxyUsername", "testuser");
+		await page.fill("#proxyPassword", "testpass");
+		await page.dispatchEvent("#proxyPort", "change");
+		let savedProxy = await page.evaluate(() => localStorage.getItem("proxy"));
+		expect(savedProxy).toBe("socks5://testuser:testpass@127.0.0.1:2080");
+
+		// Test socks5h selection and persistence
+		await page.selectOption("#proxyMode", "socks5h");
+		await page.dispatchEvent("#proxyPort", "change");
+		savedProxy = await page.evaluate(() => localStorage.getItem("proxy"));
+		expect(savedProxy).toBe("socks5h://testuser:testpass@127.0.0.1:2080");
+
+		// Test legacy invalid percent encoding in credentials without throwing
+		await page.evaluate((val) => {
+			const el = document.getElementById("proxyTxt");
+			el.value = val;
+			el.dispatchEvent(new Event("change"));
+		}, "http://user:p%ss@host:8080");
+		expect(await page.inputValue("#proxyHost")).toBe("host");
+		expect(await page.inputValue("#proxyPassword")).toBe("p%ss");
+
+		// Test scheme-less proxy defaulting to http
+		await page.evaluate((val) => {
+			const el = document.getElementById("proxyTxt");
+			el.value = val;
+			el.dispatchEvent(new Event("change"));
+		}, "localhost:8080");
+		expect(await page.inputValue("#proxyMode")).toBe("http");
+		expect(await page.inputValue("#proxyHost")).toBe("localhost");
+		expect(await page.inputValue("#proxyPort")).toBe("8080");
 
 		const customArgs = "--sponsorblock-remove all";
 		await page.fill("#customArgsInput", customArgs);

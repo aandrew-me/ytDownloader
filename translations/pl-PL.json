@@ -343,5 +343,13 @@
 	"os": "System",
 	"retry": "Retry",
 	"compatibleMode": "Compatible mode (H.264 + AAC)",
-	"compatibleModeDesc": "Re-encode to H.264 + AAC for maximum device and app compatibility (WhatsApp, iMessage, etc.). Downloads will take longer."
+	"compatibleModeDesc": "Re-encode to H.264 + AAC for maximum device and app compatibility (WhatsApp, iMessage, etc.). Downloads will take longer.",
+	"networkProxy": "Serwer proxy",
+	"networkProxyDesc": "Kieruj pobieranie przez serwer proxy",
+	"proxyType": "Typ serwera proxy",
+	"proxyTypeDesc": "Serwer proxy HTTP lub SOCKS5",
+	"proxyHost": "Host",
+	"proxyPort": "Port",
+	"proxyUsername": "Nazwa użytkownika (opcjonalnie)",
+	"proxyPassword": "Hasło (opcjonalnie)"
 }

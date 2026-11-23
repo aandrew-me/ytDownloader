@@ -343,5 +343,13 @@
 	"os": "ΛΣ",
 	"retry": "Retry",
 	"compatibleMode": "Compatible mode (H.264 + AAC)",
-	"compatibleModeDesc": "Re-encode to H.264 + AAC for maximum device and app compatibility (WhatsApp, iMessage, etc.). Downloads will take longer."
+	"compatibleModeDesc": "Re-encode to H.264 + AAC for maximum device and app compatibility (WhatsApp, iMessage, etc.). Downloads will take longer.",
+	"networkProxy": "Διακομιστής μεσολάβησης δικτύου",
+	"networkProxyDesc": "Δρομολόγηση λήψεων μέσω διακομιστή μεσολάβησης",
+	"proxyType": "Τύπος διακομιστή μεσολάβησης",
+	"proxyTypeDesc": "Διακομιστής μεσολάβησης HTTP ή SOCKS5",
+	"proxyHost": "Κεντρικός υπολογιστής",
+	"proxyPort": "Θύρα",
+	"proxyUsername": "Όνομα χρήστη (προαιρετικό)",
+	"proxyPassword": "Κωδικός πρόσβασης (προαιρετικός)"
 }

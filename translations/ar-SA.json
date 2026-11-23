@@ -343,5 +343,13 @@
 	"os": "نظام التشغيل",
 	"retry": "Retry",
 	"compatibleMode": "Compatible mode (H.264 + AAC)",
-	"compatibleModeDesc": "Re-encode to H.264 + AAC for maximum device and app compatibility (WhatsApp, iMessage, etc.). Downloads will take longer."
+	"compatibleModeDesc": "Re-encode to H.264 + AAC for maximum device and app compatibility (WhatsApp, iMessage, etc.). Downloads will take longer.",
+	"networkProxy": "وكيل الشبكة",
+	"networkProxyDesc": "توجيه التنزيلات عبر خادم وكيل",
+	"proxyType": "نوع الوكيل",
+	"proxyTypeDesc": "وكيل HTTP أو SOCKS5",
+	"proxyHost": "المضيف",
+	"proxyPort": "المنفذ",
+	"proxyUsername": "اسم المستخدم (اختياري)",
+	"proxyPassword": "كلمة المرور (اختياري)"
 }
