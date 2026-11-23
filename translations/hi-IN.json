@@ -343,5 +343,13 @@
 	"os": "ओएस",
 	"retry": "Retry",
 	"compatibleMode": "Compatible mode (H.264 + AAC)",
-	"compatibleModeDesc": "Re-encode to H.264 + AAC for maximum device and app compatibility (WhatsApp, iMessage, etc.). Downloads will take longer."
+	"compatibleModeDesc": "Re-encode to H.264 + AAC for maximum device and app compatibility (WhatsApp, iMessage, etc.). Downloads will take longer.",
+	"networkProxy": "नेटवर्क प्रॉक्सी",
+	"networkProxyDesc": "प्रॉक्सी सर्वर के माध्यम से डाउनलोड रूट करें",
+	"proxyType": "प्रॉक्सी प्रकार",
+	"proxyTypeDesc": "HTTP या SOCKS5 प्रॉक्सी",
+	"proxyHost": "होस्ट",
+	"proxyPort": "पोर्ट",
+	"proxyUsername": "उपयोगकर्ता नाम (वैकल्पिक)",
+	"proxyPassword": "पासवर्ड (वैकल्पिक)"
 }

@@ -343,5 +343,13 @@
 	"os": "SE",
 	"retry": "Retry",
 	"compatibleMode": "Compatible mode (H.264 + AAC)",
-	"compatibleModeDesc": "Re-encode to H.264 + AAC for maximum device and app compatibility (WhatsApp, iMessage, etc.). Downloads will take longer."
+	"compatibleModeDesc": "Re-encode to H.264 + AAC for maximum device and app compatibility (WhatsApp, iMessage, etc.). Downloads will take longer.",
+	"networkProxy": "Sareko proxya",
+	"networkProxyDesc": "Bideratu deskargak proxy zerbitzari baten bidez",
+	"proxyType": "Proxy mota",
+	"proxyTypeDesc": "HTTP edo SOCKS5 proxya",
+	"proxyHost": "Ostalaria",
+	"proxyPort": "Ataka",
+	"proxyUsername": "Erabiltzaile-izena (aukerakoa)",
+	"proxyPassword": "Pasahitza (aukerakoa)"
 }

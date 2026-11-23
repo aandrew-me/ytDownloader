@@ -343,5 +343,13 @@
 	"os": "İS",
 	"retry": "Retry",
 	"compatibleMode": "Compatible mode (H.264 + AAC)",
-	"compatibleModeDesc": "Re-encode to H.264 + AAC for maximum device and app compatibility (WhatsApp, iMessage, etc.). Downloads will take longer."
+	"compatibleModeDesc": "Re-encode to H.264 + AAC for maximum device and app compatibility (WhatsApp, iMessage, etc.). Downloads will take longer.",
+	"networkProxy": "Ağ Vekil Sunucusu",
+	"networkProxyDesc": "İndirmeleri bir vekil sunucu üzerinden yönlendir",
+	"proxyType": "Vekil Türü",
+	"proxyTypeDesc": "HTTP veya SOCKS5 vekil",
+	"proxyHost": "Sunucu",
+	"proxyPort": "Bağlantı Noktası",
+	"proxyUsername": "Kullanıcı adı (isteğe bağlı)",
+	"proxyPassword": "Şifre (isteğe bağlı)"
 }

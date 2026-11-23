@@ -569,6 +569,112 @@ function initPreferences() {
 	const systemProxyVal = getId("systemProxyVal");
 	const customProxyBox = getId("customProxyBox");
 	const proxyEl = getId("proxyTxt");
+	const proxyHostEl = getId("proxyHost");
+	const proxyPortEl = getId("proxyPort");
+	const proxyUserEl = getId("proxyUsername");
+	const proxyPassEl = getId("proxyPassword");
+
+	const CUSTOM_PROTOCOLS = ["socks5", "socks5h", "http", "https"];
+
+	function safeDecodeURIComponent(str) {
+		try {
+			return decodeURIComponent(str);
+		} catch {
+			return str;
+		}
+	}
+
+	function parseProxyUrl(rawUrl) {
+		if (!rawUrl || typeof rawUrl !== "string") {
+			return { protocol: "socks5", host: "", port: "", user: "", pass: "" };
+		}
+		let str = rawUrl.trim();
+		let protocol = "http";
+		if (str.startsWith("socks5h://")) {
+			protocol = "socks5h";
+			str = str.replace(/^socks5h:\/\//, "");
+		} else if (str.startsWith("socks5://")) {
+			protocol = "socks5";
+			str = str.replace(/^socks5:\/\//, "");
+		} else if (str.startsWith("https://")) {
+			protocol = "https";
+			str = str.replace(/^https:\/\//, "");
+		} else if (str.startsWith("http://")) {
+			protocol = "http";
+			str = str.replace(/^http:\/\//, "");
+		}
+
+		let user = "";
+		let pass = "";
+		if (str.includes("@")) {
+			const atIdx = str.indexOf("@");
+			const auth = str.slice(0, atIdx);
+			str = str.slice(atIdx + 1);
+			if (auth.includes(":")) {
+				const colonIdx = auth.indexOf(":");
+				user = safeDecodeURIComponent(auth.slice(0, colonIdx));
+				pass = safeDecodeURIComponent(auth.slice(colonIdx + 1));
+			} else {
+				user = safeDecodeURIComponent(auth);
+			}
+		}
+
+		let host = str;
+		let port = "";
+		if (str.includes(":")) {
+			const lastColon = str.lastIndexOf(":");
+			host = str.slice(0, lastColon);
+			port = str.slice(lastColon + 1).replace(/\/.*$/, "");
+		} else {
+			host = str.replace(/\/.*$/, "");
+		}
+
+		return { protocol, host, port, user, pass };
+	}
+
+	function buildProxyUrl({ protocol, host, port, user, pass }) {
+		const trimmedHost = (host || "").trim();
+		if (!trimmedHost) return "";
+		let auth = "";
+		const trimmedUser = (user || "").trim();
+		const trimmedPass = (pass || "").trim();
+		if (trimmedUser && trimmedPass) {
+			auth = `${encodeURIComponent(trimmedUser)}:${encodeURIComponent(trimmedPass)}@`;
+		} else if (trimmedUser) {
+			auth = `${encodeURIComponent(trimmedUser)}@`;
+		}
+		const trimmedPort = (port || "").trim();
+		const portPart = trimmedPort ? `:${trimmedPort}` : "";
+		return `${protocol || "http"}://${auth}${trimmedHost}${portPart}`;
+	}
+
+	function syncInputsFromProxyUrl(url) {
+		const parsed = parseProxyUrl(url);
+		if (proxyHostEl) proxyHostEl.value = parsed.host;
+		if (proxyPortEl) proxyPortEl.value = parsed.port;
+		if (proxyUserEl) proxyUserEl.value = parsed.user;
+		if (proxyPassEl) proxyPassEl.value = parsed.pass;
+		if (proxyModeSelect) {
+			const isCustomProtocol = CUSTOM_PROTOCOLS.includes(parsed.protocol);
+			if (proxyModeSelect.value !== "none" && proxyModeSelect.value !== "system") {
+				proxyModeSelect.value = isCustomProtocol ? parsed.protocol : "socks5";
+			}
+		}
+	}
+
+	function syncProxyUrlFromInputs() {
+		const selectVal = proxyModeSelect ? proxyModeSelect.value : "socks5";
+		const protocol = CUSTOM_PROTOCOLS.includes(selectVal)
+			? selectVal
+			: (localStorage.getItem("proxyType") || "socks5");
+		const host = proxyHostEl ? proxyHostEl.value : "";
+		const port = proxyPortEl ? proxyPortEl.value : "";
+		const user = proxyUserEl ? proxyUserEl.value : "";
+		const pass = proxyPassEl ? proxyPassEl.value : "";
+		const url = buildProxyUrl({ protocol, host, port, user, pass });
+		if (proxyEl) proxyEl.value = url;
+		localStorage.setItem("proxy", url);
+	}
 
 	const savedProxyMode =
 		localStorage.getItem("proxyMode") ||
@@ -597,8 +703,9 @@ function initPreferences() {
 	refreshSystemProxyDisplay = updateSystemProxyDisplay;
 
 	function updateProxyModeUI(mode) {
+		const isCustom = mode === "custom" || CUSTOM_PROTOCOLS.includes(mode);
 		if (customProxyBox) {
-			customProxyBox.style.display = mode === "custom" ? "flex" : "none";
+			customProxyBox.style.display = isCustom ? "flex" : "none";
 		}
 		if (systemProxyBox) {
 			systemProxyBox.style.display = mode === "system" ? "flex" : "none";
@@ -608,22 +715,60 @@ function initPreferences() {
 		}
 	}
 
+	const savedProxy = localStorage.getItem("proxy") || "";
+	if (proxyEl) proxyEl.value = savedProxy;
+	const parsedProxy = parseProxyUrl(savedProxy);
+	if (proxyHostEl) proxyHostEl.value = parsedProxy.host;
+	if (proxyPortEl) proxyPortEl.value = parsedProxy.port;
+	if (proxyUserEl) proxyUserEl.value = parsedProxy.user;
+	if (proxyPassEl) proxyPassEl.value = parsedProxy.pass;
+
 	if (proxyModeSelect) {
-		proxyModeSelect.value = savedProxyMode;
+		if (savedProxyMode === "none" || savedProxyMode === "system") {
+			proxyModeSelect.value = savedProxyMode;
+		} else {
+			const isCustomProtocol = CUSTOM_PROTOCOLS.includes(parsedProxy.protocol);
+			proxyModeSelect.value = isCustomProtocol
+				? parsedProxy.protocol
+				: (localStorage.getItem("proxyType") || "socks5");
+		}
 		updateProxyModeUI(savedProxyMode);
 
 		const updateProxyMode = (e) => {
 			const newMode = e.target.value;
-			localStorage.setItem("proxyMode", newMode);
-			updateProxyModeUI(newMode);
+			if (newMode === "none") {
+				localStorage.setItem("proxyMode", "none");
+				updateProxyModeUI("none");
+			} else if (newMode === "system") {
+				localStorage.setItem("proxyMode", "system");
+				updateProxyModeUI("system");
+			} else {
+				localStorage.setItem("proxyMode", "custom");
+				if (newMode !== "custom") {
+					localStorage.setItem("proxyType", newMode);
+				}
+				syncProxyUrlFromInputs();
+				updateProxyModeUI("custom");
+			}
 		};
 		proxyModeSelect.addEventListener("change", updateProxyMode);
 	}
 
+	const onFieldChange = () => {
+		syncProxyUrlFromInputs();
+	};
+	[proxyHostEl, proxyPortEl, proxyUserEl, proxyPassEl].forEach((el) => {
+		if (el) {
+			el.addEventListener("input", onFieldChange);
+			el.addEventListener("change", onFieldChange);
+		}
+	});
+
 	if (proxyEl) {
-		const savedProxy = localStorage.getItem("proxy");
-		if (savedProxy) proxyEl.value = savedProxy;
-		const updateProxy = (e) => localStorage.setItem("proxy", e.target.value);
+		const updateProxy = (e) => {
+			localStorage.setItem("proxy", e.target.value);
+			syncInputsFromProxyUrl(e.target.value);
+		};
 		proxyEl.addEventListener("change", updateProxy);
 		proxyEl.addEventListener("input", updateProxy);
 	}

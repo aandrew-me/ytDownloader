@@ -343,5 +343,13 @@
 	"os": "Käyttöjärjestelmä",
 	"retry": "Retry",
 	"compatibleMode": "Compatible mode (H.264 + AAC)",
-	"compatibleModeDesc": "Re-encode to H.264 + AAC for maximum device and app compatibility (WhatsApp, iMessage, etc.). Downloads will take longer."
+	"compatibleModeDesc": "Re-encode to H.264 + AAC for maximum device and app compatibility (WhatsApp, iMessage, etc.). Downloads will take longer.",
+	"networkProxy": "Verkkovälityspalvelin",
+	"networkProxyDesc": "Reititä lataukset välityspalvelimen kautta",
+	"proxyType": "Välityspalvelimen tyyppi",
+	"proxyTypeDesc": "HTTP- tai SOCKS5-välityspalvelin",
+	"proxyHost": "Isäntä",
+	"proxyPort": "Portti",
+	"proxyUsername": "Käyttäjänimi (valinnainen)",
+	"proxyPassword": "Salasana (valinnainen)"
 }

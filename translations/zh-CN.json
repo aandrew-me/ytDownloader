@@ -343,5 +343,13 @@
 	"os": "系统",
 	"retry": "Retry",
 	"compatibleMode": "Compatible mode (H.264 + AAC)",
-	"compatibleModeDesc": "Re-encode to H.264 + AAC for maximum device and app compatibility (WhatsApp, iMessage, etc.). Downloads will take longer."
+	"compatibleModeDesc": "Re-encode to H.264 + AAC for maximum device and app compatibility (WhatsApp, iMessage, etc.). Downloads will take longer.",
+	"networkProxy": "网络代理",
+	"networkProxyDesc": "通过代理服务器路由下载",
+	"proxyType": "代理类型",
+	"proxyTypeDesc": "HTTP 或 SOCKS5 代理",
+	"proxyHost": "主机",
+	"proxyPort": "端口",
+	"proxyUsername": "用户名（可选）",
+	"proxyPassword": "密码（可选）"
 }
