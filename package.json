@@ -109,7 +109,14 @@
 			"base": "core24",
 			"core24": {
 				"grade": "stable",
-				"useLXD": true
+				"useLXD": true,
+				"plugs": [
+					"home",
+					"network",
+					"browser-support",
+					"audio-playback",
+					"unity7"
+				]
 			}
 		},
 		"win": {
