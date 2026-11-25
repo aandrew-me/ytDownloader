@@ -199,6 +199,7 @@ class YtDownloaderApp {
 			maxActiveDownloads: 5,
 			currentDownloads: 0,
 			isFetchingInfo: false,
+			isUpdatingYtDlp: false,
 			// Video metadata
 			videoInfo: {
 				title: "",
@@ -908,25 +909,57 @@ class YtDownloaderApp {
 	}
 
 	/**
+	 * Shows or hides the centered fullscreen blocking popup used during yt-dlp downloads/updates.
+	 * @param {boolean} visible Whether the blocking popup should be shown.
+	 * @param {string} [message=""] Message to display inside the popup.
+	 */
+	_setBlockingPopup(visible, message = "") {
+		const popupBox = $(CONSTANTS.DOM_IDS.POPUP_BOX);
+		if (!popupBox) return;
+		if (!visible) {
+			popupBox.style.display = "none";
+			return;
+		}
+		const popupSvg = $(CONSTANTS.DOM_IDS.POPUP_SVG);
+		const popupMsg =
+			$(CONSTANTS.DOM_IDS.POPUP_MESSAGE) ||
+			document.querySelector("#popupBox p");
+		const progressEl = $(CONSTANTS.DOM_IDS.YTDLP_DOWNLOAD_PROGRESS);
+		const popupHint = $(CONSTANTS.DOM_IDS.POPUP_HINT);
+		const popupActions = $(CONSTANTS.DOM_IDS.POPUP_ACTIONS);
+
+		popupBox.style.display = "block";
+		if (popupSvg) popupSvg.style.display = "flex";
+		if (popupActions) popupActions.style.display = "none";
+		if (popupHint) popupHint.style.display = "none";
+		if (popupMsg) popupMsg.textContent = message;
+		if (progressEl) progressEl.textContent = "";
+		if (
+			document.activeElement &&
+			typeof document.activeElement.blur === "function"
+		) {
+			document.activeElement.blur();
+		}
+	}
+
+	/**
 	 * yt-dlp background update
 	 */
 	_runBackgroundUpdate(executablePath, isMacOS) {
 		try {
+			const spawnFn =
+				window.electronAPI?.isTest && window.__mockSpawn
+					? window.__mockSpawn
+					: spawn;
+
+			let updateProc;
 			if (isMacOS) {
 				const brewPaths = [
 					"/opt/homebrew/bin/brew",
 					"/usr/local/bin/brew",
 				];
 				const brewExec = brewPaths.find((p) => existsSync(p)) || "brew";
-
-				const brewUpdate = spawn(brewExec, ["upgrade", "yt-dlp"]);
-
-				brewUpdate.on("error", (err) =>
-					console.error("Failed to run 'brew upgrade yt-dlp':", err),
-				);
-				brewUpdate.stdout.on("data", (data) =>
-					console.log("yt-dlp brew update:", data.toString()),
-				);
+				updateProc = spawnFn(brewExec, ["upgrade", "yt-dlp"]);
 			} else {
 				// Only self-update binaries we manage in ~/.ytDownloader.
 				// A system yt-dlp (apt/pip/etc.) rejects `-U` and is updated
@@ -942,31 +975,71 @@ class YtDownloaderApp {
 				const releaseChannel =
 					localStorage.getItem("ytdlpChannel") || "nightly";
 
-				const updateProc = spawn(executablePath, [
+				updateProc = spawnFn(executablePath, [
 					"--update-to",
 					releaseChannel,
 				]);
+			}
 
-				updateProc.on("error", (err) =>
-					console.error(
-						"Failed to run background yt-dlp update:",
-						err,
-					),
+			let stdoutBuffer = "";
+			let hasStartedUpdate = false;
+			let didUpdate = false;
+			let finished = false;
+
+			const startUpdating = () => {
+				if (hasStartedUpdate || finished) return;
+				hasStartedUpdate = true;
+				this.state.isUpdatingYtDlp = true;
+				this._setBlockingPopup(true, i18n.__("updatingYtdlp"));
+			};
+
+			const finishUpdating = (succeeded) => {
+				if (finished) return;
+				finished = true;
+				if (hasStartedUpdate) {
+					this.state.isUpdatingYtDlp = false;
+					this._setBlockingPopup(false);
+					this._showPopup(
+						i18n.__(succeeded ? "updatedYtdlp" : "updateError"),
+						!succeeded,
+					);
+				}
+			};
+
+			updateProc.on("error", (err) => {
+				console.error("Failed to run background yt-dlp update:", err);
+				finishUpdating(false);
+			});
+
+			updateProc.stdout?.on("data", (data) => {
+				const output = data.toString();
+				stdoutBuffer += output;
+				console.log(
+					isMacOS ? "yt-dlp brew update:" : "yt-dlp update check:",
+					output,
 				);
 
-				updateProc.stdout.on("data", (data) => {
-					const output = data.toString();
-					console.log("yt-dlp update check:", output);
-
-					if (output.toLowerCase().includes("updating to")) {
-						this._showPopup(i18n.__("updatingYtdlp"));
-					} else if (
-						output.toLowerCase().includes("updated yt-dlp to")
+				const lower = stdoutBuffer.toLowerCase();
+				if (isMacOS) {
+					if (
+						lower.includes("==> downloading") ||
+						lower.includes("==> upgrading")
 					) {
-						this._showPopup(i18n.__("updatedYtdlp"));
+						startUpdating();
 					}
-				});
-			}
+				} else {
+					if (lower.includes("updating to")) {
+						startUpdating();
+					}
+					if (lower.includes("updated yt-dlp to")) {
+						didUpdate = true;
+					}
+				}
+			});
+
+			updateProc.on("close", (code) => {
+				finishUpdating(isMacOS ? code === 0 : didUpdate || code === 0);
+			});
 		} catch (err) {
 			console.warn("Error initiating background update:", err);
 		}
@@ -1032,14 +1105,7 @@ class YtDownloaderApp {
 		};
 
 		const showDownloadingState = () => {
-			if (popupBox) popupBox.style.display = "block";
-			if (popupSvg) popupSvg.style.display = "flex";
-			if (popupActions) popupActions.style.display = "none";
-			if (popupHint) popupHint.style.display = "none";
-			if (popupMsg) {
-				popupMsg.textContent = i18n.__("downloadingNecessaryFilesWait");
-			}
-			if (progressEl) progressEl.textContent = "";
+			this._setBlockingPopup(true, i18n.__("downloadingNecessaryFilesWait"));
 		};
 
 		const tryDownload = async () => {
@@ -1486,6 +1552,25 @@ class YtDownloaderApp {
 				}
 			},
 		);
+		document.addEventListener(
+			"keydown",
+			(event) => {
+				if (!this.state.isUpdatingYtDlp) return;
+				const key = event.key?.toLowerCase();
+				if (
+					key === "tab" ||
+					key === "enter" ||
+					key === " " ||
+					key === "escape" ||
+					((event.ctrlKey || (event.metaKey && platform() === "darwin")) &&
+						(key === "v" || event.code === "KeyV"))
+				) {
+					event.preventDefault();
+					event.stopPropagation();
+				}
+			},
+			true,
+		);
 		document.addEventListener("keydown", (event) => {
 			const viewHome = document.getElementById("view-home");
 			if (!viewHome || viewHome.classList.contains("hidden")) return;
@@ -1631,6 +1716,7 @@ class YtDownloaderApp {
 	 * @param {string} query The search terms.
 	 */
 	async searchYoutube(query) {
+		if (this.state.isUpdatingYtDlp) return;
 		this._resetUIForNewLink();
 		$(CONSTANTS.DOM_IDS.SEARCH_RESULTS).innerHTML = "";
 
@@ -1798,6 +1884,7 @@ class YtDownloaderApp {
 	 * Pastes URL from clipboard and initiates fetching video info.
 	 */
 	async pasteAndGetInfo() {
+		if (this.state.isUpdatingYtDlp) return;
 		const pasteBtn = $(CONSTANTS.DOM_IDS.PASTE_URL_BTN);
 		if (pasteBtn && pasteBtn.disabled) return;
 		if (this.state.isFetchingInfo) return;
@@ -1818,6 +1905,7 @@ class YtDownloaderApp {
 	 * @param {boolean} [isFromPaste=false] Whether the request originated from paste button.
 	 */
 	async getInfo(url, isFromPaste = false) {
+		if (this.state.isUpdatingYtDlp) return;
 		const pasteBtn = $(CONSTANTS.DOM_IDS.PASTE_URL_BTN);
 		if (!isFromPaste) {
 			if (pasteBtn && pasteBtn.disabled) return;
