@@ -39,6 +39,8 @@ jobs:
                       os: macos-26-intel
                     - target: linux-x64
                       os: ubuntu-latest
+                    - target: linux-arm64
+                      os: ubuntu-24.04-arm
                     - target: windows-x64
                       os: windows-latest
 
@@ -52,26 +54,36 @@ jobs:
                   node-version: 24
 
             - name: Setup LXD
-              if: matrix.target == 'linux-x64'
+              if: startsWith(matrix.target, 'linux-')
               uses: canonical/setup-lxd@v1
 
             - name: Linux Build
-              if: matrix.target == 'linux-x64'
+              if: startsWith(matrix.target, 'linux-')
               run: |
+                  if [ "${{ matrix.target }}" = "linux-arm64" ]; then
+                      FFMPEG_ARCH="arm64"
+                      NODE_ARCH="arm64"
+                      NPM_SCRIPT="gh-linux-arm64"
+                  else
+                      FFMPEG_ARCH="amd64"
+                      NODE_ARCH="x64"
+                      NPM_SCRIPT="gh-linux"
+                  fi
+                  command -v patchelf >/dev/null || (sudo apt-get update && sudo apt-get install -y patchelf)
                   sudo snap install snapcraft --classic
-                  wget "https://github.com/aandrew-me/ffmpeg-builds/releases/download/v8/ffmpeg_linux_amd64.tar.xz"
-                  NODE_ARCHIVE=$(curl -fsSL https://nodejs.org/dist/latest-v22.x/SHASUMS256.txt | grep 'linux-x64\.tar\.xz$' | awk '{print $2}')
+                  wget "https://github.com/aandrew-me/ffmpeg-builds/releases/download/v8/ffmpeg_linux_${FFMPEG_ARCH}.tar.xz"
+                  NODE_ARCHIVE=$(curl -fsSL https://nodejs.org/dist/latest-v22.x/SHASUMS256.txt | grep "linux-${NODE_ARCH}\.tar\.xz$" | awk '{print $2}')
                   curl -fsSL "https://nodejs.org/dist/latest-v22.x/${NODE_ARCHIVE}" | tar -xJ --strip-components=2 --wildcards '*/bin/node'
                   chmod +x node
-                  tar -xf ffmpeg_linux_amd64.tar.xz
-                  mv ffmpeg_linux_amd64 ffmpeg
+                  tar -xf "ffmpeg_linux_${FFMPEG_ARCH}.tar.xz"
+                  mv "ffmpeg_linux_${FFMPEG_ARCH}" ffmpeg
                   chmod +x ffmpeg/bin/ffmpeg
                   chmod +x ffmpeg/bin/ffprobe
                   patchelf --set-rpath '$ORIGIN/../lib' ffmpeg/bin/ffmpeg
                   patchelf --set-rpath '$ORIGIN/../lib' ffmpeg/bin/ffprobe
-                  rm ffmpeg_linux_amd64.tar.xz
+                  rm "ffmpeg_linux_${FFMPEG_ARCH}.tar.xz"
                   npm i
-                  npm run gh-linux
+                  npm run "$NPM_SCRIPT"
 
             - name: Macos Intel Build
               if: matrix.target == 'macos-intel'
