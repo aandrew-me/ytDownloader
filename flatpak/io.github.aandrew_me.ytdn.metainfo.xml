@@ -30,23 +30,30 @@
   <screenshots>
     <screenshot type="default">
       <image>
-        https://github.com/user-attachments/assets/12410bca-31c3-48a0-bbd3-1d74bcc752b6
+        https://github.com/user-attachments/assets/89d484b0-9413-416c-9c3b-e322f6d93ca8
       </image>
       <caption>ytDownloader homepage</caption>
     </screenshot>
 
     <screenshot>
       <image>
-        https://github.com/user-attachments/assets/060557bc-d209-4bd0-bda4-debe42ca83a0
+        https://github.com/user-attachments/assets/00717c5b-39c3-4c47-a51c-855fa9d85673
       </image>
-      <caption>ytDownloader Settings</caption>
+      <caption>ytDownloader playlist page</caption>
     </screenshot>
 
     <screenshot>
       <image>
-        https://github.com/user-attachments/assets/52da7e50-46bb-4749-8152-5e79324a6cc3
+        https://github.com/user-attachments/assets/b7907b1a-be3d-4910-b210-ddae9e4c215a
       </image>
       <caption>ytDownloader video compressor</caption>
+    </screenshot>
+
+    <screenshot>
+      <image>
+        https://github.com/user-attachments/assets/cab933db-a591-4483-9ddc-8ff6cb3a94b9
+      </image>
+      <caption>ytDownloader preferences</caption>
     </screenshot>
 
   </screenshots>
@@ -55,6 +62,18 @@
   <content_rating type="oars-1.1" />
 
   <releases>
+      <release version="4.2.0" date="2026-11-25">
+      <description>
+        <p>Added a toggle to download videos in highly compatible mode</p>
+        <p>Added a retry button for media downloads</p>
+        <p>Playlist URLs pasted into the app now automatically redirect to the playlist page</p>
+        <p>Updated Snap core to v24</p>
+        <p>Improved yt-dlp custom argument processing</p>
+        <p>Improved the proxy settings UI</p>
+        <p>Added Linux ARM64 builds</p>
+      </description>
+    </release>
+    
     <release version="4.1.0" date="2026-11-09">
       <description>
         <p>Added subtitle downloading support</p>
