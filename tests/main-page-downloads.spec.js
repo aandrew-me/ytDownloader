@@ -1187,5 +1187,121 @@ test.describe("Main Page Download Tests", () => {
 		expect(downloadCmd).toContain("Metadata+ffmpeg_o:-c:v libx264 -preset fast -crf 23 -c:a aac -b:a 128k");
 		expect(downloadCmd.join(" ")).not.toContain("ffmpeg:-c:v libx264");
 	});
+
+	async function startMockYtDlpUpdate(page) {
+		await page.evaluate(() => {
+			const listeners = {};
+			const stdoutCbs = [];
+			window.__mockUpdateController = {
+				emitStdout: (text) => stdoutCbs.forEach((cb) => cb(text)),
+				emitClose: (code) => (listeners["close"] || []).forEach((cb) => cb(code)),
+			};
+			window.__mockSpawn = () => {
+				const proc = {
+					stdout: { on: (e, cb) => { if (e === "data") stdoutCbs.push(cb); } },
+					stderr: { on: () => {} },
+					on: (e, cb) => {
+						listeners[e] = listeners[e] || [];
+						listeners[e].push(cb);
+						return proc;
+					},
+					once: (e, cb) => {
+						listeners[e] = listeners[e] || [];
+						listeners[e].push(cb);
+						return proc;
+					},
+					kill: () => {},
+				};
+				return proc;
+			};
+
+			const managedPath = window.electronAPI.join(
+				window.electronAPI.homedir(),
+				".ytDownloader",
+				window.electronAPI.platform() === "win32" ? "ytdlp.exe" : "ytdlp",
+			);
+			window.app._runBackgroundUpdate(managedPath, false);
+		});
+	}
+
+	test("yt-dlp update download shows centered blocking popup and blocks actions until finished", async () => {
+		const testUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+		await page.evaluate((url) => {
+			window.electronAPI.clipboard.writeText(url);
+		}, testUrl);
+		await startMockYtDlpUpdate(page);
+
+		// Version check alone must not show blocking popup
+		await page.evaluate(() => {
+			window.__mockUpdateController.emitStdout("Current version: 2026.11.20\nLatest version: 2026.11.25\n");
+		});
+		expect(await page.locator("#popupBox").isVisible()).toBe(false);
+
+		// Once update download starts, centered blocking popup appears
+		await page.evaluate(() => {
+			window.__mockUpdateController.emitStdout("Updating to nightly@2026.11.25...\n");
+		});
+
+		await expect(page.locator("#popupBox")).toBeVisible();
+		await expect(page.locator("#popup")).toBeVisible();
+		await expect(page.locator("#popupSvg")).toBeVisible();
+		await expect(page.locator("#popupActions")).toBeHidden();
+		await expect(page.locator("#popupMessage")).toHaveText("Updating yt-dlp");
+
+		// Popup is centered and covers the viewport to block pointer actions
+		const boxMetrics = await page.evaluate(() => {
+			const backdrop = document.getElementById("popupBox").getBoundingClientRect();
+			const modal = document.getElementById("popup").getBoundingClientRect();
+			return {
+				backdropW: backdrop.width,
+				backdropH: backdrop.height,
+				winW: window.innerWidth,
+				winH: window.innerHeight,
+				modalCenterX: modal.left + modal.width / 2,
+				modalCenterY: modal.top + modal.height / 2,
+			};
+		});
+		expect(boxMetrics.backdropW).toBe(boxMetrics.winW);
+		expect(boxMetrics.backdropH).toBe(boxMetrics.winH);
+		expect(Math.abs(boxMetrics.modalCenterX - boxMetrics.winW / 2)).toBeLessThan(2);
+		expect(Math.abs(boxMetrics.modalCenterY - boxMetrics.winH / 2)).toBeLessThan(2);
+
+		// Pointer clicks behind overlay and Ctrl+V / getInfo are blocked while updating
+		await clearExecutedCommands(page);
+		await expect(page.click("#pasteUrl", { timeout: 400 })).rejects.toThrow();
+		await page.keyboard.press("Control+v");
+		await page.evaluate((url) => window.app.getInfo(url), testUrl);
+		expect(await getExecutedCommands(page, 0)).toEqual([]);
+
+		// Completing the update hides the blocking popup and restores normal actions
+		await page.evaluate(() => {
+			window.__mockUpdateController.emitStdout("Updated yt-dlp to nightly@2026.11.25\n");
+			window.__mockUpdateController.emitClose(0);
+		});
+
+		await expect(page.locator("#popupBox")).toBeHidden();
+		const isUpdatingAfter = await page.evaluate(() => window.app.state.isUpdatingYtDlp);
+		expect(isUpdatingAfter).toBe(false);
+
+		await page.click("#pasteUrl");
+		await waitForInfoPanel(page);
+	});
+
+	test("yt-dlp update failure unblocks centered popup cleanly", async () => {
+		await startMockYtDlpUpdate(page);
+		await page.evaluate(() => {
+			window.__mockUpdateController.emitStdout("Updating to nightly@2026.11.25...\n");
+		});
+
+		await expect(page.locator("#popupBox")).toBeVisible();
+
+		await page.evaluate(() => {
+			window.__mockUpdateController.emitClose(1);
+		});
+
+		await expect(page.locator("#popupBox")).toBeHidden();
+		const isUpdatingAfter = await page.evaluate(() => window.app.state.isUpdatingYtDlp);
+		expect(isUpdatingAfter).toBe(false);
+	});
 });
 
