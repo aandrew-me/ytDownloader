@@ -157,7 +157,7 @@
 	"themeSolarizedDark": "সোলাররাইসড ডার্ক",
 	"preferredVideoCodec": "পছন্দের ভিডিও কোডেক",
 	"showMoreFormatOptions": "আরও ফরমেট অপসন দেখান",
-	"flatsealPermissionWarning": "আপনাকে এই অ্যাপ তা কে যথাযথ অনুমতি দিতে হবে. এইটা করতে পারেন \"ফ্ল্যাটসিল\" নামক অ্যাপ এর মাদ্ধমে 'filesystem=home' হিসেবে চিহ্নিত পারমিশন তা কে চালু করে দিয়ে|",
+	"flatsealPermissionWarning": "এটি ব্যবহার করার জন্য আপনাকে অ্যাপটিকে হোম ডিরেক্টরি অ্যাক্সেস করার অনুমতি দিতে হবে। আপনি Flatseal-এ 'filesystem=home' চালু করে এটি করতে পারেন। Chromium-ভিত্তিক ব্রাউজারের (Chrome, Brave, Edge ইত্যাদি) জন্য Session Bus Talks-এ 'org.freedesktop.secrets' (অথবা KDE-তে 'org.kde.kwalletd6') যোগ করুন, অথবা এর পরিবর্তে 'ফাইল (Netscape ফরম্যাট)' ব্যবহার করুন।",
 	"noAudio": "অডিও বিহীন",
 	"proxy": "প্রক্সী",
 	"proxySystem": "সিস্টেম",

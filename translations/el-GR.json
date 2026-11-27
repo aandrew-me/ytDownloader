@@ -157,7 +157,7 @@
 	"themeSolarizedDark": "Solarized Dark",
 	"preferredVideoCodec": "Προτιμώμενος κωδικοποιητής βίντεο",
 	"showMoreFormatOptions": "Εμφάνιση περισσότερων επιλογών μορφής",
-	"flatsealPermissionWarning": "Πρέπει να δώσετε στην εφαρμογή άδεια πρόσβασης στον αρχικό κατάλογο για να το χρησιμοποιήσετε. Μπορείτε να το κάνετε με το Flatseal ενεργοποιώντας την άδεια με το κείμενο 'filesystem=home'",
+	"flatsealPermissionWarning": "Πρέπει να δώσετε στην εφαρμογή άδεια πρόσβασης στον αρχικό κατάλογο για να το χρησιμοποιήσετε. Μπορείτε να το κάνετε με το Flatseal ενεργοποιώντας το 'filesystem=home'. Για προγράμματα περιήγησης που βασίζονται στο Chromium (Chrome, Brave, Edge κ.λπ.), προσθέστε επίσης το 'org.freedesktop.secrets' (ή το 'org.kde.kwalletd6' στο KDE) στην ενότητα Session Bus Talks, ή χρησιμοποιήστε το 'Αρχείο (μορφή Netscape)'.",
 	"noAudio": "Χωρίς Ήχο",
 	"proxy": "Διακομιστής Μεσολαβητής (Proxy)",
 	"proxySystem": "Σύστημα",

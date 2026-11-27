@@ -157,7 +157,7 @@
 	"themeSolarizedDark": "Solarized Dark",
 	"preferredVideoCodec": "偏好视频编码器",
 	"showMoreFormatOptions": "显示更多格式选项",
-	"flatsealPermissionWarning": "您需要授予应用程序访问家目录的权限才能使用此功能。您可以使用 Flatseal 并通过 'filesystem=home' 文本来启用权限",
+	"flatsealPermissionWarning": "您需要授予应用程序访问主目录的权限才能使用此功能。您可以使用 Flatseal 启用 'filesystem=home'。对于基于 Chromium 的浏览器（Chrome、Brave、Edge 等），还请在 Session Bus Talks 中添加 'org.freedesktop.secrets'（KDE 上为 'org.kde.kwalletd6'），或改用 '文件 (Netscape 格式)'。",
 	"noAudio": "无音频",
 	"proxy": "代理",
 	"proxySystem": "系统",

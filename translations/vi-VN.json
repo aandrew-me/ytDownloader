@@ -157,7 +157,7 @@
 	"themeSolarizedDark": "Solarized Dark",
 	"preferredVideoCodec": "Codec video ưa thích",
 	"showMoreFormatOptions": "Hiển thị nhiều tùy chọn định dạng hơn",
-	"flatsealPermissionWarning": "Bạn cần cấp quyền truy cập thư mục chính cho ứng dụng để sử dụng tính năng này. Bạn có thể làm điều đó với Flatseal bằng cách bật quyền với văn bản 'filesystem=home'",
+	"flatsealPermissionWarning": "Bạn cần cấp quyền truy cập thư mục chính cho ứng dụng để sử dụng tính năng này. Bạn có thể làm điều đó với Flatseal bằng cách bật 'filesystem=home'. Đối với các trình duyệt dựa trên Chromium (Chrome, Brave, Edge, v.v.), hãy thêm cả 'org.freedesktop.secrets' (hoặc 'org.kde.kwalletd6' trên KDE) vào mục Session Bus Talks, hoặc sử dụng 'Tệp (định dạng Netscape)'.",
 	"noAudio": "Không có Âm thanh",
 	"proxy": "Proxy",
 	"proxySystem": "Hệ thống",

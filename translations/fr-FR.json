@@ -157,7 +157,7 @@
 	"themeSolarizedDark": "Solarisé sombre",
 	"preferredVideoCodec": "Codec vidéo préféré",
 	"showMoreFormatOptions": "Afficher plus d'options de format",
-	"flatsealPermissionWarning": "Vous devez donner à l'application la permission d'accéder au répertoire personnel pour utiliser ceci. Vous pouvez le faire avec Flatseal en activant la permission avec le texte 'filesystem=home'",
+	"flatsealPermissionWarning": "Vous devez donner à l'application la permission d'accéder au répertoire personnel pour utiliser ceci. Vous pouvez le faire avec Flatseal en activant 'filesystem=home'. Pour les navigateurs basés sur Chromium (Chrome, Brave, Edge, etc.), ajoutez également 'org.freedesktop.secrets' (ou 'org.kde.kwalletd6' sous KDE) dans Session Bus Talks, ou utilisez plutôt 'Fichier (format Netscape)'.",
 	"noAudio": "Pas d'Audio",
 	"proxy": "Proxy",
 	"proxySystem": "Système",

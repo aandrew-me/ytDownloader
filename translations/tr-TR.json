@@ -157,7 +157,7 @@
 	"themeSolarizedDark": "Solarized koyu",
 	"preferredVideoCodec": "Tercih edilen video kodeği",
 	"showMoreFormatOptions": "Daha fazla format ayarı göster",
-	"flatsealPermissionWarning": "Bunu kullanmak için uygulamaya ev dizininize erişme izni vermeniz gerekiyor. Flatseal kullanarak bunu yapabilirsiniz: 'filesystem=home' parametresini kullanın",
+	"flatsealPermissionWarning": "Bunu kullanmak için uygulamaya ev dizininize erişme izni vermeniz gerekiyor. Flatseal kullanarak 'filesystem=home' iznini etkinleştirebilirsiniz. Chromium tabanlı tarayıcılar (Chrome, Brave, Edge vb.) için Session Bus Talks altına 'org.freedesktop.secrets' (veya KDE'de 'org.kde.kwalletd6') de ekleyin ya da bunun yerine 'Dosya (Netscape formatı)' kullanın.",
 	"noAudio": "Ses Yok",
 	"proxy": "Proxy",
 	"proxySystem": "Sistem",

@@ -157,7 +157,7 @@
 	"themeSolarizedDark": "تاریک خورشیدی",
 	"preferredVideoCodec": "کدک ویدیویی ترجیح داده شده",
 	"showMoreFormatOptions": "نمایش گزینه های فرمت بیشتر",
-	"flatsealPermissionWarning": "برای استفاده از این باید به برنامه اجازه دسترسی به دایرکتوری اصلی را بدهید. شما می توانید آن را با Flatseal با فعال کردن مجوز با متن 'filesystem=home' انجام دهید",
+	"flatsealPermissionWarning": "برای استفاده از این باید به برنامه اجازه دسترسی به دایرکتوری اصلی را بدهید. می‌توانید با Flatseal و فعال کردن 'filesystem=home' این کار را انجام دهید. برای مرورگرهای مبتنی بر Chromium (مانند Chrome، Brave، Edge و غیره)، همچنین 'org.freedesktop.secrets' (یا 'org.kde.kwalletd6' در KDE) را در بخش Session Bus Talks اضافه کنید، یا از 'فایل (فرمت Netscape)' استفاده کنید.",
 	"noAudio": "بدون صدا",
 	"proxy": "پروکسی",
 	"proxySystem": "سیستم",

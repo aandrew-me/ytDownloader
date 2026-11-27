@@ -160,7 +160,7 @@
 	"preferredVideoCodec": "Preferred video codec",
 	"showMoreFormatOptions": "Show more format options",
 	"embedThumbnail": "Embed thumbnail",
-	"flatsealPermissionWarning": "You need to give the app permission to access home directory to use this. You can do it with Flatseal by enabling the permission with text 'filesystem=home'",
+	"flatsealPermissionWarning": "You need to give the app permission to access home directory to use this. You can do it with Flatseal by enabling 'filesystem=home'. For Chromium-based browsers (Chrome, Brave, Edge, etc.), also add 'org.freedesktop.secrets' (or 'org.kde.kwalletd6' on KDE) under Session Bus Talks, or use 'File (Netscape format)' instead.",
 	"noAudio": "No Audio",
 	"proxy": "Proxy",
 	"proxySystem": "System",

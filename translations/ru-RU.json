@@ -157,7 +157,7 @@
 	"themeSolarizedDark": "Solarized Dark",
 	"preferredVideoCodec": "Предпочтительный видеокодек",
 	"showMoreFormatOptions": "Показать больше опций формата",
-	"flatsealPermissionWarning": "Чтобы использовать эту функцию, нужно предоставить приложению доступ к домашнему каталогу. Это можно сделать в Flatseal, включив разрешение с параметром 'filesystem=home'",
+	"flatsealPermissionWarning": "Чтобы использовать эту функцию, нужно предоставить приложению доступ к домашнему каталогу. Это можно сделать в Flatseal, включив 'filesystem=home'. Для браузеров на базе Chromium (Chrome, Brave, Edge и т. д.) также добавьте 'org.freedesktop.secrets' (или 'org.kde.kwalletd6' в KDE) в разделе Session Bus Talks или используйте 'Файл (формат Netscape)'.",
 	"noAudio": "Без аудио",
 	"proxy": "Прокси",
 	"proxySystem": "Системный",
