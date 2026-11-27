@@ -157,7 +157,7 @@
 	"themeSolarizedDark": "Solarized Dark",
 	"preferredVideoCodec": "Gustukoen bideo codec-a",
 	"showMoreFormatOptions": "Erakutsi formatu-aukera gehiago",
-	"flatsealPermissionWarning": "Home direktorioan sartzeko baimena eman behar diozu aplikazioari. Flatseal-ekin egin dezakezu 'filesystem=home' testuarekin baimena gaituz",
+	"flatsealPermissionWarning": "Home direktorioan sartzeko baimena eman behar diozu aplikazioari hau erabiltzeko. Flatseal-ekin egin dezakezu 'filesystem=home' gaituz. Chromium-en oinarritutako arakatzaileetarako (Chrome, Brave, Edge, etab.), gehitu 'org.freedesktop.secrets' (edo 'org.kde.kwalletd6' KDE-n) Session Bus Talks atalean ere, edo erabili 'Fitxategia (Netscape formatua)'.",
 	"noAudio": "Audiorik ez",
 	"proxy": "Proxy-a",
 	"proxySystem": "Sistema",

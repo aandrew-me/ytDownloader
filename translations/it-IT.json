@@ -157,7 +157,7 @@
 	"themeSolarizedDark": "Solarizzato scuro",
 	"preferredVideoCodec": "Codec video preferito",
 	"showMoreFormatOptions": "Visualizza altre opzioni formato",
-	"flatsealPermissionWarning": "Per usarlo è necessario dare all'app il permesso di accedere alla cartella home.\nPuoi farlo con Flatseal abilitando l'autorizzazione con il testo 'filesystem=home'",
+	"flatsealPermissionWarning": "Per usarlo è necessario dare all'app il permesso di accedere alla cartella home. Puoi farlo con Flatseal abilitando 'filesystem=home'. Per i browser basati su Chromium (Chrome, Brave, Edge, ecc.), aggiungi anche 'org.freedesktop.secrets' (o 'org.kde.kwalletd6' su KDE) in Session Bus Talks, oppure usa 'File (formato Netscape)'.",
 	"noAudio": "Nessun audio",
 	"proxy": "Proxy",
 	"proxySystem": "Sistema",

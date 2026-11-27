@@ -157,7 +157,7 @@
 	"themeSolarizedDark": "Szolarizált sötét",
 	"preferredVideoCodec": "Előnyben részesített videokodek",
 	"showMoreFormatOptions": "További formátumbeállítások megjelenítése",
-	"flatsealPermissionWarning": "Ennek használatához engedélyt kell adnia az alkalmazásnak a home könyvtár eléréséhez. Meg tudod csinálni a Flatseal segítségével, Ha engedélyezed az engedélyt a 'filesystem=home'szöveggel",
+	"flatsealPermissionWarning": "Ennek használatához engedélyt kell adnia az alkalmazásnak a home könyvtár eléréséhez. Ezt a Flatseal segítségével teheti meg a 'filesystem=home' engedélyezésével. Chromium-alapú böngészőkhöz (Chrome, Brave, Edge stb.) adja hozzá az 'org.freedesktop.secrets' (vagy KDE-n az 'org.kde.kwalletd6') elemet is a Session Bus Talks részhez, vagy használja helyette a 'Fájl (Netscape formátum)' lehetőséget.",
 	"noAudio": "Nincs hang",
 	"proxy": "Proxy",
 	"proxySystem": "Rendszer",

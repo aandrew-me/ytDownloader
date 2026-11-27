@@ -157,7 +157,7 @@
 	"themeSolarizedDark": "Solarized ciemny",
 	"preferredVideoCodec": "Preferowany kodek wideo",
 	"showMoreFormatOptions": "Pokaż więcej opcji formatu",
-	"flatsealPermissionWarning": "Aby z tego skorzystać, Musisz zezwolić aplikacji na dostęp do katalogu domowego. Możesz to zrobić za pomocą Flatseal, włączając uprawnienie z tekstem \"filesystem=home\"",
+	"flatsealPermissionWarning": "Aby z tego skorzystać, musisz zezwolić aplikacji na dostęp do katalogu domowego. Możesz to zrobić za pomocą Flatseal, włączając 'filesystem=home'. W przypadku przeglądarek opartych na Chromium (Chrome, Brave, Edge itp.) dodaj także 'org.freedesktop.secrets' (lub 'org.kde.kwalletd6' w KDE) w sekcji Session Bus Talks albo użyj opcji 'Plik (format Netscape)'.",
 	"noAudio": "Bez dźwięku",
 	"proxy": "Proxy",
 	"proxySystem": "Systemowy",

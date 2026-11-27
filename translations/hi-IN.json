@@ -157,7 +157,7 @@
 	"themeSolarizedDark": "सोलराइज़्ड डार्क",
 	"preferredVideoCodec": "पसंदीदा वीडियो कोडेक",
 	"showMoreFormatOptions": "अधिक स्वरूप विकल्प दिखाएँ",
-	"flatsealPermissionWarning": "इसका उपयोग करने के लिए आपको ऐप को होम डायरेक्टरी तक पहुंचने की अनुमति देनी होगी। आप इसे Flatseal के साथ 'filesystem=home' टेक्स्ट के साथ अनुमति सक्षम करके कर सकते हैं",
+	"flatsealPermissionWarning": "इसका उपयोग करने के लिए आपको ऐप को होम डायरेक्टरी तक पहुंचने की अनुमति देनी होगी। आप Flatseal में 'filesystem=home' सक्षम करके यह कर सकते हैं। Chromium-आधारित ब्राउज़र (Chrome, Brave, Edge आदि) के लिए Session Bus Talks में 'org.freedesktop.secrets' (या KDE पर 'org.kde.kwalletd6') भी जोड़ें, या इसके बजाय 'फ़ाइल (Netscape प्रारूप)' का उपयोग करें।",
 	"noAudio": "कोई ऑडियो नहीं",
 	"proxy": "प्रॉक्सी",
 	"proxySystem": "सिस्टम",

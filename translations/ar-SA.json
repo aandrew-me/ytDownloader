@@ -157,7 +157,7 @@
 	"themeSolarizedDark": "داكن مُشمس",
 	"preferredVideoCodec": "ترميز الفيديو المفضل",
 	"showMoreFormatOptions": "إظهار المزيد من خيارات التنسيق",
-	"flatsealPermissionWarning": "تحتاج إلى إعطاء الإذن للتطبيق للوصول إلى المجلد الرئيس لاستخدام هذا. يمكنك ذلك باستخدام Flatseal عن طريق تمكين الإذن ذو النص 'filesystem=home'",
+	"flatsealPermissionWarning": "تحتاج إلى إعطاء الإذن للتطبيق للوصول إلى المجلد الرئيس لاستخدام هذا. يمكنك ذلك باستخدام Flatseal عن طريق تمكين 'filesystem=home'. للمتصفحات المبنية على Chromium (مثل Chrome وBrave وEdge وغيرها)، أضف أيضاً 'org.freedesktop.secrets' (أو 'org.kde.kwalletd6' على KDE) ضمن Session Bus Talks، أو استخدم 'ملف (صيغة Netscape)' بدلاً من ذلك.",
 	"noAudio": "دون صوت",
 	"proxy": "الوكيل",
 	"proxySystem": "النظام",

@@ -157,7 +157,7 @@
 	"themeSolarizedDark": "Solarized, tumma",
 	"preferredVideoCodec": "Ensisijainen videon koodekki",
 	"showMoreFormatOptions": "Näytä lisää muotoiluvaihtoehtoja",
-	"flatsealPermissionWarning": "Sinun on annettava sovellukselle lupa käyttää kotihakemistoa tämän käyttämiseksi. Voit tehdä sen Flatsealilla ottamalla käyttöön oikeudet tekstillä 'filesystem=home'",
+	"flatsealPermissionWarning": "Sinun on annettava sovellukselle lupa käyttää kotihakemistoa tämän käyttämiseksi. Voit tehdä sen Flatsealilla ottamalla käyttöön 'filesystem=home'. Chromium-pohjaisissa selaimissa (Chrome, Brave, Edge jne.) lisää myös 'org.freedesktop.secrets' (tai 'org.kde.kwalletd6' KDE:ssä) kohtaan Session Bus Talks, tai käytä sen sijaan 'Tiedosto (Netscape-muoto)'.",
 	"noAudio": "Ei Ääntä",
 	"proxy": "Välityspalvelin",
 	"proxySystem": "Järjestelmä",

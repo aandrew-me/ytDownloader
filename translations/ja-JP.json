@@ -157,7 +157,7 @@
 	"themeSolarizedDark": "ソーラライズド・ダーク",
 	"preferredVideoCodec": "優先するビデオコーデック",
 	"showMoreFormatOptions": "他のフォーマットオプションを表示",
-	"flatsealPermissionWarning": "これを使用するには、ホームディレクトリにアクセスする権限をアプリに与える必要があります。 テキスト'filesystem=home'で権限を有効にすることで、Flatsealでそれを行うことができます",
+	"flatsealPermissionWarning": "これを使用するには、ホームディレクトリにアクセスする権限をアプリに与える必要があります。Flatsealで 'filesystem=home' を有効にすることで設定できます。Chromiumベースのブラウザ（Chrome、Brave、Edgeなど）の場合は、Session Bus Talksに 'org.freedesktop.secrets'（KDEでは 'org.kde.kwalletd6'）も追加するか、代わりに 'ファイル (Netscape形式)' を使用してください。",
 	"noAudio": "オーディオなし",
 	"proxy": "プロキシ",
 	"proxySystem": "システム",
