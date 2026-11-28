@@ -12,4 +12,5 @@ deno*
 node.exe
 node
 !ffmpeg.png
+!ffmpeg-integration.js
 test-results

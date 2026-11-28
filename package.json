@@ -10,6 +10,7 @@
 	"scripts": {
 		"start": "electron .",
 		"test": "playwright test",
+		"test:ffmpeg": "node tests/ffmpeg-integration.js",
 		"dist": "electron-builder",
 		"debug": "electron --inspect=5858 .",
 		"windows": "electron-builder -w",
