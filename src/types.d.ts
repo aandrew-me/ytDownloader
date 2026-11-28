@@ -107,6 +107,7 @@ interface ElectronAPI {
     constants: { W_OK: number; F_OK: number; R_OK: number; X_OK: number };
     isTest: boolean;
     windowsStore: boolean;
+    execPath: string;
     __dirname: string;
     si: { graphics(): Promise<any> };
     crypto: {

@@ -111,12 +111,19 @@ function getSafeCwd(explicitCwd) {
 	return os.tmpdir();
 }
 
+function prepareYTDlpOptions(options, cancellationSignal) {
+	const { options: localOpts, signal: realSignal } = normalizeSignal(options, cancellationSignal);
+	localOpts.cwd = getSafeCwd(localOpts.cwd);
+	// Allow yt-dlp to invoke Electron's own binary (process.execPath) as Node.js
+	localOpts.env = { ...process.env, ...localOpts.env, ELECTRON_RUN_AS_NODE: "1" };
+	return { localOpts, realSignal };
+}
+
 function createYTDlpWrapInstance(binaryPath) {
 	const instance = new YTDlpWrap(binaryPath);
 	return {
 		exec: (args = [], options = {}, cancellationSignal) => {
-			const { options: localOpts, signal: realSignal } = normalizeSignal(options, cancellationSignal);
-			localOpts.cwd = getSafeCwd(localOpts.cwd);
+			const { localOpts, realSignal } = prepareYTDlpOptions(options, cancellationSignal);
 			const proc = instance.exec(args, localOpts, realSignal);
 			const spawnargs =
 				proc.ytDlpProcess && proc.ytDlpProcess.spawnargs
@@ -182,8 +189,7 @@ function createYTDlpWrapInstance(binaryPath) {
 			return procWrapper;
 		},
 		execPromise: (args = [], options = {}, cancellationSignal) => {
-			const { options: localOpts, signal: realSignal } = normalizeSignal(options, cancellationSignal);
-			localOpts.cwd = getSafeCwd(localOpts.cwd);
+			const { localOpts, realSignal } = prepareYTDlpOptions(options, cancellationSignal);
 			return instance.execPromise(args, localOpts, realSignal);
 		},
 		getExtractorTitles: () => {
@@ -439,6 +445,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	},
 	isTest: process.env.NODE_ENV === "test" || process.argv.includes("--is-test") || process.env.YTDOWNLOADER_TEST === "true",
 	windowsStore: process.windowsStore,
+	execPath: process.execPath,
 	__dirname: path.join(__dirname, "html"),
 	webFrame: {
 		setZoomFactor: (factor) => webFrame.setZoomFactor(factor),

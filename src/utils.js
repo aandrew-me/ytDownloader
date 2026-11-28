@@ -262,7 +262,7 @@ export function getFfprobePath() {
  * @returns {Promise<string>}
  */
 export async function getJsRuntimePath() {
-	const { env, platform, __dirname, windowsStore, homedir, fs, join, execSync } = window.electronAPI;
+	const { env, platform, __dirname, windowsStore, homedir, fs, join, execSync, execPath } = window.electronAPI;
 	const existsSync = fs.existsSync;
 	const copyFileSync = fs.copyFileSync;
 	const mkdirSync = fs.mkdirSync;
@@ -286,7 +286,12 @@ export async function getJsRuntimePath() {
 		return "";
 	}
 
-	// Priority 3: System-installed Deno / Node (macOS Fallback)
+	// Priority 3: Reuse Electron's own Node.js runtime (invoked with ELECTRON_RUN_AS_NODE=1)
+	if (execPath && existsSync(execPath)) {
+		return `${exeName}:${execPath}`;
+	}
+
+	// Priority 4: System-installed Deno / Node (macOS Fallback)
 	if (platform() === "darwin") {
 		const userDeno = homedir ? join(homedir(), ".deno", "bin", "deno") : "";
 		const possiblePaths = [
@@ -332,7 +337,7 @@ export async function getJsRuntimePath() {
 		return "";
 	}
 
-	// Priority 4: Bundled Node Runtime
+	// Priority 5: Bundled Node Runtime fallback
 	const isWin = platform() === "win32";
 	const nodeName = isWin ? "node.exe" : "node";
 
