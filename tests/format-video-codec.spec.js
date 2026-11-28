@@ -150,6 +150,57 @@ test.describe("getJsRuntimePath macOS", () => {
 			global.window = originalWindow;
 		}
 	});
+
+	test("falls back to Electron execPath when no system or bundled node exists", async () => {
+		const originalWindow = global.window;
+		global.window = {
+			electronAPI: {
+				env: {},
+				platform: () => "win32",
+				__dirname: "C:\\app\\html",
+				windowsStore: false,
+				homedir: () => "C:\\Users\\test",
+				execPath: "C:\\app\\YTDownloader.exe",
+				join: (...parts) => parts.join("\\"),
+				fs: {
+					existsSync: (p) => p === "C:\\app\\YTDownloader.exe",
+				},
+			},
+		};
+		try {
+			expect(await getJsRuntimePath()).toBe("node:C:\\app\\YTDownloader.exe");
+		} finally {
+			global.window = originalWindow;
+		}
+	});
+
+	test("prefers Electron execPath over system deno/node on macOS", async () => {
+		const originalWindow = global.window;
+		global.window = {
+			electronAPI: {
+				env: {},
+				platform: () => "darwin",
+				__dirname: "/app/html",
+				windowsStore: false,
+				homedir: () => "/Users/test",
+				execPath: "/Applications/YTDownloader.app/Contents/MacOS/YTDownloader",
+				join: (...parts) => parts.join("/"),
+				fs: {
+					existsSync: (p) =>
+						p === "/Applications/YTDownloader.app/Contents/MacOS/YTDownloader" ||
+						p === "/opt/homebrew/bin/deno" ||
+						p === "/usr/local/bin/node",
+				},
+			},
+		};
+		try {
+			expect(await getJsRuntimePath()).toBe(
+				"node:/Applications/YTDownloader.app/Contents/MacOS/YTDownloader",
+			);
+		} finally {
+			global.window = originalWindow;
+		}
+	});
 });
 
 test.describe("timeToSeconds", () => {

@@ -58,8 +58,7 @@
 			"./src/*.js",
 			"./ffmpeg/**/*",
 			"!ffmpeg.patch",
-			"translations",
-			"node*"
+			"translations"
 		],
 		"electronLanguages": [
 			"en-US"
